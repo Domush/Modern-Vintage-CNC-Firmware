@@ -522,9 +522,20 @@ void GCodeQueue::get_serial_commands() {
         #if DISABLED(EMERGENCY_PARSER)
           // Process critical commands early
           if (command[0] == 'M') switch (command[3]) {
-            case '8': if (command[2] == '0' && command[1] == '1') { wait_for_heatup = false; TERN_(HAS_LCD_MENU, wait_for_user = false); } break;
-            case '2': if (command[2] == '1' && command[1] == '1') kill(FPSTR(M112_KILL_STR), nullptr, true); break;
-            case '0': if (command[1] == '4' && command[2] == '1') quickstop_stepper(); break;
+            case '8':
+              // continue from M0/M1
+              if (command[2] == '0' && command[1] == '1') { wait_for_heatup = false; TERN_(HAS_LCD_MENU, wait_for_user = false); } break;
+            case '2':
+              // kill
+              if (command[2] == '1' && command[1] == '1') kill(FPSTR(M112_KILL_STR), nullptr, true); break;
+            case '0':
+              // quick stop
+              if (command[1] == '4' && command[2] == '1') quickstop_stepper(); break;
+              // Feed rate adjustment - process immediately
+              if (command[2] == '2' && command[1] == '2') {
+                inject(command);
+                break;
+              }
           }
         #endif
 
