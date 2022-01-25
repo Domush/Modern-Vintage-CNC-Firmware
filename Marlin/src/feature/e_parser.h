@@ -35,11 +35,11 @@
 extern bool wait_for_user, wait_for_heatup;
 extern int16_t feedrate_percentage;
 
-#if ENABLED(REALTIME_REPORTING_COMMANDS)
-// From motion.h, which cannot be included here
-void report_current_position_moving();
-void quickpause_stepper();
-void quickresume_stepper();
+#if ENABLED(REALTIME_COMMANDS)
+  // From motion.h, which cannot be included here
+  void report_current_position_moving();
+  void quickpause_stepper();
+  void quickresume_stepper();
 #endif
 
 void HAL_reboot();
@@ -56,6 +56,7 @@ class EmergencyParser {
     EP_M108,
     EP_M11,
     EP_M112,
+  #if ENABLED(REALTIME_FEEDRATE_CHANGES)
     EP_M2,
     EP_M22,
     EP_M220,
@@ -63,17 +64,18 @@ class EmergencyParser {
     EP_M220SN,
     EP_M220SNN,
     EP_M220SNNN,
+  #endif
     EP_M4,
     EP_M41,
     EP_M410,
-#if ENABLED(HOST_PROMPT_SUPPORT)
+  #if ENABLED(HOST_PROMPT_SUPPORT)
     EP_M8,
     EP_M87,
     EP_M876,
     EP_M876S,
     EP_M876SN,
-#endif
-#if ENABLED(REALTIME_REPORTING_COMMANDS)
+  #endif
+  #if ENABLED(REALTIME_COMMANDS)
     EP_S,
     EP_S0,
     EP_S00,
@@ -86,20 +88,22 @@ class EmergencyParser {
     EP_P0,
     EP_P00,
     EP_GRBL_PAUSE,
-#endif
-#if ENABLED(SOFT_RESET_VIA_SERIAL)
+  #endif
+  #if ENABLED(SOFT_RESET_VIA_SERIAL)
     EP_ctrl,
     EP_K,
     EP_KI,
     EP_KIL,
     EP_KILL,
-#endif
+  #endif
     EP_IGNORE // to '\n'
   };
 
   static bool killed_by_M112;
   static bool quickstop_by_M410;
+#if ENABLED(REALTIME_FEEDRATE_CHANGES)
   static int16_t M220_rate;
+#endif
 
 #if ENABLED(HOST_PROMPT_SUPPORT)
   static uint8_t M876_reason;
@@ -124,7 +128,7 @@ class EmergencyParser {
           case 'M':
             state = EP_M;
             break;
-#if ENABLED(REALTIME_REPORTING_COMMANDS)
+#if ENABLED(REALTIME_COMMANDS)
           case 'S':
             state = EP_S;
             break;
@@ -157,7 +161,7 @@ class EmergencyParser {
           case 'M':
             state = EP_M;
             break;
-#if ENABLED(REALTIME_REPORTING_COMMANDS)
+#if ENABLED(REALTIME_COMMANDS)
           case 'S':
             state = EP_S;
             break;
@@ -173,7 +177,7 @@ class EmergencyParser {
         }
         break;
 
-#if ENABLED(REALTIME_REPORTING_COMMANDS)
+#if ENABLED(REALTIME_COMMANDS)
       case EP_S:
         state = (c == '0') ? EP_S0 : EP_IGNORE;
         break;
@@ -227,9 +231,11 @@ class EmergencyParser {
           case '1':
             state = EP_M1;
             break;
+#if ENABLED(REALTIME_FEEDRATE_CHANGES)
           case '2':
             state = EP_M2;
             break;
+#endif
           case '4':
             state = EP_M4;
             break;
@@ -256,6 +262,7 @@ class EmergencyParser {
         }
         break;
 
+#if ENABLED(REALTIME_FEEDRATE_CHANGES)
         // Feed rate
       case EP_M2:
         state = (c == '2') ? EP_M22 : EP_IGNORE;
@@ -263,6 +270,7 @@ class EmergencyParser {
       case EP_M22:
         state = (c == '0') ? EP_M220 : EP_IGNORE;
         break;
+#endif
 
         // Resume
       case EP_M10:
@@ -315,6 +323,7 @@ class EmergencyParser {
         break;
 
 #endif // HOST_PROMPT_SUPPORT
+#if ENABLED(REALTIME_FEEDRATE_CHANGES)
       // Process M220 (feed rate)
       case EP_M220:
         switch (c) {
@@ -364,7 +373,7 @@ class EmergencyParser {
             break;
         }
         break;
-        // end process feedrate
+#endif // REALTIME_FEEDRATE_CHANGES
 
       case EP_IGNORE:
         if (ISEOL(c)) state = EP_RESET;
@@ -382,6 +391,7 @@ class EmergencyParser {
               case EP_M410:
                 quickstop_by_M410 = true;
                 break;
+#if ENABLED(REALTIME_FEEDRATE_CHANGES)
               case EP_M220SN:
               case EP_M220SNN:
               case EP_M220SNNN:
@@ -395,12 +405,13 @@ class EmergencyParser {
                   feedrate_percentage = M220_rate;
                 }
                 break;
+#endif
 #if ENABLED(HOST_PROMPT_SUPPORT)
               case EP_M876SN:
                 hostui.handle_response(M876_reason);
                 break;
 #endif
-#if ENABLED(REALTIME_REPORTING_COMMANDS)
+#if ENABLED(REALTIME_COMMANDS)
               case EP_GRBL_STATUS:
                 report_current_position_moving();
                 break;

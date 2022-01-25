@@ -248,7 +248,7 @@ void report_current_position_projected() {
   AutoReporter<PositionReport> position_auto_reporter;
 #endif
 
-#if EITHER(FULL_REPORT_TO_HOST_FEATURE, REALTIME_REPORTING_COMMANDS)
+#if EITHER(REPORT_STATUS_TO_HOST, REALTIME_COMMANDS)
 
   M_StateEnum M_State_grbl = M_INIT;
 
@@ -316,7 +316,7 @@ void quickstop_stepper() {
   sync_plan_position();
 }
 
-#if ENABLED(REALTIME_REPORTING_COMMANDS)
+#if ENABLED(REALTIME_COMMANDS)
 
   void quickpause_stepper() {
     planner.quick_pause();

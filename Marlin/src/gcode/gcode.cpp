@@ -347,8 +347,10 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 6: G6(); break;                                      // G6: Direct Stepper Move
       #endif
 
+      #if EITHER(FWRETRACT, CNC_COORDINATE_SYSTEMS)
+        case 10: G10(); break;                                    // G10: Retract / Swap Retract, CNC work offsets
+      #endif
       #if ENABLED(FWRETRACT)
-        case 10: G10(); break;                                    // G10: Retract / Swap Retract
         case 11: G11(); break;                                    // G11: Recover / Swap Recover
       #endif
 
@@ -366,7 +368,9 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 20: G20(); break;                                    // G20: Inch Mode
         case 21: G21(); break;                                    // G21: MM Mode
       #else
-        case 21: NOOP; break;                                     // No error on unknown G21
+      case 21:
+        NOOP;
+        break; // No error on unknown G21
       #endif
 
       #if ENABLED(G26_MESH_VALIDATION)
@@ -1070,7 +1074,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       case 'D': D(parser.codenum); break;                         // Dn: Debug codes
     #endif
 
-    #if ENABLED(REALTIME_REPORTING_COMMANDS)
+    #if ENABLED(REALTIME_COMMANDS)
       case 'S': case 'P': case 'R': break;                        // Invalid S, P, R commands already filtered
     #endif
 
@@ -1173,15 +1177,15 @@ void GcodeSuite::process_subcommands_now(char * gcode) {
         case IN_HANDLER:
         case IN_PROCESS:
           SERIAL_ECHO_MSG(STR_BUSY_PROCESSING);
-          TERN_(FULL_REPORT_TO_HOST_FEATURE, report_current_position_moving());
+          TERN_(REPORT_STATUS_TO_HOST, report_current_position_moving());
           break;
         case PAUSED_FOR_USER:
           SERIAL_ECHO_MSG(STR_BUSY_PAUSED_FOR_USER);
-          TERN_(FULL_REPORT_TO_HOST_FEATURE, set_and_report_grblstate(M_HOLD));
+          TERN_(REPORT_STATUS_TO_HOST, set_and_report_grblstate(M_HOLD));
           break;
         case PAUSED_FOR_INPUT:
           SERIAL_ECHO_MSG(STR_BUSY_PAUSED_FOR_INPUT);
-          TERN_(FULL_REPORT_TO_HOST_FEATURE, set_and_report_grblstate(M_HOLD));
+          TERN_(REPORT_STATUS_TO_HOST, set_and_report_grblstate(M_HOLD));
           break;
         default:
           break;

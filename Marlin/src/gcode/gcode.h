@@ -44,7 +44,7 @@
  * G3   - CCW ARC
  * G4   - Dwell S<seconds> or P<milliseconds>
  * G5   - Cubic B-spline with XYZE destination and IJPQ offsets
- * G10  - Retract filament according to settings of M207 (Requires FWRETRACT)
+ * G10  - Retract filament according to settings of M207 (Requires FWRETRACT), Set CNC tool offsets (Requires CNC_COORDINATE_SYSTEMS)
  * G11  - Retract recover filament according to settings of M208 (Requires FWRETRACT)
  * G12  - Clean tool (Requires NOZZLE_CLEAN_FEATURE)
  * G17  - Select Plane XY (Requires CNC_WORKSPACE_PLANES)
@@ -487,8 +487,11 @@ private:
     static void G6();
   #endif
 
-  #if ENABLED(FWRETRACT)
+  #if EITHER(FWRETRACT, CNC_COORDINATE_SYSTEMS)
     static void G10();
+  #endif
+
+  #if ENABLED(FWRETRACT)
     static void G11();
   #endif
 

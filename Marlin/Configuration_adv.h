@@ -2301,38 +2301,66 @@
  *
  * Add a low-level parser to intercept certain commands as they
  * enter the serial receive buffer, so they cannot be blocked.
- * Currently handles M108, M112, M410, M876
+ * Currently handles M108, M112, M410, M876 (optionally M220)
  * NOTE: Not yet implemented for all platforms.
  */
 #define EMERGENCY_PARSER
-
-/**
- * Realtime Reporting (requires EMERGENCY_PARSER)
- *
- * - Report position and state of the machine (like Grbl).
- * - Auto-report position during long moves.
- * - Useful for CNC/LASER.
- *
- * Adds support for commands:
- *  S000 : Report State and Position while moving.
- *  P000 : Instant Pause / Hold while moving.
- *  R000 : Resume from Pause / Hold.
- *
- * - During Hold all Emergency Parser commands are available, as usual.
- * - Enable NANODLP_Z_SYNC and NANODLP_ALL_AXIS for move command end-state reports.
- */
-#define REALTIME_REPORTING_COMMANDS
-#if ENABLED(REALTIME_REPORTING_COMMANDS)
-  //#define FULL_REPORT_TO_HOST_FEATURE   // Auto-report the machine status like Grbl CNC
+#if ENABLED(EMERGENCY_PARSER)
+  /**
+   * Realtime Commands
+   *
+   * Adds support for special real-time commands:
+   *  S000 : Report State and Position (works even while moving).
+   *  P000 : Instant Pause / Hold while moving.
+   *  R000 : Resume from Pause / Hold.
+   *
+   * - During Hold all Emergency Parser commands are available, as usual.
+   */
+  #define REALTIME_COMMANDS
 #endif
 
-// Bad Serial-connections can miss a received command by sending an 'ok'
-// Therefore some clients abort after 30 seconds in a timeout.
-// Some other clients start sending commands while receiving a 'wait'.
-// This "wait" is only sent when the buffer is empty. 1 second is a good value here.
-//#define NO_TIMEOUTS 1000 // Milliseconds
+// Normally, feed rate (M220) changes will be queued, causing a lengthy delay
+// (even executing after the job is completed) with large receive buffers.
+// Enable this to prioritize these adjustments to near real-time.
+#define REALTIME_FEEDRATE_CHANGES // "M220 S<percent>" feed rate adjustments will be executed immediately instead of queued
 
-// Some clients will have this feature soon. This could make the NO_TIMEOUTS unnecessary.
+/**
+ * Send machine status updates to host (Useful for CNC/Laser)
+ *
+ * - Auto-report state of the machine (like GRBL does) in numerical format.
+ * - Auto-report position during long moves.
+ *
+ * Possible Marlin statuses (GRBL-compatible equivalent)
+ * 0: MF_INITIALIZING    (M_INIT)
+ * 1: MF_SD_COMPLETE     (M_ALARM)
+ * 2: MF_WAITING         (M_IDLE)
+ * 3: MF_STOPPED         (M_END)
+ * 4: MF_RUNNING         (M_RUNNING)
+ * 5: MF_PAUSED          (M_HOLD)
+ * 6: MF_KILLED          (M_ERROR)
+ */
+#define REPORT_STATUS_TO_HOST // Send regular machine status updates to host in GRBL format ("S_XYZ: #")
+#if ENABLED(REPORT_STATUS_TO_HOST)
+  // Enable to use an abbreviated work-position/machine-position/units/tool/coordinate-system/etc status report
+  // designed to relay maximum information to the host in the smallest number of bytes (not very human-readable)
+  // Example: STAT|X10.000:Y100.000:Z0.5|X20.000:Y120.000:Z10.5|1|0|1|2|110|2
+  // Legend:  Status header [STAT], Work coords (G92), Machine coords (G53), Metric [1] (G21), Absolute positioning [0] (G90),
+  //          Tool #[1], Coord set [2] (G55), Feed rate override [110]% (M220 S110), Status: MF_WAITING [2]
+  //
+  // As you can see, quite a bit of info is transmitted to hosts which support it, saving multiple verbose queries.
+  #define COMPACT_STATUS_REPORTS
+
+  // Report status during long moves
+  // Only enable if needed, it is very verbose and will cause the console to scroll quickly
+  #define REPORT_STATUS_DURING_MOVES
+#endif
+
+// Bad serial connections can cause a sent command to be missed, therefore some clients will abort after 30 seconds in a timeout.
+// Supporting clients will resume sending commands if they receive a "wait" (waiting for command) message.
+// This "wait" message is only sent when the buffer is empty. Every 1000 milliseconds (1 sec) is a good value here.
+#define TIMEOUT_PREVENTION_DELAY 20000 // "wait" message delay in Milliseconds
+
+// Some clients will have this feature soon. This will make the "wait" (TIMEOUT_PREVENTION_DELAY) message unnecessary.
 //#define ADVANCED_OK
 
 // Printrun may have trouble receiving long strings all at once.
@@ -3703,30 +3731,6 @@
 //#define DISABLE_DRIVER_SAFE_POWER_PROTECT
 
 /**
- * CNC Coordinate Systems
- *
- * Enables G53 and G54-G59.3 commands to select coordinate systems
- * and G92.1 to reset the workspace to native machine space.
- */
-#define CNC_COORDINATE_SYSTEMS
-
-/**
- * Auto-report fan speed with M123 S<seconds>
- * Requires fans with tachometer pins
- */
-//#define AUTO_REPORT_FANS
-
-/**
- * Auto-report temperatures with M155 S<seconds>
- */
-// #define AUTO_REPORT_TEMPERATURES
-
-/**
- * Auto-report position with M154 S<seconds>
- */
-#define AUTO_REPORT_POSITION
-
-/**
  * Include capabilities in M115 output
  */
 #define EXTENDED_CAPABILITIES_REPORT
@@ -3779,11 +3783,40 @@
 //#define NO_WORKSPACE_OFFSETS
 
 // Extra options for the M114 "Current Position" report
-//#define M114_DETAIL         // Use 'M114` for details to check planner calculations
-#define M114_REALTIME       // Real current position based on forward kinematics
-#define M114_LEGACY         // M114 used to synchronize on every call. Enable if needed.
+#define M114_DETAIL         // Enable 'M114 D' for highly detailed position reports and to check planner calculations
+#define M114_REALTIME       // Calculate Real-time current position based on forward kinematics
+// #define M114_LEGACY         // Calling M114 will force a planner synchronize. May cause stuttering, enable only if needed.
+#define M114_RAPID_REPORTING   // Outputs M114 position report to host after every G0 (rapid) move (for faster host UI updates)
 
-#define REPORT_FAN_CHANGE   // Report the new fan speed when changed by M106 (and others)
+/**
+ * CNC Coordinate Systems
+ *
+ * Enables G53 and G54-G59.3 commands to select coordinate systems
+ * and G92.1 to reset the workspace to native machine space.
+ */
+#define CNC_COORDINATE_SYSTEMS
+
+#if ENABLED(CNC_COORDINATE_SYSTEMS)
+  #define REPORT_MACHINE_COORDINATES // Returns both Work and Machine coordinates in default M114 report, similar to GRBL.
+#endif
+
+/**
+ * Auto-report fan speed with M123 S<seconds>
+ * Requires fans with tachometer pins
+ */
+//#define AUTO_REPORT_FANS
+
+/**
+ * Auto-report temperatures with M155 S<seconds>
+ */
+// #define AUTO_REPORT_TEMPERATURES
+
+/**
+ * Auto-report position with M154 S<seconds>
+ */
+#define AUTO_REPORT_POSITION
+
+#define REPORT_FAN_CHANGE // Report the new fan speed when changed by M106 (and others)
 
 /**
  * Set the number of proportional font spaces required to fill up a typical character space.

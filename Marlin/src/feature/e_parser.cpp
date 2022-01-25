@@ -30,17 +30,19 @@
 
   #include "e_parser.h"
 
-// Static data members
-bool EmergencyParser::killed_by_M112, // = false
-    EmergencyParser::quickstop_by_M410,
-    EmergencyParser::enabled;
-int16_t EmergencyParser::M220_rate; // Feed rate = 100
-
-  #if ENABLED(HOST_PROMPT_SUPPORT)
-uint8_t EmergencyParser::M876_reason; // = 0
+  // Static data members
+  bool EmergencyParser::killed_by_M112, // = false
+      EmergencyParser::quickstop_by_M410,
+      EmergencyParser::enabled;
+  #if ENABLED(REALTIME_FEEDRATE_CHANGES)
+    int16_t EmergencyParser::M220_rate; // Feed rate = 100
   #endif
 
-// Global instance
-EmergencyParser emergency_parser;
+  #if ENABLED(HOST_PROMPT_SUPPORT)
+    uint8_t EmergencyParser::M876_reason; // = 0
+  #endif
+
+  // Global instance
+  EmergencyParser emergency_parser;
 
 #endif // EMERGENCY_PARSER
