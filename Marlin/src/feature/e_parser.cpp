@@ -24,7 +24,8 @@
  * e_parser.cpp - Intercept special commands directly in the serial stream
  */
 
-#include "../inc/MarlinConfigPre.h"
+#include "../inc/MarlinConfig.h"
+// #include "../inc/MarlinConfigPre.h"
 
 #if ENABLED(EMERGENCY_PARSER)
 
@@ -34,6 +35,7 @@
   bool EmergencyParser::killed_by_M112, // = false
       EmergencyParser::quickstop_by_M410,
       EmergencyParser::enabled;
+
   #if ENABLED(REALTIME_FEEDRATE_CHANGES)
     int16_t EmergencyParser::M220_rate; // Feed rate = 100
   #endif

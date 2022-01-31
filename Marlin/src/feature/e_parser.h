@@ -42,6 +42,15 @@ extern int16_t feedrate_percentage;
   void quickresume_stepper();
 #endif
 
+#if ENABLED(REALTIME_FEEDRATE_CHANGES)
+  // From motion.h, which cannot be included here
+  // static float saved_feedrate_mm_s;
+  // static int16_t saved_feedrate_percentage;
+  // static int16_t backup_feedrate_percentage = 100;
+  void restore_feedrate_and_scaling();
+  void remember_feedrate_and_scaling();
+#endif
+
 void HAL_reboot();
 
 class EmergencyParser {
@@ -270,6 +279,67 @@ class EmergencyParser {
       case EP_M22:
         state = (c == '0') ? EP_M220 : EP_IGNORE;
         break;
+      // Process M220 (feed rate)
+      case EP_M220:
+        switch (c) {
+          case ' ':
+            break;
+          case 'S':
+            state = EP_M220S;
+            break;
+          case 'B':
+            remember_feedrate_and_scaling();
+            state = EP_IGNORE;
+            break;
+          case 'R':
+            restore_feedrate_and_scaling();
+            state = EP_IGNORE;
+            break;
+          default:
+            state = EP_IGNORE;
+            break;
+        }
+        break;
+
+      case EP_M220S:
+        switch (c) {
+          case '0' ... '9':
+            state     = EP_M220SN;
+            M220_rate = int16_t(c - '0');
+            break;
+          default: state = EP_IGNORE;
+        }
+        break;
+
+      case EP_M220SN:
+        switch (c) {
+          case '0' ... '9':
+            state     = EP_M220SNN;
+            M220_rate = int16_t(c - '0');
+            break;
+          default: state = EP_IGNORE;
+        }
+        break;
+
+      case EP_M220SNN:
+        switch (c) {
+          case '0' ... '9':
+            state     = EP_M220SNNN;
+            M220_rate = int16_t((M220_rate * 10) + (c - '0'));
+            break;
+          default: state = EP_IGNORE;
+        }
+        break;
+
+      case EP_M220SNNN:
+        switch (c) {
+          case '0' ... '9':
+            state               = EP_M220SNNN;
+            feedrate_percentage = int16_t((M220_rate * 10) + (c - '0'));
+            break;
+          default: state = EP_IGNORE;
+        }
+        break;
 #endif
 
         // Resume
@@ -323,57 +393,6 @@ class EmergencyParser {
         break;
 
 #endif // HOST_PROMPT_SUPPORT
-#if ENABLED(REALTIME_FEEDRATE_CHANGES)
-      // Process M220 (feed rate)
-      case EP_M220:
-        switch (c) {
-          case ' ':
-            break;
-          case 'S':
-            state = EP_M220S;
-            break;
-          default:
-            state = EP_IGNORE;
-            break;
-        }
-        break;
-
-      case EP_M220S:
-        switch (c) {
-          case '0' ... '9':
-            state     = EP_M220SN;
-            M220_rate = int16_t(c - '0');
-            break;
-        }
-        break;
-
-      case EP_M220SN:
-        switch (c) {
-          case '0' ... '9':
-            state     = EP_M220SNN;
-            M220_rate = int16_t(c - '0');
-            break;
-        }
-        break;
-
-      case EP_M220SNN:
-        switch (c) {
-          case '0' ... '9':
-            state     = EP_M220SNNN;
-            M220_rate = int16_t((M220_rate * 10) + (c - '0'));
-            break;
-        }
-        break;
-
-      case EP_M220SNNN:
-        switch (c) {
-          case '0' ... '9':
-            state               = EP_M220SNNN;
-            feedrate_percentage = int16_t((M220_rate * 10) + (c - '0'));
-            break;
-        }
-        break;
-#endif // REALTIME_FEEDRATE_CHANGES
 
       case EP_IGNORE:
         if (ISEOL(c)) state = EP_RESET;
@@ -395,13 +414,8 @@ class EmergencyParser {
               case EP_M220SN:
               case EP_M220SNN:
               case EP_M220SNNN:
-                if (M220_rate == 0) {
-                  feedrate_percentage = 100;
-                } else if (M220_rate > 499) {
-                  feedrate_percentage = 500;
-                } else if (M220_rate < 2) {
-                  feedrate_percentage = 1;
-                } else {
+                LIMIT(M220_rate, 10, 999);
+                if (M220_rate != feedrate_percentage) {
                   feedrate_percentage = M220_rate;
                 }
                 break;

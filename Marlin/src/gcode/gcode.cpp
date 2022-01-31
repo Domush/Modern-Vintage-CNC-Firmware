@@ -573,15 +573,15 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       case 110: M110(); break;                                    // M110: Set Current Line Number
       case 111: M111(); break;                                    // M111: Set debug level
 
-      #if DISABLED(EMERGENCY_PARSER)
-        case 108: M108(); break;                                  // M108: Cancel Waiting
-        case 112: M112(); break;                                  // M112: Full Shutdown
-        case 410: M410(); break;                                  // M410: Quickstop - Abort all the planned moves.
-        TERN_(HOST_PROMPT_SUPPORT, case 876:)                     // M876: Handle Host prompt responses
-      #else
+      #if ENABLED(EMERGENCY_PARSER)                               // Don't respond to features handled by the E-parser
         case 108: case 112: case 410:
         TERN_(HOST_PROMPT_SUPPORT, case 876:)
         break;
+      #else
+        case 108: M108(); break;                                  // M108: Cancel Waiting
+        case 112: M112(); break;                                  // M112: Full Shutdown
+        case 410: M410(); break;                                  // M410: Quickstop - Abort all the planned moves.
+        case 876: TERN_(HOST_PROMPT_SUPPORT, M876()); break;      // M876: Handle Host prompt responses
       #endif
 
       #if ENABLED(HOST_KEEPALIVE_FEATURE)
@@ -722,7 +722,11 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 218: M218(); break;                                  // M218: Set a tool offset
       #endif
 
-      case 220: M220(); break;                                    // M220: Set Feedrate Percentage: S<percent> ("FR" on your LCD)
+      #if BOTH(EMERGENCY_PARSER, REALTIME_FEEDRATE_CHANGES)
+        case 220: break;
+      #else
+        case 220: M220(); break;                                  // M220: Set Feedrate Percentage: S<percent> ("FR" on your LCD)
+      #endif
 
       #if HAS_EXTRUDERS
         case 221: M221(); break;                                  // M221: Set Flow Percentage
