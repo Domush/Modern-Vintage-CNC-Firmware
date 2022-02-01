@@ -30,7 +30,7 @@
   #include "../gcode.h"
   #include "../../module/motion.h"
   #include "../../module/stepper.h"
-  #define DEBUG_G10
+  // #define DEBUG_G10
 
 /**
  * G10 S#         - Retract filament according to settings of M207
