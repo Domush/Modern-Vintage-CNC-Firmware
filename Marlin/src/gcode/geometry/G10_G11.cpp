@@ -53,7 +53,7 @@ void GcodeSuite::G10() {
                 offset_type   = parser.intval('L');
 
     if (WITHIN(target_system, 0, MAX_COORDINATE_SYSTEMS - 1)) {
-      const int8_t current_system = GcodeSuite::active_coordinate_system; // Store current coord system
+      const int8_t current_system = gcode.active_coordinate_system; // Store current coord system
       if (current_system != target_system) {
         gcode.select_coordinate_system(target_system); // Select New Coordinate System If Needed
         #if ENABLED(DEBUG_G10)
@@ -94,11 +94,11 @@ void GcodeSuite::G10() {
           }
           break;
       }
-      GcodeSuite::coordinate_system[GcodeSuite::active_coordinate_system] = position_shift;
-      #if ENABLED(DEBUG_G10)
-        SERIAL_ECHOLNPGM("New position for workspace ", target_system);
-        report_current_position();
-      #endif
+      gcode.coordinate_system[gcode.active_coordinate_system] = position_shift;
+    #if ENABLED(DEBUG_G10)
+      SERIAL_ECHOLNPGM("New position for workspace ", target_system);
+      report_current_position();
+    #endif
       if (current_system != target_system) {
         gcode.select_coordinate_system(current_system);
       }
