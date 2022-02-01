@@ -288,10 +288,10 @@ void report_real_position() {
     report_compact_status(npos);
   #else
     report_logical_position(npos);
-    report_more_positions();
     #ifdef REPORT_MACHINE_POSITION
       report_machine_position(npos);
     #endif
+    report_more_positions();
   #endif
 }
 
@@ -301,10 +301,10 @@ void report_current_position() {
     report_compact_status();
   #else
     report_logical_position(current_position);
-    report_more_positions();
     #ifdef REPORT_MACHINE_POSITION
       report_machine_position(current_position);
     #endif
+    report_more_positions();
   #endif
 }
 
@@ -319,10 +319,10 @@ void report_current_position_projected() {
     report_compact_status();
   #else
     report_logical_position(current_position);
-    stepper.report_a_position(planner.position);
     #ifdef REPORT_MACHINE_POSITION
       report_machine_position(current_position);
     #endif
+    stepper.report_a_position(planner.position);
   #endif
 }
 
@@ -349,11 +349,11 @@ void report_current_position_projected() {
       report_compact_status(cartes);
     #else
       report_logical_position(cartes);
-      stepper.report_positions();
-      TERN_(IS_SCARA, scara_report_positions());
       #ifdef REPORT_MACHINE_POSITION
         report_machine_position(cartes);
       #endif
+      stepper.report_positions();
+      TERN_(IS_SCARA, scara_report_positions());
       report_current_grblstate_moving();
     #endif
   }
