@@ -518,8 +518,8 @@ void GCodeQueue::get_serial_commands() {
           }
         }
 
+        // Process critical commands early
         #if DISABLED(EMERGENCY_PARSER)
-          // Process critical commands early
           if (command[0] == 'M') switch (command[3]) {
             case '8':
               // continue from M0/M1
@@ -530,14 +530,15 @@ void GCodeQueue::get_serial_commands() {
             case '0':
               // quick stop
               if (command[1] == '4' && command[2] == '1') quickstop_stepper(); break;
-              #if ENABLED(REALTIME_FEEDRATE_CHANGES)
-                // Feed rate adjustment - process immediately
-                if (command[2] == '2' && command[1] == '2') {
-                  gcode.process_subcommands_now(command, false);
-                  // inject(command);
-                  break;
-                }
-              #endif
+          }
+        #endif
+
+        #if ENABLED(REALTIME_FEEDRATE_CHANGES)
+          // Feed rate adjustment - process immediately
+          if (!!strstr_P(command, PSTR("M220"))) {
+            gcode.process_subcommands_now(command, false);
+            // inject(command);
+            break;
           }
         #endif
 

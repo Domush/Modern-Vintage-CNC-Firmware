@@ -722,11 +722,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 218: M218(); break;                                  // M218: Set a tool offset
       #endif
 
-      #if BOTH(EMERGENCY_PARSER, REALTIME_FEEDRATE_CHANGES)
-        case 220: break;
-      #else
-        case 220: M220(); break;                                  // M220: Set Feedrate Percentage: S<percent> ("FR" on your LCD)
-      #endif
+      case 220: M220(); break;                                  // M220: Set Feedrate Percentage: S<percent> ("FR" on your LCD)
 
       #if HAS_EXTRUDERS
         case 221: M221(); break;                                  // M221: Set Flow Percentage
@@ -1132,7 +1128,7 @@ void GcodeSuite::process_next_command() {
  * Run a series of commands, bypassing the command queue to allow
  * G-code "macros" to be called from within other G-code handlers.
  */
-void GcodeSuite::process_subcommands_now(FSTR_P fgcode, bool no_ok = true) {
+void GcodeSuite::process_subcommands_now(FSTR_P fgcode, bool no_ok) {
   PGM_P pgcode = FTOP(fgcode);
   char * const saved_cmd = parser.command_ptr;        // Save the parser state
   for (;;) {
@@ -1151,7 +1147,7 @@ void GcodeSuite::process_subcommands_now(FSTR_P fgcode, bool no_ok = true) {
 
 #pragma GCC diagnostic pop
 
-void GcodeSuite::process_subcommands_now(char *gcode, bool no_ok = true) {
+void GcodeSuite::process_subcommands_now(char *gcode, bool no_ok) {
   char * const saved_cmd = parser.command_ptr;        // Save the parser state
   for (;;) {
     char * const delim = strchr(gcode, '\n');         // Get address of next newline

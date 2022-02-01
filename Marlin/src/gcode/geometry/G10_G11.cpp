@@ -52,7 +52,7 @@ void GcodeSuite::G10() {
     const int8_t target_system = parser.intval('P') - 1, // Subtract 1 because P1 is G54, which is Marlin coordinate_system 0
                 offset_type   = parser.intval('L');
 
-    if (WITHIN(active_coordinate_system, 0, MAX_COORDINATE_SYSTEMS - 1)) {
+    if (WITHIN(target_system, 0, MAX_COORDINATE_SYSTEMS - 1)) {
       const int8_t current_system = active_coordinate_system; // Store current coord system
       if (current_system != target_system) {
         select_coordinate_system(target_system); // Select New Coordinate System If Needed
@@ -87,7 +87,6 @@ void GcodeSuite::G10() {
             if (parser.seen(axis_codes[i])) {
               if (TERN1(HAS_EXTRUDERS, i != E_AXIS)) {
                 const float axis_value = parser.axis_value_to_mm((AxisEnum)i, parser.value_float());
-                const float axis_offset = axis_value - current_position[i];
                 position_shift[i]       = current_position[i] - axis_value;
                 update_workspace_offset((AxisEnum)i);
               }
@@ -96,17 +95,11 @@ void GcodeSuite::G10() {
           break;
       }
     #if ENABLED(DEBUG_G10)
-      SERIAL_ECHOLN("New work position:");
+      SERIAL_ECHOLNPGM("New position for workspace ", target_system);
       report_current_position();
-      // Apply Workspace Offset to the active coordinate system
-      coordinate_system[active_coordinate_system] = position_shift;
-      SERIAL_ECHOLN("New applied work position:");
-      report_current_position();
-      SERIAL_ECHOLNPGM("Switching to back to workspace ", target_system);
     #endif
       if (current_system != target_system) {
         gcode.select_coordinate_system(current_system);
-        report_current_position();
       }
     }
   #endif // ENABLED(CNC_COORDINATE_SYSTEMS)

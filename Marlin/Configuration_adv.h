@@ -1193,7 +1193,7 @@
 //#define MICROSTEP32 HIGH,LOW,HIGH
 
 // Microstep settings (Requires a board with pins named X_MS1, X_MS2, etc.)
-#define MICROSTEP_MODES { 16, 16, 16, 16, 16, 16 } // [1,2,4,8,16]
+// #define MICROSTEP_MODES { 16, 16, 16, 16, 16, 16 } // [1,2,4,8,16]
 
 /**
  *  @section  stepper motor current
@@ -2320,9 +2320,9 @@
 #endif
 
 // Normally, feed rate (M220) changes will be queued, causing a lengthy delay
-// (even executing after the job is completed) with large receive buffers.
-// Enable this to prioritize these adjustments to near real-time.
-#define REALTIME_FEEDRATE_CHANGES // "M220 S<percent>" feed rate adjustments will be executed immediately instead of queued
+// (even executing after the job is completed) with large planner buffers.
+// Enable this to ensure M220 feed rate adjustments are processed immediately instead of queued.
+#define REALTIME_FEEDRATE_CHANGES
 
 /**
  * Send machine status updates to host (Useful for CNC/Laser)
@@ -2339,20 +2339,25 @@
  * 5: MF_PAUSED          (M_HOLD)
  * 6: MF_KILLED          (M_ERROR)
  */
-#define REPORT_STATUS_TO_HOST // Send regular machine status updates to host in GRBL format ("S_XYZ: #")
+// #define REPORT_STATUS_TO_HOST // Send regular machine status updates to host in GRBL format ("S_XYZ: #")
 #if ENABLED(REPORT_STATUS_TO_HOST)
-  // Enable to use an abbreviated work-position/machine-position/units/tool/coordinate-system/etc status report
-  // designed to relay maximum information to the host in the smallest number of bytes (not very human-readable)
-  // Example: STAT|X10.000:Y100.000:Z0.5|X20.000:Y120.000:Z10.5|1|0|1|2|110|2
-  // Legend:  Status header [STAT], Work coords (G92), Machine coords (G53), Metric [1] (G21), Absolute positioning [0] (G90),
-  //          Tool #[1], Coord set [2] (G55), Feed rate override [110]% (M220 S110), Status: MF_WAITING [2]
-  //
-  // As you can see, quite a bit of info is transmitted to hosts which support it, saving multiple verbose queries.
-  #define COMPACT_STATUS_REPORTS
-
   // Report status during long moves
   // Only enable if needed, it is very verbose and will cause the console to scroll quickly
   // #define REPORT_STATUS_DURING_MOVES
+#endif
+
+// Use an abbreviated, advanced status report designed to relay maximum information to the host
+// in the smallest number of bytes (not very human-readable, designed for error-free host UI updates)
+// Example: STAT|X10.000:Y100.000:Z0.5|X20.000:Y120.000:Z10.5|1|0|1|2|110|2
+// Legend:  Status header [STAT], Work coords (G92), Machine coords (G53), Metric [1] (G21), Absolute positioning [0] (G90),
+//          Tool #[1], Coord set [2] (G55), Feed rate override [110]% (M220 S110), Status: MF_WAITING [2]
+//
+// As you can see, quite a bit of info is transmitted to hosts which support it, saving multiple verbose queries.
+#define COMPACT_STATUS_REPORTS
+#if ENABLED(COMPACT_STATUS_REPORTS)
+  // M114 will return compact reports instead of the usual verbose report
+  #define M114_USES_COMPACT_REPORTS // CAUTION - May break host UI's which look for M114's verbose output
+  #define GRBL_COMPATIBLE_STATES    // Show the GRBL compatible equivalents of Marlin states
 #endif
 
 // Bad serial connections can cause a sent command to be missed, therefore some clients will abort after 30 seconds in a timeout.
@@ -3735,7 +3740,7 @@
  */
 #define EXTENDED_CAPABILITIES_REPORT
 #if ENABLED(EXTENDED_CAPABILITIES_REPORT)
-  #define M115_GEOMETRY_REPORT
+  // #define M115_GEOMETRY_REPORT
 #endif
 
 /**
@@ -3783,10 +3788,10 @@
 //#define NO_WORKSPACE_OFFSETS
 
 // Extra options for the M114 "Current Position" report
-#define M114_DETAIL         // Enable 'M114 D' for highly detailed position reports and to check planner calculations
-#define M114_REALTIME       // Calculate Real-time current position based on forward kinematics
-// #define M114_LEGACY         // Calling M114 will force a planner synchronize. May cause stuttering, enable only if needed.
-#define M114_RAPID_REPORTING   // Outputs M114 position report to host after every G0 (rapid) move (for faster host UI updates)
+#define M114_DETAIL             // Enable 'M114 D' for highly detailed position reports and to check planner calculations
+#define M114_REALTIME           // Calculate Real-time current position based on forward kinematics
+// #define M114_LEGACY          // Calling M114 will force a planner synchronize. May cause stuttering, enable only if needed.
+#define M114_RAPID_REPORTING    // Outputs M114 position report to host after every G0 (rapid) move (for faster host UI updates)
 
 /**
  * CNC Coordinate Systems
@@ -3797,7 +3802,7 @@
 #define CNC_COORDINATE_SYSTEMS
 
 #if ENABLED(CNC_COORDINATE_SYSTEMS)
-  #define REPORT_MACHINE_COORDINATES // Returns both Work and Machine coordinates in default M114 report, similar to GRBL.
+  #define REPORT_MACHINE_POSITION // Returns both Work and Machine coordinates in default M114 report, similar to GRBL.
 #endif
 
 /**

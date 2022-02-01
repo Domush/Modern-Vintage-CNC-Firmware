@@ -233,6 +233,7 @@ inline float home_bump_mm(const AxisEnum axis) {
 void report_real_position();
 void report_current_position();
 void report_current_position_projected();
+void report_compact_status(const xyze_pos_t &rpos = current_position);
 
 #if ENABLED(AUTO_REPORT_POSITION)
   #include "../libs/autoreport.h"
@@ -240,7 +241,7 @@ void report_current_position_projected();
   extern AutoReporter<PositionReport> position_auto_reporter;
 #endif
 
-#if EITHER(REPORT_STATUS_TO_HOST, REALTIME_COMMANDS)
+#if ANY(REPORT_STATUS_TO_HOST, REALTIME_COMMANDS, GRBL_COMPATIBLE_STATES)
   #define HAS_GRBL_STATE 1
   /**
    * Machine states for GRBL or TinyG
