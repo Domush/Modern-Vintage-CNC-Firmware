@@ -533,7 +533,8 @@ void GCodeQueue::get_serial_commands() {
               #if ENABLED(REALTIME_FEEDRATE_CHANGES)
                 // Feed rate adjustment - process immediately
                 if (command[2] == '2' && command[1] == '2') {
-                  inject(command);
+                  gcode.process_subcommands_now(command, false);
+                  // inject(command);
                   break;
                 }
               #endif

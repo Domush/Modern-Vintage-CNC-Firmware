@@ -25,7 +25,7 @@
  * e_parser.h - Intercept special commands directly in the serial stream
  */
 
-#include "../inc/MarlinConfigPre.h"
+#include "../inc/MarlinConfig.h"
 
 #if ENABLED(HOST_PROMPT_SUPPORT)
   #include "host_actions.h"
@@ -44,9 +44,6 @@ extern int16_t feedrate_percentage;
 
 #if ENABLED(REALTIME_FEEDRATE_CHANGES)
   // From motion.h, which cannot be included here
-  // static float saved_feedrate_mm_s;
-  // static int16_t saved_feedrate_percentage;
-  // static int16_t backup_feedrate_percentage = 100;
   void restore_feedrate_and_scaling();
   void remember_feedrate_and_scaling();
 #endif
@@ -54,7 +51,7 @@ extern int16_t feedrate_percentage;
 void HAL_reboot();
 
 class EmergencyParser {
- public:
+  public:
   // Currently looking for: M108, M112, M220, M410, M876 S[0-9], S000, P000, R000
   enum State : uint8_t {
     EP_RESET,
@@ -65,58 +62,56 @@ class EmergencyParser {
     EP_M108,
     EP_M11,
     EP_M112,
-  #if ENABLED(REALTIME_FEEDRATE_CHANGES)
-    EP_M2,
-    EP_M22,
-    EP_M220,
-    EP_M220S,
-    EP_M220SN,
-    EP_M220SNN,
-    EP_M220SNNN,
-  #endif
+    #if ENABLED(REALTIME_FEEDRATE_CHANGES)
+      EP_M2,
+      EP_M22,
+      EP_M220,
+      EP_M220S,
+      EP_M220_SET,
+    #endif
     EP_M4,
     EP_M41,
     EP_M410,
-  #if ENABLED(HOST_PROMPT_SUPPORT)
-    EP_M8,
-    EP_M87,
-    EP_M876,
-    EP_M876S,
-    EP_M876SN,
-  #endif
-  #if ENABLED(REALTIME_COMMANDS)
-    EP_S,
-    EP_S0,
-    EP_S00,
-    EP_GRBL_STATUS,
-    EP_R,
-    EP_R0,
-    EP_R00,
-    EP_GRBL_RESUME,
-    EP_P,
-    EP_P0,
-    EP_P00,
-    EP_GRBL_PAUSE,
-  #endif
-  #if ENABLED(SOFT_RESET_VIA_SERIAL)
-    EP_ctrl,
-    EP_K,
-    EP_KI,
-    EP_KIL,
-    EP_KILL,
-  #endif
+    #if ENABLED(HOST_PROMPT_SUPPORT)
+      EP_M8,
+      EP_M87,
+      EP_M876,
+      EP_M876S,
+      EP_M876SN,
+    #endif
+    #if ENABLED(REALTIME_COMMANDS)
+      EP_S,
+      EP_S0,
+      EP_S00,
+      EP_GRBL_STATUS,
+      EP_R,
+      EP_R0,
+      EP_R00,
+      EP_GRBL_RESUME,
+      EP_P,
+      EP_P0,
+      EP_P00,
+      EP_GRBL_PAUSE,
+    #endif
+    #if ENABLED(SOFT_RESET_VIA_SERIAL)
+      EP_ctrl,
+      EP_K,
+      EP_KI,
+      EP_KIL,
+      EP_KILL,
+    #endif
     EP_IGNORE // to '\n'
   };
 
   static bool killed_by_M112;
   static bool quickstop_by_M410;
-#if ENABLED(REALTIME_FEEDRATE_CHANGES)
-  static int16_t M220_rate;
-#endif
+  #if ENABLED(REALTIME_FEEDRATE_CHANGES)
+    static int16_t M220_rate;
+  #endif
 
-#if ENABLED(HOST_PROMPT_SUPPORT)
-  static uint8_t M876_reason;
-#endif
+  #if ENABLED(HOST_PROMPT_SUPPORT)
+    static uint8_t M876_reason;
+  #endif
 
   EmergencyParser() { enable(); }
 
@@ -137,25 +132,25 @@ class EmergencyParser {
           case 'M':
             state = EP_M;
             break;
-#if ENABLED(REALTIME_COMMANDS)
-          case 'S':
-            state = EP_S;
-            break;
-          case 'P':
-            state = EP_P;
-            break;
-          case 'R':
-            state = EP_R;
-            break;
-#endif
-#if ENABLED(SOFT_RESET_VIA_SERIAL)
-          case '^':
-            state = EP_ctrl;
-            break;
-          case 'K':
-            state = EP_K;
-            break;
-#endif
+          #if ENABLED(REALTIME_COMMANDS)
+            case 'S':
+              state = EP_S;
+              break;
+            case 'P':
+              state = EP_P;
+              break;
+            case 'R':
+              state = EP_R;
+              break;
+          #endif
+          #if ENABLED(SOFT_RESET_VIA_SERIAL)
+            case '^':
+              state = EP_ctrl;
+              break;
+            case 'K':
+              state = EP_K;
+              break;
+          #endif
           default:
             state = EP_IGNORE;
         }
@@ -170,68 +165,68 @@ class EmergencyParser {
           case 'M':
             state = EP_M;
             break;
-#if ENABLED(REALTIME_COMMANDS)
-          case 'S':
-            state = EP_S;
-            break;
-          case 'P':
-            state = EP_P;
-            break;
-          case 'R':
-            state = EP_R;
-            break;
-#endif
+          #if ENABLED(REALTIME_COMMANDS)
+            case 'S':
+              state = EP_S;
+              break;
+            case 'P':
+              state = EP_P;
+              break;
+            case 'R':
+              state = EP_R;
+              break;
+          #endif
           default:
             state = EP_IGNORE;
         }
         break;
 
-#if ENABLED(REALTIME_COMMANDS)
-      case EP_S:
-        state = (c == '0') ? EP_S0 : EP_IGNORE;
-        break;
-      case EP_S0:
-        state = (c == '0') ? EP_S00 : EP_IGNORE;
-        break;
-      case EP_S00:
-        state = (c == '0') ? EP_GRBL_STATUS : EP_IGNORE;
-        break;
+      #if ENABLED(REALTIME_COMMANDS)
+        case EP_S:
+          state = (c == '0') ? EP_S0 : EP_IGNORE;
+          break;
+        case EP_S0:
+          state = (c == '0') ? EP_S00 : EP_IGNORE;
+          break;
+        case EP_S00:
+          state = (c == '0') ? EP_GRBL_STATUS : EP_IGNORE;
+          break;
 
-      case EP_R:
-        state = (c == '0') ? EP_R0 : EP_IGNORE;
-        break;
-      case EP_R0:
-        state = (c == '0') ? EP_R00 : EP_IGNORE;
-        break;
-      case EP_R00:
-        state = (c == '0') ? EP_GRBL_RESUME : EP_IGNORE;
-        break;
+        case EP_R:
+          state = (c == '0') ? EP_R0 : EP_IGNORE;
+          break;
+        case EP_R0:
+          state = (c == '0') ? EP_R00 : EP_IGNORE;
+          break;
+        case EP_R00:
+          state = (c == '0') ? EP_GRBL_RESUME : EP_IGNORE;
+          break;
 
-      case EP_P:
-        state = (c == '0') ? EP_P0 : EP_IGNORE;
-        break;
-      case EP_P0:
-        state = (c == '0') ? EP_P00 : EP_IGNORE;
-        break;
-      case EP_P00:
-        state = (c == '0') ? EP_GRBL_PAUSE : EP_IGNORE;
-        break;
-#endif
+        case EP_P:
+          state = (c == '0') ? EP_P0 : EP_IGNORE;
+          break;
+        case EP_P0:
+          state = (c == '0') ? EP_P00 : EP_IGNORE;
+          break;
+        case EP_P00:
+          state = (c == '0') ? EP_GRBL_PAUSE : EP_IGNORE;
+          break;
+      #endif
 
-#if ENABLED(SOFT_RESET_VIA_SERIAL)
-      case EP_ctrl:
-        state = (c == 'X') ? EP_KILL : EP_IGNORE;
-        break;
-      case EP_K:
-        state = (c == 'I') ? EP_KI : EP_IGNORE;
-        break;
-      case EP_KI:
-        state = (c == 'L') ? EP_KIL : EP_IGNORE;
-        break;
-      case EP_KIL:
-        state = (c == 'L') ? EP_KILL : EP_IGNORE;
-        break;
-#endif
+      #if ENABLED(SOFT_RESET_VIA_SERIAL)
+        case EP_ctrl:
+          state = (c == 'X') ? EP_KILL : EP_IGNORE;
+          break;
+        case EP_K:
+          state = (c == 'I') ? EP_KI : EP_IGNORE;
+          break;
+        case EP_KI:
+          state = (c == 'L') ? EP_KIL : EP_IGNORE;
+          break;
+        case EP_KIL:
+          state = (c == 'L') ? EP_KILL : EP_IGNORE;
+          break;
+      #endif
 
       case EP_M:
         switch (c) {
@@ -240,19 +235,19 @@ class EmergencyParser {
           case '1':
             state = EP_M1;
             break;
-#if ENABLED(REALTIME_FEEDRATE_CHANGES)
-          case '2':
-            state = EP_M2;
-            break;
-#endif
+          #if ENABLED(REALTIME_FEEDRATE_CHANGES)
+            case '2':
+              state = EP_M2;
+              break;
+          #endif
           case '4':
             state = EP_M4;
             break;
-#if ENABLED(HOST_PROMPT_SUPPORT)
-          case '8':
-            state = EP_M8;
-            break;
-#endif
+          #if ENABLED(HOST_PROMPT_SUPPORT)
+            case '8':
+              state = EP_M8;
+              break;
+          #endif
           default:
             state = EP_IGNORE;
         }
@@ -271,7 +266,7 @@ class EmergencyParser {
         }
         break;
 
-#if ENABLED(REALTIME_FEEDRATE_CHANGES)
+      #if ENABLED(REALTIME_FEEDRATE_CHANGES)
         // Feed rate
       case EP_M2:
         state = (c == '2') ? EP_M22 : EP_IGNORE;
@@ -286,6 +281,7 @@ class EmergencyParser {
             break;
           case 'S':
             state = EP_M220S;
+            M220_rate = int16_t(0);
             break;
           case 'B':
             remember_feedrate_and_scaling();
@@ -296,6 +292,7 @@ class EmergencyParser {
             state = EP_IGNORE;
             break;
           default:
+            SERIAL_ECHOLNPGM("FR:", feedrate_percentage, "%");
             state = EP_IGNORE;
             break;
         }
@@ -304,43 +301,13 @@ class EmergencyParser {
       case EP_M220S:
         switch (c) {
           case '0' ... '9':
-            state     = EP_M220SN;
-            M220_rate = int16_t(c - '0');
-            break;
-          default: state = EP_IGNORE;
-        }
-        break;
-
-      case EP_M220SN:
-        switch (c) {
-          case '0' ... '9':
-            state     = EP_M220SNN;
-            M220_rate = int16_t(c - '0');
-            break;
-          default: state = EP_IGNORE;
-        }
-        break;
-
-      case EP_M220SNN:
-        switch (c) {
-          case '0' ... '9':
-            state     = EP_M220SNNN;
+            state     = EP_M220S;
             M220_rate = int16_t((M220_rate * 10) + (c - '0'));
             break;
-          default: state = EP_IGNORE;
+          default: state = EP_M220_SET;
         }
         break;
-
-      case EP_M220SNNN:
-        switch (c) {
-          case '0' ... '9':
-            state               = EP_M220SNNN;
-            feedrate_percentage = int16_t((M220_rate * 10) + (c - '0'));
-            break;
-          default: state = EP_IGNORE;
-        }
-        break;
-#endif
+      #endif
 
         // Resume
       case EP_M10:
@@ -359,7 +326,7 @@ class EmergencyParser {
         break;
 
         // Process M876 (host response)
-#if ENABLED(HOST_PROMPT_SUPPORT)
+      #if ENABLED(HOST_PROMPT_SUPPORT)
 
       case EP_M8:
         state = (c == '7') ? EP_M87 : EP_IGNORE;
@@ -392,7 +359,7 @@ class EmergencyParser {
         }
         break;
 
-#endif // HOST_PROMPT_SUPPORT
+      #endif // HOST_PROMPT_SUPPORT
 
       case EP_IGNORE:
         if (ISEOL(c)) state = EP_RESET;
@@ -410,22 +377,20 @@ class EmergencyParser {
               case EP_M410:
                 quickstop_by_M410 = true;
                 break;
-#if ENABLED(REALTIME_FEEDRATE_CHANGES)
-              case EP_M220SN:
-              case EP_M220SNN:
-              case EP_M220SNNN:
+              #if ENABLED(REALTIME_FEEDRATE_CHANGES)
+              case EP_M220_SET:
+                if (M220_rate == int16_t(0)) M220_rate = int16_t(100);
                 LIMIT(M220_rate, 10, 999);
-                if (M220_rate != feedrate_percentage) {
-                  feedrate_percentage = M220_rate;
-                }
+                if (M220_rate != feedrate_percentage) feedrate_percentage = M220_rate;
+                SERIAL_ECHOLNPGM("FR:", feedrate_percentage, "%");
                 break;
-#endif
-#if ENABLED(HOST_PROMPT_SUPPORT)
+              #endif
+              #if ENABLED(HOST_PROMPT_SUPPORT)
               case EP_M876SN:
                 hostui.handle_response(M876_reason);
                 break;
-#endif
-#if ENABLED(REALTIME_COMMANDS)
+              #endif
+              #if ENABLED(REALTIME_COMMANDS)
               case EP_GRBL_STATUS:
                 report_current_position_moving();
                 break;
@@ -435,12 +400,12 @@ class EmergencyParser {
               case EP_GRBL_RESUME:
                 quickresume_stepper();
                 break;
-#endif
-#if ENABLED(SOFT_RESET_VIA_SERIAL)
+              #endif
+              #if ENABLED(SOFT_RESET_VIA_SERIAL)
               case EP_KILL:
                 HAL_reboot();
                 break;
-#endif
+              #endif
               default:
                 break;
             }

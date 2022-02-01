@@ -29,7 +29,7 @@
 
 #include "../inc/MarlinConfig.h"
 
-//#define DEBUG_GCODE_PARSER
+#define DEBUG_GCODE_PARSER
 #if ENABLED(DEBUG_GCODE_PARSER)
   #include "../libs/hex_print.h"
 #endif
