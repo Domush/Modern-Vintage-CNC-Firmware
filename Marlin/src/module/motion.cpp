@@ -241,22 +241,22 @@ void report_compact_status(const xyze_pos_t &rpos) {
   SERIAL_ECHOPGM_P(
     LIST_N(DOUBLE(LINEAR_AXES),
       "|X", lpos.x,
-      "Y", lpos.y,
-      "Z", lpos.z,
-      "I", lpos.i,
-      "J", lpos.j,
-      "K", lpos.k
+      ":Y", lpos.y,
+      ":Z", lpos.z,
+      ":I", lpos.i,
+      ":J", lpos.j,
+      ":K", lpos.k
     )
   );
   // Machine coords
   SERIAL_ECHOPGM_P(
     LIST_N(DOUBLE(LINEAR_AXES),
       "|X", mpos.x,
-      "Y", mpos.y,
-      "Z", mpos.z,
-      "I", mpos.i,
-      "J", mpos.j,
-      "K", mpos.k
+      ":Y", mpos.y,
+      ":Z", mpos.z,
+      ":I", mpos.i,
+      ":J", mpos.j,
+      ":K", mpos.k
     )
   );
   SERIAL_ECHOPGM("|", (parser.linear_unit_factor > 1) ? 0 : 1); // Inch = 0 (G20), Metric = 1 (G21)
