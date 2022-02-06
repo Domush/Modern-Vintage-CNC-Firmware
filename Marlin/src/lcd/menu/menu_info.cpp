@@ -92,7 +92,7 @@
 
 #endif
 
-  #if HAS_EXTRUDERS
+#if HAS_EXTRUDERS
   //
   // About Printer > Thermistors
   //
@@ -211,6 +211,7 @@
   END_SCREEN();
 }
 #endif
+
 //
 // About Printer > Board Info
 //
