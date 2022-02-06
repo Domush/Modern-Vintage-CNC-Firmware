@@ -227,8 +227,8 @@ inline void report_machine_position(const xyze_pos_t &rpos) {
 }
 
 #ifdef COMPACT_STATUS_REPORTS
-// Example: STAT|X10.000:Y100.000:Z0.5|X20.000:Y120.000:Z10.5|1|0|1|2|110|2
-// Legend:  Status header [STAT] | Work coords (G92) | Machine coords (G53) | Metric [1] (G21)
+// Example: |#|X10.000:Y100.000:Z0.5|X20.000:Y120.000:Z10.5|1|0|1|2|110|2
+// Legend:  Status header [|#] | Work coords (G92) | Machine coords (G53) | Metric [1] (G21)
 //          | Absolute positioning [0] (G90) | Tool #[1] | Coord system [-1] (G53)
 //          | Feed rate override [110]% (M220 S110) | Status: MF_WAITING [2]
 //
@@ -236,7 +236,7 @@ inline void report_machine_position(const xyze_pos_t &rpos) {
 void report_compact_status(const xyze_pos_t &rpos) {
   const xyze_pos_t lpos = rpos.asLogical();
   const xyze_pos_t mpos = rpos.asFloat();
-  SERIAL_ECHO("STAT"); // Header
+  SERIAL_ECHO("|#"); // Header
   // Work coords
   SERIAL_ECHOPGM_P(
     LIST_N(DOUBLE(LINEAR_AXES),
