@@ -534,10 +534,9 @@ void GCodeQueue::get_serial_commands() {
         #endif
 
         #if ENABLED(REALTIME_FEEDRATE_CHANGES)
-          // Feed rate adjustment - process immediately
-          if (!!strstr_P(command, PSTR("M220"))) {
+          // Feed rate adjustment - process immediately, unless preceded by an M400 (finish moves) command
+          if (!!strstr_P(command, PSTR("M220")) && !strstr_P(ring_buffer.last_queued_command(), PSTR("M400"))) {
             gcode.process_subcommands_now(command, false);
-            // inject(command);
             break;
           }
         #endif
