@@ -2358,7 +2358,7 @@
 #if ENABLED(COMPACT_STATUS_REPORTS)
   // M114 will return compact reports instead of the usual verbose report
   // #define M114_USES_COMPACT_REPORTS // CAUTION - May break host UI's which look for M114's verbose output
-  // #define GRBL_COMPATIBLE_STATES    // Show the GRBL compatible equivalents of Marlin states
+  // #define GRBL_COMPATIBLE_STATES    // Report GRBL-equivalent states instead of Marlin states
 #endif
 
 // Bad serial connections can cause a sent command to be missed, therefore some clients will abort after 30 seconds in a timeout.
