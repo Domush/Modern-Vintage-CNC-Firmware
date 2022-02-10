@@ -2348,7 +2348,7 @@
  *
  * As you can see, quite a bit of info is transmitted to hosts which support it, saving multiple verbose queries.
  */
-#define COMPACT_STATUS_REPORTS
+// #define COMPACT_STATUS_REPORTS
 #if ENABLED(COMPACT_STATUS_REPORTS)
 
   // M114 will return compact reports instead of the usual verbose report
