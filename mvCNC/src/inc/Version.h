@@ -7,7 +7,7 @@
  * Release version. Leave the mvCNC version or apply a custom scheme.
  */
 #ifndef SHORT_BUILD_VERSION
-  #define SHORT_BUILD_VERSION "bugfix-2.0.x"
+  #define SHORT_BUILD_VERSION "mvCNC v0.0.1"
 #endif
 
 /**
@@ -34,7 +34,7 @@
  * to alert users to major changes.
  */
 
-#define mvCNC_HEX_VERSION 02000903
+#define mvCNC_HEX_VERSION 00000001
 #ifndef REQUIRED_CONFIGURATION_H_VERSION
   #define REQUIRED_CONFIGURATION_H_VERSION mvCNC_HEX_VERSION
 #endif
@@ -55,7 +55,7 @@
  * Define a generic cnc name to be output to the LCD after booting mvCNC.
  */
 #ifndef MACHINE_NAME
-  #define MACHINE_NAME "CNC"
+  #define MACHINE_NAME "Modern Vintage CNC"
 #endif
 
 /**
@@ -64,7 +64,7 @@
  * providing the source code to your customers.)
  */
 #ifndef SOURCE_CODE_URL
-  #define SOURCE_CODE_URL "github.com/mvCNCFirmware/mvCNC"
+  #define SOURCE_CODE_URL "github.com/Domush/Modern-Vintage-CNC-Firmware"
 #endif
 
 /**
@@ -79,7 +79,7 @@
    * documentation about a specific mvCNC release. Displayed in the Info Menu.
    */
 #ifndef WEBSITE_URL
-  #define WEBSITE_URL "mvcncfw.org"
+  #define WEBSITE_URL "https://github.com/Domush/Modern-Vintage-CNC-Firmware"
 #endif
 
 /**

@@ -1,8 +1,7 @@
-#ifndef _CONFIGURATION_
-#define _CONFIGURATION_
 /**
  * Modern Vintage CNC Firmware
 */
+#pragma once
 
 /**
  * Configuration.h
@@ -2948,6 +2947,3 @@
 
 // Disable servo with M282 to reduce power consumption, noise, and heat when not in use
 //#define SERVO_DETACH_GCODE
-
-
-#endif // _CONFIGURATION_

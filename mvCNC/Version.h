@@ -10,7 +10,7 @@
 /**
  * mvCNC release version identifier
  */
-#define SHORT_BUILD_VERSION "bugfix-CNC-1.0.1"
+#define SHORT_BUILD_VERSION "mvCNC v0.0.1"
 
 /**
  * Verbose version identifier which should contain a reference to the location
@@ -36,7 +36,7 @@
  * has a distinct Github fork— the Source Code URL should just be the main
  * mvCNC repository.
  */
-#define SOURCE_CODE_URL "https://github.com/Domush/mvCNC-for-SKR-based-CNC.git"
+#define SOURCE_CODE_URL "https://github.com/Domush/Modern-Vintage-CNC-Firmware.git"
 
 /**
  * Default generic cnc UUID.
