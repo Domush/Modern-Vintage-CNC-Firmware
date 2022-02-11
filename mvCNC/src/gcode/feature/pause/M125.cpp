@@ -43,7 +43,7 @@ void GcodeSuite::M125() {
   // Initial retract before move to filament change position
   const float retract = TERN0(HAS_EXTRUDERS, -ABS(parser.axisunitsval('L', E_AXIS, PAUSE_PARK_RETRACT_LENGTH)));
 
-  xyz_pos_t park_point = NOZZLE_PARK_POINT;
+  xyz_pos_t park_point = SPINDLE_PARK_POINT;
 
   // Move to filament change position or given position
   LINEAR_AXIS_CODE(

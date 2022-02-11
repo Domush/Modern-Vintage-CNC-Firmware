@@ -230,7 +230,7 @@ void Draw_Tramming_Menu();
 #if HAS_FILAMENT_SENSOR
   void Draw_FilSet_Menu();
 #endif
-#if ENABLED(NOZZLE_PARK_FEATURE)
+#if ENABLED(SPINDLE_PARK_FEATURE)
   void Draw_ParkPos_Menu();
 #endif
 void Draw_PhySet_Menu();

@@ -358,7 +358,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 26: G26(); break;                                    // G26: Mesh Validation Pattern generation
       #endif
 
-      #if ENABLED(NOZZLE_PARK_FEATURE)
+      #if ENABLED(SPINDLE_PARK_FEATURE)
         case 27: G27(); break;                                    // G27: Nozzle Park
       #endif
 

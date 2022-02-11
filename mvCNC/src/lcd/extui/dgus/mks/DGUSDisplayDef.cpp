@@ -58,8 +58,8 @@ void MKS_reset_settings() {
 }
 
 xyz_pos_t position_before_pause;
-constexpr feedRate_t park_speed_xy = TERN(NOZZLE_PARK_FEATURE, NOZZLE_PARK_XY_FEEDRATE, 100),
-                     park_speed_z  = TERN(NOZZLE_PARK_FEATURE, NOZZLE_PARK_Z_FEEDRATE,    5);
+constexpr feedRate_t park_speed_xy = TERN(SPINDLE_PARK_FEATURE, SPINDLE_PARK_XY_FEEDRATE, 100),
+                     park_speed_z  = TERN(SPINDLE_PARK_FEATURE, SPINDLE_PARK_Z_FEEDRATE,    5);
 
 void MKS_pause_print_move() {
   queue.exhaust();
@@ -91,7 +91,7 @@ uint16_t lcd_default_light = 50;
 
 EX_FILAMENT_DEF ex_filament;
 RUNOUT_MKS_DEF runout_mks;
-NOZZLE_PARK_DEF nozzle_park_mks;
+SPINDLE_PARK_DEF nozzle_park_mks;
 
 const uint16_t VPList_Boot[] PROGMEM = {
   VP_MVCNC_VERSION,

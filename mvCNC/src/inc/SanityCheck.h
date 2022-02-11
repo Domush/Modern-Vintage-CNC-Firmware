@@ -138,21 +138,21 @@
 #elif ENABLED(FILAMENT_CHANGE_FEATURE)
   #error "FILAMENT_CHANGE_FEATURE is now ADVANCED_PAUSE_FEATURE."
 #elif defined(FILAMENT_CHANGE_X_POS) || defined(FILAMENT_CHANGE_Y_POS)
-  #error "FILAMENT_CHANGE_[XY]_POS is now set with NOZZLE_PARK_POINT."
+  #error "FILAMENT_CHANGE_[XY]_POS is now set with SPINDLE_PARK_POINT."
 #elif defined(FILAMENT_CHANGE_Z_ADD)
-  #error "FILAMENT_CHANGE_Z_ADD is now set with NOZZLE_PARK_POINT."
+  #error "FILAMENT_CHANGE_Z_ADD is now set with SPINDLE_PARK_POINT."
 #elif defined(FILAMENT_CHANGE_XY_FEEDRATE)
-  #error "FILAMENT_CHANGE_XY_FEEDRATE is now NOZZLE_PARK_XY_FEEDRATE."
+  #error "FILAMENT_CHANGE_XY_FEEDRATE is now SPINDLE_PARK_XY_FEEDRATE."
 #elif defined(FILAMENT_CHANGE_Z_FEEDRATE)
-  #error "FILAMENT_CHANGE_Z_FEEDRATE is now NOZZLE_PARK_Z_FEEDRATE."
+  #error "FILAMENT_CHANGE_Z_FEEDRATE is now SPINDLE_PARK_Z_FEEDRATE."
 #elif defined(PAUSE_PARK_X_POS) || defined(PAUSE_PARK_Y_POS)
-  #error "PAUSE_PARK_[XY]_POS is now set with NOZZLE_PARK_POINT."
+  #error "PAUSE_PARK_[XY]_POS is now set with SPINDLE_PARK_POINT."
 #elif defined(PAUSE_PARK_Z_ADD)
-  #error "PAUSE_PARK_Z_ADD is now set with NOZZLE_PARK_POINT."
+  #error "PAUSE_PARK_Z_ADD is now set with SPINDLE_PARK_POINT."
 #elif defined(PAUSE_PARK_XY_FEEDRATE)
-  #error "PAUSE_PARK_XY_FEEDRATE is now NOZZLE_PARK_XY_FEEDRATE."
+  #error "PAUSE_PARK_XY_FEEDRATE is now SPINDLE_PARK_XY_FEEDRATE."
 #elif defined(PAUSE_PARK_Z_FEEDRATE)
-  #error "PAUSE_PARK_Z_FEEDRATE is now NOZZLE_PARK_Z_FEEDRATE."
+  #error "PAUSE_PARK_Z_FEEDRATE is now SPINDLE_PARK_Z_FEEDRATE."
 #elif defined(FILAMENT_CHANGE_RETRACT_FEEDRATE)
   #error "FILAMENT_CHANGE_RETRACT_FEEDRATE is now PAUSE_PARK_RETRACT_FEEDRATE."
 #elif defined(FILAMENT_CHANGE_RETRACT_LENGTH)
@@ -386,8 +386,8 @@
   #error "SINGLENOZZLE_SWAP_PARK is now TOOLCHANGE_PARK."
 #elif defined(SINGLENOZZLE_TOOLCHANGE_XY)
   #error "SINGLENOZZLE_TOOLCHANGE_XY is now TOOLCHANGE_PARK_XY."
-#elif defined(SINGLENOZZLE_PARK_XY_FEEDRATE)
-  #error "SINGLENOZZLE_PARK_XY_FEEDRATE is now TOOLCHANGE_PARK_XY_FEEDRATE."
+#elif defined(SINGLESPINDLE_PARK_XY_FEEDRATE)
+  #error "SINGLESPINDLE_PARK_XY_FEEDRATE is now TOOLCHANGE_PARK_XY_FEEDRATE."
 #elif defined(PARKING_EXTRUDER_SECURITY_RAISE)
   #error "PARKING_EXTRUDER_SECURITY_RAISE is now TOOLCHANGE_ZRAISE."
 #elif defined(SWITCHING_TOOLHEAD_SECURITY_RAISE)
@@ -889,8 +889,8 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   #endif
 #endif
 
-#if defined(EVENT_GCODE_SD_ABORT) && DISABLED(NOZZLE_PARK_FEATURE)
-  static_assert(nullptr == strstr(EVENT_GCODE_SD_ABORT, "G27"), "NOZZLE_PARK_FEATURE is required to use G27 in EVENT_GCODE_SD_ABORT.");
+#if defined(EVENT_GCODE_SD_ABORT) && DISABLED(SPINDLE_PARK_FEATURE)
+  static_assert(nullptr == strstr(EVENT_GCODE_SD_ABORT, "G27"), "SPINDLE_PARK_FEATURE is required to use G27 in EVENT_GCODE_SD_ABORT.");
 #endif
 
 /**
@@ -991,8 +991,8 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
   #if !HAS_RESUME_CONTINUE
     #error "ADVANCED_PAUSE_FEATURE requires a supported LCD controller (or EMERGENCY_PARSER)."
-  #elif DISABLED(NOZZLE_PARK_FEATURE)
-    #error "ADVANCED_PAUSE_FEATURE requires NOZZLE_PARK_FEATURE."
+  #elif DISABLED(SPINDLE_PARK_FEATURE)
+    #error "ADVANCED_PAUSE_FEATURE requires SPINDLE_PARK_FEATURE."
   #elif !defined(FILAMENT_UNLOAD_PURGE_FEEDRATE)
     #error "ADVANCED_PAUSE_FEATURE requires FILAMENT_UNLOAD_PURGE_FEEDRATE."
   #elif ENABLED(EXTRUDER_RUNOUT_PREVENT)
@@ -1010,13 +1010,13 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   #endif
 #endif
 
-#if ENABLED(NOZZLE_PARK_FEATURE)
-  constexpr float npp[] = NOZZLE_PARK_POINT;
-  static_assert(COUNT(npp) == XYZ, "NOZZLE_PARK_POINT requires X, Y, and Z values.");
-  constexpr xyz_pos_t npp_xyz = NOZZLE_PARK_POINT;
-  static_assert(WITHIN(npp_xyz.x, X_MIN_POS, X_MAX_POS), "NOZZLE_PARK_POINT.X is out of bounds (X_MIN_POS, X_MAX_POS).");
-  static_assert(WITHIN(npp_xyz.y, Y_MIN_POS, Y_MAX_POS), "NOZZLE_PARK_POINT.Y is out of bounds (Y_MIN_POS, Y_MAX_POS).");
-  static_assert(WITHIN(npp_xyz.z, Z_MIN_POS, Z_MAX_POS), "NOZZLE_PARK_POINT.Z is out of bounds (Z_MIN_POS, Z_MAX_POS).");
+#if ENABLED(SPINDLE_PARK_FEATURE)
+  constexpr float npp[] = SPINDLE_PARK_POINT;
+  static_assert(COUNT(npp) == XYZ, "SPINDLE_PARK_POINT requires X, Y, and Z values.");
+  constexpr xyz_pos_t npp_xyz = SPINDLE_PARK_POINT;
+  static_assert(WITHIN(npp_xyz.x, X_MIN_POS, X_MAX_POS), "SPINDLE_PARK_POINT.X is out of bounds (X_MIN_POS, X_MAX_POS).");
+  static_assert(WITHIN(npp_xyz.y, Y_MIN_POS, Y_MAX_POS), "SPINDLE_PARK_POINT.Y is out of bounds (Y_MIN_POS, Y_MAX_POS).");
+  static_assert(WITHIN(npp_xyz.z, Z_MIN_POS, Z_MAX_POS), "SPINDLE_PARK_POINT.Z is out of bounds (Z_MIN_POS, Z_MAX_POS).");
 #endif
 
 /**
@@ -1059,8 +1059,8 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #error "PRUSA_MMU2(S) requires exactly 5 EXTRUDERS. Please update your Configuration."
   #elif HAS_EXTENDABLE_MMU && EXTRUDERS > 15
     #error "EXTRUDERS is too large for MMU(S) emulation mode. The maximum value is 15."
-  #elif DISABLED(NOZZLE_PARK_FEATURE)
-    #error "PRUSA_MMU2(S) requires NOZZLE_PARK_FEATURE. Enable it to continue."
+  #elif DISABLED(SPINDLE_PARK_FEATURE)
+    #error "PRUSA_MMU2(S) requires SPINDLE_PARK_FEATURE. Enable it to continue."
   #elif HAS_PRUSA_MMU2S && DISABLED(FILAMENT_RUNOUT_SENSOR)
     #error "PRUSA_MMU2S requires FILAMENT_RUNOUT_SENSOR. Enable it to continue."
   #elif ENABLED(MMU_EXTRUDER_SENSOR) && DISABLED(FILAMENT_RUNOUT_SENSOR)

@@ -43,13 +43,6 @@
 
 #include "probe.h"
 
-#if HAS_LEVELING
-  #include "../feature/bedlevel/bedlevel.h"
-  #if ENABLED(X_AXIS_TWIST_COMPENSATION)
-    #include "../feature/bedlevel/abl/x_twist.h"
-  #endif
-#endif
-
 #if ENABLED(Z_STEPPER_AUTO_ALIGN)
   #include "../feature/z_stepper_align.h"
 #endif
@@ -72,8 +65,6 @@
   #define EEPROM_NUM_SERVOS NUM_SERVO_PLUGS
 #endif
 
-#include "../feature/fwretract.h"
-
 #if ENABLED(POWER_LOSS_RECOVERY)
   #include "../feature/powerloss.h"
 #endif
@@ -86,17 +77,6 @@
 
 #if ENABLED(BACKLASH_COMPENSATION)
   #include "../feature/backlash.h"
-#endif
-
-#if HAS_FILAMENT_SENSOR
-  #include "../feature/runout.h"
-  #ifndef FIL_RUNOUT_ENABLED_DEFAULT
-    #define FIL_RUNOUT_ENABLED_DEFAULT true
-  #endif
-#endif
-
-#if ENABLED(EXTRA_LIN_ADVANCE_K)
-  extern float other_extruder_advance_K[EXTRUDERS];
 #endif
 
 #if HAS_MULTI_EXTRUDER
@@ -378,12 +358,6 @@ typedef struct SettingsDataStruct {
   // POWER_LOSS_RECOVERY
   //
   bool recovery_enabled;                                // M413 S
-
-  //
-  // FWRETRACT
-  //
-  fwretract_settings_t fwretract_settings;              // M207 S F Z W, M208 S F W R
-  bool autoretract_enabled;                             // M209 S
 
   //
   // !NO_VOLUMETRIC
@@ -1107,50 +1081,8 @@ void mvCNCSettings::postprocess() {
       EEPROM_WRITE(recovery_enabled);
     }
 
-    //
-    // Firmware Retraction
-    //
-    {
-      _FIELD_TEST(fwretract_settings);
-      #if DISABLED(FWRETRACT)
-        const fwretract_settings_t autoretract_defaults = { 3, 45, 0, 0, 0, 13, 0, 8 };
-      #endif
-      EEPROM_WRITE(TERN(FWRETRACT, fwretract.settings, autoretract_defaults));
-
-      #if DISABLED(FWRETRACT_AUTORETRACT)
-        const bool autoretract_enabled = false;
-      #endif
-      EEPROM_WRITE(TERN(FWRETRACT_AUTORETRACT, fwretract.autoretract_enabled, autoretract_enabled));
-    }
-
-    //
-    // Volumetric & Filament Size
-    //
-    {
-      _FIELD_TEST(parser_volumetric_enabled);
-
-      #if DISABLED(NO_VOLUMETRICS)
-
-        EEPROM_WRITE(parser.volumetric_enabled);
-        EEPROM_WRITE(planner.filament_size);
-        #if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
-          EEPROM_WRITE(planner.volumetric_extruder_limit);
-        #else
-          dummyf = DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT;
-          for (uint8_t q = EXTRUDERS; q--;) EEPROM_WRITE(dummyf);
-        #endif
-
-      #else
-
-        const bool volumetric_enabled = false;
-        EEPROM_WRITE(volumetric_enabled);
-        dummyf = DEFAULT_NOMINAL_FILAMENT_DIA;
-        for (uint8_t q = EXTRUDERS; q--;) EEPROM_WRITE(dummyf);
-        dummyf = DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT;
-        for (uint8_t q = EXTRUDERS; q--;) EEPROM_WRITE(dummyf);
-
-      #endif
-    }
+    const bool volumetric_enabled = false;
+    EEPROM_WRITE(volumetric_enabled);
 
     //
     // TMC Configuration
@@ -2009,45 +1941,15 @@ void mvCNCSettings::postprocess() {
       }
 
       //
-      // Firmware Retraction
-      //
-      {
-        fwretract_settings_t fwretract_settings;
-        bool autoretract_enabled;
-        _FIELD_TEST(fwretract_settings);
-        EEPROM_READ(fwretract_settings);
-        EEPROM_READ(autoretract_enabled);
-
-        #if ENABLED(FWRETRACT)
-          if (!validating) {
-            fwretract.settings = fwretract_settings;
-            TERN_(FWRETRACT_AUTORETRACT, fwretract.autoretract_enabled = autoretract_enabled);
-          }
-        #endif
-      }
-
-      //
       // Volumetric & Filament Size
       //
       {
         struct {
           bool volumetric_enabled;
-          float filament_size[EXTRUDERS];
-          float volumetric_extruder_limit[EXTRUDERS];
         } storage;
 
         _FIELD_TEST(parser_volumetric_enabled);
         EEPROM_READ(storage);
-
-        #if DISABLED(NO_VOLUMETRICS)
-          if (!validating) {
-            parser.volumetric_enabled = storage.volumetric_enabled;
-            COPY(planner.filament_size, storage.filament_size);
-            #if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
-              COPY(planner.volumetric_extruder_limit, storage.volumetric_extruder_limit);
-            #endif
-          }
-        #endif
       }
 
       //
@@ -2672,7 +2574,6 @@ void mvCNCSettings::reset() {
 
   planner.settings.min_segment_time_us = DEFAULT_MINSEGMENTTIME;
   planner.settings.acceleration = DEFAULT_ACCELERATION;
-  planner.settings.retract_acceleration = DEFAULT_RETRACT_ACCELERATION;
   planner.settings.travel_acceleration = DEFAULT_TRAVEL_ACCELERATION;
   planner.settings.min_feedrate_mm_s = feedRate_t(DEFAULT_MINIMUMFEEDRATE);
   planner.settings.min_travel_feedrate_mm_s = feedRate_t(DEFAULT_MINTRAVELFEEDRATE);
@@ -2713,27 +2614,11 @@ void mvCNCSettings::reset() {
   TERN_(HAS_HOTEND_OFFSET, reset_hotend_offsets());
 
   //
-  // Filament Runout Sensor
-  //
-
-  #if HAS_FILAMENT_SENSOR
-    runout.enabled = FIL_RUNOUT_ENABLED_DEFAULT;
-    runout.reset();
-    TERN_(HAS_FILAMENT_RUNOUT_DISTANCE, runout.set_runout_distance(FILAMENT_RUNOUT_DISTANCE_MM));
-  #endif
-
-  //
   // Tool-change Settings
   //
 
   #if HAS_MULTI_EXTRUDER
     #if ENABLED(TOOLCHANGE_FILAMENT_SWAP)
-      toolchange_settings.swap_length     = TOOLCHANGE_FS_LENGTH;
-      toolchange_settings.extra_resume    = TOOLCHANGE_FS_EXTRA_RESUME_LENGTH;
-      toolchange_settings.retract_speed   = TOOLCHANGE_FS_RETRACT_SPEED;
-      toolchange_settings.unretract_speed = TOOLCHANGE_FS_UNRETRACT_SPEED;
-      toolchange_settings.extra_prime     = TOOLCHANGE_FS_EXTRA_PRIME;
-      toolchange_settings.prime_speed     = TOOLCHANGE_FS_PRIME_SPEED;
       toolchange_settings.fan_speed       = TOOLCHANGE_FS_FAN_SPEED;
       toolchange_settings.fan_time        = TOOLCHANGE_FS_FAN_TIME;
     #endif

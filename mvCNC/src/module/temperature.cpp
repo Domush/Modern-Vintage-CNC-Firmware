@@ -49,7 +49,7 @@
   #include "../gcode/gcode.h"
 #endif
 
-#if ENABLED(NOZZLE_PARK_FEATURE)
+#if ENABLED(SPINDLE_PARK_FEATURE)
   #include "../libs/nozzle.h"
 #endif
 
@@ -970,7 +970,7 @@ inline void loud_kill(FSTR_P const lcd_msg, const heater_id_t heater_id) {
     }
     WRITE(BEEPER_PIN, HIGH);
   #endif
-  #if ENABLED(NOZZLE_PARK_FEATURE)
+  #if ENABLED(SPINDLE_PARK_FEATURE)
     if (!homing_needed_error()) {
       nozzle.park(0);
       planner.synchronize();

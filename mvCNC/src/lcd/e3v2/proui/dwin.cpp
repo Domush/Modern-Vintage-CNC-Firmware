@@ -2421,7 +2421,7 @@ void SetPID(celsius_t t, heater_id_t h) {
   #endif
 #endif
 
-#if ENABLED(NOZZLE_PARK_FEATURE)
+#if ENABLED(SPINDLE_PARK_FEATURE)
   void SetParkPosX()   { SetPIntOnClick(0, X_MAX_POS); }
   void SetParkPosY()   { SetPIntOnClick(0, Y_MAX_POS); }
   void SetParkZRaise() { SetPIntOnClick(0, 50); }

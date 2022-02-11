@@ -7,7 +7,6 @@
 #if HAS_BED_PROBE
 
 #include "../gcode.h"
-#include "../../feature/bedlevel/bedlevel.h"
 #include "../../module/probe.h"
 
 /**

@@ -4,7 +4,7 @@
 
 #include "../../../inc/mvCNCConfig.h"
 
-#if ENABLED(NOZZLE_PARK_FEATURE)
+#if ENABLED(SPINDLE_PARK_FEATURE)
 
 #include "../../gcode.h"
 #include "../../../libs/nozzle.h"
@@ -19,4 +19,4 @@ void GcodeSuite::G27() {
   nozzle.park(parser.ushortval('P'));
 }
 
-#endif // NOZZLE_PARK_FEATURE
+#endif // SPINDLE_PARK_FEATURE

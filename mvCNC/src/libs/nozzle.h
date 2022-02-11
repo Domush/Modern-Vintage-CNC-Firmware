@@ -63,10 +63,10 @@ class Nozzle {
 
   #endif // NOZZLE_CLEAN_FEATURE
 
-  #if ENABLED(NOZZLE_PARK_FEATURE)
+  #if ENABLED(SPINDLE_PARK_FEATURE)
 
     static float park_mode_0_height(const_float_t park_z) _Os;
-    static void park(const uint8_t z_action, const xyz_pos_t &park=NOZZLE_PARK_POINT) _Os;
+    static void park(const uint8_t z_action, const xyz_pos_t &park=SPINDLE_PARK_POINT) _Os;
 
   #endif
 };

@@ -102,9 +102,9 @@ typedef struct {
   uint16_t x_pos;
   uint16_t y_pos;
   uint16_t z_pos;
-} NOZZLE_PARK_DEF;
+} SPINDLE_PARK_DEF;
 
-extern NOZZLE_PARK_DEF nozzle_park_mks;
+extern SPINDLE_PARK_DEF nozzle_park_mks;
 
 enum DGUSLCD_Screens : uint8_t {
   #if ENABLED(USE_MKS_GREEN_UI)
