@@ -79,7 +79,7 @@ void ChironTFT::Startup() {
   // Signal Board has reset
   SendtoTFTLN(AC_msg_main_board_has_reset);
 
-  // Enable leveling and Disable end stops during print
+  // Enable leveling and Disable end stops during a CNC job
   // as Z home places nozzle above the bed so we need to allow it past the end stops
   injectCommands(AC_cmnd_enable_leveling);
 
@@ -838,7 +838,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
         if (tokenpos != -1) { // Set offset (adjusts all points by value)
           float Zshift = atof(&panel_command[tokenpos+1]);
           setSoftEndstopState(false);  // disable endstops
-          // Allow temporary Z position nudging during print
+          // Allow temporary Z position nudging during a CNC job
           // From the leveling panel use the all points UI to adjust the print pos.
           if (isPrinting()) {
             #if ACDEBUG(AC_INFO)

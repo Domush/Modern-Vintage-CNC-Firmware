@@ -310,7 +310,7 @@ void NextionTFT::PanelInfo(uint8_t req) {
     break;
 
   case 27: // CNCcounter
-    #if ENABLED(PRINTCOUNTER)
+    #if ENABLED(JOBCOUNTER)
       char buffer[21];
       #define SEND_PRINT_INFO(A, B) SEND_VALasTXT(A, B(buffer))
     #else

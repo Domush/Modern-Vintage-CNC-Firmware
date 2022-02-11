@@ -141,7 +141,7 @@ enum {
 #include "display_tuning_screen.h"
 #include "media_player_screen.h"
 
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
   #include "statistics_screen.h"
 #endif
 

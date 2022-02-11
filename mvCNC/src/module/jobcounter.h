@@ -7,8 +7,8 @@
 #include "../libs/duration_t.h"
 #include "../inc/mvCNCConfig.h"
 
-// CNC debug messages with M111 S2
-//#define DEBUG_PRINTCOUNTER
+// Show debug messages with M111 S2
+//#define DEBUG_JOBCOUNTER
 
 // Round up I2C / SPI address to next page boundary (assuming 32 byte pages)
 #define STATS_EEPROM_ADDRESS TERN(USE_WIRED_EEPROM, 0x40, 0x32)
@@ -18,7 +18,7 @@ struct printStatistics {    // 16 bytes
   uint16_t totalPrints;     // Number of prints
   uint16_t finishedPrints;  // Number of complete prints
   uint32_t printTime;       // Accumulated printing time
-  uint32_t longestPrint;    // Longest successful print job
+  uint32_t longestPrint;    // Longest successful CNC job
   float    filamentUsed;    // Accumulated filament consumed in mm
   #if SERVICE_INTERVAL_1 > 0
     uint32_t nextService1;  // Service intervals (or placeholders)
@@ -56,14 +56,14 @@ class CNCCounter: public Stopwatch {
      */
     static constexpr millis_t updateInterval = SEC_TO_MS(10);
 
-    #if PRINTCOUNTER_SAVE_INTERVAL > 0
+    #if JOBCOUNTER_SAVE_INTERVAL > 0
       /**
        * @brief Interval in seconds between EEPROM saves
        * @details This const value defines what will be the time between each
        * EEPROM save cycle, the development team recommends to set this value
        * no lower than 3600 secs (1 hour).
        */
-      static constexpr millis_t saveInterval = MIN_TO_MS(PRINTCOUNTER_SAVE_INTERVAL);
+      static constexpr millis_t saveInterval = MIN_TO_MS(JOBCOUNTER_SAVE_INTERVAL);
     #endif
 
     /**
@@ -168,7 +168,7 @@ class CNCCounter: public Stopwatch {
       static bool needsService(const int index);
     #endif
 
-    #if ENABLED(DEBUG_PRINTCOUNTER)
+    #if ENABLED(DEBUG_JOBCOUNTER)
 
       /**
        * @brief Print a debug message
@@ -180,7 +180,7 @@ class CNCCounter: public Stopwatch {
 };
 
 // Global CNC Job Timer instance
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
   extern CNCCounter print_job_timer;
 #else
   extern Stopwatch print_job_timer;

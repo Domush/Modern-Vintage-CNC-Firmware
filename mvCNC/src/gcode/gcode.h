@@ -97,10 +97,10 @@
  * M48  - Measure Z Probe repeatability: M48 P<points> X<pos> Y<pos> V<level> E<engage> L<legs> S<chizoid>. (Requires Z_MIN_PROBE_REPEATABILITY_TEST)
  *
  * M73  - Set the progress percentage. (Requires LCD_SET_PROGRESS_MANUALLY)
- * M75  - Start the print job timer.
- * M76  - Pause the print job timer.
- * M77  - Stop the print job timer.
- * M78  - Show statistical information about the print jobs. (Requires PRINTCOUNTER)
+ * M75  - Start the CNC job timer.
+ * M76  - Pause the CNC job timer.
+ * M77  - Stop the CNC job timer.
+ * M78  - Show statistical information about the CNC jobs. (Requires JOBCOUNTER)
  *
  * M80  - Turn on Power Supply. (Requires PSU_CONTROL)
  * M81  - Turn off Power Supply. (Requires PSU_CONTROL)
@@ -230,7 +230,7 @@
  * M510 - Lock CNC (Requires PASSWORD_FEATURE)
  * M511 - Unlock CNC (Requires PASSWORD_UNLOCK_GCODE)
  * M512 - Set/Change/Remove Password (Requires PASSWORD_CHANGE_GCODE)
- * M524 - Abort the current SD print job started with M24. (Requires SDSUPPORT)
+ * M524 - Abort the current SD CNC job started with M24. (Requires SDSUPPORT)
  * M540 - Enable/disable SD card abort on endstop hit: "M540 S<state>". (Requires SD_ABORT_ON_ENDSTOP_HIT)
  * M552 - Get or set IP address. Enable/disable network interface. (Requires enabled Ethernet port)
  * M553 - Get or set IP netmask. (Requires enabled Ethernet port)
@@ -661,7 +661,7 @@ private:
   static void M76();
   static void M77();
 
-  #if ENABLED(PRINTCOUNTER)
+  #if ENABLED(JOBCOUNTER)
     static void M78();
   #endif
 

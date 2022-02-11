@@ -17,7 +17,7 @@
 #include "../../../gcode/queue.h"
 #include "../../../module/planner.h"
 #include "../../../libs/duration_t.h"
-#include "../../../module/printcounter.h"
+#include "../../../module/jobcounter.h"
 #if ENABLED(POWER_LOSS_RECOVERY)
   #include "../../../feature/powerloss.h"
 #endif

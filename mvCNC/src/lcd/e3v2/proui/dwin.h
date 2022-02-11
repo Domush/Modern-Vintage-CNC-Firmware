@@ -203,7 +203,7 @@ void HMI_LockScreen();
 #if HAS_ESDIAG
   void Draw_EndStopDiag();
 #endif
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
   void Draw_PrintStats();
 #endif
 

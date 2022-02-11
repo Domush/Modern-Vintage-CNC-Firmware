@@ -8,7 +8,7 @@
  */
 
 #include "../sd/cardreader.h"
-#include "../module/printcounter.h"
+#include "../module/jobcounter.h"
 #include "../module/planner.h"
 #include "../module/stepper.h" // for block_t
 #include "../gcode/queue.h"

@@ -38,7 +38,7 @@
 #include "../../../gcode/queue.h"
 
 #include "../../../module/temperature.h"
-#include "../../../module/printcounter.h"
+#include "../../../module/jobcounter.h"
 #include "../../../module/motion.h"
 #include "../../../module/planner.h"
 

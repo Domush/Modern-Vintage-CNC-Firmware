@@ -9,7 +9,7 @@
 #include "../../gcode.h"
 #include "../../../feature/pause.h"
 #include "../../../module/motion.h"
-#include "../../../module/printcounter.h"
+#include "../../../module/jobcounter.h"
 
 #if HAS_MULTI_EXTRUDER
   #include "../../../module/tool_change.h"

@@ -37,7 +37,7 @@
 #include "../../../sd/cardreader.h"
 #include "../../../module/motion.h"
 #include "../../../module/temperature.h"
-#include "../../../module/printcounter.h"
+#include "../../../module/jobcounter.h"
 
 #if ENABLED(SDSUPPORT)
   #include "../../../libs/duration_t.h"

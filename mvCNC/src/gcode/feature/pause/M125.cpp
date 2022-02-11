@@ -11,7 +11,7 @@
 #include "../../../feature/pause.h"
 #include "../../../lcd/mvcncui.h"
 #include "../../../module/motion.h"
-#include "../../../module/printcounter.h"
+#include "../../../module/jobcounter.h"
 #include "../../../sd/cardreader.h"
 
 #if ENABLED(POWER_LOSS_RECOVERY)

@@ -15,7 +15,7 @@
 #include "../../../module/temperature.h"
 #include "../../../module/motion.h"
 #include "../../../module/planner.h"
-#include "../../../module/printcounter.h"
+#include "../../../module/jobcounter.h"
 #include "../../../sd/cardreader.h"
 
 #if ENABLED(POWER_LOSS_RECOVERY)
@@ -190,7 +190,7 @@ void DGUSScreenHandler::DGUSLCD_SendStringToDisplayPGM(DGUS_VP_Variable &var) {
   }
 #endif
 
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
 
   // Send the accumulate print time to the display.
   // It is using a hex display for that: It expects BSD coded data in the format xxyyzz
@@ -468,7 +468,7 @@ void DGUSScreenHandler::HandleSettings(DGUS_VP_Variable &var, void *val_ptr) {
   switch (value) {
     default: break;
     case 1:
-      TERN_(PRINTCOUNTER, print_job_timer.initStats());
+      TERN_(JOBCOUNTER, print_job_timer.initStats());
       settings.reset();
       settings.save();
       break;

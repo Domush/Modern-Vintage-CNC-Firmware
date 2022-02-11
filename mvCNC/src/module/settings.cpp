@@ -587,8 +587,8 @@ void mvCNCSettings::postprocess() {
   TERN_(HAS_LCD_BRIGHTNESS, ui.refresh_brightness());
 }
 
-#if BOTH(PRINTCOUNTER, EEPROM_SETTINGS)
-  #include "printcounter.h"
+#if BOTH(JOBCOUNTER, EEPROM_SETTINGS)
+  #include "jobcounter.h"
   static_assert(
     !WITHIN(STATS_EEPROM_ADDRESS, EEPROM_OFFSET, EEPROM_OFFSET + sizeof(SettingsData)) &&
     !WITHIN(STATS_EEPROM_ADDRESS + sizeof(printStatistics), EEPROM_OFFSET, EEPROM_OFFSET + sizeof(SettingsData)),

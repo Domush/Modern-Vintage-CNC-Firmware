@@ -46,7 +46,7 @@
 #include "../../../core/macros.h"
 
 #include "../../../module/temperature.h"
-#include "../../../module/printcounter.h"
+#include "../../../module/jobcounter.h"
 #include "../../../module/motion.h"
 #include "../../../module/planner.h"
 
@@ -97,7 +97,7 @@
   #include "meshviewer.h"
 #endif
 
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
   #include "printstats.h"
 #endif
 
@@ -1456,7 +1456,7 @@ void Draw_Main_Area() {
     #if HAS_ESDIAG
       case ESDiagProcess:        Draw_EndStopDiag(); break;
     #endif
-    #if ENABLED(PRINTCOUNTER)
+    #if ENABLED(JOBCOUNTER)
       case CNCStatsProcess:    Draw_PrintStats(); break;
     #endif
     case PauseOrStop:            Popup_window_PauseOrStop(); break;
@@ -1703,7 +1703,7 @@ void DWIN_HandleScreen() {
     #if HAS_ESDIAG
       case ESDiagProcess: HMI_Popup(); break;
     #endif
-    #if ENABLED(PRINTCOUNTER)
+    #if ENABLED(JOBCOUNTER)
       case CNCStatsProcess: HMI_Popup(); break;
     #endif
     default: break;
@@ -1717,7 +1717,7 @@ bool IDisPopUp() {    // If ID is popup...
           (checkkey == Homing) ||
           (checkkey == Leveling) ||
           TERN_(HAS_ESDIAG, (checkkey == ESDiagProcess) ||)
-          TERN_(PRINTCOUNTER, (checkkey == CNCStatsProcess) ||)
+          TERN_(JOBCOUNTER, (checkkey == CNCStatsProcess) ||)
           (checkkey == PauseOrStop) ||
           (checkkey == FilamentPurge);
 }
@@ -1848,7 +1848,7 @@ void DWIN_Print_Started(const bool sd) {
   Goto_PrintProcess();
 }
 
-// Ended print job
+// Ended CNC job
 void DWIN_Print_Finished() {
   if (checkkey == CNCProcess || printingIsActive()) {
     thermalManager.cooldown();
@@ -2082,7 +2082,7 @@ void Goto_ConfirmToPrint() {
   }
 #endif
 
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
   void Draw_PrintStats() {
     HMI_SaveProcessID(CNCStatsProcess);
     CNCStats.Draw();
@@ -3448,7 +3448,7 @@ void Draw_AdvancedSettings_Menu() {
     #if HAS_ESDIAG
       MENU_ITEM(ICON_ESDiag, F("End-stops diag."), onDrawSubMenu, Draw_EndStopDiag);
     #endif
-    #if ENABLED(PRINTCOUNTER)
+    #if ENABLED(JOBCOUNTER)
       MENU_ITEM(ICON_PrintStats, GET_TEXT_F(MSG_INFO_STATS_MENU), onDrawSubMenu, Draw_PrintStats);
       MENU_ITEM(ICON_PrintStatsReset, GET_TEXT_F(MSG_INFO_PRINT_COUNT_RESET), onDrawSubMenu, CNCStats.Reset);
     #endif

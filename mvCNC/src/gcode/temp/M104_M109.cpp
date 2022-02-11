@@ -20,8 +20,8 @@
 
 #include "../../mvCNCCore.h" // for startOrResumeJob, etc.
 
-#if ENABLED(PRINTJOB_TIMER_AUTOSTART)
-  #include "../../module/printcounter.h"
+#if ENABLED(JOB_TIMER_AUTOSTART)
+  #include "../../module/jobcounter.h"
   #if ENABLED(CANCEL_OBJECTS)
     #include "../../feature/cancel_object.h"
   #endif
@@ -52,7 +52,7 @@
  *  M104 S100 : Set target to 100° and return.
  *  M109 R150 : Set target to 150°. Wait until the hotend gets close to 150°.
  *
- * With PRINTJOB_TIMER_AUTOSTART turning on heaters will start the print job timer
+ * With JOB_TIMER_AUTOSTART turning on heaters will start the CNC job timer
  *  (used by printingIsActive, etc.) and turning off heaters will stop the timer.
  */
 void GcodeSuite::M104_M109(const bool isM109) {
@@ -98,7 +98,7 @@ void GcodeSuite::M104_M109(const bool isM109) {
         thermalManager.setTargetHotend(temp ? temp + duplicate_extruder_temp_offset : 0, 1);
     #endif
 
-    #if ENABLED(PRINTJOB_TIMER_AUTOSTART)
+    #if ENABLED(JOB_TIMER_AUTOSTART)
       /**
        * Use half EXTRUDE_MINTEMP to allow nozzles to be put into hot
        * standby mode, (e.g., in a dual extruder setup) without affecting

@@ -14,7 +14,7 @@
 
 #include "../../sd/cardreader.h"
 #include "../../module/temperature.h"
-#include "../../module/printcounter.h"
+#include "../../module/jobcounter.h"
 #include "../../module/planner.h"
 #include "../../module/motion.h"
 
@@ -802,7 +802,7 @@ void mvCNCUI::move_axis_screen() {
 
   const bool busy = printingIsActive();
 
-  // Babysteps during printing? Select babystep for Z probe offset
+  // Babysteps during a CNC job? Select babystep for Z probe offset
   if (busy && ENABLED(BABYSTEP_ZPROBE_OFFSET))
     motionAxisState.z_selection = Z_SELECTION_Z_PROBE;
 

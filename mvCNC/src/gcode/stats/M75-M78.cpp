@@ -3,7 +3,7 @@
 */
 
 #include "../gcode.h"
-#include "../../module/printcounter.h"
+#include "../../module/jobcounter.h"
 #include "../../lcd/mvcncui.h"
 #if ENABLED(HOST_PAUSE_M76)
   #include "../../feature/host_actions.h"
@@ -42,7 +42,7 @@ void GcodeSuite::M77() {
   TERN_(DWIN_CREALITY_LCD_ENHANCED, DWIN_Print_Finished());
 }
 
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
 
   /**
    * M78: Show print statistics
@@ -65,4 +65,4 @@ void GcodeSuite::M77() {
     print_job_timer.showStats();
   }
 
-#endif // PRINTCOUNTER
+#endif // JOBCOUNTER

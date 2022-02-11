@@ -9,7 +9,7 @@
 #include "menu.h"
 #include "../../module/planner.h"
 #include "../../module/motion.h"
-#include "../../module/printcounter.h"
+#include "../../module/jobcounter.h"
 #include "../../gcode/queue.h"
 
 #if HAS_BUZZER

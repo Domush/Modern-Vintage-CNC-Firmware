@@ -4,7 +4,7 @@
 
 #include "../gcode.h"
 #include "../../core/serial.h"
-#include "../../module/printcounter.h"
+#include "../../module/jobcounter.h"
 #include "../../libs/duration_t.h"
 #include "../../lcd/mvcncui.h"
 

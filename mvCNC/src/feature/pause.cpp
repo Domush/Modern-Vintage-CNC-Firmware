@@ -18,7 +18,7 @@
 #include "../module/motion.h"
 #include "../module/planner.h"
 #include "../module/stepper.h"
-#include "../module/printcounter.h"
+#include "../module/jobcounter.h"
 #include "../module/temperature.h"
 
 #if ENABLED(AUTO_BED_LEVELING_UBL)
@@ -393,7 +393,7 @@ bool pause_print(const_float_t retract, const xyz_pos_t &park_point, const bool 
   // Indicate that the cnc is paused
   ++did_pause_print;
 
-  // Pause the print job and timer
+  // Pause the CNC job and timer
   #if ENABLED(SDSUPPORT)
     const bool was_sd_printing = IS_SD_PRINTING();
     if (was_sd_printing) {
@@ -581,7 +581,7 @@ void wait_for_confirmation(const bool is_reload/*=false*/, const int8_t max_beep
  *                 Not sure how this logic comes into use.
  * - Sync the planner E to resume_position.e
  * - Send host action for resume, if configured
- * - Resume the current SD print job, if any
+ * - Resume the current SD CNC job, if any
  */
 void resume_print(const_float_t slow_load_length/*=0*/, const_float_t fast_load_length/*=0*/, const_float_t purge_length/*=ADVANCED_PAUSE_PURGE_LENGTH*/, const int8_t max_beep_count/*=0*/, const celsius_t targetTemp/*=0*/ DXC_ARGS) {
   DEBUG_SECTION(rp, "resume_print", true);
@@ -673,7 +673,7 @@ void resume_print(const_float_t slow_load_length/*=0*/, const_float_t fast_load_
 
   TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_open(PROMPT_INFO, F("Resuming"), FPSTR(DISMISS_STR)));
 
-  // Resume the print job timer if it was running
+  // Resume the CNC job timer if it was running
   if (print_job_timer.isPaused()) print_job_timer.start();
 
   #if ENABLED(SDSUPPORT)

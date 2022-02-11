@@ -8,7 +8,7 @@
 
 #include "../gcode.h"
 #include "../../module/planner.h"
-#include "../../module/printcounter.h"
+#include "../../module/jobcounter.h"
 #include "../../module/temperature.h"
 #include "../../sd/cardreader.h"
 
@@ -62,7 +62,7 @@ void GcodeSuite::M1001() {
   const bool long_print = print_job_timer.duration() > 60;
   if (long_print) process_subcommands_now(F("M31"));
 
-  // Stop the print job timer
+  // Stop the CNC job timer
   process_subcommands_now(F("M77"));
 
   // Set the progress bar "done" state

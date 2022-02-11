@@ -13,7 +13,7 @@
 #include "menu_item.h"
 #include "../../module/temperature.h"
 #include "../../gcode/queue.h"
-#include "../../module/printcounter.h"
+#include "../../module/jobcounter.h"
 #include "../../module/stepper.h"
 #include "../../sd/cardreader.h"
 

@@ -3476,8 +3476,8 @@ static_assert(_PLUS_TEST(4), "HOMING_FEEDRATE_MM_M values must be positive.");
   #endif
 #endif
 
-#if ENABLED(PRINTCOUNTER) && DISABLED(EEPROM_SETTINGS)
-  #error "PRINTCOUNTER requires EEPROM_SETTINGS."
+#if ENABLED(JOBCOUNTER) && DISABLED(EEPROM_SETTINGS)
+  #error "JOBCOUNTER requires EEPROM_SETTINGS."
 #endif
 
 #if ENABLED(USB_FLASH_DRIVE_SUPPORT) && !PINS_EXIST(USB_CS, USB_INTR) && DISABLED(USE_OTG_USB_HOST)
@@ -3536,9 +3536,9 @@ static_assert(_PLUS_TEST(4), "HOMING_FEEDRATE_MM_M values must be positive.");
 #endif
 
 /**
- * Advanced PRINTCOUNTER settings
+ * Advanced JOBCOUNTER settings
  */
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
   #if defined(SERVICE_INTERVAL_1) != defined(SERVICE_NAME_1)
     #error "Both SERVICE_NAME_1 and SERVICE_INTERVAL_1 are required."
   #elif defined(SERVICE_INTERVAL_2) != defined(SERVICE_NAME_2)

@@ -1329,7 +1329,7 @@
   // Add an 'M73' G-code to set the current percentage
   #define LCD_SET_PROGRESS_MANUALLY
 
-  // Show the E position (filament used) during printing
+  // Show the E position (filament used) during a CNC job
   //#define LCD_SHOW_E_TOTAL
 
   /**
@@ -1726,7 +1726,7 @@
   #define DGUS_UPDATE_INTERVAL_MS  500    // (ms) Interval between automatic screen updates
 
   #if ANY(DGUS_LCD_UI_FYSETC, DGUS_LCD_UI_MKS, DGUS_LCD_UI_HIPRECY)
-    #define DGUS_PRINT_FILENAME           // Display the filename during printing
+    #define DGUS_PRINT_FILENAME           // Display the filename during a CNC job
     #define DGUS_PREHEAT_UI               // Display a preheat screen during heatup
 
     #if EITHER(DGUS_LCD_UI_FYSETC, DGUS_LCD_UI_MKS)
@@ -3958,7 +3958,7 @@
   //#define BUTTON1_PIN -1
   #if PIN_EXISTS(BUTTON1)
     #define BUTTON1_HIT_STATE     LOW       // State of the triggered button. NC=LOW. NO=HIGH.
-    #define BUTTON1_WHEN_PRINTING false     // Button allowed to trigger during printing?
+    #define BUTTON1_WHEN_PRINTING false     // Button allowed to trigger during a CNC job?
     #define BUTTON1_GCODE         "G28"
     #define BUTTON1_DESC          "Homing"  // Optional string to set the LCD status
   #endif
@@ -4320,9 +4320,9 @@
 #endif // HAS_PRUSA_MMU2
 
 /**
- * Advanced CNC Counter settings
+ * Advanced Job Counter settings
  */
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
   #define SERVICE_WARNING_BUZZES  3
   // Activate up to 3 service interval watchdogs
   //#define SERVICE_NAME_1      "Service S"

@@ -28,7 +28,7 @@
 #include "module/endstops.h"
 #include "module/temperature.h"
 #include "module/settings.h"
-#include "module/printcounter.h" // CNCCounter or Stopwatch
+#include "module/jobcounter.h" // CNCCounter or Stopwatch
 
 #include "module/stepper.h"
 #include "module/stepper/indirection.h"
@@ -798,7 +798,7 @@ void idle(bool no_stepper_sleep/*=false*/) {
   TERN_(HOST_KEEPALIVE_FEATURE, gcode.host_keepalive());
 
   // Update the CNC Job Timer state
-  TERN_(PRINTCOUNTER, print_job_timer.tick());
+  TERN_(JOBCOUNTER, print_job_timer.tick());
 
   // Update the Beeper queue
   TERN_(USE_BEEPER, buzzer.tick());
@@ -1317,7 +1317,7 @@ void setup() {
 
   SETUP_RUN(thermalManager.init());   // Initialize temperature loop
 
-  SETUP_RUN(print_job_timer.init());  // Initial setup of print job timer
+  SETUP_RUN(print_job_timer.init());  // Initial setup of CNC job timer
 
   SETUP_RUN(endstops.init());         // Init endstops and pullups
 

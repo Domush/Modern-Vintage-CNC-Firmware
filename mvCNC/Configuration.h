@@ -972,7 +972,7 @@
 /**
  * S-Curve Acceleration
  *
- * This option eliminates vibration during printing by fitting a Bézier
+ * This option eliminates vibration during a CNC job by fitting a Bézier
  * curve to move acceleration, producing much smoother direction changes.
  *
  * See https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
@@ -1408,11 +1408,11 @@
  * Filament Runout Sensors
  * Mechanical or opto endstops are used to check for the presence of filament.
  *
- * IMPORTANT: Runout will only trigger if mvCNC is aware that a print job is running.
- * mvCNC knows a print job is running when:
- *  1. Running a print job from media started with M24.
+ * IMPORTANT: Runout will only trigger if mvCNC is aware that a CNC job is running.
+ * mvCNC knows a CNC job is running when:
+ *  1. Running a CNC job from media started with M24.
  *  2. The CNC Job Timer has been started with M75.
- *  3. The heaters were turned on and PRINTJOB_TIMER_AUTOSTART is enabled.
+ *  3. The heaters were turned on and JOB_TIMER_AUTOSTART is enabled.
  *
  * RAMPS-based boards use SERVO3_PIN for the first runout sensor.
  * For other boards you may need to define FIL_RUNOUT_PIN, FIL_RUNOUT2_PIN, etc.
@@ -1953,8 +1953,8 @@
 /**
  * CNC Job Timer
  *
- * Automatically start and stop the print job timer on M104/M109/M140/M190/M141/M191.
- * The print job timer will only be stopped if the bed/chamber target temp is
+ * Automatically start and stop the CNC job timer on M104/M109/M140/M190/M141/M191.
+ * The CNC job timer will only be stopped if the bed/chamber target temp is
  * below BED_MINTEMP/CHAMBER_MINTEMP.
  *
  *   M104 (hotend, no wait)  - high temp = none,        low temp = stop timer
@@ -1970,27 +1970,27 @@
  *
  * The timer can also be controlled with the following commands:
  *
- *   M75 - Start the print job timer
- *   M76 - Pause the print job timer
- *   M77 - Stop the print job timer
+ *   M75 - Start the CNC job timer
+ *   M76 - Pause the CNC job timer
+ *   M77 - Stop the CNC job timer
  */
-#define PRINTJOB_TIMER_AUTOSTART
+#define JOB_TIMER_AUTOSTART
 
 /**
- * CNC Counter
+ * Job Counter
  *
  * Track statistical data such as:
  *
- *  - Total print jobs
- *  - Total successful print jobs
- *  - Total failed print jobs
- *  - Total time printing
+ *  - Total CNC jobs
+ *  - Total successful CNC jobs
+ *  - Total failed CNC jobs
+ *  - Total time active
  *
  * View the current statistics with M78.
  */
-//#define PRINTCOUNTER
-#if ENABLED(PRINTCOUNTER)
-  #define PRINTCOUNTER_SAVE_INTERVAL 60 // (minutes) EEPROM save interval during print
+//#define JOBCOUNTER
+#if ENABLED(JOBCOUNTER)
+  #define JOBCOUNTER_SAVE_INTERVAL 60 // (minutes) EEPROM save interval during a CNC job
 #endif
 
 /**

@@ -35,7 +35,7 @@
 
 #include "../../sd/cardreader.h"
 #include "../../module/temperature.h"
-#include "../../module/printcounter.h"
+#include "../../module/jobcounter.h"
 #include "../../mvCNCCore.h"
 
 #if ENABLED(SDSUPPORT)

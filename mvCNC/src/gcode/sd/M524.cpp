@@ -10,7 +10,7 @@
 #include "../../sd/cardreader.h"
 
 /**
- * M524: Abort the current SD print job (started with M24)
+ * M524: Abort the current SD CNC job (started with M24)
  */
 void GcodeSuite::M524() {
 

@@ -20,7 +20,7 @@
 #endif
 
 #include "../module/planner.h"        // for synchronize
-#include "../module/printcounter.h"
+#include "../module/jobcounter.h"
 #include "../gcode/queue.h"
 #include "../module/settings.h"
 #include "../module/stepper/indirection.h"

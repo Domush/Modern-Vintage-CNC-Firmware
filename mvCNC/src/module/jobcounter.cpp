@@ -4,18 +4,18 @@
 
 #include "../inc/mvCNCConfig.h"
 
-#if DISABLED(PRINTCOUNTER)
+#if DISABLED(JOBCOUNTER)
 
 #include "../libs/stopwatch.h"
 Stopwatch print_job_timer;      // Global CNC Job Timer instance
 
-#else // PRINTCOUNTER
+#else // JOBCOUNTER
 
 #if ENABLED(EXTENSIBLE_UI)
   #include "../lcd/extui/ui_api.h"
 #endif
 
-#include "printcounter.h"
+#include "jobcounter.h"
 #include "../mvCNCCore.h"
 #include "../HAL/shared/eeprom_api.h"
 
@@ -23,9 +23,9 @@ Stopwatch print_job_timer;      // Global CNC Job Timer instance
   #include "../libs/buzzer.h"
 #endif
 
-#if PRINTCOUNTER_SYNC
+#if JOBCOUNTER_SYNC
   #include "../module/planner.h"
-  #warning "To prevent step loss, motion will pause for PRINTCOUNTER auto-save."
+  #warning "To prevent step loss, motion will pause for JOBCOUNTER auto-save."
 #endif
 
 // Service intervals
@@ -57,14 +57,14 @@ millis_t CNCCounter::lastDuration;
 bool CNCCounter::loaded = false;
 
 millis_t CNCCounter::deltaDuration() {
-  TERN_(DEBUG_PRINTCOUNTER, debug(PSTR("deltaDuration")));
+  TERN_(DEBUG_JOBCOUNTER, debug(PSTR("deltaDuration")));
   millis_t tmp = lastDuration;
   lastDuration = duration();
   return lastDuration - tmp;
 }
 
 void CNCCounter::incFilamentUsed(float const &amount) {
-  TERN_(DEBUG_PRINTCOUNTER, debug(PSTR("incFilamentUsed")));
+  TERN_(DEBUG_JOBCOUNTER, debug(PSTR("incFilamentUsed")));
 
   // Refuses to update data if object is not loaded
   if (!isLoaded()) return;
@@ -73,7 +73,7 @@ void CNCCounter::incFilamentUsed(float const &amount) {
 }
 
 void CNCCounter::initStats() {
-  TERN_(DEBUG_PRINTCOUNTER, debug(PSTR("initStats")));
+  TERN_(DEBUG_JOBCOUNTER, debug(PSTR("initStats")));
 
   loaded = true;
   data = { 0, 0, 0, 0, 0.0
@@ -109,7 +109,7 @@ void CNCCounter::initStats() {
 #endif
 
 void CNCCounter::loadStats() {
-  TERN_(DEBUG_PRINTCOUNTER, debug(PSTR("loadStats")));
+  TERN_(DEBUG_JOBCOUNTER, debug(PSTR("loadStats")));
 
   // Check if the EEPROM block is initialized
   uint8_t value = 0;
@@ -142,12 +142,12 @@ void CNCCounter::loadStats() {
 }
 
 void CNCCounter::saveStats() {
-  TERN_(DEBUG_PRINTCOUNTER, debug(PSTR("saveStats")));
+  TERN_(DEBUG_JOBCOUNTER, debug(PSTR("saveStats")));
 
   // Refuses to save data if object is not loaded
   if (!isLoaded()) return;
 
-  TERN_(PRINTCOUNTER_SYNC, planner.synchronize());
+  TERN_(JOBCOUNTER_SYNC, planner.synchronize());
 
   // Saves the struct to EEPROM
   persistentStore.access_start();
@@ -180,7 +180,7 @@ void CNCCounter::showStats() {
   duration_t elapsed = data.printTime;
   elapsed.toString(buffer);
   SERIAL_ECHOPGM("Total time: ", buffer);
-  #if ENABLED(DEBUG_PRINTCOUNTER)
+  #if ENABLED(DEBUG_JOBCOUNTER)
     SERIAL_ECHOPGM(" (", data.printTime);
     SERIAL_CHAR(')');
   #endif
@@ -188,7 +188,7 @@ void CNCCounter::showStats() {
   elapsed = data.longestPrint;
   elapsed.toString(buffer);
   SERIAL_ECHOPGM(", Longest job: ", buffer);
-  #if ENABLED(DEBUG_PRINTCOUNTER)
+  #if ENABLED(DEBUG_JOBCOUNTER)
     SERIAL_ECHOPGM(" (", data.longestPrint);
     SERIAL_CHAR(')');
   #endif
@@ -217,7 +217,7 @@ void CNCCounter::tick() {
   if (ELAPSED(now, update_next)) {
     update_next = now + updateInterval;
 
-    TERN_(DEBUG_PRINTCOUNTER, debug(PSTR("tick")));
+    TERN_(DEBUG_JOBCOUNTER, debug(PSTR("tick")));
 
     millis_t delta = deltaDuration();
     data.printTime += delta;
@@ -233,7 +233,7 @@ void CNCCounter::tick() {
     #endif
   }
 
-  #if PRINTCOUNTER_SAVE_INTERVAL > 0
+  #if JOBCOUNTER_SAVE_INTERVAL > 0
     static millis_t eeprom_next; // = 0
     if (ELAPSED(now, eeprom_next)) {
       eeprom_next = now + saveInterval;
@@ -244,7 +244,7 @@ void CNCCounter::tick() {
 
 // @Override
 bool CNCCounter::start() {
-  TERN_(DEBUG_PRINTCOUNTER, debug(PSTR("start")));
+  TERN_(DEBUG_JOBCOUNTER, debug(PSTR("start")));
 
   bool paused = isPaused();
 
@@ -260,7 +260,7 @@ bool CNCCounter::start() {
 }
 
 bool CNCCounter::_stop(const bool completed) {
-  TERN_(DEBUG_PRINTCOUNTER, debug(PSTR("stop")));
+  TERN_(DEBUG_JOBCOUNTER, debug(PSTR("stop")));
 
   const bool did_stop = super::stop();
   if (did_stop) {
@@ -277,7 +277,7 @@ bool CNCCounter::_stop(const bool completed) {
 
 // @Override
 void CNCCounter::reset() {
-  TERN_(DEBUG_PRINTCOUNTER, debug(PSTR("stop")));
+  TERN_(DEBUG_JOBCOUNTER, debug(PSTR("stop")));
 
   super::reset();
   lastDuration = 0;
@@ -318,7 +318,7 @@ void CNCCounter::reset() {
 
 #endif // HAS_SERVICE_INTERVALS
 
-#if ENABLED(DEBUG_PRINTCOUNTER)
+#if ENABLED(DEBUG_JOBCOUNTER)
 
   void CNCCounter::debug(const char func[]) {
     if (DEBUGGING(INFO)) {
@@ -330,4 +330,4 @@ void CNCCounter::reset() {
 
 #endif
 
-#endif // PRINTCOUNTER
+#endif // JOBCOUNTER

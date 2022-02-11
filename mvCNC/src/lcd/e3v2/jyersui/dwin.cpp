@@ -3018,8 +3018,8 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
     case Info:
 
       #define INFO_BACK 0
-      #define INFO_PRINTCOUNT (INFO_BACK + ENABLED(PRINTCOUNTER))
-      #define INFO_PRINTTIME (INFO_PRINTCOUNT + ENABLED(PRINTCOUNTER))
+      #define INFO_PRINTCOUNT (INFO_BACK + ENABLED(JOBCOUNTER))
+      #define INFO_PRINTTIME (INFO_PRINTCOUNT + ENABLED(JOBCOUNTER))
       #define INFO_SIZE (INFO_PRINTTIME + 1)
       #define INFO_VERSION (INFO_SIZE + 1)
       #define INFO_CONTACT (INFO_VERSION + 1)
@@ -3030,7 +3030,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           if (draw) {
             Draw_Menu_Item(row, ICON_Back, F("Back"));
 
-            #if ENABLED(PRINTCOUNTER)
+            #if ENABLED(JOBCOUNTER)
               char row1[50], row2[50], buf[32];
               printStatistics ps = print_job_timer.getStats();
 

@@ -18,7 +18,7 @@
 #endif
 
 #if BOTH(SD_ABORT_ON_ENDSTOP_HIT, SDSUPPORT)
-  #include "printcounter.h" // for print_job_timer
+  #include "jobcounter.h" // for print_job_timer
 #endif
 
 #if ENABLED(BLTOUCH)

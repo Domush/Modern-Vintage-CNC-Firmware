@@ -8,7 +8,7 @@
 
 #include "../gcode.h"
 #include "../../sd/cardreader.h"
-#include "../../module/printcounter.h"
+#include "../../module/jobcounter.h"
 #include "../../lcd/mvcncui.h"
 
 #if ENABLED(PARK_HEAD_ON_PAUSE)
@@ -53,7 +53,7 @@ void GcodeSuite::M24() {
 
   if (card.isFileOpen()) {
     card.startOrResumeFilePrinting();            // SD card will now be read for commands
-    startOrResumeJob();               // Start (or resume) the print job timer
+    startOrResumeJob();               // Start (or resume) the CNC job timer
     TERN_(POWER_LOSS_RECOVERY, recovery.prepare());
   }
 

@@ -10,7 +10,7 @@
 #include "../mvCNCCore.h"
 
 #include "../module/stepper/indirection.h"
-#include "../module/printcounter.h"
+#include "../module/jobcounter.h"
 #include "../libs/duration_t.h"
 #include "../gcode/gcode.h"
 

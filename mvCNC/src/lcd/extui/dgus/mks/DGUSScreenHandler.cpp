@@ -15,7 +15,7 @@
 #include "../../../../module/temperature.h"
 #include "../../../../module/motion.h"
 #include "../../../../module/planner.h"
-#include "../../../../module/printcounter.h"
+#include "../../../../module/jobcounter.h"
 
 #include "../../../../gcode/gcode.h"
 

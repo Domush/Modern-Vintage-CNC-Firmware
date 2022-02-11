@@ -41,7 +41,7 @@ mvCNCUI ui;
 #endif
 
 #if ANY(HAS_DISPLAY, HAS_STATUS_MESSAGE, BASIC_PROGRESS_BAR)
-  #include "../module/printcounter.h"
+  #include "../module/jobcounter.h"
 #endif
 
 #if LCD_HAS_WAIT_FOR_MOVE

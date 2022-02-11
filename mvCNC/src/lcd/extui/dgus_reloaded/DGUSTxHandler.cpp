@@ -31,7 +31,7 @@
 
 #include "../ui_api.h"
 #include "../../../module/stepper.h"
-#include "../../../module/printcounter.h"
+#include "../../../module/jobcounter.h"
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
   #include "../../../feature/pause.h"
 #endif
@@ -500,7 +500,7 @@ void DGUSTxHandler::BuildVolume(DGUS_VP &vp) {
 }
 
 void DGUSTxHandler::TotalPrints(DGUS_VP &vp) {
-  #if ENABLED(PRINTCOUNTER)
+  #if ENABLED(JOBCOUNTER)
     dgus_display.Write((uint16_t)vp.addr, dgus_display.SwapBytes(print_job_timer.getStats().totalPrints));
   #else
     UNUSED(vp);
@@ -508,7 +508,7 @@ void DGUSTxHandler::TotalPrints(DGUS_VP &vp) {
 }
 
 void DGUSTxHandler::FinishedPrints(DGUS_VP &vp) {
-  #if ENABLED(PRINTCOUNTER)
+  #if ENABLED(JOBCOUNTER)
     dgus_display.Write((uint16_t)vp.addr, dgus_display.SwapBytes(print_job_timer.getStats().finishedPrints));
   #else
     UNUSED(vp);
@@ -516,7 +516,7 @@ void DGUSTxHandler::FinishedPrints(DGUS_VP &vp) {
 }
 
 void DGUSTxHandler::CNCTime(DGUS_VP &vp) {
-  #if ENABLED(PRINTCOUNTER)
+  #if ENABLED(JOBCOUNTER)
     char buffer[21];
     ExtUI::getTotalPrintTime_str(buffer);
 
@@ -527,7 +527,7 @@ void DGUSTxHandler::CNCTime(DGUS_VP &vp) {
 }
 
 void DGUSTxHandler::LongestPrint(DGUS_VP &vp) {
-  #if ENABLED(PRINTCOUNTER)
+  #if ENABLED(JOBCOUNTER)
     char buffer[21];
     ExtUI::getLongestPrint_str(buffer);
 
@@ -538,7 +538,7 @@ void DGUSTxHandler::LongestPrint(DGUS_VP &vp) {
 }
 
 void DGUSTxHandler::FilamentUsed(DGUS_VP &vp) {
-  #if ENABLED(PRINTCOUNTER)
+  #if ENABLED(JOBCOUNTER)
     char buffer[21];
     ExtUI::getFilamentUsed_str(buffer);
 

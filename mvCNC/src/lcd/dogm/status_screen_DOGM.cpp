@@ -56,7 +56,7 @@
 #endif
 
 #if HAS_PRINT_PROGRESS
-  #include "../../module/printcounter.h"
+  #include "../../module/jobcounter.h"
 #endif
 
 #if HAS_DUAL_MIXING

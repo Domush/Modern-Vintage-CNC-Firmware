@@ -8,7 +8,7 @@ The firmware needs to maintain continuity and timing so the command senders rema
 
 To keep things flowing mvCNC feeds a single queue of G-code commands from all inputs, inserting them in the order received. Movement commands immediately go into the Planner Buffer, if there is room. The buffering of a move is considered the completion of the command, so if a non-movement command has to occur after a move is done, and not just after a move is buffered, then there has to be an `M400` to wait for the Planner Buffer to finish.
 
-Whenever the command queue gets full the sender needs to wait for space to open up, and the host may need to re-send the last command again. mvCNC does some handshaking to keep the host informed during a print job, described below.
+Whenever the command queue gets full the sender needs to wait for space to open up, and the host may need to re-send the last command again. mvCNC does some handshaking to keep the host informed during a CNC job, described below.
 
 An opposite problem called "planner starvation" occurs when mvCNC receives many short and fast moves in a row so the Planner Buffer gets completed very quickly. In this case the host can't send commands fast enough to prevent the Planner Buffer from emptying out. Planner starvation causes obvious stuttering and is commonly seen on overloaded deltabots during small curves. mvCNC has strategies to mitigate this issue, but sometimes a model has to be re-sliced (or the G-code has to be post-processed with Arc Welder) just to stay within the machine's inherent limits.
 

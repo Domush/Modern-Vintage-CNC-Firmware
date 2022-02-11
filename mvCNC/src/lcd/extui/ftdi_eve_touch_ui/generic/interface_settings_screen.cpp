@@ -30,8 +30,8 @@
 
 #include "../../../../module/settings.h"
 
-#if ENABLED(LULZBOT_PRINTCOUNTER)
-  #include "../../../../module/printcounter.h"
+#if ENABLED(LULZBOT_JOBCOUNTER)
+  #include "../../../../module/jobcounter.h"
 #endif
 
 bool restoreEEPROM();

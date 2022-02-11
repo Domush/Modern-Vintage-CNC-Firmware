@@ -79,7 +79,7 @@ The `L6470_monitor` feature reads the status of each device every half second. I
 
 **M916, M917 & M918**
 
-These utilities are used to tune the system. They can get you in the ballpark for acceptable jerk, acceleration, top speed and `KVAL_HOLD` settings (`TVAL` on L6474). In general they seem to provide an overly optimistic `KVAL_HOLD` (`TVAL`) setting because of the lag between setting `KVAL_HOLD` (`TVAL`) and the driver reaching final temperature. Enabling the `L6470_monitor` feature during prints will provide the **final useful setting**.
+These utilities are used to tune the system. They can get you in the ballpark for acceptable jerk, acceleration, top speed and `KVAL_HOLD` settings (`TVAL` on L6474). In general they seem to provide an overly optimistic `KVAL_HOLD` (`TVAL`) setting because of the lag between setting `KVAL_HOLD` (`TVAL`) and the driver reaching final temperature. Enabling the `L6470_monitor` feature during a CNC jobs will provide the **final useful setting**.
 
 The amount of power needed to move the stepper without skipping steps increases as jerk, acceleration, top speed, and micro-steps increase. The power dissipated by the driver increases as the power to the stepper increases. The net result is a balancing act between jerk, acceleration, top speed, micro-steps, and power dissipated by the driver.
 

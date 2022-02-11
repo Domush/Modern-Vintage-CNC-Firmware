@@ -24,7 +24,7 @@ void GcodeSuite::M141() {
   if (parser.seenval('S')) {
     thermalManager.setTargetChamber(parser.value_celsius());
 
-    #if ENABLED(PRINTJOB_TIMER_AUTOSTART)
+    #if ENABLED(JOB_TIMER_AUTOSTART)
       /**
        * Stop the timer at the end of print. Hotend, bed target, and chamber
        * temperatures need to be set below mintemp. Order of M140, M104, and M141
@@ -45,7 +45,7 @@ void GcodeSuite::M191() {
   const bool no_wait_for_cooling = parser.seenval('S');
   if (no_wait_for_cooling || parser.seenval('R')) {
     thermalManager.setTargetChamber(parser.value_celsius());
-    TERN_(PRINTJOB_TIMER_AUTOSTART, thermalManager.auto_job_check_timer(true, false));
+    TERN_(JOB_TIMER_AUTOSTART, thermalManager.auto_job_check_timer(true, false));
   }
   else return;
 

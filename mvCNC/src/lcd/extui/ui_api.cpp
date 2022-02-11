@@ -34,13 +34,13 @@
 #include "../../module/planner.h"
 #include "../../module/probe.h"
 #include "../../module/temperature.h"
-#include "../../module/printcounter.h"
+#include "../../module/jobcounter.h"
 #include "../../libs/duration_t.h"
 #include "../../HAL/shared/Delay.h"
 #include "../../mvCNCCore.h"
 #include "../../sd/cardreader.h"
 
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
   #include "../../core/utility.h"
   #include "../../libs/numtostr.h"
 #endif
@@ -912,7 +912,7 @@ namespace ExtUI {
     void setHostResponse(const uint8_t response) { hostui.handle_response(response); }
   #endif
 
-  #if ENABLED(PRINTCOUNTER)
+  #if ENABLED(JOBCOUNTER)
     char* getFailedPrints_str(char buffer[21])   { strcpy(buffer,i16tostr3left(print_job_timer.getStats().totalPrints - print_job_timer.getStats().finishedPrints)); return buffer; }
     char* getTotalPrints_str(char buffer[21])    { strcpy(buffer,i16tostr3left(print_job_timer.getStats().totalPrints));    return buffer; }
     char* getFinishedPrints_str(char buffer[21]) { strcpy(buffer,i16tostr3left(print_job_timer.getStats().finishedPrints)); return buffer; }

@@ -30,7 +30,7 @@
 #endif
 
 #if HAS_DISPLAY
-  #include "../module/printcounter.h"
+  #include "../module/jobcounter.h"
 #endif
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)

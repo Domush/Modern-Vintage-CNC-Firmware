@@ -51,7 +51,7 @@
 #include "../lcdprint.h"
 #include "../../libs/duration_t.h"
 #include "../../module/motion.h"
-#include "../../module/printcounter.h"
+#include "../../module/jobcounter.h"
 #include "../../module/temperature.h"
 
 #if ENABLED(SDSUPPORT)

@@ -19,9 +19,9 @@
 #define VALUE_ITEM(MSG, VALUE, STYL)    do{ char msg[21]; strcpy_P(msg, PSTR(": ")); strcpy(msg + 2, VALUE); STATIC_ITEM(MSG, STYL, msg); }while(0)
 #define VALUE_ITEM_P(MSG, PVALUE, STYL) do{ char msg[21]; strcpy_P(msg, PSTR(": ")); strcpy_P(msg + 2, PSTR(PVALUE)); STATIC_ITEM(MSG, STYL, msg); }while(0)
 
-#if ENABLED(PRINTCOUNTER)
+#if ENABLED(JOBCOUNTER)
 
-  #include "../../module/printcounter.h"
+  #include "../../module/jobcounter.h"
 
   //
   // About CNC > CNC Stats
@@ -269,7 +269,7 @@ void menu_info() {
     #endif
   #endif
 
-  #if ENABLED(PRINTCOUNTER)
+  #if ENABLED(JOBCOUNTER)
     SUBMENU(MSG_INFO_STATS_MENU, menu_info_stats);               // CNC Stats >
   #endif
 

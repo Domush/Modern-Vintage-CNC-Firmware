@@ -16,7 +16,7 @@
 #include "temperature.h"
 #include "endstops.h"
 #include "planner.h"
-#include "printcounter.h"
+#include "jobcounter.h"
 
 #if EITHER(HAS_COOLER, LASER_COOLANT_FLOW_METER)
   #include "../feature/cooler.h"
@@ -2675,7 +2675,7 @@ void Temperature::disable_all_heaters() {
   #endif
 }
 
-#if ENABLED(PRINTJOB_TIMER_AUTOSTART)
+#if ENABLED(JOB_TIMER_AUTOSTART)
 
   bool Temperature::auto_job_over_threshold() {
     #if HAS_HOTEND
@@ -2695,7 +2695,7 @@ void Temperature::disable_all_heaters() {
     }
   }
 
-#endif // PRINTJOB_TIMER_AUTOSTART
+#endif // JOB_TIMER_AUTOSTART
 
 #if ENABLED(PROBING_HEATERS_OFF)
 

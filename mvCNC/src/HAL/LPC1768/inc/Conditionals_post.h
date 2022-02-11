@@ -9,8 +9,8 @@
   #define USE_SHARED_EEPROM 1
 #endif
 
-// LPC1768 boards seem to lose steps when saving to EEPROM during print (issue #20785)
+// LPC1768 boards seem to lose steps when saving to EEPROM during a CNC job (issue #20785)
 // TODO: Which other boards are incompatible?
-#if defined(MCU_LPC1768) && PRINTCOUNTER_SAVE_INTERVAL > 0
-  #define PRINTCOUNTER_SYNC 1
+#if defined(MCU_LPC1768) && JOBCOUNTER_SAVE_INTERVAL > 0
+  #define JOBCOUNTER_SYNC 1
 #endif

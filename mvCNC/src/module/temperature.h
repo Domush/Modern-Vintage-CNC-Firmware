@@ -875,7 +875,7 @@ class Temperature {
       disable_all_heaters();
     }
 
-    #if ENABLED(PRINTJOB_TIMER_AUTOSTART)
+    #if ENABLED(JOB_TIMER_AUTOSTART)
       /**
        * Methods to check if heaters are enabled, indicating an active job
        */

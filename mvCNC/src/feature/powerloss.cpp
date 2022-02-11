@@ -32,7 +32,7 @@ uint32_t CNCJobRecovery::cmd_sdpos, // = 0
 #include "../gcode/gcode.h"
 #include "../module/motion.h"
 #include "../module/planner.h"
-#include "../module/printcounter.h"
+#include "../module/jobcounter.h"
 #include "../module/temperature.h"
 #include "../core/serial.h"
 
@@ -201,7 +201,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
       info.retract_hop = fwretract.current_hop;
     #endif
 
-    // Elapsed print job time
+    // Elapsed CNC job time
     info.print_job_elapsed = print_job_timer.duration();
 
     // Relative axis modes
@@ -303,7 +303,7 @@ void CNCJobRecovery::write() {
 }
 
 /**
- * Resume the saved print job
+ * Resume the saved CNC job
  */
 void CNCJobRecovery::resume() {
 

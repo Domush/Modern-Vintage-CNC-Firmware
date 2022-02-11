@@ -19,7 +19,7 @@
 //#include "../../../module/stepper.h"
 //#include "../../../module/motion.h"
 //#include "../../../libs/duration_t.h"
-//#include "../../../module/printcounter.h"
+//#include "../../../module/jobcounter.h"
 //#include "../../../gcode/queue.h"
 
 namespace ExtUI {

@@ -31,13 +31,13 @@
 
 #include "../../../inc/mvCNCConfigPre.h"
 
-#if BOTH(DWIN_CREALITY_LCD_ENHANCED, PRINTCOUNTER)
+#if BOTH(DWIN_CREALITY_LCD_ENHANCED, JOBCOUNTER)
 
 #include "printstats.h"
 
 #include "../../../core/types.h"
 #include "../../mvcncui.h"
-#include "../../../module/printcounter.h"
+#include "../../../module/jobcounter.h"
 #include "dwin_lcd.h"
 #include "dwinui.h"
 #include "dwin_popup.h"
@@ -75,4 +75,4 @@ void CNCStatsClass::Reset() {
   HMI_AudioFeedback();
 }
 
-#endif // DWIN_CREALITY_LCD_ENHANCED && PRINTCOUNTER
+#endif // DWIN_CREALITY_LCD_ENHANCED && JOBCOUNTER
