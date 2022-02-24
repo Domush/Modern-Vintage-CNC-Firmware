@@ -82,6 +82,7 @@ extern feedRate_t feedrate_mm_s;
  * Feedrate scaling is applied to all G0/G1, G2/G3, and G5 moves
  */
 extern int16_t feedrate_percentage;
+extern float feedrate_percentage_change;
 #define MMS_SCALED(V) ((V) * 0.01f * feedrate_percentage)
 
 // The active extruder (tool). Set with T<extruder> command.
@@ -345,11 +346,12 @@ void do_blocking_move_to_x(const_float_t rx, const_feedRate_t fr_mm_s=0.0f);
 void remember_feedrate_and_scaling();
 void remember_feedrate_scaling_off();
 void restore_feedrate_and_scaling();
+void update_feedrate_scaling(int16_t new_feedrate_percentage = 100, bool update_planner = true);
 
 #if HAS_Z_AXIS
-  void do_z_clearance(const_float_t zclear, const bool lower_allowed=false);
+    void do_z_clearance(const_float_t zclear, const bool lower_allowed = false);
 #else
-  inline void do_z_clearance(float, bool=false) {}
+    inline void do_z_clearance(float, bool = false) {}
 #endif
 
 /**

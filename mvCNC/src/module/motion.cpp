@@ -119,6 +119,7 @@ xyze_pos_t destination; // {0}
 // Functions that override this for custom moves *must always* restore it!
 feedRate_t feedrate_mm_s = MMM_TO_MMS(1500);
 int16_t feedrate_percentage = 100;
+float feedrate_percentage_change = 1.0f;
 
 // Cartesian conversion result goes here:
 xyz_pos_t cartes;
@@ -740,21 +741,31 @@ void remember_feedrate_and_scaling() {
 }
 void remember_feedrate_scaling_off() {
   remember_feedrate_and_scaling();
-  feedrate_percentage = 100;
+  update_feedrate_scaling(100);
 }
 void restore_feedrate_and_scaling() {
   feedrate_mm_s = saved_feedrate_mm_s;
-  feedrate_percentage = saved_feedrate_percentage;
+  update_feedrate_scaling(saved_feedrate_percentage);
+}
+
+// Updates the current feed rate override to the new value
+// Optionally updates the planner for an immediate effect
+void update_feedrate_scaling(int16_t new_feedrate_percentage/* = 100*/, bool update_planner/* = true*/) {
+  if (new_feedrate_percentage > 500)
+    new_feedrate_percentage = 500;
+  else if (new_feedrate_percentage < 1)
+    new_feedrate_percentage = 1;
+  feedrate_percentage_change = saved_feedrate_percentage / feedrate_percentage;
+  if (update_planner) planner.modify_nominal_speeds(feedrate_percentage_change);
 }
 
 #if HAS_SOFTWARE_ENDSTOPS
 
-  // Software Endstops are based on the configured limits.
-  soft_endstops_t soft_endstop = {
-    true, false,
-    LINEAR_AXIS_ARRAY(X_MIN_POS, Y_MIN_POS, Z_MIN_POS, I_MIN_POS, J_MIN_POS, K_MIN_POS),
-    LINEAR_AXIS_ARRAY(X_MAX_BED, Y_MAX_BED, Z_MAX_POS, I_MAX_POS, J_MAX_POS, K_MAX_POS)
-  };
+    // Software Endstops are based on the configured limits.
+    soft_endstops_t soft_endstop = {
+        true, false,
+        LINEAR_AXIS_ARRAY(X_MIN_POS, Y_MIN_POS, Z_MIN_POS, I_MIN_POS, J_MIN_POS, K_MIN_POS),
+        LINEAR_AXIS_ARRAY(X_MAX_BED, Y_MAX_BED, Z_MAX_POS, I_MAX_POS, J_MAX_POS, K_MAX_POS)};
 
   /**
    * Software endstops can be used to monitor the open end of
@@ -936,7 +947,7 @@ void restore_feedrate_and_scaling() {
 
 #else // !HAS_SOFTWARE_ENDSTOPS
 
-  soft_endstops_t soft_endstop;
+    soft_endstops_t soft_endstop;
 
 #endif // !HAS_SOFTWARE_ENDSTOPS
 

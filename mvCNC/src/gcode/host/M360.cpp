@@ -166,7 +166,7 @@ void GcodeSuite::M360() {
       config_line_e(e, JERK_STR, TERN(HAS_LINEAR_E_JERK, planner.max_e_jerk[E_INDEX_N(e)], TERN(HAS_CLASSIC_JERK, planner.max_jerk.e, DEFAULT_EJERK)));
       config_line_e(e, F("MaxSpeed"), planner.settings.max_feedrate_mm_s[E_AXIS_N(e)]);
       config_line_e(e, F("Acceleration"), planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(e)]);
-      config_line_e(e, F("Diameter"), TERN(NO_VOLUMETRICS, DEFAULT_NOMINAL_FILAMENT_DIA, planner.filament_size[e]));
+      config_line_e(e, F("Diameter"), TERN(USE_VOLUMETRICS, planner.filament_size[e], DEFAULT_NOMINAL_FILAMENT_DIA));
       config_line_e(e, F("MaxTemp"), thermalManager.hotend_maxtemp[e]);
     }
   #endif

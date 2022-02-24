@@ -62,7 +62,7 @@
 #endif
 
 #if !HAS_EXTRUDERS
-  #define NO_VOLUMETRICS
+  #undef USE_VOLUMETRICS
   #undef TEMP_SENSOR_0
   #undef TEMP_SENSOR_1
   #undef TEMP_SENSOR_2
@@ -795,7 +795,7 @@
 #endif
 
 // Poll-based jogging for joystick and other devices
-#if ENABLED(JOYSTICK)
+#if EITHER(JOYSTICK, WII_NUNCHUCK_JOGGING)
   #define POLL_JOG
 #endif
 

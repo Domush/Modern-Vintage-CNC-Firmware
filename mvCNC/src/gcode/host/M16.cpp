@@ -4,7 +4,7 @@
 
 #include "../../inc/mvCNCConfigPre.h"
 
-#if ENABLED(EXPECTED_PRINTER_CHECK)
+#if ENABLED(CNC_ID_CHECK)
 
 #include "../gcode.h"
 #include "../../mvCNCCore.h"

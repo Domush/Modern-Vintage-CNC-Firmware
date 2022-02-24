@@ -74,7 +74,7 @@ void GcodeSuite::M115() {
     cap_line(F("EEPROM"), ENABLED(EEPROM_SETTINGS));
 
     // Volumetric Extrusion (M200)
-    cap_line(F("VOLUMETRIC"), DISABLED(NO_VOLUMETRICS));
+    cap_line(F("VOLUMETRIC"), ENABLED(USE_VOLUMETRICS));
 
     // AUTOREPORT_POS (M154)
     cap_line(F("AUTOREPORT_POS"), ENABLED(AUTO_REPORT_POSITION));

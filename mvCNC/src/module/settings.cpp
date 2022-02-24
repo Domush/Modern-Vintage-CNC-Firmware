@@ -521,7 +521,7 @@ void mvCNCSettings::postprocess() {
 
   TERN_(PIDTEMP, thermalManager.updatePID());
 
-  #if DISABLED(NO_VOLUMETRICS)
+  #if ENABLED(USE_VOLUMETRICS)
     planner.calculate_volumetric_multipliers();
   #elif EXTRUDERS
     for (uint8_t i = COUNT(planner.e_factor); i--;)
@@ -2916,7 +2916,7 @@ void mvCNCSettings::reset() {
   // Volumetric & Filament Size
   //
 
-  #if DISABLED(NO_VOLUMETRICS)
+  #if ENABLED(USE_VOLUMETRICS)
     parser.volumetric_enabled = ENABLED(VOLUMETRIC_DEFAULT_ON);
     LOOP_L_N(q, COUNT(planner.filament_size))
       planner.filament_size[q] = DEFAULT_NOMINAL_FILAMENT_DIA;
@@ -3052,7 +3052,7 @@ void mvCNCSettings::reset() {
     //
     // M200 Volumetric Extrusion
     //
-    IF_DISABLED(NO_VOLUMETRICS, gcode.M200_report(forReplay));
+    IF_ENABLED(USE_VOLUMETRICS, gcode.M200_report(forReplay));
 
     //
     // M92 Steps per Unit

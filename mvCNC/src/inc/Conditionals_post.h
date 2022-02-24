@@ -321,7 +321,7 @@
 #endif
 
 /**
- * Provide a DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT in case NO_VOLUMETRICS is enabled
+ * Provide a DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT in case USE_VOLUMETRICS is enabled
  */
 #ifndef DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT
   #define DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT 0.00
@@ -2456,6 +2456,12 @@
   #endif
   #if PIN_EXISTS(JOY_EN)
     #define HAS_JOY_ADC_EN 1
+  #endif
+#endif
+
+#if ENABLED(WII_NUNCHUCK_JOGGING)
+  #if PIN_EXISTS(WII_EN)
+    #define HAS_WII_EN 1
   #endif
 #endif
 

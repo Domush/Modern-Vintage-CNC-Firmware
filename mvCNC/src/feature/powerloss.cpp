@@ -170,7 +170,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
     TERN_(HAS_POSITION_SHIFT, info.position_shift = position_shift);
     E_TERN_(info.active_extruder = active_extruder);
 
-    #if DISABLED(NO_VOLUMETRICS)
+    #if ENABLED(USE_VOLUMETRICS)
       info.flag.volumetric_enabled = parser.volumetric_enabled;
       #if HAS_MULTI_EXTRUDER
         for (int8_t e = 0; e < EXTRUDERS; e++) info.filament_size[e] = planner.filament_size[e];
@@ -428,7 +428,7 @@ void CNCJobRecovery::resume() {
   #endif
 
   // Recover volumetric extrusion state
-  #if DISABLED(NO_VOLUMETRICS)
+  #if ENABLED(USE_VOLUMETRICS)
     #if HAS_MULTI_EXTRUDER
       for (int8_t e = 0; e < EXTRUDERS; e++) {
         sprintf_P(cmd, PSTR("M200T%iD%s"), e, dtostrf(info.filament_size[e], 1, 3, str_1));
@@ -601,7 +601,7 @@ void CNCJobRecovery::resume() {
           DEBUG_ECHOLNPGM("active_extruder: ", info.active_extruder);
         #endif
 
-        #if DISABLED(NO_VOLUMETRICS)
+        #if ENABLED(USE_VOLUMETRICS)
           DEBUG_ECHOPGM("filament_size:");
           LOOP_L_N(i, EXTRUDERS) DEBUG_ECHOLNPGM(" ", info.filament_size[i]);
           DEBUG_EOL();

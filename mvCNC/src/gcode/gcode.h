@@ -67,7 +67,7 @@
  * M10  - Turn Vacuum or Blower motor ON (Requires AIR_EVACUATION)
  * M11  - Turn Vacuum or Blower motor OFF (Requires AIR_EVACUATION)
  * M12  - Set up closed loop control system. (Requires EXTERNAL_CLOSED_LOOP_CONTROLLER)
- * M16  - Expected cnc check. (Requires EXPECTED_PRINTER_CHECK)
+ * M16  - Expected cnc check. (Requires CNC_ID_CHECK)
  * M17  - Enable/Power all stepper motors
  * M18  - Disable all stepper motors; same as M84
  *
@@ -606,7 +606,7 @@ private:
     static void M12();
   #endif
 
-  #if ENABLED(EXPECTED_PRINTER_CHECK)
+  #if ENABLED(CNC_ID_CHECK)
     static void M16();
   #endif
 
@@ -796,7 +796,7 @@ private:
     #endif
   #endif
 
-  #if DISABLED(NO_VOLUMETRICS)
+  #if ENABLED(USE_VOLUMETRICS)
     static void M200();
     static void M200_report(const bool forReplay=true);
   #endif

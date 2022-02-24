@@ -1,7 +1,7 @@
 # Modern Vintage CNC Firmware (mvCNC)
 ## Feature rich CNC/Laser firmware with support for multiple hardware platforms
 
-<img align="right" width=175 src="https://github.com/Domush/Webber-Ranch-CNC-Firmware/raw/Webber-Ranch-CNC/Logo.bmp" />
+<img align="right" width=175 src="https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware/raw/Webber-Ranch-CNC/Logo.bmp" />
 
 mvCNC is based on the popular Marlin 3D printing firmware, but changes the focus specifically to CNC spindled and laser machines and their unique demands, such as Automatic Tool Changer support, dynamic stepper configuration, multiple coordinate systems, and Real-Time commands.
 

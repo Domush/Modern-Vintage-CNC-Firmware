@@ -151,11 +151,7 @@ int8_t GcodeSuite::get_target_e_stepper_from_command(const int8_t dval/*=-1*/) {
 void GcodeSuite::get_destination_from_command() {
   xyze_bool_t seen{false};
 
-  #if ENABLED(CANCEL_OBJECTS)
-    const bool &skip_move = cancelable.skipping;
-  #else
-    constexpr bool skip_move = false;
-  #endif
+  constexpr bool skip_move = false;
 
   // Get new XYZ position, whether absolute or relative
   LOOP_LINEAR_AXES(i) {
@@ -170,16 +166,6 @@ void GcodeSuite::get_destination_from_command() {
       destination[i] = current_position[i];
   }
 
-  #if HAS_EXTRUDERS
-    // Get new E position, whether absolute or relative
-    if ( (seen.e = parser.seenval('E')) ) {
-      const float v = parser.value_axis_units(E_AXIS);
-      destination.e = axis_is_relative(E_AXIS) ? current_position.e + v : v;
-    }
-    else
-      destination.e = current_position.e;
-  #endif
-
   #if ENABLED(POWER_LOSS_RECOVERY) && !PIN_EXISTS(POWER_LOSS)
     // Only update power loss recovery on moves with E
     if (recovery.enabled && IS_SD_PRINTING() && seen.e && (seen.x || seen.y))
@@ -192,11 +178,6 @@ void GcodeSuite::get_destination_from_command() {
   #if ENABLED(JOBCOUNTER)
     if (!DEBUGGING(DRYRUN) && !skip_move)
       print_job_timer.incFilamentUsed(destination.e - current_position.e);
-  #endif
-
-  // Get ABCDHI mixing factors
-  #if BOTH(MIXING_EXTRUDER, DIRECT_MIXING_IN_G1)
-    M165();
   #endif
 
   #if ENABLED(LASER_MOVE_POWER)
@@ -475,7 +456,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 12: M12(); break;                                    // M12: Synchronize and optionally force a CLC set
       #endif
 
-      #if ENABLED(EXPECTED_PRINTER_CHECK)
+      #if ENABLED(CNC_ID_CHECK)
         case 16: M16(); break;                                    // M16: Expected cnc check
       #endif
 
@@ -663,7 +644,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         #endif
       #endif
 
-      #if DISABLED(NO_VOLUMETRICS)
+      #if ENABLED(USE_VOLUMETRICS)
         case 200: M200(); break;                                  // M200: Set filament diameter, E to cubic units
       #endif
 

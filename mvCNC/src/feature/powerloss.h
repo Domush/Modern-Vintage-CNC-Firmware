@@ -56,7 +56,7 @@ typedef struct {
     uint8_t active_extruder;
   #endif
 
-  #if DISABLED(NO_VOLUMETRICS)
+  #if ENABLED(USE_VOLUMETRICS)
     float filament_size[EXTRUDERS];
   #endif
 
@@ -105,7 +105,7 @@ typedef struct {
     #if HAS_LEVELING
       bool leveling:1;            // M420 S
     #endif
-    #if DISABLED(NO_VOLUMETRICS)
+    #if ENABLED(USE_VOLUMETRICS)
       bool volumetric_enabled:1;  // M200 S D
     #endif
   } flag;

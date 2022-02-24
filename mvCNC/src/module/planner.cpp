@@ -53,32 +53,12 @@
 
 #include "../mvCNCCore.h"
 
-#if HAS_LEVELING
-  #include "../feature/bedlevel/bedlevel.h"
-#endif
-
-#if ENABLED(FILAMENT_WIDTH_SENSOR)
-  #include "../feature/filwidth.h"
-#endif
-
-#if ENABLED(BARICUDA)
-  #include "../feature/baricuda.h"
-#endif
-
-#if ENABLED(MIXING_EXTRUDER)
-  #include "../feature/mixing.h"
-#endif
-
 #if ENABLED(AUTO_POWER_CONTROL)
   #include "../feature/power.h"
 #endif
 
 #if ENABLED(BACKLASH_COMPENSATION)
   #include "../feature/backlash.h"
-#endif
-
-#if ENABLED(CANCEL_OBJECTS)
-  #include "../feature/cancel_object.h"
 #endif
 
 #if ENABLED(POWER_LOSS_RECOVERY)
@@ -133,53 +113,14 @@ float Planner::mm_per_step[DISTINCT_AXES];      // (mm) Millimeters per step
   bool Planner::abort_on_endstop_hit = false;
 #endif
 
-#if ENABLED(DISTINCT_E_FACTORS)
-  uint8_t Planner::last_extruder = 0;     // Respond to extruder change
-#endif
-
 #if ENABLED(DIRECT_STEPPING)
   uint32_t Planner::last_page_step_rate = 0;
   xyze_bool_t Planner::last_page_dir{0};
 #endif
 
-#if HAS_EXTRUDERS
-  int16_t Planner::flow_percentage[EXTRUDERS] = ARRAY_BY_EXTRUDERS1(100); // Extrusion factor for each extruder
-  float Planner::e_factor[EXTRUDERS] = ARRAY_BY_EXTRUDERS1(1.0f); // The flow percentage and volumetric multiplier combine to scale E movement
-#endif
-
-#if DISABLED(NO_VOLUMETRICS)
-  float Planner::filament_size[EXTRUDERS],          // diameter of filament (in millimeters), typically around 1.75 or 2.85, 0 disables the volumetric calculations for the extruder
-        Planner::volumetric_area_nominal = CIRCLE_AREA(float(DEFAULT_NOMINAL_FILAMENT_DIA) * 0.5f), // Nominal cross-sectional area
-        Planner::volumetric_multiplier[EXTRUDERS];  // Reciprocal of cross-sectional area of filament (in mm^2). Pre-calculated to reduce computation in the planner
-#endif
-
-#if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
-  float Planner::volumetric_extruder_limit[EXTRUDERS],          // max mm^3/sec the extruder is able to handle
-        Planner::volumetric_extruder_feedrate_limit[EXTRUDERS]; // pre calculated extruder feedrate limit based on volumetric_extruder_limit; pre-calculated to reduce computation in the planner
-#endif
-
-#if HAS_LEVELING
-  bool Planner::leveling_active = false; // Flag that auto bed leveling is enabled
-  #if ABL_PLANAR
-    matrix_3x3 Planner::bed_level_matrix; // Transform to compensate for bed level
-  #endif
-  #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-    float Planner::z_fade_height,      // Initialized by settings.load()
-          Planner::inverse_z_fade_height,
-          Planner::last_fade_z;
-  #endif
-#else
-  constexpr bool Planner::leveling_active;
-#endif
+constexpr bool Planner::leveling_active;
 
 skew_factor_t Planner::skew_factor; // Initialized by settings.load()
-
-#if ENABLED(AUTOTEMP)
-  celsius_t Planner::autotemp_max = 250,
-            Planner::autotemp_min = 210;
-  float Planner::autotemp_factor = 0.1f;
-  bool Planner::autotemp_enabled = false;
-#endif
 
 // private:
 
@@ -190,18 +131,10 @@ uint32_t Planner::acceleration_long_cutoff;
 xyze_float_t Planner::previous_speed;
 float Planner::previous_nominal_speed_sqr;
 
-#if ENABLED(DISABLE_INACTIVE_EXTRUDER)
-  last_move_t Planner::g_uc_extruder_last_move[E_STEPPERS] = { 0 };
-#endif
-
 #ifdef XY_FREQUENCY_LIMIT
   int8_t Planner::xy_freq_limit_hz = XY_FREQUENCY_LIMIT;
   float Planner::xy_freq_min_speed_factor = (XY_FREQUENCY_MIN_PERCENT) * 0.01f;
   int32_t Planner::xy_freq_min_interval_us = LROUND(1000000.0 / (XY_FREQUENCY_LIMIT));
-#endif
-
-#if ENABLED(LIN_ADVANCE)
-  float Planner::extruder_advance_K[EXTRUDERS]; // Initialized by settings.load()
 #endif
 
 #if HAS_POSITION_FLOAT
@@ -1144,7 +1077,7 @@ void Planner::recalculate_trapezoids() {
 
       if (block) {
         // Recalculate if current block entry or exit junction speed has changed.
-        if (TEST(block->flag, BLOCK_BIT_RECALCULATE) || TEST(next->flag, BLOCK_BIT_RECALCULATE)) {
+        if (TEST(block->flag, BLOCK_BIT_RECALCULATE) || TEST(next->flag, BLOCK_BIT_RECALCULATE) || feedrate_percentage_change) {
 
           // Mark the current block as RECALCULATE, to protect it from the Stepper ISR running it.
           // Note that due to the above condition, there's a chance the current block isn't marked as
@@ -1226,6 +1159,17 @@ void Planner::recalculate() {
   recalculate_trapezoids();
 }
 
+void Planner::modify_nominal_speeds(float nominal_speed_modifier/* = 1.0f*/) {
+  // Initialize block index to the last block in the planner buffer.
+  const uint8_t block_index = prev_block_index(block_buffer_head);
+  // If there is just one block, no planning can be done. Avoid it!
+  if (block_index != block_buffer_planned) {
+    reverse_pass();
+    forward_pass();
+  }
+  recalculate_trapezoids();
+}
+
 /**
  * Apply fan speeds
  */
@@ -1292,15 +1236,6 @@ void Planner::check_axes_activity() {
     bool fans_need_update = false;
   #endif
 
-  #if ENABLED(BARICUDA)
-    #if HAS_HEATER_1
-      uint8_t tail_valve_pressure;
-    #endif
-    #if HAS_HEATER_2
-      uint8_t tail_e_to_p_pressure;
-    #endif
-  #endif
-
   if (has_blocks_queued()) {
 
     #if EITHER(HAS_TAIL_FAN_SPEED, BARICUDA)
@@ -1315,11 +1250,6 @@ void Planner::check_axes_activity() {
           tail_fan_speed[i] = spd;
         }
       }
-    #endif
-
-    #if ENABLED(BARICUDA)
-      TERN_(HAS_HEATER_1, tail_valve_pressure = block->valve_pressure);
-      TERN_(HAS_HEATER_2, tail_e_to_p_pressure = block->e_to_p_pressure);
     #endif
 
     #if ANY(DISABLE_X, DISABLE_Y, DISABLE_Z, DISABLE_I, DISABLE_J, DISABLE_K, DISABLE_E)
@@ -1351,10 +1281,6 @@ void Planner::check_axes_activity() {
       }
     #endif
 
-    #if ENABLED(BARICUDA)
-      TERN_(HAS_HEATER_1, tail_valve_pressure = baricuda_valve_pressure);
-      TERN_(HAS_HEATER_2, tail_e_to_p_pressure = baricuda_e_to_p_pressure);
-    #endif
   }
 
   //
@@ -1378,138 +1304,7 @@ void Planner::check_axes_activity() {
 
   TERN_(AUTOTEMP, autotemp_task());
 
-  #if ENABLED(BARICUDA)
-    TERN_(HAS_HEATER_1, set_pwm_duty(pin_t(HEATER_1_PIN), tail_valve_pressure));
-    TERN_(HAS_HEATER_2, set_pwm_duty(pin_t(HEATER_2_PIN), tail_e_to_p_pressure));
-  #endif
 }
-
-#if ENABLED(AUTOTEMP)
-
-  #if ENABLED(AUTOTEMP_PROPORTIONAL)
-    void Planner::_autotemp_update_from_hotend() {
-      const celsius_t target = thermalManager.degTargetHotend(active_extruder);
-      autotemp_min = target + AUTOTEMP_MIN_P;
-      autotemp_max = target + AUTOTEMP_MAX_P;
-    }
-  #endif
-
-  /**
-   * Called after changing tools to:
-   *  - Reset or re-apply the default proportional autotemp factor.
-   *  - Enable autotemp if the factor is non-zero.
-   */
-  void Planner::autotemp_update() {
-    _autotemp_update_from_hotend();
-    autotemp_factor = TERN(AUTOTEMP_PROPORTIONAL, AUTOTEMP_FACTOR_P, 0);
-    autotemp_enabled = autotemp_factor != 0;
-  }
-
-  /**
-   * Called by the M104/M109 commands after setting Hotend Temperature
-   *
-   */
-  void Planner::autotemp_M104_M109() {
-    _autotemp_update_from_hotend();
-
-    if (parser.seenval('S')) autotemp_min = parser.value_celsius();
-    if (parser.seenval('B')) autotemp_max = parser.value_celsius();
-
-    // When AUTOTEMP_PROPORTIONAL is enabled, F0 disables autotemp.
-    // Normally, leaving off F also disables autotemp.
-    autotemp_factor = parser.seen('F') ? parser.value_float() : TERN(AUTOTEMP_PROPORTIONAL, AUTOTEMP_FACTOR_P, 0);
-    autotemp_enabled = autotemp_factor != 0;
-  }
-
-  /**
-   * Called every so often to adjust the hotend target temperature
-   * based on the extrusion speed, which is calculated from the blocks
-   * currently in the planner.
-   */
-  void Planner::autotemp_task() {
-    static float oldt = 0;
-
-    if (!autotemp_enabled) return;
-    if (thermalManager.degTargetHotend(active_extruder) < autotemp_min - 2) return; // Below the min?
-
-    float high = 0.0;
-    for (uint8_t b = block_buffer_tail; b != block_buffer_head; b = next_block_index(b)) {
-      block_t *block = &block_buffer[b];
-      if (LINEAR_AXIS_GANG(block->steps.x, || block->steps.y, || block->steps.z, || block->steps.i, || block->steps.j, || block->steps.k)) {
-        const float se = (float)block->steps.e / block->step_event_count * SQRT(block->nominal_speed_sqr); // mm/sec;
-        NOLESS(high, se);
-      }
-    }
-
-    float t = autotemp_min + high * autotemp_factor;
-    LIMIT(t, autotemp_min, autotemp_max);
-    if (t < oldt) t = t * (1.0f - (AUTOTEMP_OLDWEIGHT)) + oldt * (AUTOTEMP_OLDWEIGHT);
-    oldt = t;
-    thermalManager.setTargetHotend(t, active_extruder);
-  }
-
-#endif
-
-#if DISABLED(NO_VOLUMETRICS)
-
-  /**
-   * Get a volumetric multiplier from a filament diameter.
-   * This is the reciprocal of the circular cross-section area.
-   * Return 1.0 with volumetric off or a diameter of 0.0.
-   */
-  inline float calculate_volumetric_multiplier(const_float_t diameter) {
-    return (parser.volumetric_enabled && diameter) ? 1.0f / CIRCLE_AREA(diameter * 0.5f) : 1;
-  }
-
-  /**
-   * Convert the filament sizes into volumetric multipliers.
-   * The multiplier converts a given E value into a length.
-   */
-  void Planner::calculate_volumetric_multipliers() {
-    LOOP_L_N(i, COUNT(filament_size)) {
-      volumetric_multiplier[i] = calculate_volumetric_multiplier(filament_size[i]);
-      refresh_e_factor(i);
-    }
-    #if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
-      calculate_volumetric_extruder_limits(); // update volumetric_extruder_limits as well.
-    #endif
-  }
-
-#endif // !NO_VOLUMETRICS
-
-#if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
-
-  /**
-   * Convert volumetric based limits into pre calculated extruder feedrate limits.
-   */
-  void Planner::calculate_volumetric_extruder_limit(const uint8_t e) {
-    const float &lim = volumetric_extruder_limit[e], &siz = filament_size[e];
-    volumetric_extruder_feedrate_limit[e] = (lim && siz) ? lim / CIRCLE_AREA(siz * 0.5f) : 0;
-  }
-  void Planner::calculate_volumetric_extruder_limits() {
-    LOOP_L_N(e, EXTRUDERS) calculate_volumetric_extruder_limit(e);
-  }
-
-#endif
-
-#if ENABLED(FILAMENT_WIDTH_SENSOR)
-  /**
-   * Convert the ratio value given by the filament width sensor
-   * into a volumetric multiplier. Conversion differs when using
-   * linear extrusion vs volumetric extrusion.
-   */
-  void Planner::apply_filament_width_sensor(const int8_t encoded_ratio) {
-    // Reconstitute the nominal/measured ratio
-    const float nom_meas_ratio = 1 + 0.01f * encoded_ratio,
-                ratio_2 = sq(nom_meas_ratio);
-
-    volumetric_multiplier[FILAMENT_SENSOR_EXTRUDER_NUM] = parser.volumetric_enabled
-      ? ratio_2 / CIRCLE_AREA(filwidth.nominal_mm * 0.5f) // Volumetric uses a true volumetric multiplier
-      : ratio_2;                                          // Linear squares the ratio, which scales the volume
-
-    refresh_e_factor(FILAMENT_SENSOR_EXTRUDER_NUM);
-  }
-#endif
 
 #if ENABLED(IMPROVE_HOMING_RELIABILITY)
 
@@ -1535,99 +1330,6 @@ void Planner::check_axes_activity() {
       TERN_(HAS_CLASSIC_JERK, max_jerk = saved_motion_state.jerk_state);
     }
     reset_acceleration_rates();
-  }
-
-#endif
-
-#if HAS_LEVELING
-
-  constexpr xy_pos_t level_fulcrum = {
-    TERN(Z_SAFE_HOMING, Z_SAFE_HOMING_X_POINT, X_HOME_POS),
-    TERN(Z_SAFE_HOMING, Z_SAFE_HOMING_Y_POINT, Y_HOME_POS)
-  };
-
-  /**
-   * rx, ry, rz - Cartesian positions in mm
-   *              Leveled XYZ on completion
-   */
-  void Planner::apply_leveling(xyz_pos_t &raw) {
-    if (!leveling_active) return;
-
-    #if ABL_PLANAR
-
-      xy_pos_t d = raw - level_fulcrum;
-      bed_level_matrix.apply_rotation_xyz(d.x, d.y, raw.z);
-      raw = d + level_fulcrum;
-
-    #elif HAS_MESH
-
-      #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-        const float fade_scaling_factor = fade_scaling_factor_for_z(raw.z);
-      #elif DISABLED(MESH_BED_LEVELING)
-        constexpr float fade_scaling_factor = 1.0;
-      #endif
-
-      raw.z += (
-        #if ENABLED(MESH_BED_LEVELING)
-          mbl.get_z(raw OPTARG(ENABLE_LEVELING_FADE_HEIGHT, fade_scaling_factor))
-        #elif ENABLED(AUTO_BED_LEVELING_UBL)
-          fade_scaling_factor ? fade_scaling_factor * ubl.get_z_correction(raw) : 0.0
-        #elif ENABLED(AUTO_BED_LEVELING_BILINEAR)
-          fade_scaling_factor ? fade_scaling_factor * bilinear_z_offset(raw) : 0.0
-        #endif
-      );
-
-    #endif
-  }
-
-  void Planner::unapply_leveling(xyz_pos_t &raw) {
-
-    if (leveling_active) {
-
-      #if ABL_PLANAR
-
-        matrix_3x3 inverse = matrix_3x3::transpose(bed_level_matrix);
-
-        xy_pos_t d = raw - level_fulcrum;
-        inverse.apply_rotation_xyz(d.x, d.y, raw.z);
-        raw = d + level_fulcrum;
-
-      #elif HAS_MESH
-
-        #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-          const float fade_scaling_factor = fade_scaling_factor_for_z(raw.z);
-        #elif DISABLED(MESH_BED_LEVELING)
-          constexpr float fade_scaling_factor = 1.0;
-        #endif
-
-        raw.z -= (
-          #if ENABLED(MESH_BED_LEVELING)
-            mbl.get_z(raw OPTARG(ENABLE_LEVELING_FADE_HEIGHT, fade_scaling_factor))
-          #elif ENABLED(AUTO_BED_LEVELING_UBL)
-            fade_scaling_factor ? fade_scaling_factor * ubl.get_z_correction(raw) : 0.0
-          #elif ENABLED(AUTO_BED_LEVELING_BILINEAR)
-            fade_scaling_factor ? fade_scaling_factor * bilinear_z_offset(raw) : 0.0
-          #endif
-        );
-
-      #endif
-    }
-  }
-
-#endif // HAS_LEVELING
-
-#if ENABLED(FWRETRACT)
-  /**
-   * rz, e - Cartesian positions in mm
-   */
-  void Planner::apply_retract(float &rz, float &e) {
-    rz += fwretract.current_hop;
-    e -= fwretract.current_retract[active_extruder];
-  }
-
-  void Planner::unapply_retract(float &rz, float &e) {
-    rz -= fwretract.current_hop;
-    e += fwretract.current_retract[active_extruder];
   }
 
 #endif
@@ -1860,40 +1562,6 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
     );
   //*/
 
-  #if EITHER(PREVENT_COLD_EXTRUSION, PREVENT_LENGTHY_EXTRUDE)
-    if (de) {
-      #if ENABLED(PREVENT_COLD_EXTRUSION)
-        if (thermalManager.tooColdToExtrude(extruder)) {
-          position.e = target.e; // Behave as if the move really took place, but ignore E part
-          TERN_(HAS_POSITION_FLOAT, position_float.e = target_float.e);
-          de = 0; // no difference
-          SERIAL_ECHO_MSG(STR_ERR_COLD_EXTRUDE_STOP);
-        }
-      #endif // PREVENT_COLD_EXTRUSION
-      #if ENABLED(PREVENT_LENGTHY_EXTRUDE)
-        const float e_steps = ABS(de * e_factor[extruder]);
-        const float max_e_steps = settings.axis_steps_per_mm[E_AXIS_N(extruder)] * (EXTRUDE_MAXLENGTH);
-        if (e_steps > max_e_steps) {
-          #if ENABLED(MIXING_EXTRUDER)
-            bool ignore_e = false;
-            float collector[MIXING_STEPPERS];
-            mixer.refresh_collector(1.0, mixer.get_current_vtool(), collector);
-            MIXER_STEPPER_LOOP(e)
-              if (e_steps * collector[e] > max_e_steps) { ignore_e = true; break; }
-          #else
-            constexpr bool ignore_e = true;
-          #endif
-          if (ignore_e) {
-            position.e = target.e; // Behave as if the move really took place, but ignore E part
-            TERN_(HAS_POSITION_FLOAT, position_float.e = target_float.e);
-            de = 0; // no difference
-            SERIAL_ECHO_MSG(STR_ERR_LONG_EXTRUDE_STOP);
-          }
-        }
-      #endif // PREVENT_LENGTHY_EXTRUDE
-    }
-  #endif // PREVENT_COLD_EXTRUSION || PREVENT_LENGTHY_EXTRUDE
-
   // Compute direction bit-mask for this block
   axis_bits_t dm = 0;
   #if ANY(CORE_IS_XY, MARKFORGED_XY, MARKFORGED_YX)
@@ -1944,13 +1612,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
     );
   #endif
 
-  #if HAS_EXTRUDERS
-    if (de < 0) SBI(dm, E_AXIS);
-    const float esteps_float = de * e_factor[extruder];
-    const uint32_t esteps = ABS(esteps_float) + 0.5f;
-  #else
-    constexpr uint32_t esteps = 0;
-  #endif
+  constexpr uint32_t esteps = 0;
 
   // Clear all flags, including the "busy" bit
   block->flag = 0x00;
@@ -2040,10 +1702,6 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
     );
   #endif
 
-  TERN_(HAS_EXTRUDERS, steps_dist_mm.e = esteps_float * mm_per_step[E_AXIS_N(extruder)]);
-
-  TERN_(LCD_SHOW_E_TOTAL, e_move_accumulator += steps_dist_mm.e);
-
   if (true LINEAR_AXIS_GANG(
       && block->steps.a < MIN_STEPS_PER_SEGMENT,
       && block->steps.b < MIN_STEPS_PER_SEGMENT,
@@ -2103,8 +1761,6 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
     TERN_(BACKLASH_COMPENSATION, backlash.add_correction_steps(da, db, dc, dm, block));
   }
 
-  TERN_(HAS_EXTRUDERS, block->steps.e = esteps);
-
   block->step_event_count = _MAX(LOGICAL_AXIS_LIST(
     esteps, block->steps.a, block->steps.b, block->steps.c, block->steps.i, block->steps.j, block->steps.k
   ));
@@ -2112,20 +1768,11 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
   // Bail if this is a zero-length block
   if (block->step_event_count < MIN_STEPS_PER_SEGMENT) return false;
 
-  TERN_(MIXING_EXTRUDER, mixer.populate_block(block->b_color));
-
   TERN_(HAS_CUTTER, block->cutter_power = cutter.power);
 
   #if HAS_FAN
     FANS_LOOP(i) block->fan_speed[i] = thermalManager.fan_speed[i];
   #endif
-
-  #if ENABLED(BARICUDA)
-    block->valve_pressure = baricuda_valve_pressure;
-    block->e_to_p_pressure = baricuda_e_to_p_pressure;
-  #endif
-
-  E_TERN_(block->extruder = extruder);
 
   #if ENABLED(AUTO_POWER_CONTROL)
     if (LINEAR_AXIS_GANG(
@@ -2175,46 +1822,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
     TERN_(HAS_K_AXIS, if (block->steps.k) stepper.enable_axis(K_AXIS));
   #endif
 
-  // Enable extruder(s)
-  #if HAS_EXTRUDERS
-    if (esteps) {
-      TERN_(AUTO_POWER_CONTROL, powerManager.power_on());
-
-      #if ENABLED(DISABLE_INACTIVE_EXTRUDER) // Enable only the selected extruder
-
-        // Count down all steppers that were recently moved
-        LOOP_L_N(i, E_STEPPERS)
-          if (g_uc_extruder_last_move[i]) g_uc_extruder_last_move[i]--;
-
-        // Switching Extruder uses one E stepper motor per two nozzles
-        #define E_STEPPER_INDEX(E) TERN(SWITCHING_EXTRUDER, (E) / 2, E)
-
-        // Enable all (i.e., both) E steppers for IDEX-style duplication, but only active E steppers for multi-nozzle (i.e., single wide X carriage) duplication
-        #define _IS_DUPE(N) TERN0(HAS_DUPLICATION_MODE, (extruder_duplication_enabled && TERN1(MULTI_NOZZLE_DUPLICATION, TEST(duplication_e_mask, N))))
-
-        #define ENABLE_ONE_E(N) do{ \
-          if (N == E_STEPPER_INDEX(extruder) || _IS_DUPE(N)) {    /* N is 'extruder', or N is duplicating */ \
-            stepper.ENABLE_EXTRUDER(N);                           /* Enable the relevant E stepper... */ \
-            g_uc_extruder_last_move[N] = (BLOCK_BUFFER_SIZE) * 2; /* ...and reset its counter */ \
-          } \
-          else if (!g_uc_extruder_last_move[N])                   /* Counter expired since last E stepper enable */ \
-            stepper.DISABLE_EXTRUDER(N);                          /* Disable the E stepper */ \
-        }while(0);
-
-      #else
-
-        #define ENABLE_ONE_E(N) stepper.ENABLE_EXTRUDER(N);
-
-      #endif
-
-      REPEAT(E_STEPPERS, ENABLE_ONE_E); // (ENABLE_ONE_E must end with semicolon)
-    }
-  #endif // HAS_EXTRUDERS
-
-  if (esteps)
-    NOLESS(fr_mm_s, settings.min_feedrate_mm_s);
-  else
-    NOLESS(fr_mm_s, settings.min_travel_feedrate_mm_s);
+  NOLESS(fr_mm_s, settings.min_travel_feedrate_mm_s);
 
   const float inverse_millimeters = 1.0f / block->millimeters;  // Inverse millimeters to remove multiple divides
 
@@ -2261,11 +1869,6 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
   block->nominal_speed_sqr = sq(block->millimeters * inverse_secs);   // (mm/sec)^2 Always > 0
   block->nominal_rate = CEIL(block->step_event_count * inverse_secs); // (step/sec) Always > 0
 
-  #if ENABLED(FILAMENT_WIDTH_SENSOR)
-    if (extruder == FILAMENT_SENSOR_EXTRUDER_NUM)   // Only for extruder with filament sensor
-      filwidth.advance_e(steps_dist_mm.e);
-  #endif
-
   // Calculate and limit speed in mm/sec
 
   xyze_float_t current_speed;
@@ -2278,45 +1881,6 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
                  max_fr = settings.max_feedrate_mm_s[i];
     if (cs > max_fr) NOMORE(speed_factor, max_fr / cs);
   }
-
-  // Limit speed on extruders, if any
-  #if HAS_EXTRUDERS
-    {
-      current_speed.e = steps_dist_mm.e * inverse_secs;
-      #if HAS_MIXER_SYNC_CHANNEL
-        // Move all mixing extruders at the specified rate
-        if (mixer.get_current_vtool() == MIXER_AUTORETRACT_TOOL)
-          current_speed.e *= MIXING_STEPPERS;
-      #endif
-
-      const feedRate_t cs = ABS(current_speed.e),
-                   max_fr = settings.max_feedrate_mm_s[E_AXIS_N(extruder)]
-                            * TERN(HAS_MIXER_SYNC_CHANNEL, MIXING_STEPPERS, 1);
-
-      if (cs > max_fr) NOMORE(speed_factor, max_fr / cs); //respect max feedrate on any movement (doesn't matter if E axes only or not)
-
-      #if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
-        const feedRate_t max_vfr = volumetric_extruder_feedrate_limit[extruder]
-                                   * TERN(HAS_MIXER_SYNC_CHANNEL, MIXING_STEPPERS, 1);
-
-        // TODO: Doesn't work properly for joined segments. Set MIN_STEPS_PER_SEGMENT 1 as workaround.
-
-        if (block->steps.a || block->steps.b || block->steps.c) {
-
-          if (max_vfr > 0 && cs > max_vfr) {
-            NOMORE(speed_factor, max_vfr / cs); // respect volumetric extruder limit (if any)
-            /* <-- add a slash to enable
-            SERIAL_ECHOPGM("volumetric extruder limit enforced: ", (cs * CIRCLE_AREA(filament_size[extruder] * 0.5f)));
-            SERIAL_ECHOPGM(" mm^3/s (", cs);
-            SERIAL_ECHOPGM(" mm/s) limited to ", (max_vfr * CIRCLE_AREA(filament_size[extruder] * 0.5f)));
-            SERIAL_ECHOPGM(" mm^3/s (", max_vfr);
-            SERIAL_ECHOLNPGM(" mm/s)");
-            //*/
-          }
-        }
-      #endif
-    }
-  #endif
 
   #ifdef XY_FREQUENCY_LIMIT
 
@@ -2385,47 +1949,6 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
     // Start with print or travel acceleration
     accel = CEIL((esteps ? settings.acceleration : settings.travel_acceleration) * steps_per_mm);
 
-    #if ENABLED(LIN_ADVANCE)
-      // Linear advance is currently not ready for HAS_I_AXIS
-      #define MAX_E_JERK(N) TERN(HAS_LINEAR_E_JERK, max_e_jerk[E_INDEX_N(N)], max_jerk.e)
-
-      /**
-       * Use LIN_ADVANCE for blocks if all these are true:
-       *
-       * esteps             : This is a print move, because we checked for A, B, C steps before.
-       *
-       * extruder_advance_K[active_extruder] : There is an advance factor set for this extruder.
-       *
-       * de > 0             : Extruder is running forward (e.g., for "Wipe while retracting" (Slic3r) or "Combing" (Cura) moves)
-       */
-      block->use_advance_lead =  esteps
-                              && extruder_advance_K[active_extruder]
-                              && de > 0;
-
-      if (block->use_advance_lead) {
-        block->e_D_ratio = (target_float.e - position_float.e) /
-          #if IS_KINEMATIC
-            block->millimeters
-          #else
-            SQRT(sq(target_float.x - position_float.x)
-               + sq(target_float.y - position_float.y)
-               + sq(target_float.z - position_float.z))
-          #endif
-        ;
-
-        // Check for unusual high e_D ratio to detect if a retract move was combined with the last print move due to min. steps per segment. Never execute this with advance!
-        // This assumes no one will use a retract length of 0mm < retr_length < ~0.2mm and no one will print 100mm wide lines using 3mm filament or 35mm wide lines using 1.75mm filament.
-        if (block->e_D_ratio > 3.0f)
-          block->use_advance_lead = false;
-        else {
-          const uint32_t max_accel_steps_per_s2 = MAX_E_JERK(extruder) / (extruder_advance_K[active_extruder] * block->e_D_ratio) * steps_per_mm;
-          if (TERN0(LA_DEBUG, accel > max_accel_steps_per_s2))
-            SERIAL_ECHOLNPGM("Acceleration limited.");
-          NOMORE(accel, max_accel_steps_per_s2);
-        }
-      }
-    #endif
-
     // Limit acceleration per axis
     if (block->step_event_count <= acceleration_long_cutoff) {
       LOGICAL_AXIS_CODE(
@@ -2455,17 +1978,6 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
   #if DISABLED(S_CURVE_ACCELERATION)
     block->acceleration_rate = (uint32_t)(accel * (sq(4096.0f) / (STEPPER_TIMER_RATE)));
   #endif
-  #if ENABLED(LIN_ADVANCE)
-    if (block->use_advance_lead) {
-      block->advance_speed = (STEPPER_TIMER_RATE) / (extruder_advance_K[active_extruder] * block->e_D_ratio * block->acceleration * settings.axis_steps_per_mm[E_AXIS_N(extruder)]);
-      #if ENABLED(LA_DEBUG)
-        if (extruder_advance_K[active_extruder] * block->e_D_ratio * block->acceleration * 2 < SQRT(block->nominal_speed_sqr) * block->e_D_ratio)
-          SERIAL_ECHOLNPGM("More than 2 steps per eISR loop executed.");
-        if (block->advance_speed < 200)
-          SERIAL_ECHOLNPGM("eISR running at > 10kHz.");
-      #endif
-    }
-  #endif
 
   float vmax_junction_sqr; // Initial limit on the segment entry velocity (mm/s)^2
 
@@ -2494,7 +2006,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
      * change the overall maximum entry speed conditions of all blocks.
      *
      * #######
-     * https://github.com/Domush/Webber-Ranch-CNC-Firmware/issues/10341#issuecomment-388191754
+     * https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware/issues/10341#issuecomment-388191754
      *
      * hoffbaked: on May 10 2018 tuned and improved the GRBL algorithm for mvCNC:
           Okay! It seems to be working good. I somewhat arbitrarily cut it off at 1mm
@@ -2861,14 +2373,6 @@ bool Planner::buffer_segment(const abce_pos_t &abce
   // If we are cleaning, do not accept queuing of movements
   if (cleaning_buffer_counter) return false;
 
-  // When changing extruders recalculate steps corresponding to the E position
-  #if ENABLED(DISTINCT_E_FACTORS)
-    if (last_extruder != extruder && settings.axis_steps_per_mm[E_AXIS_N(extruder)] != settings.axis_steps_per_mm[E_AXIS_N(last_extruder)]) {
-      position.e = LROUND(position.e * settings.axis_steps_per_mm[E_AXIS_N(extruder)] * mm_per_step[E_AXIS_N(last_extruder)]);
-      last_extruder = extruder;
-    }
-  #endif
-
   // The target position of the tool in absolute steps
   // Calculate target position in absolute steps
   const abce_long_t target = {
@@ -2885,14 +2389,6 @@ bool Planner::buffer_segment(const abce_pos_t &abce
 
   #if HAS_POSITION_FLOAT
     const xyze_pos_t target_float = abce;
-  #endif
-
-  #if HAS_EXTRUDERS
-    // DRYRUN prevents E moves from taking place
-    if (DEBUGGING(DRYRUN) || TERN0(CANCEL_OBJECTS, cancelable.skipping)) {
-      position.e = target.e;
-      TERN_(HAS_POSITION_FLOAT, position_float.e = abce.e);
-    }
   #endif
 
   /* <-- add a slash to enable

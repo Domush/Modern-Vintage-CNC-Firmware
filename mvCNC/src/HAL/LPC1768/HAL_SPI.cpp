@@ -25,7 +25,7 @@
  *
  * A more sophisticated hardware SPI can be found at the following link.
  * This implementation has not been fully debugged.
- * https://github.com/Domush/Webber-Ranch-CNC-Firmware/tree/071c7a78f27078fd4aee9a3ef365fcf5e143531e
+ * https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware/tree/071c7a78f27078fd4aee9a3ef365fcf5e143531e
  */
 
 #ifdef TARGET_LPC1768

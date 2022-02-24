@@ -164,15 +164,7 @@ typedef struct block_t {
   };
   uint32_t step_event_count;                // The number of step events required to complete this block
 
-  #if HAS_MULTI_EXTRUDER
-    uint8_t extruder;                       // The extruder to move (if E move)
-  #else
-    static constexpr uint8_t extruder = 0;
-  #endif
-
-  #if ENABLED(MIXING_EXTRUDER)
-    mixer_comp_t b_color[MIXING_STEPPERS];  // Normalized color for the mixing steppers
-  #endif
+  static constexpr uint8_t extruder = 0;
 
   // Settings for the trapezoid generator
   uint32_t accelerate_until,                // The index of the step event on which to stop acceleration
@@ -189,15 +181,6 @@ typedef struct block_t {
   #endif
 
   axis_bits_t direction_bits;               // The direction bit set for this block (refers to *_DIRECTION_BIT in config.h)
-
-  // Advance extrusion
-  #if ENABLED(LIN_ADVANCE)
-    bool use_advance_lead;
-    uint16_t advance_speed,                 // STEP timer value for extruder speed offset ISR
-             max_adv_steps,                 // max. advance steps to get cruising speed pressure (not always nominal_speed!)
-             final_adv_steps;               // advance steps due to exit speed
-    float e_D_ratio;
-  #endif
 
   uint32_t nominal_rate,                    // The nominal step rate for this block in step_events/sec
            initial_rate,                    // The jerk-adjusted step rate at start of block
@@ -216,10 +199,6 @@ typedef struct block_t {
     uint8_t fan_speed[FAN_COUNT];
   #endif
 
-  #if ENABLED(BARICUDA)
-    uint8_t valve_pressure, e_to_p_pressure;
-  #endif
-
   #if HAS_WIRED_LCD
     uint32_t segment_time_us;
   #endif
@@ -233,10 +212,6 @@ typedef struct block_t {
   #endif
 
 } block_t;
-
-#if ANY(LIN_ADVANCE, SCARA_FEEDRATE_SCALING, GRADIENT_MIX, LCD_SHOW_E_TOTAL)
-  #define HAS_POSITION_FLOAT 1
-#endif
 
 #define BLOCK_MOD(n) ((n)&(BLOCK_BUFFER_SIZE-1))
 
@@ -298,10 +273,6 @@ typedef struct {
   #endif
 } skew_factor_t;
 
-#if ENABLED(DISABLE_INACTIVE_EXTRUDER)
-  typedef IF<(BLOCK_BUFFER_SIZE > 64), uint16_t, uint8_t>::type last_move_t;
-#endif
-
 class Planner {
   public:
 
@@ -326,31 +297,9 @@ class Planner {
     static uint16_t cleaning_buffer_counter;        // A counter to disable queuing of blocks
     static uint8_t delay_before_delivering;         // This counter delays delivery of blocks when queue becomes empty to allow the opportunity of merging blocks
 
-
-    #if ENABLED(DISTINCT_E_FACTORS)
-      static uint8_t last_extruder;                 // Respond to extruder change
-    #endif
-
     #if ENABLED(DIRECT_STEPPING)
       static uint32_t last_page_step_rate;          // Last page step rate given
       static xyze_bool_t last_page_dir;             // Last page direction given
-    #endif
-
-    #if HAS_EXTRUDERS
-      static int16_t flow_percentage[EXTRUDERS];    // Extrusion factor for each extruder
-      static float e_factor[EXTRUDERS];             // The flow percentage and volumetric multiplier combine to scale E movement
-    #endif
-
-    #if DISABLED(NO_VOLUMETRICS)
-      static float filament_size[EXTRUDERS],          // diameter of filament (in millimeters), typically around 1.75 or 2.85, 0 disables the volumetric calculations for the extruder
-                   volumetric_area_nominal,           // Nominal cross-sectional area
-                   volumetric_multiplier[EXTRUDERS];  // Reciprocal of cross-sectional area of filament (in mm^2). Pre-calculated to reduce computation in the planner
-                                                      // May be auto-adjusted by a filament width sensor
-    #endif
-
-    #if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
-      static float volumetric_extruder_limit[EXTRUDERS],          // Maximum mm^3/sec the extruder can handle
-                   volumetric_extruder_feedrate_limit[EXTRUDERS]; // Feedrate limit (mm/s) calculated from volume limit
     #endif
 
     static planner_settings_t settings;
@@ -374,21 +323,7 @@ class Planner {
       static TERN(HAS_LINEAR_E_JERK, xyz_pos_t, xyze_pos_t) max_jerk;
     #endif
 
-    #if HAS_LEVELING
-      static bool leveling_active;          // Flag that bed leveling is enabled
-      #if ABL_PLANAR
-        static matrix_3x3 bed_level_matrix; // Transform to compensate for bed level
-      #endif
-      #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-        static float z_fade_height, inverse_z_fade_height;
-      #endif
-    #else
-      static constexpr bool leveling_active = false;
-    #endif
-
-    #if ENABLED(LIN_ADVANCE)
-      static float extruder_advance_K[EXTRUDERS];
-    #endif
+    static constexpr bool leveling_active = false;
 
     /**
      * The current position of the tool in absolute steps
@@ -444,15 +379,6 @@ class Planner {
      */
     static uint32_t acceleration_long_cutoff;
 
-    #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-      static float last_fade_z;
-    #endif
-
-    #if ENABLED(DISABLE_INACTIVE_EXTRUDER)
-      // Counters to manage disabling inactive extruder steppers
-      static last_move_t g_uc_extruder_last_move[E_STEPPERS];
-    #endif
-
     #if HAS_WIRED_LCD
       volatile static uint32_t block_buffer_runtime_us; // Theoretical block buffer runtime in µs
     #endif
@@ -480,6 +406,11 @@ class Planner {
      */
     static void refresh_positioning();
 
+    /**
+     * Update the feed rate of moves already in the planner
+     */
+    static void modify_nominal_speeds(float nominal_speed_modifier = 1.0f);
+
     // For an axis set the Maximum Acceleration in mm/s^2
     static void set_max_acceleration(const uint8_t axis, float inMaxAccelMMS2);
 
@@ -491,18 +422,6 @@ class Planner {
       static void set_max_jerk(const AxisEnum axis, float inMaxJerkMMS);
     #else
       static void set_max_jerk(const AxisEnum, const_float_t) {}
-    #endif
-
-    #if HAS_EXTRUDERS
-      FORCE_INLINE static void refresh_e_factor(const uint8_t e) {
-        e_factor[e] = flow_percentage[e] * 0.01f * TERN(NO_VOLUMETRICS, 1.0f, volumetric_multiplier[e]);
-      }
-
-      static void set_flow(const uint8_t e, const int16_t flow) {
-        flow_percentage[e] = flow;
-        refresh_e_factor(e);
-      }
-
     #endif
 
     // Manage fans, paste pressure, etc.
@@ -518,88 +437,13 @@ class Planner {
       #endif
     #endif
 
-    #if ENABLED(FILAMENT_WIDTH_SENSOR)
-      void apply_filament_width_sensor(const int8_t encoded_ratio);
-
-      static float volumetric_percent(const bool vol) {
-        return 100.0f * (vol
-            ? volumetric_area_nominal / volumetric_multiplier[FILAMENT_SENSOR_EXTRUDER_NUM]
-            : volumetric_multiplier[FILAMENT_SENSOR_EXTRUDER_NUM]
-        );
-      }
-    #endif
-
     #if ENABLED(IMPROVE_HOMING_RELIABILITY)
       void enable_stall_prevention(const bool onoff);
     #endif
 
-    #if DISABLED(NO_VOLUMETRICS)
+    FORCE_INLINE static float fade_scaling_factor_for_z(const_float_t) { return 1; }
 
-      // Update multipliers based on new diameter measurements
-      static void calculate_volumetric_multipliers();
-
-      #if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
-        // Update pre calculated extruder feedrate limits based on volumetric values
-        static void calculate_volumetric_extruder_limit(const uint8_t e);
-        static void calculate_volumetric_extruder_limits();
-      #endif
-
-      FORCE_INLINE static void set_filament_size(const uint8_t e, const_float_t v) {
-        filament_size[e] = v;
-        if (v > 0) volumetric_area_nominal = CIRCLE_AREA(v * 0.5); //TODO: should it be per extruder
-        // make sure all extruders have some sane value for the filament size
-        LOOP_L_N(i, COUNT(filament_size))
-          if (!filament_size[i]) filament_size[i] = DEFAULT_NOMINAL_FILAMENT_DIA;
-      }
-
-    #endif
-
-    #if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
-      FORCE_INLINE static void set_volumetric_extruder_limit(const uint8_t e, const_float_t v) {
-        volumetric_extruder_limit[e] = v;
-        calculate_volumetric_extruder_limit(e);
-      }
-    #endif
-
-    #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-
-      /**
-       * Get the Z leveling fade factor based on the given Z height,
-       * re-calculating only when needed.
-       *
-       *  Returns 1.0 if planner.z_fade_height is 0.0.
-       *  Returns 0.0 if Z is past the specified 'Fade Height'.
-       */
-      static float fade_scaling_factor_for_z(const_float_t rz) {
-        static float z_fade_factor = 1;
-        if (!z_fade_height) return 1;
-        if (rz >= z_fade_height) return 0;
-        if (last_fade_z != rz) {
-          last_fade_z = rz;
-          z_fade_factor = 1 - rz * inverse_z_fade_height;
-        }
-        return z_fade_factor;
-      }
-
-      FORCE_INLINE static void force_fade_recalc() { last_fade_z = -999.999f; }
-
-      FORCE_INLINE static void set_z_fade_height(const_float_t zfh) {
-        z_fade_height = zfh > 0 ? zfh : 0;
-        inverse_z_fade_height = RECIPROCAL(z_fade_height);
-        force_fade_recalc();
-      }
-
-      FORCE_INLINE static bool leveling_active_at_z(const_float_t rz) {
-        return !z_fade_height || rz < z_fade_height;
-      }
-
-    #else
-
-      FORCE_INLINE static float fade_scaling_factor_for_z(const_float_t) { return 1; }
-
-      FORCE_INLINE static bool leveling_active_at_z(const_float_t) { return true; }
-
-    #endif
+    FORCE_INLINE static bool leveling_active_at_z(const_float_t) { return true; }
 
     #if ENABLED(SKEW_CORRECTION)
 
@@ -626,30 +470,6 @@ class Planner {
       FORCE_INLINE static void unskew(xyz_pos_t &raw) { unskew(raw.x, raw.y, raw.z); }
 
     #endif // SKEW_CORRECTION
-
-    #if HAS_LEVELING
-      /**
-       * Apply leveling to transform a cartesian position
-       * as it will be given to the planner and steppers.
-       */
-      static void apply_leveling(xyz_pos_t &raw);
-      static void unapply_leveling(xyz_pos_t &raw);
-      FORCE_INLINE static void force_unapply_leveling(xyz_pos_t &raw) {
-        leveling_active = true;
-        unapply_leveling(raw);
-        leveling_active = false;
-      }
-    #else
-      FORCE_INLINE static void apply_leveling(xyz_pos_t&) {}
-      FORCE_INLINE static void unapply_leveling(xyz_pos_t&) {}
-    #endif
-
-    #if ENABLED(FWRETRACT)
-      static void apply_retract(float &rz, float &e);
-      FORCE_INLINE static void apply_retract(xyze_pos_t &raw) { apply_retract(raw.z, raw.e); }
-      static void unapply_retract(float &rz, float &e);
-      FORCE_INLINE static void unapply_retract(xyze_pos_t &raw) { unapply_retract(raw.z, raw.e); }
-    #endif
 
     #if HAS_POSITION_MODIFIERS
       FORCE_INLINE static void apply_modifiers(xyze_pos_t &pos, bool leveling=ENABLED(PLANNER_LEVELING)) {
@@ -802,10 +622,6 @@ class Planner {
      */
     static void set_position_mm(const xyze_pos_t &xyze);
 
-    #if HAS_EXTRUDERS
-      static void set_e_position_mm(const_float_t e);
-    #endif
-
     /**
      * Set the planner.position and individual stepper positions.
      *
@@ -897,15 +713,6 @@ class Planner {
       static void clear_block_buffer_runtime();
     #endif
 
-    #if ENABLED(AUTOTEMP)
-      static celsius_t autotemp_min, autotemp_max;
-      static float autotemp_factor;
-      static bool autotemp_enabled;
-      static void autotemp_update();
-      static void autotemp_M104_M109();
-      static void autotemp_task();
-    #endif
-
     #if HAS_LINEAR_E_JERK
       FORCE_INLINE static void recalculate_max_e_jerk() {
         const float prop = junction_deviation_mm * SQRT(0.5) / (1.0f - SQRT(0.5));
@@ -915,14 +722,6 @@ class Planner {
     #endif
 
   private:
-
-    #if ENABLED(AUTOTEMP)
-      #if ENABLED(AUTOTEMP_PROPORTIONAL)
-        static void _autotemp_update_from_hotend();
-      #else
-        static void _autotemp_update_from_hotend() {}
-      #endif
-    #endif
 
     /**
      * Get the index of the next / previous block in the ring buffer

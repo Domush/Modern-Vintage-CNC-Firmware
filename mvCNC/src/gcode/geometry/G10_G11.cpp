@@ -18,7 +18,7 @@
  * G10 S#         - Retract filament according to settings of M207
  *     L2/L20 P# X# Y# Z#... - Sets the origin of the coordinate system, specified by the P parameter (1 to 9)
  *
- * Beta L2/L20 implementation based on https://github.com/Domush/Webber-Ranch-CNC-Firmware/issues/14734
+ * Beta L2/L20 implementation based on https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware/issues/14734
  * and http://linuxcnc.org/docs/2.6/html/gcode/gcode.html#sec:G10-L1_
  *
  * *Supported CNC_COORDINATE_SYSTEMS parameters: L2 and L20
