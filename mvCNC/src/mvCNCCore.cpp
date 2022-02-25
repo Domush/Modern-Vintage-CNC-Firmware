@@ -108,7 +108,12 @@
 #endif
 
 #if ENABLED(POLL_JOG)
-  #include "feature/joystick.h"
+  #if ENABLED(JOYSTICK)
+    #include "feature/joystick.h"
+  #endif
+  #if ENABLED(WII_NUNCHUCK_JOGGING)
+    #include "feature/wii_i2c.h"
+  #endif
 #endif
 
 #if HAS_SERVOS
@@ -835,7 +840,14 @@ void idle(bool no_stepper_sleep/*=false*/) {
   TERN_(HAS_PRUSA_MMU2, mmu2.mmu_loop());
 
   // Handle Joystick jogging
-  TERN_(POLL_JOG, joystick.inject_jog_moves());
+  #if BOTH(POLL_JOG, JOYSTICK)
+    joystick.inject_jog_moves();
+  #endif
+
+  // Handle Wii Nunchuck jogging
+  #if BOTH(POLL_JOG, WII_NUNCHUCK_JOGGING)
+    wii.inject_jog_moves();
+  #endif
 
   // Direct Stepping
   TERN_(DIRECT_STEPPING, page_manager.write_responses());

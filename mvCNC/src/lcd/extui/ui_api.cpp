@@ -64,14 +64,6 @@
   #include "../../feature/backlash.h"
 #endif
 
-#if HAS_LEVELING
-  #include "../../feature/bedlevel/bedlevel.h"
-#endif
-
-#if HAS_FILAMENT_SENSOR
-  #include "../../feature/runout.h"
-#endif
-
 #if ENABLED(CASE_LIGHT_ENABLE)
   #include "../../feature/caselight.h"
 #endif
@@ -88,14 +80,11 @@
   #include "../../feature/host_actions.h"
 #endif
 
-#if M600_PURGE_MORE_RESUMABLE
-  #include "../../feature/pause.h"
-#endif
 
 namespace ExtUI {
   static struct {
     uint8_t cnc_killed : 1;
-    #if ENABLED(JOYSTICK)
+    #if EITHER(JOYSTICK,WII_NUNCHUCK_JOGGING)
       uint8_t jogging : 1;
     #endif
   } flags;
@@ -183,7 +172,7 @@ namespace ExtUI {
     #endif
   }
 
-  #if ENABLED(JOYSTICK)
+  #if EITHER(JOYSTICK, WII_NUNCHUCK_JOGGING)
     /**
      * Jogs in the direction given by the vector (dx, dy, dz).
      * The values range from -1 to 1 mapping to the maximum
@@ -201,8 +190,8 @@ namespace ExtUI {
       flags.jogging = !NEAR_ZERO(dir.x) || !NEAR_ZERO(dir.y) || !NEAR_ZERO(dir.z);
     }
 
-    // Called by the polling routine in "joystick.cpp"
-    void _joystick_update(xyz_float_t &norm_jog) {
+    // Called by the polling routine in "joystick.cpp" or "wii_i2c.cpp"
+    void _jogging_update(xyz_float_t &norm_jog) {
       if (flags.jogging) {
         #define OUT_OF_RANGE(VALUE) (VALUE < -1.0f || VALUE > 1.0f)
 

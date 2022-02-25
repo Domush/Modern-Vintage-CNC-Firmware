@@ -3119,18 +3119,21 @@
  */
 #define WII_NUNCHUCK_JOGGING
 #if ENABLED(WII_NUNCHUCK_JOGGING)
-  #define WII_SDA_PIN    5
-  #define WII_SCL_PIN   10
-  // #define WII_EN_PIN  44
+  // #define WII_SDA_PIN    5
+  // #define WII_SCL_PIN    10
+  // #define WII_EN_PIN     44
 
-  //#define INVERT_WII_X  // Enable if X direction is reversed
-  //#define INVERT_WII_Y  // Enable if Y direction is reversed
-  //#define INVERT_WII_Z  // Enable if Z direction is reversed
+  // Pressing the C button enables full speed movements up to max_feed_rate for each respective axis
+  #define WII_SLOW_DIVISER 3 // Divide all speeds by value for standard (C unpressed) movements
+
+  //#define INVERT_WII_X  // Enable to reverse X axis jogging
+  //#define INVERT_WII_Y  // Enable to reverse Y axis jogging
+  //#define INVERT_WII_Z  // Enable to reverse Z axis jogging
 
   // Use M119 with WII_NUNCHUCK_DEBUG to find reasonable values after connecting:
-  #define WII_X_LIMITS { 30, 128-10, 128+10, 240 } // min, deadzone start, deadzone end, max
-  #define WII_Y_LIMITS { 30, 128-10, 128+10, 240 }
-  #define WII_Z_LIMITS { 30, 128-10, 128+10, 240 }
+  #define WII_X_LIMITS { 0, 128-10, 128+10, 255 } // min, deadzone start, deadzone end, max
+  #define WII_Y_LIMITS { 0, 128-10, 128+10, 255 }
+  #define WII_Z_LIMITS { 0, 128-10, 128+10, 255 }
   #define WII_NUNCHUCK_DEBUG
 #endif
 

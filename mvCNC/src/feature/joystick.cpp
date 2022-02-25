@@ -140,7 +140,7 @@ Joystick joystick;
     // Other non-joystick poll-based jogging could be implemented here
     // with "jogging" encapsulated as a more general class.
 
-    TERN_(EXTENSIBLE_UI, ExtUI::_joystick_update(norm_jog));
+    TERN_(EXTENSIBLE_UI, ExtUI::_jogging_update(norm_jog));
 
     // norm_jog values of [-1 .. 1] maps linearly to [-feedrate .. feedrate]
     xyz_float_t move_dist{0};

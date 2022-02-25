@@ -15,69 +15,122 @@
 #include "../inc/mvCNCConfig.h"  // for pins
 #include "../module/planner.h"
 
-WiiNunchuck wiinunchuck;
+WiiNunchuck wii;
 
 #if ENABLED(EXTENSIBLE_UI)
   #include "../lcd/extui/ui_api.h"
 #endif
 
-temp_info_t WiiNunchuck::x; // = { 0 }
 #if ENABLED(INVERT_WII_X)
-  #define WII_X(N) (16383 - (N))
+  #define WII_X(N) (255 - (N))
 #else
   #define WII_X(N) (N)
 #endif
-temp_info_t WiiNunchuck::y; // = { 0 }
+
 #if ENABLED(INVERT_WII_Y)
-  #define WII_Y(N) (16383 - (N))
+  #define WII_Y(N) (255 - (N))
 #else
   #define WII_Y(N) (N)
 #endif
-temp_info_t WiiNunchuck::z; // = { 0 }
+
 #if ENABLED(INVERT_WII_Z)
-  #define WII_Z(N) (16383 - (N))
+  #define WII_Z(N) (255 - (N))
 #else
   #define WII_Z(N) (N)
 #endif
 
 #if ENABLED(WII_NUNCHUCK_DEBUG)
   void WiiNunchuck::report() {
-    SERIAL_ECHOPGM("WiiNunchuck");
-      SERIAL_ECHOPGM_P(SP_X_STR, WII_X(x.raw));
-      SERIAL_ECHOPGM_P(SP_Y_STR, WII_Y(y.raw));
-      SERIAL_ECHOPGM_P(SP_Z_STR, WII_Z(z.raw));
+    SERIAL_ECHOPGM("Wii Nunchuck States:");
+      if (wii.state.buttonZ()) {
+        SERIAL_ECHOPGM_P(SP_X_STR, "idle");
+        SERIAL_ECHOPGM_P(SP_Y_STR, "idle");
+        SERIAL_ECHOPGM_P(SP_Z_STR, WII_Z(MAX(wii.state.joyX(),wii.state.joyY())));
+      } else {
+        SERIAL_ECHOPGM_P(SP_X_STR, WII_X(wii.state.joyX()));
+        SERIAL_ECHOPGM_P(SP_Y_STR, WII_Y(wii.state.joyY()));
+        SERIAL_ECHOPGM_P(SP_Z_STR, "idle");
+      }
     #if HAS_WII_EN
       SERIAL_ECHO_TERNARY(READ(WII_EN_PIN), " EN=", "HIGH (dis", "LOW (en", "abled)");
     #endif
     SERIAL_EOL();
+    char buffer[80];
+
+    const char cPrint = wii.state.buttonC() ? 'C' : '-';
+    const char zPrint = wii.state.buttonZ() ? 'Z' : '-';
+
+    snprintf(buffer, sizeof(buffer),
+             "Raw Values: Joy:(%3u, %3u) | Accel XYZ:(%4u, %4u, %4u) | Buttons: %c%c",
+             wii.state.joyX(), wii.state.joyY(), wii.state.accelX(), wii.state.accelY(), wii.state.accelZ(), cPrint, zPrint);
+    SERIAL_ECHOLN(buffer);
   }
 #endif
 
-  void WiiNunchuck::calculate(xyz_float_t &norm_jog) {
-    // Do nothing if enable pin (active-low) is not LOW
-    #if HAS_WII_EN
-      if (READ(WII_EN_PIN)) return;
-    #endif
+void WiiNunchuck::connect() {
+  // Do nothing if enable pin (active-low) is not LOW
+  #if HAS_WII_EN
+    if (READ(WII_EN_PIN)) return;
+  #endif
 
-    auto _normalize_wii = [](float &axis_jog, const int16_t raw, const int16_t (&wii_limits)[4]) {
-      if (WITHIN(raw, wii_limits[0], wii_limits[3])) {
-        // within limits, check deadzone
-        if (raw > wii_limits[2])
-          axis_jog = (raw - wii_limits[2]) / float(wii_limits[3] - wii_limits[2]);
-        else if (raw < wii_limits[1])
-          axis_jog = (raw - wii_limits[1]) / float(wii_limits[1] - wii_limits[0]);  // negative value
-        // Map normal to jog value via quadratic relationship
-        axis_jog = SIGN(axis_jog) * sq(axis_jog);
-      }
-    };
+  // Delay reconnection attempts to save CPU time and prevent job stuttering
+  const millis_t _reconnection_delay = 15000; // delay in ms
 
-    static constexpr int16_t wii_x_limits[4] = WII_X_LIMITS;
-    _normalize_wii(norm_jog.x, WII_X(x.raw), wii_x_limits);
-    static constexpr int16_t wii_y_limits[4] = WII_Y_LIMITS;
-    _normalize_wii(norm_jog.y, WII_Y(y.raw), wii_y_limits);
-    static constexpr int16_t wii_z_limits[4] = WII_Z_LIMITS;
-    _normalize_wii(norm_jog.z, WII_Z(z.raw), wii_z_limits);
+  static millis_t next_run = 0;
+  if (PENDING(millis(), next_run)) return;
+  next_run = millis() + _reconnection_delay;
+
+  wii.state.begin();
+  wii.state.connect();
+}
+
+void WiiNunchuck::calculate(xyz_float_t &norm_jog) {
+  // Do nothing if enable pin (active-low) is not LOW
+  #if HAS_WII_EN
+    if (READ(WII_EN_PIN)) return;
+  #endif
+
+  // Attempt a connection if not currently connected
+  if (wii.state.getControllerType() == ExtensionType::NoController) {
+    wii.connect();
   }
+
+  auto _normalize_wii = [](float &axis_jog, const int16_t joy_value, const int16_t (&wii_limits)[4], const bool is_z_axis = false) {
+    if (WITHIN(joy_value, wii_limits[0], wii_limits[3])) {
+      // within limits, check deadzone
+      if (joy_value > wii_limits[2])
+        axis_jog = (joy_value - wii_limits[2]) / float(wii_limits[3] - wii_limits[2]);
+      else if (joy_value < wii_limits[1])
+        axis_jog = (joy_value - wii_limits[1]) / float(wii_limits[1] - wii_limits[0]);  // negative value
+      // If C button is not pressed, reduce the speed of the movement
+      if (axis_jog != 0.0f && !wii.state.buttonC()) {
+        axis_jog = axis_jog / WII_SLOW_DIVISER;
+      }
+      // Map normal to jog value via quadratic relationship
+      axis_jog = SIGN(axis_jog) * sq(axis_jog);
+    }
+  };
+
+  static constexpr int16_t wii_x_limits[4] = WII_X_LIMITS;
+  static constexpr int16_t wii_y_limits[4] = WII_Y_LIMITS;
+  static constexpr int16_t wii_z_limits[4] = WII_Z_LIMITS;
+  if (wii.state.update()) {
+    if (wii.state.buttonZ()) { // Move Z axis if Z button pressed
+      if (wii.state.joyX() < wii_z_limits[1] || wii.state.joyX() > wii_z_limits[2]) {
+        // joyX moves the Z axis at half adjusted speed.
+        float _half_joy_speed = wii.state.joyX() + (128 - wii.state.joyX()) / 2;
+        _normalize_wii(norm_jog.z, WII_Z(_half_joy_speed), wii_z_limits, true);
+      } else {
+        // joyY moves the Z axis at normal adjusted speed.
+        _normalize_wii(norm_jog.z, WII_Z(wii.state.joyY()), wii_z_limits, true);
+      }
+    } else { // Move X/Y axis
+      _normalize_wii(norm_jog.x, WII_X(wii.state.joyX()), wii_x_limits);
+      _normalize_wii(norm_jog.y, WII_Y(wii.state.joyY()), wii_y_limits);
+    }
+  }
+
+}
 
 #if ENABLED(POLL_JOG)
 
@@ -111,12 +164,12 @@ temp_info_t WiiNunchuck::z; // = { 0 }
     xyz_float_t norm_jog{0};
 
     // Use ADC values and defined limits. The active zone is normalized: -1..0 (dead) 0..1
-    wiinunchuck.calculate(norm_jog);
+    wii.calculate(norm_jog);
 
     // Other non-wiinunchuck poll-based jogging could be implemented here
     // with "jogging" encapsulated as a more general class.
 
-    TERN_(EXTENSIBLE_UI, ExtUI::_wiinunchuck_update(norm_jog));
+    TERN_(EXTENSIBLE_UI, ExtUI::_jogging_update(norm_jog));
 
     // norm_jog values of [-1 .. 1] maps linearly to [-feedrate .. feedrate]
     xyz_float_t move_dist{0};
