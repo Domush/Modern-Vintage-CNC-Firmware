@@ -9,10 +9,7 @@
 
 #include "../inc/mvCNCConfigPre.h"
 #include "../core/types.h"
-#ifndef PI
-  #define PI Math.PI
-#endif
-#include "NintendoExtensionCtrl.h"
+#include "../../lib/wii_i2c/src/NintendoExtensionCtrl.h"
 
 class WiiNunchuck {
   public:

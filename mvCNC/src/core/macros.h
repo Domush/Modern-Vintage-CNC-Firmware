@@ -149,6 +149,7 @@
 #endif
 
 // Macros to chain up to 40 conditions
+#define _DO_0(W, C, A)     (_##W##_1(A)) // Not actually called. Just defined to avoid code check errors
 #define _DO_1(W,C,A)       (_##W##_1(A))
 #define _DO_2(W,C,A,B)     (_##W##_1(A) C _##W##_1(B))
 #define _DO_3(W,C,A,V...)  (_##W##_1(A) C _DO_2(W,C,V))
