@@ -165,7 +165,7 @@
 //
 #if NO_EEPROM_SELECTED
   //#define SPI_EEPROM
-  //#define HAS_SPI_FLASH                      1  // need mvCNC_DEV_MODE for M993/M994 eeprom backup tests
+  //#define HAS_SPI_FLASH                      1  // need MVCNC_DEV_MODE for M993/M994 eeprom backup tests
   #define FLASH_EEPROM_EMULATION
 #endif
 
@@ -177,7 +177,7 @@
   #define EEPROM_MISO_PIN    BOARD_SPI1_MISO_PIN  // PA6 pin 31
   #define EEPROM_MOSI_PIN    BOARD_SPI1_MOSI_PIN  // PA7 pin 32
   #define EEPROM_PAGE_SIZE               0x1000U  // 4KB (from datasheet)
-  #define mvCNC_EEPROM_SIZE 16UL * (EEPROM_PAGE_SIZE)   // Limit to 64KB for now...
+  #define MVCNC_EEPROM_SIZE                    16UL * (EEPROM_PAGE_SIZE)  // Limit to 64KB for now...
 #elif HAS_SPI_FLASH
   #define SPI_FLASH_SIZE                0x40000U  // limit to 256KB (M993 will reboot with 512)
   #define SPI_FLASH_CS_PIN                  PC5
@@ -188,7 +188,7 @@
   // SoC Flash (framework-arduinoststm32-maple/STM32F1/libraries/EEPROM/EEPROM.h)
   #define EEPROM_PAGE_SIZE     (0x800U)           // 2KB
   #define EEPROM_START_ADDRESS (0x8000000UL + (STM32_FLASH_SIZE) * 1024UL - (EEPROM_PAGE_SIZE) * 2UL)
-  #define mvCNC_EEPROM_SIZE (EEPROM_PAGE_SIZE)
+  #define MVCNC_EEPROM_SIZE    (EEPROM_PAGE_SIZE)
 #else
-  #define mvCNC_EEPROM_SIZE              0x800U  // On SD, Limit to 2KB, require this amount of RAM
+  #define MVCNC_EEPROM_SIZE 0x800U  // On SD, Limit to 2KB, require this amount of RAM
 #endif

@@ -75,18 +75,18 @@ public:
   static bool isReady;                    // Ready to apply power setting from the UI to OCR
   static uint8_t power;
 
-  #if ENABLED(mvCNC_DEV_MODE)
-    static cutter_frequency_t frequency;  // Set PWM frequency; range: 2K-50K
-  #endif
+#if ENABLED(MVCNC_DEV_MODE)
+  static cutter_frequency_t frequency;  // Set PWM frequency; range: 2K-50K
+#endif
 
   static cutter_power_t menuPower,        // Power as set via LCD menu in PWM, Percentage or RPM
                         unitPower;        // Power as displayed status in PWM, Percentage or RPM
 
   static void init();
 
-  #if ENABLED(mvCNC_DEV_MODE)
-    static void refresh_frequency() { set_pwm_frequency(pin_t(SPINDLE_LASER_PWM_PIN), frequency); }
-  #endif
+#if ENABLED(MVCNC_DEV_MODE)
+  static void refresh_frequency() { set_pwm_frequency(pin_t(SPINDLE_LASER_PWM_PIN), frequency); }
+#endif
 
   // Modifying this function should update everywhere
   static bool enabled(const cutter_power_t opwr) { return opwr > 0; }

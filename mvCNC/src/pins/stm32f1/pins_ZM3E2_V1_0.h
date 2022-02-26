@@ -17,7 +17,7 @@
   #define FLASH_EEPROM_EMULATION
   #define EEPROM_PAGE_SIZE      (0x800) // 2KB
   #define EEPROM_START_ADDRESS  (0x08000000 + (STM32_FLASH_SIZE) * 1024 - 2 * EEPROM_PAGE_SIZE)
-  #define mvCNC_EEPROM_SIZE    EEPROM_PAGE_SIZE  // 2KB
+  #define MVCNC_EEPROM_SIZE     EEPROM_PAGE_SIZE  // 2KB
 #endif
 
 //=============================================================================

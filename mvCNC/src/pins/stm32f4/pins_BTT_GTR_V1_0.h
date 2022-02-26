@@ -20,7 +20,7 @@
 
 // Onboard I2C EEPROM
 #define I2C_EEPROM
-#define mvCNC_EEPROM_SIZE                0x2000  // 8KB (24C64 ... 64Kb = 8KB)
+#define MVCNC_EEPROM_SIZE                   0x2000  // 8KB (24C64 ... 64Kb = 8KB)
 
 //
 // Servos

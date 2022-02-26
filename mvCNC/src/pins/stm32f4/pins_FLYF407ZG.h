@@ -32,11 +32,11 @@
   // the 128kB sector allocated for EEPROM emulation.
   #define FLASH_EEPROM_LEVELING
 #elif ENABLED(I2C_EEPROM)
-  #define mvCNC_EEPROM_SIZE              0x2000  // 8KB
+  #define MVCNC_EEPROM_SIZE 0x2000  // 8KB
 #endif
 
-#ifndef mvCNC_EEPROM_SIZE
-  #define mvCNC_EEPROM_SIZE              0x1000  // 4KB
+#ifndef MVCNC_EEPROM_SIZE
+  #define MVCNC_EEPROM_SIZE 0x1000  // 4KB
 #endif
 
 //

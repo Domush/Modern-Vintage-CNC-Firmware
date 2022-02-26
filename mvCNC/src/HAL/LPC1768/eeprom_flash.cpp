@@ -28,22 +28,24 @@ extern "C" {
   #include <lpc17xx_iap.h>
 }
 
-#ifndef mvCNC_EEPROM_SIZE
-  #define mvCNC_EEPROM_SIZE 0x1000 // 4KB
-#endif
+    #ifndef MVCNC_EEPROM_SIZE
+      #define MVCNC_EEPROM_SIZE 0x1000  // 4KB
+    #endif
 
-#define SECTOR_START(sector)  ((sector < 16) ? (sector << 12) : ((sector - 14) << 15))
-#define EEPROM_SECTOR 29
-#define SECTOR_SIZE 32768
-#define EEPROM_SLOTS ((SECTOR_SIZE)/(mvCNC_EEPROM_SIZE))
-#define EEPROM_ERASE 0xFF
-#define SLOT_ADDRESS(sector, slot) (((uint8_t *)SECTOR_START(sector)) + slot * (mvCNC_EEPROM_SIZE))
+    #define SECTOR_START(sector)       ((sector < 16) ? (sector << 12) : ((sector - 14) << 15))
+    #define EEPROM_SECTOR              29
+    #define SECTOR_SIZE                32768
+    #define EEPROM_SLOTS               ((SECTOR_SIZE) / (MVCNC_EEPROM_SIZE))
+    #define EEPROM_ERASE               0xFF
+    #define SLOT_ADDRESS(sector, slot) (((uint8_t *)SECTOR_START(sector)) + slot * (MVCNC_EEPROM_SIZE))
 
-static uint8_t ram_eeprom[mvCNC_EEPROM_SIZE] __attribute__((aligned(4))) = {0};
-static bool eeprom_dirty = false;
-static int current_slot = 0;
+static uint8_t ram_eeprom[MVCNC_EEPROM_SIZE] __attribute__((aligned(4))) = {0};
+static bool eeprom_dirty                                                 = false;
+static int current_slot                                                  = 0;
 
-size_t PersistentStore::capacity() { return mvCNC_EEPROM_SIZE; }
+size_t PersistentStore::capacity() {
+  return MVCNC_EEPROM_SIZE;
+}
 
 bool PersistentStore::access_start() {
   uint32_t first_nblank_loc, first_nblank_val;
@@ -56,15 +58,15 @@ bool PersistentStore::access_start() {
 
   if (status == CMD_SUCCESS) {
     // sector is blank so nothing stored yet
-    for (int i = 0; i < mvCNC_EEPROM_SIZE; i++) ram_eeprom[i] = EEPROM_ERASE;
+    for (int i = 0; i < MVCNC_EEPROM_SIZE; i++) ram_eeprom[i] = EEPROM_ERASE;
     current_slot = EEPROM_SLOTS;
   }
   else {
     // current slot is the first non blank one
-    current_slot = first_nblank_loc / (mvCNC_EEPROM_SIZE);
+    current_slot         = first_nblank_loc / (MVCNC_EEPROM_SIZE);
     uint8_t *eeprom_data = SLOT_ADDRESS(EEPROM_SECTOR, current_slot);
     // load current settings
-    for (int i = 0; i < mvCNC_EEPROM_SIZE; i++) ram_eeprom[i] = eeprom_data[i];
+    for (int i = 0; i < MVCNC_EEPROM_SIZE; i++) ram_eeprom[i] = eeprom_data[i];
   }
   eeprom_dirty = false;
 

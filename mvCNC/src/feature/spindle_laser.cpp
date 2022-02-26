@@ -29,52 +29,52 @@ bool SpindleLaser::isReady;                                           // Ready t
 cutter_power_t SpindleLaser::menuPower,                               // Power set via LCD menu in PWM, PERCENT, or RPM
                SpindleLaser::unitPower;                               // LCD status power in PWM, PERCENT, or RPM
 
-#if ENABLED(mvCNC_DEV_MODE)
-  cutter_frequency_t SpindleLaser::frequency;                         // PWM frequency setting; range: 2K - 50K
-#endif
-#define SPINDLE_LASER_PWM_OFF TERN(SPINDLE_LASER_PWM_INVERT, 255, 0)
+  #if ENABLED(MVCNC_DEV_MODE)
+cutter_frequency_t SpindleLaser::frequency;  // PWM frequency setting; range: 2K - 50K
+  #endif
+  #define SPINDLE_LASER_PWM_OFF TERN(SPINDLE_LASER_PWM_INVERT, 255, 0)
 
 /**
  * Init the cutter to a safe OFF state
  */
 void SpindleLaser::init() {
   #if ENABLED(SPINDLE_SERVO)
-    MOVE_SERVO(SPINDLE_SERVO_NR, SPINDLE_SERVO_MIN);
+  MOVE_SERVO(SPINDLE_SERVO_NR, SPINDLE_SERVO_MIN);
   #else
-    OUT_WRITE(SPINDLE_LASER_ENA_PIN, !SPINDLE_LASER_ACTIVE_STATE);    // Init spindle to off
+  OUT_WRITE(SPINDLE_LASER_ENA_PIN, !SPINDLE_LASER_ACTIVE_STATE);  // Init spindle to off
   #endif
   #if ENABLED(SPINDLE_CHANGE_DIR)
-    OUT_WRITE(SPINDLE_DIR_PIN, SPINDLE_INVERT_DIR);                   // Init rotation to clockwise (M3)
+  OUT_WRITE(SPINDLE_DIR_PIN, SPINDLE_INVERT_DIR);  // Init rotation to clockwise (M3)
   #endif
   #if ENABLED(SPINDLE_LASER_USE_PWM)
-    SET_PWM(SPINDLE_LASER_PWM_PIN);
-    set_pwm_duty(pin_t(SPINDLE_LASER_PWM_PIN), SPINDLE_LASER_PWM_OFF); // Set to lowest speed
+  SET_PWM(SPINDLE_LASER_PWM_PIN);
+  set_pwm_duty(pin_t(SPINDLE_LASER_PWM_PIN), SPINDLE_LASER_PWM_OFF);  // Set to lowest speed
   #endif
   #if ENABLED(HAL_CAN_SET_PWM_FREQ) && SPINDLE_LASER_FREQUENCY
-    set_pwm_frequency(pin_t(SPINDLE_LASER_PWM_PIN), SPINDLE_LASER_FREQUENCY);
-    TERN_(mvCNC_DEV_MODE, frequency = SPINDLE_LASER_FREQUENCY);
+  set_pwm_frequency(pin_t(SPINDLE_LASER_PWM_PIN), SPINDLE_LASER_FREQUENCY);
+  TERN_(MVCNC_DEV_MODE, frequency = SPINDLE_LASER_FREQUENCY);
   #endif
   #if ENABLED(AIR_EVACUATION)
-    OUT_WRITE(AIR_EVACUATION_PIN, !AIR_EVACUATION_ACTIVE);            // Init Vacuum/Blower OFF
+  OUT_WRITE(AIR_EVACUATION_PIN, !AIR_EVACUATION_ACTIVE);  // Init Vacuum/Blower OFF
   #endif
   #if ENABLED(AIR_ASSIST)
-    OUT_WRITE(AIR_ASSIST_PIN, !AIR_ASSIST_ACTIVE);                    // Init Air Assist OFF
+  OUT_WRITE(AIR_ASSIST_PIN, !AIR_ASSIST_ACTIVE);  // Init Air Assist OFF
   #endif
-  TERN_(I2C_AMMETER, ammeter.init());                                 // Init I2C Ammeter
+  TERN_(I2C_AMMETER, ammeter.init());  // Init I2C Ammeter
 }
 
-#if ENABLED(SPINDLE_LASER_USE_PWM)
-  /**
+  #if ENABLED(SPINDLE_LASER_USE_PWM)
+/**
    * Set the cutter PWM directly to the given ocr value
    *
    * @param ocr Power value
    */
-  void SpindleLaser::_set_ocr(const uint8_t ocr) {
+void SpindleLaser::_set_ocr(const uint8_t ocr) {
     #if ENABLED(HAL_CAN_SET_PWM_FREQ) && SPINDLE_LASER_FREQUENCY
-      set_pwm_frequency(pin_t(SPINDLE_LASER_PWM_PIN), TERN(mvCNC_DEV_MODE, frequency, SPINDLE_LASER_FREQUENCY));
+  set_pwm_frequency(pin_t(SPINDLE_LASER_PWM_PIN), TERN(MVCNC_DEV_MODE, frequency, SPINDLE_LASER_FREQUENCY));
     #endif
     set_pwm_duty(pin_t(SPINDLE_LASER_PWM_PIN), ocr ^ SPINDLE_LASER_PWM_OFF);
-  }
+}
 
   void SpindleLaser::set_ocr(const uint8_t ocr) {
     WRITE(SPINDLE_LASER_ENA_PIN,  SPINDLE_LASER_ACTIVE_STATE); // Cutter ON

@@ -22,7 +22,7 @@
   //#define SDCARD_EEPROM_EMULATION
   //#define I2C_EEPROM                            // AT24C32
   #define FLASH_EEPROM_EMULATION
-  #define mvCNC_EEPROM_SIZE              0x1000  // 4KB
+  #define MVCNC_EEPROM_SIZE 0x1000  // 4KB
 #endif
 
 //

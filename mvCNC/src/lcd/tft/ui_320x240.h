@@ -3,7 +3,7 @@
 */
 #pragma once
 
-#define mvCNC_LOGO_FULL_SIZE mvCNCLogo320x240x16
+#define MVCNC_LOGO_FULL_SIZE   mvCNCLogo320x240x16
 
 #define TFT_STATUS_TOP_Y       0
 #define TFT_TOP_LINE_Y         2

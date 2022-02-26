@@ -9,19 +9,20 @@
 
 #include "../inc/mvCNCConfigPre.h"
 #include "../core/types.h"
-#include "../../lib/wii_i2c/src/NintendoExtensionCtrl.h"
+#include "lib/wii_i2c/src/NintendoExtensionCtrl.h"
 
 class WiiNunchuck {
-  public:
-    #if ENABLED(WII_NUNCHUCK_DEBUG)
-      static void report();
-    #endif
-    static void calculate(xyz_float_t &norm_jog);
-    static void inject_jog_moves();
+#if ENABLED(WII_NUNCHUCK_DEBUG)
+  static void report();
+#endif
+  static void calculate(xyz_float_t &norm_jog);
 
-   Nunchuk state;
-   static void connect();
-   static void update();
+public:
+  void inject_jog_moves();
+
+  static Nunchuk state;
+  void connect();
+  void update();
 };
 
 extern WiiNunchuck wii;

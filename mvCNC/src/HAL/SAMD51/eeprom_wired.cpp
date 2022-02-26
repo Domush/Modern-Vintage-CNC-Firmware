@@ -19,10 +19,12 @@
 #include "../shared/eeprom_if.h"
 #include "../shared/eeprom_api.h"
 
-#ifndef mvCNC_EEPROM_SIZE
-  #error "mvCNC_EEPROM_SIZE is required for I2C / SPI EEPROM."
-#endif
-size_t PersistentStore::capacity()    { return mvCNC_EEPROM_SIZE; }
+    #ifndef MVCNC_EEPROM_SIZE
+      #error "MVCNC_EEPROM_SIZE is required for I2C / SPI EEPROM."
+    #endif
+size_t PersistentStore::capacity() {
+  return MVCNC_EEPROM_SIZE;
+}
 
 bool PersistentStore::access_start()  { eeprom_init(); return true; }
 bool PersistentStore::access_finish() { return true; }

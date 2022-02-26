@@ -3,7 +3,7 @@
 */
 #pragma once
 
-#define mvCNC_LOGO_FULL_SIZE mvCNCLogo480x320x16
+#define MVCNC_LOGO_FULL_SIZE mvCNCLogo480x320x16
 
 #include "ui_common.h"
 

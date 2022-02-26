@@ -88,7 +88,7 @@
     }
   }
 
-  #if ENABLED(mvCNC_DEV_MODE)
+  #if ENABLED(MVCNC_DEV_MODE)
     void dump_delay_accuracy_check() {
       auto report_call_time = [](FSTR_P const name, FSTR_P const unit, const uint32_t cycles, const uint32_t total, const bool do_flush=true) {
         SERIAL_ECHOPGM("Calling ");
@@ -147,13 +147,12 @@
         report_call_time(dcd, cyc, 200, e - s, false);
       }
     }
-  #endif // mvCNC_DEV_MODE
-
+  #endif  // MVCNC_DEV_MODE
 
 #else
 
   void calibrate_delay_loop() {}
-  #if ENABLED(mvCNC_DEV_MODE)
+  #if ENABLED(MVCNC_DEV_MODE)
     void dump_delay_accuracy_check() { SERIAL_ECHOPGM("N/A on this platform"); }
   #endif
 

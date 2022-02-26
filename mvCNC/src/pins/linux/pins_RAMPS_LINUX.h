@@ -35,8 +35,8 @@
   #define DEFAULT_MACHINE_NAME "SimRap 1.4"
 #endif
 
-#ifndef mvCNC_EEPROM_SIZE
-  #define mvCNC_EEPROM_SIZE              0x1000  // 4KB
+#ifndef MVCNC_EEPROM_SIZE
+  #define MVCNC_EEPROM_SIZE 0x1000  // 4KB
 #endif
 
 //

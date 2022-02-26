@@ -37,10 +37,10 @@
   #if ENABLED(IIC_BL24CXX_EEPROM)
     #define IIC_EEPROM_SDA                  PA11
     #define IIC_EEPROM_SCL                  PA12
-    #define mvCNC_EEPROM_SIZE             0x800  // 2Kb (24C16)
+    #define MVCNC_EEPROM_SIZE               0x800  // 2Kb (24C16)
   #else
     #define SDCARD_EEPROM_EMULATION               // SD EEPROM until all EEPROM is BL24CXX
-    #define mvCNC_EEPROM_SIZE             0x800  // 2Kb
+    #define MVCNC_EEPROM_SIZE 0x800               // 2Kb
   #endif
 
   // SPI

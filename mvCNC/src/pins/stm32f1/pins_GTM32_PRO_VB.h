@@ -40,7 +40,7 @@
 // Enable EEPROM Emulation for this board as it doesn't have EEPROM
 #if EITHER(NO_EEPROM_SELECTED, FLASH_EEPROM_EMULATION)
   #define FLASH_EEPROM_EMULATION
-  #define mvCNC_EEPROM_SIZE              0x1000  // 4KB
+  #define MVCNC_EEPROM_SIZE 0x1000  // 4KB
 #endif
 
 //

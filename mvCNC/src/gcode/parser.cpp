@@ -127,27 +127,28 @@ void GCodeParser::parse(char *p) {
     starpos[1] = '\0';
   }
 
-  #if ANY(mvCNC_DEV_MODE, SWITCHING_TOOLHEAD, MAGNETIC_SWITCHING_TOOLHEAD, ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
-    #define SIGNED_CODENUM 1
-  #endif
+#if ANY(MVCNC_DEV_MODE, SWITCHING_TOOLHEAD, MAGNETIC_SWITCHING_TOOLHEAD, ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
+  #define SIGNED_CODENUM 1
+#endif
 
-  /**
+/**
    * Screen for good command letters.
    * With Realtime Reporting, commands S000, P000, and R000 are allowed.
    */
-  #if ENABLED(REALTIME_COMMANDS)
-    switch (letter) {
-      case 'P': case 'R' ... 'S': {
-        uint8_t digits = 0;
-        char *a = p;
-        while (*a++ == '0') digits++; // Count up '0' characters
-        if (digits == 3) {            // Three '0' digits is a good command
-          codenum = 0;
-          command_letter = letter;
-          return;
-        }
+#if ENABLED(REALTIME_COMMANDS)
+  switch (letter) {
+    case 'P':
+    case 'R' ... 'S': {
+      uint8_t digits = 0;
+      char *a        = p;
+      while (*a++ == '0') digits++;  // Count up '0' characters
+      if (digits == 3) {             // Three '0' digits is a good command
+        codenum        = 0;
+        command_letter = letter;
+        return;
       }
     }
+  }
   #endif
 
   /**
@@ -155,9 +156,12 @@ void GCodeParser::parse(char *p) {
    * With Motion Modes enabled any axis letter can come first.
    */
   switch (letter) {
-    case 'G': case 'M': case 'T': TERN_(mvCNC_DEV_MODE, case 'D':) {
-      // Skip spaces to get the numeric part
-      while (*p == ' ') p++;
+    case 'G':
+    case 'M':
+    case 'T':
+      TERN_(MVCNC_DEV_MODE, case 'D' :) {
+        // Skip spaces to get the numeric part
+        while (*p == ' ') p++;
 
       #if HAS_PRUSA_MMU2
         if (letter == 'T') {
@@ -210,8 +214,8 @@ void GCodeParser::parse(char *p) {
           TERN_(USE_GCODE_SUBCODES, motion_mode_subcode = subcode);
         }
       #endif
-
-      } break;
+      }
+      break;
 
     #if ENABLED(GCODE_MOTION_MODES)
 

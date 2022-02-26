@@ -23,20 +23,23 @@
 #include <EEPROM.h>
 
 // Store settings in the last two pages
-#ifndef mvCNC_EEPROM_SIZE
-  #define mvCNC_EEPROM_SIZE ((EEPROM_PAGE_SIZE) * 2)
-#endif
-size_t PersistentStore::capacity() { return mvCNC_EEPROM_SIZE; }
+    #ifndef MVCNC_EEPROM_SIZE
+      #define MVCNC_EEPROM_SIZE ((EEPROM_PAGE_SIZE)*2)
+    #endif
+size_t PersistentStore::capacity() {
+  return MVCNC_EEPROM_SIZE;
+}
 
-static uint8_t ram_eeprom[mvCNC_EEPROM_SIZE] __attribute__((aligned(4))) = {0};
+static uint8_t ram_eeprom[MVCNC_EEPROM_SIZE] __attribute__((aligned(4))) = {0};
 static bool eeprom_dirty = false;
 
 bool PersistentStore::access_start() {
   const uint32_t *source = reinterpret_cast<const uint32_t*>(EEPROM_PAGE0_BASE);
   uint32_t *destination = reinterpret_cast<uint32_t*>(ram_eeprom);
 
-  static_assert(0 == (mvCNC_EEPROM_SIZE) % 4, "mvCNC_EEPROM_SIZE is corrupted. (Must be a multiple of 4.)"); // Ensure copying as uint32_t is safe
-  constexpr size_t eeprom_size_u32 = (mvCNC_EEPROM_SIZE) / 4;
+  static_assert(0 == (MVCNC_EEPROM_SIZE) % 4,
+                "MVCNC_EEPROM_SIZE is corrupted. (Must be a multiple of 4.)");  // Ensure copying as uint32_t is safe
+  constexpr size_t eeprom_size_u32 = (MVCNC_EEPROM_SIZE) / 4;
 
   for (size_t i = 0; i < eeprom_size_u32; ++i, ++destination, ++source)
     *destination = *source;
@@ -66,7 +69,7 @@ bool PersistentStore::access_finish() {
     if (status != FLASH_COMPLETE) ACCESS_FINISHED(true);
 
     const uint16_t *source = reinterpret_cast<const uint16_t*>(ram_eeprom);
-    for (size_t i = 0; i < mvCNC_EEPROM_SIZE; i += 2, ++source) {
+    for (size_t i = 0; i < MVCNC_EEPROM_SIZE; i += 2, ++source) {
       if (FLASH_ProgramHalfWord(EEPROM_PAGE0_BASE + i, *source) != FLASH_COMPLETE)
         ACCESS_FINISHED(false);
     }

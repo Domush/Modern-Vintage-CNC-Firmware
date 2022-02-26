@@ -15,10 +15,12 @@
 #include "../shared/eeprom_if.h"
 #include "../shared/eeprom_api.h"
 
-#ifndef mvCNC_EEPROM_SIZE
-  #define mvCNC_EEPROM_SIZE           0x8000 // 32KB‬
-#endif
-size_t PersistentStore::capacity()    { return mvCNC_EEPROM_SIZE; }
+    #ifndef MVCNC_EEPROM_SIZE
+      #define MVCNC_EEPROM_SIZE 0x8000  // 32KB‬
+    #endif
+size_t PersistentStore::capacity() {
+  return MVCNC_EEPROM_SIZE;
+}
 
 bool PersistentStore::access_start()  { eeprom_init(); return true; }
 bool PersistentStore::access_finish() { return true; }

@@ -19,7 +19,7 @@
 
 #if NO_EEPROM_SELECTED
   #define FLASH_EEPROM_EMULATION
-  #define mvCNC_EEPROM_SIZE              0x1000  // 4KB
+  #define MVCNC_EEPROM_SIZE 0x1000  // 4KB
 #endif
 
 #if ENABLED(FLASH_EEPROM_EMULATION)

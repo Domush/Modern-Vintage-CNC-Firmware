@@ -451,7 +451,7 @@ void mvCNCUI::clear_lcd() { lcd.clear(); }
       // Show the mvCNC logo, splash line1, and splash line 2
       //
       logo_lines(PSTR(" " SHORT_BUILD_VERSION));
-      CENTER_OR_SCROLL(mvCNC_WEBSITE_URL, 2000);
+      CENTER_OR_SCROLL(MVCNC_WEBSITE_URL, 2000);
     }
     else {
       //
@@ -460,10 +460,10 @@ void mvCNCUI::clear_lcd() { lcd.clear(); }
       //
       logo_lines(NUL_STR);
       CENTER_OR_SCROLL(SHORT_BUILD_VERSION, 1500);
-      CENTER_OR_SCROLL(mvCNC_WEBSITE_URL, 1500);
-      #ifdef STRING_SPLASH_LINE3
-        CENTER_OR_SCROLL(STRING_SPLASH_LINE3, 1500);
-      #endif
+      CENTER_OR_SCROLL(MVCNC_WEBSITE_URL, 1500);
+    #ifdef STRING_SPLASH_LINE3
+      CENTER_OR_SCROLL(STRING_SPLASH_LINE3, 1500);
+    #endif
     }
   }
 

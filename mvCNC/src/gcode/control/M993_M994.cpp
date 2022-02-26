@@ -4,11 +4,11 @@
 
 #include "../../inc/mvCNCConfig.h"
 
-#if ALL(HAS_SPI_FLASH, SDSUPPORT, mvCNC_DEV_MODE)
+#if ALL(HAS_SPI_FLASH, SDSUPPORT, MVCNC_DEV_MODE)
 
-#include "../gcode.h"
-#include "../../sd/cardreader.h"
-#include "../../libs/W25Qxx.h"
+  #include "../gcode.h"
+  #include "../../sd/cardreader.h"
+  #include "../../libs/W25Qxx.h"
 
 /**
  * M993: Backup SPI Flash to SD
@@ -67,4 +67,4 @@ void GcodeSuite::M994() {
   card.closefile();
 }
 
-#endif // HAS_SPI_FLASH && SDSUPPORT && mvCNC_DEV_MODE
+#endif  // HAS_SPI_FLASH && SDSUPPORT && MVCNC_DEV_MODE

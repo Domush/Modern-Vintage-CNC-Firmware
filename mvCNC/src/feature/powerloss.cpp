@@ -208,7 +208,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
     info.axis_relative = gcode.axis_relative;
 
     // Misc. mvCNC flags
-    info.flag.dryrun = !!(mvcnc_debug_flags & mvCNC_DEBUG_DRYRUN);
+    info.flag.dryrun               = !!(mvcnc_debug_flags & MVCNC_DEBUG_DRYRUN);
     info.flag.allow_cold_extrusion = TERN0(PREVENT_COLD_EXTRUSION, thermalManager.allow_cold_extrude);
 
     write();
@@ -312,7 +312,7 @@ void CNCJobRecovery::resume() {
   const uint32_t resume_sdpos = info.sdpos; // Get here before the stepper ISR overwrites it
 
   // Apply the dry-run flag if enabled
-  if (info.flag.dryrun) mvcnc_debug_flags |= mvCNC_DEBUG_DRYRUN;
+  if (info.flag.dryrun) mvcnc_debug_flags |= MVCNC_DEBUG_DRYRUN;
 
   // Restore cold extrusion permission
   TERN_(PREVENT_COLD_EXTRUSION, thermalManager.allow_cold_extrude = info.flag.allow_cold_extrusion);
@@ -539,7 +539,7 @@ void CNCJobRecovery::resume() {
 
   #if ENABLED(DEBUG_POWER_LOSS_RECOVERY)
     const uint8_t old_flags = mvcnc_debug_flags;
-    mvcnc_debug_flags |= mvCNC_DEBUG_ECHO;
+    mvcnc_debug_flags |= MVCNC_DEBUG_ECHO;
   #endif
 
   // Continue to apply PLR when a file is resumed!

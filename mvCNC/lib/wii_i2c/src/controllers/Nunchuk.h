@@ -26,47 +26,46 @@
 #include "../internal/ExtensionController.h"
 
 namespace NintendoExtensionCtrl {
-	class NunchukBase : public ExtensionController {
-	public:
-		struct Maps {
-			constexpr static IndexMap JoyX = 0;
-			constexpr static IndexMap JoyY = 1;
+  class NunchukBase : public ExtensionController {
+  public:
+    struct Maps {
+      constexpr static IndexMap JoyX       = 0;
+      constexpr static IndexMap JoyY       = 1;
 
-			constexpr static IndexMap AccelX_MSB = 2;
-			constexpr static ByteMap  AccelX_LSB = ByteMap(5, 2, 2, 2);
+      constexpr static IndexMap AccelX_MSB = 2;
+      constexpr static ByteMap AccelX_LSB  = ByteMap(5, 2, 2, 2);
 
-			constexpr static IndexMap AccelY_MSB = 3;
-			constexpr static ByteMap  AccelY_LSB = ByteMap(5, 2, 4, 4);
+      constexpr static IndexMap AccelY_MSB = 3;
+      constexpr static ByteMap AccelY_LSB  = ByteMap(5, 2, 4, 4);
 
-			constexpr static IndexMap AccelZ_MSB = 4;
-			constexpr static ByteMap  AccelZ_LSB = ByteMap(5, 2, 6, 6);
+      constexpr static IndexMap AccelZ_MSB = 4;
+      constexpr static ByteMap AccelZ_LSB  = ByteMap(5, 2, 6, 6);
 
-			constexpr static BitMap   ButtonC = { 5, 1 };
-			constexpr static BitMap   ButtonZ = { 5, 0 };
-		};
+      constexpr static BitMap ButtonC      = {5, 1};
+      constexpr static BitMap ButtonZ      = {5, 0};
+    };
 
-		using ExtensionController::ExtensionController;
+    using ExtensionController::ExtensionController;
 
-		ExtensionType getExpectedType() const;
+    ExtensionType getExpectedType() const;
 
-		uint8_t joyX() const;  // 8 bits, 0-255
-		uint8_t joyY() const;
+    uint8_t joyX() const;  // 8 bits, 0-255
+    uint8_t joyY() const;
 
-		uint16_t accelX() const;  // 10 bits, 0-1023
-		uint16_t accelY() const;
-		uint16_t accelZ() const;
+    uint16_t accelX() const;  // 10 bits, 0-1023
+    uint16_t accelY() const;
+    uint16_t accelZ() const;
 
-		boolean buttonC() const;
-		boolean buttonZ() const;
+    boolean buttonC() const;
+    boolean buttonZ() const;
 
-		float rollAngle() const;  // -180.0 to 180.0
-		float pitchAngle() const;
+    float rollAngle() const;  // -180.0 to 180.0
+    float pitchAngle() const;
 
-		void printDebug(Print& output = NXC_SERIAL_DEFAULT) const;
-	};
-}
+    void printDebug(Print &output = NXC_SERIAL_DEFAULT) const;
+  };
+}  // namespace NintendoExtensionCtrl
 
-using Nunchuk = NintendoExtensionCtrl::BuildControllerClass
-	<NintendoExtensionCtrl::NunchukBase>;
+using Nunchuk = NintendoExtensionCtrl::BuildControllerClass<NintendoExtensionCtrl::NunchukBase>;
 
 #endif

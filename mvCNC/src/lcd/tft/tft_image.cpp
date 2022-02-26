@@ -57,8 +57,8 @@ const tImage Leveling_32x32x4       = { (void *)leveling_32x32x4, 32, 32, GREYSC
 
 const tImage Slider8x16x4           = { (void *)slider_8x16x4, 8, 16, GREYSCALE4 };
 
-const tImage Images[imgCount] = {
-  TERN(SHOW_BOOTSCREEN, TERN(BOOT_MVCNC_LOGO_SMALL, mvCNCLogo195x59x16, mvCNC_LOGO_FULL_SIZE), NoLogo),
+const tImage Images[imgCount]       = {
+  TERN(SHOW_BOOTSCREEN, TERN(BOOT_MVCNC_LOGO_SMALL, mvCNCLogo195x59x16, MVCNC_LOGO_FULL_SIZE), NoLogo),
   HotEnd_64x64x4,
   Bed_64x64x4,
   Bed_Heated_64x64x4,

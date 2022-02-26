@@ -495,7 +495,7 @@ typedef struct SettingsDataStruct {
 
 } SettingsData;
 
-//static_assert(sizeof(SettingsData) <= mvCNC_EEPROM_SIZE, "EEPROM too small to contain SettingsData!");
+//static_assert(sizeof(SettingsData) <= MVCNC_EEPROM_SIZE, "EEPROM too small to contain SettingsData!");
 
 mvCNCSettings settings;
 
@@ -638,9 +638,10 @@ void mvCNCSettings::postprocess() {
   bool mvCNCSettings::size_error(const uint16_t size) {
     if (size != datasize()) {
       DEBUG_ERROR_MSG("EEPROM datasize error."
-        #if ENABLED(mvCNC_DEV_MODE)
-          " (Actual:", size, " Expected:", datasize(), ")"
-        #endif
+  #if ENABLED(MVCNC_DEV_MODE)
+                      " (Actual:",
+                      size, " Expected:", datasize(), ")"
+  #endif
       );
       return true;
     }

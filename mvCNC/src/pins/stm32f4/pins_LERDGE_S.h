@@ -167,14 +167,14 @@
   #define EEPROM_MISO_PIN                   PB14  // datasheet: DO pin, found with multimeter, not tested
   #define EEPROM_MOSI_PIN                   PB15  // datasheet: DI pin, found with multimeter, not tested
   #define EEPROM_PAGE_SIZE               0x1000U  // 4KB (from datasheet)
-  #define mvCNC_EEPROM_SIZE 16UL * (EEPROM_PAGE_SIZE)   // Limit to 64KB for now...
+  #define MVCNC_EEPROM_SIZE                    16UL * (EEPROM_PAGE_SIZE)  // Limit to 64KB for now...
 #elif ENABLED(I2C_EEPROM)                         // FM24CL64BG (CYP1813) 64Kbit F-RAM
   #define SOFT_I2C_EEPROM                         // Force the use of Software I2C
   #define I2C_SDA_PIN                       PG13
   #define I2C_SCL_PIN                       PG14  // To be confirmed on the Lerdge S, but probably same as the K
-  #define mvCNC_EEPROM_SIZE             0x10000
+  #define MVCNC_EEPROM_SIZE                 0x10000
 #else
-  #define mvCNC_EEPROM_SIZE              0x800U  // On SD, Limit to 2KB, require this amount of RAM
+  #define MVCNC_EEPROM_SIZE 0x800U  // On SD, Limit to 2KB, require this amount of RAM
 #endif
 
 //

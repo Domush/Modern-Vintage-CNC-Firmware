@@ -3241,14 +3241,14 @@
 #define PINS_DEBUGGING
 
 // Enable mvCNC dev mode which adds some special commands
-//#define mvCNC_DEV_MODE
+//#define MVCNC_DEV_MODE
 
-#if ENABLED(mvCNC_DEV_MODE)
-  /**
+#if ENABLED(MVCNC_DEV_MODE)
+/**
    * D576 - Buffer Monitoring
    * To help diagnose print quality issues stemming from empty command buffers.
    */
-  //#define BUFFER_MONITORING
+//#define BUFFER_MONITORING
 #endif
 
 /**

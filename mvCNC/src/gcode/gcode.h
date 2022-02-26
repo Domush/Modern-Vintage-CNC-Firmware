@@ -299,7 +299,7 @@
  * M997 - Perform in-application firmware update
  * M999 - Restart after being stopped by error
  *
- * D... - Custom Development G-code. Add hooks to 'gcode_D.cpp' for developers to test features. (Requires mvCNC_DEV_MODE)
+ * D... - Custom Development G-code. Add hooks to 'gcode_D.cpp' for developers to test features. (Requires MVCNC_DEV_MODE)
  *        D576 - Set buffer monitoring options. (Requires BUFFER_MONITORING)
  *
  *** "T" Codes ***
@@ -449,9 +449,9 @@ private:
 
   friend class mvCNCSettings;
 
-  #if ENABLED(mvCNC_DEV_MODE)
-    static void D(const int16_t dcode);
-  #endif
+#if ENABLED(MVCNC_DEV_MODE)
+  static void D(const int16_t dcode);
+#endif
 
   static void G0_G1(TERN_(HAS_FAST_MOVES, const bool fast_move=false));
 

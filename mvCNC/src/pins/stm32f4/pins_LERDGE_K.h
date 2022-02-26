@@ -19,7 +19,7 @@
   #define SOFT_I2C_EEPROM                         // Force the use of Software I2C
   #define I2C_SCL_PIN                       PG14
   #define I2C_SDA_PIN                       PG13
-  #define mvCNC_EEPROM_SIZE             0x10000
+  #define MVCNC_EEPROM_SIZE             0x10000
 #endif
 
 #define HAS_OTG_USB_HOST_SUPPORT                  // USB Flash Drive support

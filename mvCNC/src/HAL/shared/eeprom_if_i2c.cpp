@@ -43,16 +43,16 @@ static constexpr uint8_t eeprom_device_address = I2C_ADDRESS(EEPROM_DEVICE_ADDRE
 // Public functions
 // ------------------------
 
-#define SMALL_EEPROM (mvCNC_EEPROM_SIZE <= 2048)
+    #define SMALL_EEPROM (MVCNC_EEPROM_SIZE <= 2048)
 
 // Combine Address high bits into the device address on <=16Kbit (2K) and >512Kbit (64K) EEPROMs.
-// Note: mvCNC_EEPROM_SIZE is specified in bytes, whereas EEPROM model numbers refer to bits.
+// Note: MVCNC_EEPROM_SIZE is specified in bytes, whereas EEPROM model numbers refer to bits.
 //       e.g., The "16" in BL24C16 indicates a 16Kbit (2KB) size.
-static uint8_t _eeprom_calc_device_address(uint8_t * const pos) {
+static uint8_t _eeprom_calc_device_address(uint8_t *const pos) {
   const unsigned eeprom_address = (unsigned)pos;
-  return (SMALL_EEPROM || mvCNC_EEPROM_SIZE > 65536)
-    ? uint8_t(eeprom_device_address | ((eeprom_address >> (SMALL_EEPROM ? 8 : 16)) & 0x07))
-    : eeprom_device_address;
+  return (SMALL_EEPROM || MVCNC_EEPROM_SIZE > 65536)
+         ? uint8_t(eeprom_device_address | ((eeprom_address >> (SMALL_EEPROM ? 8 : 16)) & 0x07))
+         : eeprom_device_address;
 }
 
 static void _eeprom_begin(uint8_t * const pos) {

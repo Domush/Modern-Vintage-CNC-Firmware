@@ -168,12 +168,10 @@ bool mvCNCUI::detected() { return true; }
   void mvCNCUI::draw_mvcnc_bootscreen(const bool line2/*=false*/) {
 
     // Determine text space needed
-    constexpr u8g_uint_t text_width_1 = u8g_uint_t((sizeof(SHORT_BUILD_VERSION) - 1) * (MENU_FONT_WIDTH)),
-                         text_width_2 = u8g_uint_t((sizeof(mvCNC_WEBSITE_URL) - 1) * (MENU_FONT_WIDTH)),
-                         text_max_width = _MAX(text_width_1, text_width_2),
-                         text_total_height = (MENU_FONT_HEIGHT) * 2,
-                         width = LCD_PIXEL_WIDTH, height = LCD_PIXEL_HEIGHT,
-                         rspace = width - (START_BMPWIDTH);
+    constexpr u8g_uint_t text_width_1   = u8g_uint_t((sizeof(SHORT_BUILD_VERSION) - 1) * (MENU_FONT_WIDTH)),
+                         text_width_2   = u8g_uint_t((sizeof(MVCNC_WEBSITE_URL) - 1) * (MENU_FONT_WIDTH)),
+                         text_max_width = _MAX(text_width_1, text_width_2), text_total_height = (MENU_FONT_HEIGHT)*2,
+                         width = LCD_PIXEL_WIDTH, height = LCD_PIXEL_HEIGHT, rspace = width - (START_BMPWIDTH);
 
     u8g_int_t offx, offy, txt_base, txt_offx_1, txt_offx_2;
 
@@ -200,7 +198,7 @@ bool mvCNCUI::detected() { return true; }
       u8g.drawBitmapP(offx, offy, START_BMP_BYTEWIDTH, START_BMPHEIGHT, bitmap);
       set_font(FONT_MENU);
       if (!two_part || !line2) lcd_put_u8str(txt_offx_1, txt_base - (MENU_FONT_HEIGHT), F(SHORT_BUILD_VERSION));
-      if (!two_part || line2) lcd_put_u8str(txt_offx_2, txt_base, F(mvCNC_WEBSITE_URL));
+      if (!two_part || line2) lcd_put_u8str(txt_offx_2, txt_base, F(MVCNC_WEBSITE_URL));
     };
 
     auto draw_bootscreen_bmp = [&](const uint8_t *bitmap) {

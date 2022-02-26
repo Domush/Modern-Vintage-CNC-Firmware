@@ -10,14 +10,16 @@
 #include "../shared/eeprom_api.h"
 #include <stdio.h>
 
-#ifndef mvCNC_EEPROM_SIZE
-  #define mvCNC_EEPROM_SIZE 0x1000 // 4KB of Emulated EEPROM
-#endif
+    #ifndef MVCNC_EEPROM_SIZE
+      #define MVCNC_EEPROM_SIZE 0x1000  // 4KB of Emulated EEPROM
+    #endif
 
-uint8_t buffer[mvCNC_EEPROM_SIZE];
+uint8_t buffer[MVCNC_EEPROM_SIZE];
 char filename[] = "eeprom.dat";
 
-size_t PersistentStore::capacity() { return mvCNC_EEPROM_SIZE; }
+size_t PersistentStore::capacity() {
+  return MVCNC_EEPROM_SIZE;
+}
 
 bool PersistentStore::access_start() {
   const char eeprom_erase_value = 0xFF;
@@ -27,10 +29,9 @@ bool PersistentStore::access_start() {
   fseek(eeprom_file, 0L, SEEK_END);
   std::size_t file_size = ftell(eeprom_file);
 
-  if (file_size < mvCNC_EEPROM_SIZE) {
-    memset(buffer + file_size, eeprom_erase_value, mvCNC_EEPROM_SIZE - file_size);
-  }
-  else {
+  if (file_size < MVCNC_EEPROM_SIZE) {
+    memset(buffer + file_size, eeprom_erase_value, MVCNC_EEPROM_SIZE - file_size);
+  } else {
     fseek(eeprom_file, 0L, SEEK_SET);
     fread(buffer, sizeof(uint8_t), sizeof(buffer), eeprom_file);
   }

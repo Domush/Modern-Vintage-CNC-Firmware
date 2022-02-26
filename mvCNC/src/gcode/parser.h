@@ -97,7 +97,7 @@ public:
   }
 
   FORCE_INLINE static bool valid_number(const char * const p) {
-    // TODO: With mvCNC_DEV_MODE allow HEX values starting with "x"
+    // TODO: With MVCNC_DEV_MODE allow HEX values starting with "x"
     return valid_float(p);
   }
 
@@ -400,23 +400,21 @@ public:
   static celsius_t celsiusval(const char c, const celsius_t dval=0)    { return seenval(c) ? value_celsius() : dval; }
   static feedRate_t feedrateval(const char c, const feedRate_t dval=0) { return seenval(c) ? value_feedrate() : dval; }
 
-  #if ENABLED(mvCNC_DEV_MODE)
+#if ENABLED(MVCNC_DEV_MODE)
 
-    static uint8_t* hex_adr_val(const char c, uint8_t * const dval=nullptr) {
-      if (!seen(c) || *value_ptr != 'x') return dval;
-      uint8_t *out = nullptr;
-      for (char *vp = value_ptr + 1; HEXCHR(*vp) >= 0; vp++)
-        out = (uint8_t*)((uintptr_t(out) << 8) | HEXCHR(*vp));
-      return out;
-    }
+  static uint8_t *hex_adr_val(const char c, uint8_t *const dval = nullptr) {
+    if (!seen(c) || *value_ptr != 'x') return dval;
+    uint8_t *out = nullptr;
+    for (char *vp = value_ptr + 1; HEXCHR(*vp) >= 0; vp++) out = (uint8_t *)((uintptr_t(out) << 8) | HEXCHR(*vp));
+    return out;
+  }
 
-    static uint16_t hex_val(const char c, uint16_t const dval=0) {
-      if (!seen(c) || *value_ptr != 'x') return dval;
-      uint16_t out = 0;
-      for (char *vp = value_ptr + 1; HEXCHR(*vp) >= 0; vp++)
-        out = ((out) << 8) | HEXCHR(*vp);
-      return out;
-    }
+  static uint16_t hex_val(const char c, uint16_t const dval = 0) {
+    if (!seen(c) || *value_ptr != 'x') return dval;
+    uint16_t out = 0;
+    for (char *vp = value_ptr + 1; HEXCHR(*vp) >= 0; vp++) out = ((out) << 8) | HEXCHR(*vp);
+    return out;
+  }
 
   #endif
 };

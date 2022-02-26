@@ -19,7 +19,7 @@
 // Onboard I2C EEPROM
 #if NO_EEPROM_SELECTED
   #define I2C_EEPROM
-  #define mvCNC_EEPROM_SIZE              0x1000  // 4KB
+  #define MVCNC_EEPROM_SIZE                 0x1000  // 4KB
   #define I2C_SCL_PIN                       PB6
   #define I2C_SDA_PIN                       PB7
   #undef NO_EEPROM_SELECTED

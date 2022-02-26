@@ -986,7 +986,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 422: M422(); break;                                  // M422: Set Z Stepper automatic alignment position using probe
       #endif
 
-      #if ALL(HAS_SPI_FLASH, SDSUPPORT, mvCNC_DEV_MODE)
+#if ALL(HAS_SPI_FLASH, SDSUPPORT, MVCNC_DEV_MODE)
         case 993: M993(); break;                                  // M993: Backup SPI Flash to SD
         case 994: M994(); break;                                  // M994: Load a Backup from SD to SPI Flash
       #endif
@@ -1032,13 +1032,18 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
     case 'T': T(parser.codenum); break;                           // Tn: Tool Change
 
-    #if ENABLED(mvCNC_DEV_MODE)
-      case 'D': D(parser.codenum); break;                         // Dn: Debug codes
-    #endif
+#if ENABLED(MVCNC_DEV_MODE)
+    case 'D':
+      D(parser.codenum);
+      break;  // Dn: Debug codes
+#endif
 
-    #if ENABLED(REALTIME_COMMANDS)
-      case 'S': case 'P': case 'R': break;                        // Invalid S, P, R commands already filtered
-    #endif
+#if ENABLED(REALTIME_COMMANDS)
+    case 'S':
+    case 'P':
+    case 'R':
+      break;  // Invalid S, P, R commands already filtered
+#endif
 
     default:
       #if ENABLED(WIFI_CUSTOM_COMMAND)

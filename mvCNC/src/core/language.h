@@ -74,7 +74,7 @@
   #define MACHINE_UUID DEFAULT_MACHINE_UUID
 #endif
 
-#define mvCNC_WEBSITE_URL "mvcncfw.org"
+#define MVCNC_WEBSITE_URL                   "mvcncfw.org"
 
 //#if !defined(STRING_SPLASH_LINE3) && defined(WEBSITE_URL)
 //  #define STRING_SPLASH_LINE3 WEBSITE_URL

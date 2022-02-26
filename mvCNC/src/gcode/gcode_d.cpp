@@ -4,21 +4,21 @@
 
 #include "../inc/mvCNCConfigPre.h"
 
-#if ENABLED(mvCNC_DEV_MODE)
+#if ENABLED(MVCNC_DEV_MODE)
 
-#include "gcode.h"
+  #include "gcode.h"
 
-#if ENABLED(BUFFER_MONITORING)
-  #include "queue.h"
-#endif
+  #if ENABLED(BUFFER_MONITORING)
+    #include "queue.h"
+  #endif
 
-#include "../module/settings.h"
-#include "../module/temperature.h"
-#include "../libs/hex_print.h"
-#include "../HAL/shared/eeprom_if.h"
-#include "../HAL/shared/Delay.h"
-#include "../sd/cardreader.h"
-#include "../mvCNCCore.h" // for kill
+  #include "../module/settings.h"
+  #include "../module/temperature.h"
+  #include "../libs/hex_print.h"
+  #include "../HAL/shared/eeprom_if.h"
+  #include "../HAL/shared/Delay.h"
+  #include "../sd/cardreader.h"
+  #include "../mvCNCCore.h"  // for kill
 
 extern void dump_delay_accuracy_check();
 
@@ -281,4 +281,4 @@ void GcodeSuite::D(const int16_t dcode) {
   }
 }
 
-#endif // mvCNC_DEV_MODE
+#endif  // MVCNC_DEV_MODE

@@ -203,7 +203,7 @@ void GcodeSuite::G28() {
     DualXMode IDEX_saved_mode = dual_x_carriage_mode;
   #endif
 
-  #if ENABLED(mvCNC_DEV_MODE)
+#if ENABLED(MVCNC_DEV_MODE)
     if (parser.seen_test('S')) {
       LOOP_LINEAR_AXES(a) set_axis_is_at_home((AxisEnum)a);
       sync_plan_position();

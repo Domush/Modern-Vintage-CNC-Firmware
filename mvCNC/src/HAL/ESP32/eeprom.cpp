@@ -10,12 +10,14 @@
 #include "../shared/eeprom_api.h"
 #include <EEPROM.h>
 
-#ifndef mvCNC_EEPROM_SIZE
-  #define mvCNC_EEPROM_SIZE 0x1000 // 4KB
-#endif
-size_t PersistentStore::capacity()    { return mvCNC_EEPROM_SIZE; }
+    #ifndef MVCNC_EEPROM_SIZE
+      #define MVCNC_EEPROM_SIZE 0x1000  // 4KB
+    #endif
+size_t PersistentStore::capacity() {
+  return MVCNC_EEPROM_SIZE;
+}
 
-bool PersistentStore::access_start()  { return EEPROM.begin(mvCNC_EEPROM_SIZE); }
+bool PersistentStore::access_start()  { return EEPROM.begin(MVCNC_EEPROM_SIZE); }
 bool PersistentStore::access_finish() { EEPROM.end(); return true; }
 
 bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, uint16_t *crc) {

@@ -23,7 +23,7 @@
 #undef INVERTED_FAN_PINS
 
 #define I2C_EEPROM
-#define mvCNC_EEPROM_SIZE 0x10000 // 64K in a 24C512
+#define MVCNC_EEPROM_SIZE 0x10000  // 64K in a 24C512
 
 #ifndef PS_ON_PIN
   #define PS_ON_PIN        12

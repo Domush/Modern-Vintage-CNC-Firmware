@@ -48,7 +48,7 @@
 
 // I2C EEPROM with 4K of space
 #define I2C_EEPROM
-#define mvCNC_EEPROM_SIZE                0x1000
+#define MVCNC_EEPROM_SIZE                      0x1000
 
 #define SDA_PIN                               20
 #define SCL_PIN                               21

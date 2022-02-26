@@ -22,7 +22,7 @@
  */
 
 #define SRAM_EEPROM_EMULATION
-#define mvCNC_EEPROM_SIZE                0x2000  // 8KB
+#define MVCNC_EEPROM_SIZE 0x2000  // 8KB
 
 // I2C MCP3426 (16-Bit, 240SPS, dual-channel ADC)
 #define HAS_MCP3426_ADC

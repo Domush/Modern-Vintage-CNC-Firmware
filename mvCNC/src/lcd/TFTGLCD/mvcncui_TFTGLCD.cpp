@@ -385,7 +385,7 @@ static void center_text_P(PGM_P pstart, uint8_t y) {
     lcd.setCursor(indent, 1); lcd.write(LR);  lcd_put_u8str(F("mvCNC"));  lcd.write(LR);
     lcd.setCursor(indent, 2); lcd.write(BLC); lcd_put_u8str(F("------"));  lcd.write(BRC);
     center_text_P(PSTR(SHORT_BUILD_VERSION), 3);
-    center_text_P(PSTR(mvCNC_WEBSITE_URL), 4);
+    center_text_P(PSTR(MVCNC_WEBSITE_URL), 4);
     picBits = ICON_LOGO;
     lcd.print_screen();
   }

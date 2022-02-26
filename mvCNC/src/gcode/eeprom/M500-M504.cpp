@@ -61,7 +61,7 @@ void GcodeSuite::M502() {
 
 #if ENABLED(EEPROM_SETTINGS)
 
-  #if ENABLED(mvCNC_DEV_MODE)
+  #if ENABLED(MVCNC_DEV_MODE)
     #include "../../libs/hex_print.h"
   #endif
 
@@ -69,33 +69,31 @@ void GcodeSuite::M502() {
    * M504: Validate EEPROM Contents
    */
   void GcodeSuite::M504() {
-    #if ENABLED(mvCNC_DEV_MODE)
-      const bool dowrite = parser.seenval('W');
-      if (dowrite || parser.seenval('R')) {
-        uint8_t val = 0;
-        int addr = parser.value_ushort();
-        if (dowrite) {
-          val = parser.byteval('V');
-          persistentStore.write_data(addr, &val);
-          SERIAL_ECHOLNPGM("Wrote address ", addr, " with ", val);
-        }
-        else {
-          if (parser.seenval('T')) {
-            const int endaddr = parser.value_ushort();
-            while (addr <= endaddr) {
-              persistentStore.read_data(addr, &val);
-              SERIAL_ECHOLNPGM("0x", hex_word(addr), ":", hex_byte(val));
-              addr++;
-              safe_delay(10);
-            }
-            SERIAL_EOL();
-          }
-          else {
+  #if ENABLED(MVCNC_DEV_MODE)
+    const bool dowrite = parser.seenval('W');
+    if (dowrite || parser.seenval('R')) {
+      uint8_t val = 0;
+      int addr    = parser.value_ushort();
+      if (dowrite) {
+        val = parser.byteval('V');
+        persistentStore.write_data(addr, &val);
+        SERIAL_ECHOLNPGM("Wrote address ", addr, " with ", val);
+      } else {
+        if (parser.seenval('T')) {
+          const int endaddr = parser.value_ushort();
+          while (addr <= endaddr) {
             persistentStore.read_data(addr, &val);
-            SERIAL_ECHOLNPGM("Read address ", addr, " and got ", val);
+            SERIAL_ECHOLNPGM("0x", hex_word(addr), ":", hex_byte(val));
+            addr++;
+            safe_delay(10);
           }
+          SERIAL_EOL();
+        } else {
+          persistentStore.read_data(addr, &val);
+          SERIAL_ECHOLNPGM("Read address ", addr, " and got ", val);
         }
-        return;
+      }
+      return;
       }
     #endif
 

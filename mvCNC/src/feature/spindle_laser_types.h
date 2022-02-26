@@ -61,7 +61,7 @@ typedef IF<(SPEED_POWER_MAX > 255), uint16_t, uint8_t>::type cutter_cpower_t;
   #define CUTTER_MENU_PULSE_TYPE uint16_3
 #endif
 
-#if ENABLED(mvCNC_DEV_MODE)
+#if ENABLED(MVCNC_DEV_MODE)
   typedef uint16_t cutter_frequency_t;
   #define CUTTER_MENU_FREQUENCY_TYPE uint16_5
 #endif

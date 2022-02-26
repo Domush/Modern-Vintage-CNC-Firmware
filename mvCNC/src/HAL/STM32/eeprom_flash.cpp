@@ -41,53 +41,60 @@
   #define DEBUG_OUT ENABLED(EEPROM_CHITCHAT)
   #include "../../core/debug_out.h"
 
-  #ifndef mvCNC_EEPROM_SIZE
-    #define mvCNC_EEPROM_SIZE    0x1000 // 4KB
-  #endif
+      #ifndef MVCNC_EEPROM_SIZE
+        #define MVCNC_EEPROM_SIZE 0x1000  // 4KB
+      #endif
 
-  #ifndef FLASH_SECTOR
-    #define FLASH_SECTOR          (FLASH_SECTOR_TOTAL - 1)
-  #endif
-  #ifndef FLASH_UNIT_SIZE
-    #define FLASH_UNIT_SIZE       0x20000 // 128kB
-  #endif
+      #ifndef FLASH_SECTOR
+        #define FLASH_SECTOR (FLASH_SECTOR_TOTAL - 1)
+      #endif
+      #ifndef FLASH_UNIT_SIZE
+        #define FLASH_UNIT_SIZE 0x20000  // 128kB
+      #endif
 
-  #ifndef FLASH_ADDRESS_START
-    #define FLASH_ADDRESS_START   (FLASH_END - ((FLASH_SECTOR_TOTAL - (FLASH_SECTOR)) * (FLASH_UNIT_SIZE)) + 1)
-  #endif
-  #define FLASH_ADDRESS_END       (FLASH_ADDRESS_START + FLASH_UNIT_SIZE  - 1)
+      #ifndef FLASH_ADDRESS_START
+        #define FLASH_ADDRESS_START (FLASH_END - ((FLASH_SECTOR_TOTAL - (FLASH_SECTOR)) * (FLASH_UNIT_SIZE)) + 1)
+      #endif
+      #define FLASH_ADDRESS_END  (FLASH_ADDRESS_START + FLASH_UNIT_SIZE - 1)
 
-  #define EEPROM_SLOTS            ((FLASH_UNIT_SIZE) / (mvCNC_EEPROM_SIZE))
-  #define SLOT_ADDRESS(slot)      (FLASH_ADDRESS_START + (slot * (mvCNC_EEPROM_SIZE)))
+      #define EEPROM_SLOTS       ((FLASH_UNIT_SIZE) / (MVCNC_EEPROM_SIZE))
+      #define SLOT_ADDRESS(slot) (FLASH_ADDRESS_START + (slot * (MVCNC_EEPROM_SIZE)))
 
-  #define UNLOCK_FLASH()          if (!flash_unlocked) { \
-                                    HAL_FLASH_Unlock(); \
-                                    __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | \
-                                                           FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR); \
-                                    flash_unlocked = true; \
-                                  }
+      #define UNLOCK_FLASH()                                                                                 \
+        if (!flash_unlocked) {                                                                               \
+          HAL_FLASH_Unlock();                                                                                \
+          __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | \
+                                 FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);                                     \
+          flash_unlocked = true;                                                                             \
+        }
   #define LOCK_FLASH()            if (flash_unlocked) { HAL_FLASH_Lock(); flash_unlocked = false; }
 
   #define EMPTY_UINT32            ((uint32_t)-1)
   #define EMPTY_UINT8             ((uint8_t)-1)
 
-  static uint8_t ram_eeprom[mvCNC_EEPROM_SIZE] __attribute__((aligned(4))) = {0};
-  static int current_slot = -1;
+static uint8_t ram_eeprom[MVCNC_EEPROM_SIZE] __attribute__((aligned(4))) = {0};
+static int current_slot                                                  = -1;
 
-  static_assert(0 == mvCNC_EEPROM_SIZE % 4, "mvCNC_EEPROM_SIZE must be a multiple of 4"); // Ensure copying as uint32_t is safe
-  static_assert(0 == FLASH_UNIT_SIZE % mvCNC_EEPROM_SIZE, "mvCNC_EEPROM_SIZE must divide evenly into your FLASH_UNIT_SIZE");
-  static_assert(FLASH_UNIT_SIZE >= mvCNC_EEPROM_SIZE, "FLASH_UNIT_SIZE must be greater than or equal to your mvCNC_EEPROM_SIZE");
-  static_assert(IS_FLASH_SECTOR(FLASH_SECTOR), "FLASH_SECTOR is invalid");
-  static_assert(IS_POWER_OF_2(FLASH_UNIT_SIZE), "FLASH_UNIT_SIZE should be a power of 2, please check your chip's spec sheet");
+static_assert(0 == MVCNC_EEPROM_SIZE % 4,
+              "MVCNC_EEPROM_SIZE must be a multiple of 4");  // Ensure copying as uint32_t is safe
+static_assert(0 == FLASH_UNIT_SIZE % MVCNC_EEPROM_SIZE,
+              "MVCNC_EEPROM_SIZE must divide evenly into your FLASH_UNIT_SIZE");
+static_assert(FLASH_UNIT_SIZE >= MVCNC_EEPROM_SIZE,
+              "FLASH_UNIT_SIZE must be greater than or equal to your MVCNC_EEPROM_SIZE");
+static_assert(IS_FLASH_SECTOR(FLASH_SECTOR), "FLASH_SECTOR is invalid");
+static_assert(IS_POWER_OF_2(FLASH_UNIT_SIZE),
+              "FLASH_UNIT_SIZE should be a power of 2, please check your chip's spec sheet");
 
-#endif
+    #endif
 
 static bool eeprom_data_written = false;
 
-#ifndef mvCNC_EEPROM_SIZE
-  #define mvCNC_EEPROM_SIZE size_t(E2END + 1)
-#endif
-size_t PersistentStore::capacity() { return mvCNC_EEPROM_SIZE; }
+    #ifndef MVCNC_EEPROM_SIZE
+      #define MVCNC_EEPROM_SIZE size_t(E2END + 1)
+    #endif
+size_t PersistentStore::capacity() {
+  return MVCNC_EEPROM_SIZE;
+}
 
 bool PersistentStore::access_start() {
 
@@ -104,20 +111,20 @@ bool PersistentStore::access_start() {
       while (address <= FLASH_ADDRESS_END) {
         uint32_t address_value = (*(__IO uint32_t*)address);
         if (address_value != EMPTY_UINT32) {
-          current_slot = (address - (FLASH_ADDRESS_START)) / (mvCNC_EEPROM_SIZE);
+          current_slot = (address - (FLASH_ADDRESS_START)) / (MVCNC_EEPROM_SIZE);
           break;
         }
         address += sizeof(uint32_t);
       }
       if (current_slot == -1) {
         // We didn't find anything, so we'll just initialize to empty
-        for (int i = 0; i < mvCNC_EEPROM_SIZE; i++) ram_eeprom[i] = EMPTY_UINT8;
+        for (int i = 0; i < MVCNC_EEPROM_SIZE; i++) ram_eeprom[i] = EMPTY_UINT8;
         current_slot = EEPROM_SLOTS;
       }
       else {
         // load current settings
         uint8_t *eeprom_data = (uint8_t *)SLOT_ADDRESS(current_slot);
-        for (int i = 0; i < mvCNC_EEPROM_SIZE; i++) ram_eeprom[i] = eeprom_data[i];
+        for (int i = 0; i < MVCNC_EEPROM_SIZE; i++) ram_eeprom[i] = eeprom_data[i];
         DEBUG_ECHOLNPGM("EEPROM loaded from slot ", current_slot, ".");
       }
       eeprom_data_written = false;
@@ -176,7 +183,7 @@ bool PersistentStore::access_finish() {
 
       uint32_t offset = 0;
       uint32_t address = SLOT_ADDRESS(current_slot);
-      uint32_t address_end = address + mvCNC_EEPROM_SIZE;
+      uint32_t address_end = address + MVCNC_EEPROM_SIZE;
       uint32_t data = 0;
 
       bool success = true;

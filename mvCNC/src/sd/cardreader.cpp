@@ -37,9 +37,9 @@
   #include "../feature/pause.h"
 #endif
 
-#define DEBUG_OUT EITHER(DEBUG_CARDREADER, mvCNC_DEV_MODE)
-#include "../core/debug_out.h"
-#include "../libs/hex_print.h"
+  #define DEBUG_OUT EITHER(DEBUG_CARDREADER, MVCNC_DEV_MODE)
+  #include "../core/debug_out.h"
+  #include "../libs/hex_print.h"
 
 // extern
 

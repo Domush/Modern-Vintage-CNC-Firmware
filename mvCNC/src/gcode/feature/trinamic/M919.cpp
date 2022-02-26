@@ -16,8 +16,8 @@
 #include "../../../feature/tmc_util.h"
 #include "../../../module/stepper/indirection.h"
 
-#define DEBUG_OUT ENABLED(mvCNC_DEV_MODE)
-#include "../../../core/debug_out.h"
+  #define DEBUG_OUT ENABLED(MVCNC_DEV_MODE)
+  #include "../../../core/debug_out.h"
 
 template<typename TMC>
 static void tmc_print_chopper_time(TMC &st) {

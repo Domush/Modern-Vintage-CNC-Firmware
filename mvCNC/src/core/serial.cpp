@@ -9,7 +9,7 @@
   #include "../feature/ethernet.h"
 #endif
 
-uint8_t mvcnc_debug_flags = mvCNC_DEBUG_NONE;
+uint8_t mvcnc_debug_flags = MVCNC_DEBUG_NONE;
 
 // Commonly-used strings in serial output
 PGMSTR(NUL_STR,   "");   PGMSTR(SP_P_STR, " P");  PGMSTR(SP_T_STR, " T");

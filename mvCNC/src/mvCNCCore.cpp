@@ -750,10 +750,10 @@ inline void manage_inactivity(const bool no_stepper_sleep=false) {
  *  - Handle Joystick jogging
  */
 void idle(bool no_stepper_sleep/*=false*/) {
-  #if ENABLED(mvCNC_DEV_MODE)
-    static uint16_t idle_depth = 0;
-    if (++idle_depth > 5) SERIAL_ECHOLNPGM("idle() call depth: ", idle_depth);
-  #endif
+#if ENABLED(MVCNC_DEV_MODE)
+  static uint16_t idle_depth = 0;
+  if (++idle_depth > 5) SERIAL_ECHOLNPGM("idle() call depth: ", idle_depth);
+#endif
 
   // Core mvCNC activities
   manage_inactivity(no_stepper_sleep);
@@ -856,8 +856,8 @@ void idle(bool no_stepper_sleep/*=false*/) {
   TERN_(HAS_TFT_LVGL_UI, LV_TASK_HANDLER());
 
   IDLE_DONE:
-  TERN_(mvCNC_DEV_MODE, idle_depth--);
-  return;
+    TERN_(MVCNC_DEV_MODE, idle_depth--);
+    return;
 }
 
 /**
@@ -1116,17 +1116,23 @@ void setup() {
   const byte mcu = HAL_get_reset_source();
   HAL_clear_reset_source();
 
-  #if ENABLED(mvCNC_DEV_MODE)
-    auto log_current_ms = [&](PGM_P const msg) {
-      SERIAL_ECHO_START();
-      SERIAL_CHAR('['); SERIAL_ECHO(millis()); SERIAL_ECHOPGM("] ");
-      SERIAL_ECHOLNPGM_P(msg);
-    };
-    #define SETUP_LOG(M) log_current_ms(PSTR(M))
-  #else
-    #define SETUP_LOG(...) NOOP
-  #endif
-  #define SETUP_RUN(C) do{ SETUP_LOG(STRINGIFY(C)); C; }while(0)
+#if ENABLED(MVCNC_DEV_MODE)
+  auto log_current_ms = [&](PGM_P const msg) {
+    SERIAL_ECHO_START();
+    SERIAL_CHAR('[');
+    SERIAL_ECHO(millis());
+    SERIAL_ECHOPGM("] ");
+    SERIAL_ECHOLNPGM_P(msg);
+  };
+  #define SETUP_LOG(M) log_current_ms(PSTR(M))
+#else
+  #define SETUP_LOG(...) NOOP
+#endif
+#define SETUP_RUN(C)         \
+  do {                       \
+    SETUP_LOG(STRINGIFY(C)); \
+    C;                       \
+  } while (0)
 
   MYSERIAL1.begin(BAUDRATE);
   millis_t serial_connect_timeout = millis() + 1000UL;
@@ -1599,9 +1605,9 @@ void setup() {
 
   #if BOTH(HAS_WIRED_LCD, SHOW_BOOTSCREEN)
     const millis_t elapsed = millis() - bootscreen_ms;
-    #if ENABLED(mvCNC_DEV_MODE)
-      SERIAL_ECHOLNPGM("elapsed=", elapsed);
-    #endif
+  #if ENABLED(MVCNC_DEV_MODE)
+    SERIAL_ECHOLNPGM("elapsed=", elapsed);
+  #endif
     SETUP_RUN(ui.bootscreen_completion(elapsed));
   #endif
 

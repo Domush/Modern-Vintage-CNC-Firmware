@@ -27,24 +27,24 @@ extern const char NUL_STR[],
 // Debugging flags for use by M111
 //
 enum mvCNCDebugFlags : uint8_t {
-  mvCNC_DEBUG_NONE          = 0,
-  mvCNC_DEBUG_ECHO          = _BV(0), ///< Echo commands in order as they are processed
-  mvCNC_DEBUG_INFO          = _BV(1), ///< Print messages for code that has debug output
-  mvCNC_DEBUG_ERRORS        = _BV(2), ///< Not implemented
-  mvCNC_DEBUG_DRYRUN        = _BV(3), ///< Ignore temperature setting and E movement commands
-  mvCNC_DEBUG_COMMUNICATION = _BV(4), ///< Not implemented
+  MVCNC_DEBUG_NONE          = 0,
+  MVCNC_DEBUG_ECHO          = _BV(0),  ///< Echo commands in order as they are processed
+  MVCNC_DEBUG_INFO          = _BV(1),  ///< Print messages for code that has debug output
+  MVCNC_DEBUG_ERRORS        = _BV(2),  ///< Not implemented
+  MVCNC_DEBUG_DRYRUN        = _BV(3),  ///< Ignore temperature setting and E movement commands
+  MVCNC_DEBUG_COMMUNICATION = _BV(4),  ///< Not implemented
   #if ENABLED(DEBUG_LEVELING_FEATURE)
-    mvCNC_DEBUG_LEVELING    = _BV(5), ///< Print detailed output for homing and leveling
-    mvCNC_DEBUG_MESH_ADJUST = _BV(6), ///< UBL bed leveling
+  MVCNC_DEBUG_LEVELING    = _BV(5),  ///< Print detailed output for homing and leveling
+  MVCNC_DEBUG_MESH_ADJUST = _BV(6),  ///< UBL bed leveling
   #else
-    mvCNC_DEBUG_LEVELING    = 0,
-    mvCNC_DEBUG_MESH_ADJUST = 0,
+  MVCNC_DEBUG_LEVELING    = 0,
+  MVCNC_DEBUG_MESH_ADJUST = 0,
   #endif
-  mvCNC_DEBUG_ALL           = 0xFF
+    MVCNC_DEBUG_ALL = 0xFF
 };
 
 extern uint8_t mvcnc_debug_flags;
-#define DEBUGGING(F) (mvcnc_debug_flags & (mvCNC_DEBUG_## F))
+#define DEBUGGING(F) (mvcnc_debug_flags & (MVCNC_DEBUG_##F))
 
 //
 // Serial redirection

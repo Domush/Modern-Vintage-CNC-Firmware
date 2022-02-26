@@ -18,7 +18,7 @@
 
 // Onboard I2C EEPROM
 #define I2C_EEPROM
-#define mvCNC_EEPROM_SIZE                0x1000  // 4KB (AT24C32)
+#define MVCNC_EEPROM_SIZE                  0x1000  // 4KB (AT24C32)
 
 //
 // Servos

@@ -34,9 +34,9 @@
 #if ENABLED(I2C_EEPROM)
   #define IIC_EEPROM_SDA                    PB7
   #define IIC_EEPROM_SCL                    PB6
-  #define mvCNC_EEPROM_SIZE              0x1000  // 4KB
+  #define MVCNC_EEPROM_SIZE                 0x1000  // 4KB
 #elif ENABLED(SDCARD_EEPROM_EMULATION)
-  #define mvCNC_EEPROM_SIZE              0x1000  // 4KB
+  #define MVCNC_EEPROM_SIZE 0x1000  // 4KB
 #endif
 
 //

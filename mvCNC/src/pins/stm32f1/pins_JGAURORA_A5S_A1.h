@@ -35,10 +35,10 @@
 #endif
 
 #if ENABLED(I2C_EEPROM)
-  //#define mvCNC_EEPROM_SIZE          0x8000UL  // 32KB
+//#define MVCNC_EEPROM_SIZE          0x8000UL  // 32KB
 #elif ENABLED(FLASH_EEPROM_EMULATION)
-  //#define mvCNC_EEPROM_SIZE          0x1000UL  // 4KB
-  //#define mvCNC_EEPROM_SIZE (EEPROM_START_ADDRESS + (EEPROM_PAGE_SIZE) * 2UL)
+//#define MVCNC_EEPROM_SIZE          0x1000UL  // 4KB
+//#define MVCNC_EEPROM_SIZE (EEPROM_START_ADDRESS + (EEPROM_PAGE_SIZE) * 2UL)
 #endif
 
 //

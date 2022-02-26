@@ -16,7 +16,7 @@
   #define FLASH_EEPROM_EMULATION
   #define EEPROM_PAGE_SIZE     0x800 // 2KB
   #define EEPROM_START_ADDRESS (0x8000000 + 256 * 1024 - 2 * EEPROM_PAGE_SIZE) // 256K firmware space
-  #define mvCNC_EEPROM_SIZE   EEPROM_PAGE_SIZE
+  #define MVCNC_EEPROM_SIZE    EEPROM_PAGE_SIZE
 #endif
 
 //

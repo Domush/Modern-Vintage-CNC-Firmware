@@ -56,7 +56,7 @@
       ACTION_ITEM(MSG_LASER_FIRE_PULSE, cutter.test_fire_pulse);
     #endif
 
-    #if BOTH(mvCNC_DEV_MODE, HAL_CAN_SET_PWM_FREQ) && SPINDLE_LASER_FREQUENCY
+  #if BOTH(MVCNC_DEV_MODE, HAL_CAN_SET_PWM_FREQ) && SPINDLE_LASER_FREQUENCY
       EDIT_ITEM_FAST(CUTTER_MENU_FREQUENCY_TYPE, MSG_CUTTER_FREQUENCY, &cutter.frequency, 2000, 80000, cutter.refresh_frequency);
     #endif
 

@@ -38,4 +38,4 @@
 // Mini Controllers
 /* (included with ClassicController.h) */
 
-#endif // _NINTENDOEXTENSIONCTRL_
+#endif  // _NINTENDOEXTENSIONCTRL_
