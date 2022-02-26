@@ -554,24 +554,6 @@
 #undef EXTENDABLE_EMU_MMU2
 #undef EXTENDABLE_EMU_MMU2S
 
-/**
- * Extruders have some combination of stepper motors and hotends
- * so we separate these concepts into the defines:
- *
- *  EXTRUDERS    - Number of Selectable Tools
- *  HOTENDS      - Number of hotends, whether connected or separate
- *  E_STEPPERS   - Number of actual E stepper motors
- *  E_MANUAL     - Number of E steppers for LCD move options
- *
- * These defines must be simple constants for use in REPEAT, etc.
- */
-#if EXTRUDERS
-  #define HAS_EXTRUDERS 1
-  #if EXTRUDERS > 1
-    #define HAS_MULTI_EXTRUDER 1
-  #endif
-  #define E_AXIS_N(E) AxisEnum(E_AXIS + E_INDEX_N(E))
-#else
   #undef EXTRUDERS
   #define EXTRUDERS 0
   #undef SINGLENOZZLE
@@ -580,75 +562,14 @@
   #undef MIXING_EXTRUDER
   #undef HOTEND_IDLE_TIMEOUT
   #undef DISABLE_E
-#endif
 
 #define E_OPTARG(N) OPTARG(HAS_MULTI_EXTRUDER, N)
 #define E_TERN_(N)  TERN_(HAS_MULTI_EXTRUDER, N)
 #define E_TERN0(N)  TERN0(HAS_MULTI_EXTRUDER, N)
 
-#if ENABLED(E_DUAL_STEPPER_DRIVERS) // E0/E1 steppers act in tandem as E0
-
-  #define E_STEPPERS      2
-  #define E_MANUAL        1
-
-#elif ENABLED(SWITCHING_EXTRUDER)   // One stepper for every two EXTRUDERS
-
-  #if EXTRUDERS > 4
-    #define E_STEPPERS    3
-  #elif EXTRUDERS > 2
-    #define E_STEPPERS    2
-  #else
-    #define E_STEPPERS    1
-  #endif
-  #if DISABLED(SWITCHING_NOZZLE)
-    #define HOTENDS       E_STEPPERS
-  #endif
-
-#elif ENABLED(MIXING_EXTRUDER)      // Multiple feeds are mixed proportionally
-
-  #define E_STEPPERS      MIXING_STEPPERS
-  #define E_MANUAL        1
-  #if MIXING_STEPPERS == 2
-    #define HAS_DUAL_MIXING 1
-  #endif
-
-#elif ENABLED(SWITCHING_TOOLHEAD)   // Toolchanger
-
+#if ENABLED(SWITCHING_TOOLHEAD)   // Toolchanger
   #define E_STEPPERS      EXTRUDERS
   #define E_MANUAL        EXTRUDERS
-
-#elif HAS_PRUSA_MMU2                // Průša Multi-Material Unit v2
-
-  #define E_STEPPERS      1
-  #define E_MANUAL        1
-
-#endif
-
-// No inactive extruders with SWITCHING_NOZZLE or Průša MMU1
-#if ENABLED(SWITCHING_NOZZLE) || HAS_PRUSA_MMU1
-  #undef DISABLE_INACTIVE_EXTRUDER
-#endif
-
-// Průša MMU1, MMU(S) 2.0 and EXTENDABLE_EMU_MMU2(S) force SINGLENOZZLE
-#if HAS_MMU
-  #define SINGLENOZZLE
-#endif
-
-#if EITHER(SINGLENOZZLE, MIXING_EXTRUDER)         // One hotend, one thermistor, no XY offset
-  #undef HOTENDS
-  #define HOTENDS       1
-  #undef HOTEND_OFFSET_X
-  #undef HOTEND_OFFSET_Y
-#endif
-
-#ifndef HOTENDS
-  #define HOTENDS EXTRUDERS
-#endif
-#ifndef E_STEPPERS
-  #define E_STEPPERS EXTRUDERS
-#endif
-#ifndef E_MANUAL
-  #define E_MANUAL EXTRUDERS
 #endif
 
 /**
@@ -679,49 +600,14 @@
  * All the logical axes that can be commanded directly by G-code.
  * Delta maps stepper-specific values to ABC steppers.
  */
-#if HAS_EXTRUDERS
-  #define LOGICAL_AXES INCREMENT(LINEAR_AXES)
-#else
   #define LOGICAL_AXES LINEAR_AXES
-#endif
 
-/**
- * DISTINCT_E_FACTORS is set to give extruders (some) individual settings.
- *
- * DISTINCT_AXES is the number of distinct addressable axes (not steppers).
- *  Includes all linear axes plus all distinguished extruders.
- *  The default behavior is to treat all extruders as a single E axis
- *  with shared motion and temperature settings.
- *
- * DISTINCT_E is the number of distinguished extruders. By default this
- *  well be 1 which indicates all extruders share the same settings.
- *
- * E_INDEX_N(E) should be used to get the E index of any item that might be
- *  distinguished.
- */
-#if ENABLED(DISTINCT_E_FACTORS) && E_STEPPERS > 1
-  #define DISTINCT_AXES (LINEAR_AXES + E_STEPPERS)
-  #define DISTINCT_E E_STEPPERS
-  #define E_INDEX_N(E) (E)
-#else
   #undef DISTINCT_E_FACTORS
   #define DISTINCT_AXES LOGICAL_AXES
   #define DISTINCT_E 1
   #define E_INDEX_N(E) 0
-#endif
 
-#if HOTENDS
-  #define HAS_HOTEND 1
-  #ifndef HOTEND_OVERSHOOT
-    #define HOTEND_OVERSHOOT 15
-  #endif
-  #if HOTENDS > 1
-    #define HAS_MULTI_HOTEND 1
-    #define HAS_HOTEND_OFFSET 1
-  #endif
-#else
   #undef PID_PARAMS_PER_HOTEND
-#endif
 
 // Helper macros for extruder and hotend arrays
 #define HOTEND_LOOP() for (int8_t e = 0; e < HOTENDS; e++)
@@ -730,20 +616,6 @@
 #define ARRAY_BY_HOTENDS(V...) ARRAY_N(HOTENDS, V)
 #define ARRAY_BY_HOTENDS1(v1) ARRAY_N_1(HOTENDS, v1)
 
-/**
- * Default hotend offsets, if not defined
- */
-#if HAS_HOTEND_OFFSET
-  #ifndef HOTEND_OFFSET_X
-    #define HOTEND_OFFSET_X { 0 } // X offsets for each extruder
-  #endif
-  #ifndef HOTEND_OFFSET_Y
-    #define HOTEND_OFFSET_Y { 0 } // Y offsets for each extruder
-  #endif
-  #ifndef HOTEND_OFFSET_Z
-    #define HOTEND_OFFSET_Z { 0 } // Z offsets for each extruder
-  #endif
-#endif
 
 /**
  * Disable unused SINGLENOZZLE sub-options
@@ -753,35 +625,6 @@
 #endif
 #if !BOTH(HAS_FAN, SINGLENOZZLE)
   #undef SINGLENOZZLE_STANDBY_FAN
-#endif
-
-// Switching extruder has its own servo?
-#if ENABLED(SWITCHING_EXTRUDER) && (DISABLED(SWITCHING_NOZZLE) || SWITCHING_EXTRUDER_SERVO_NR != SWITCHING_NOZZLE_SERVO_NR)
-  #define DO_SWITCH_EXTRUDER 1
-#endif
-
-/**
- * The BLTouch Probe emulates a servo probe
- * and uses "special" angles for its state.
- */
-#if ENABLED(BLTOUCH)
-  #ifndef Z_PROBE_SERVO_NR
-    #define Z_PROBE_SERVO_NR 0
-  #endif
-  #ifdef DEACTIVATE_SERVOS_AFTER_MOVE
-    #error "BLTOUCH requires DEACTIVATE_SERVOS_AFTER_MOVE to be to disabled. Please update your Configuration.h file."
-  #endif
-
-  // Always disable probe pin inverting for BLTouch
-  #if Z_MIN_PROBE_ENDSTOP_INVERTING
-    #error "BLTOUCH requires Z_MIN_PROBE_ENDSTOP_INVERTING set to false. Please update your Configuration.h file."
-  #endif
-
-  #if ENABLED(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN)
-    #if Z_MIN_ENDSTOP_INVERTING
-      #error "BLTOUCH requires Z_MIN_ENDSTOP_INVERTING set to false. Please update your Configuration.h file."
-    #endif
-  #endif
 #endif
 
 /**
@@ -803,100 +646,6 @@
 #if ANY(HAS_Z_SERVO_PROBE, FIX_MOUNTED_PROBE, NOZZLE_AS_PROBE, TOUCH_MI_PROBE, Z_PROBE_ALLEN_KEY, Z_PROBE_SLED, SOLENOID_PROBE, SENSORLESS_PROBING, RACK_AND_PINION_PROBE, MAGLEV4)
   #define HAS_BED_PROBE 1
 #endif
-
-/**
- * Fill in undefined Filament Sensor options
- */
-#if ENABLED(FILAMENT_RUNOUT_SENSOR)
-  #if NUM_RUNOUT_SENSORS >= 1
-    #ifndef FIL_RUNOUT1_STATE
-      #define FIL_RUNOUT1_STATE FIL_RUNOUT_STATE
-    #endif
-    #ifndef FIL_RUNOUT1_PULLUP
-      #define FIL_RUNOUT1_PULLUP FIL_RUNOUT_PULLUP
-    #endif
-    #ifndef FIL_RUNOUT1_PULLDOWN
-      #define FIL_RUNOUT1_PULLDOWN FIL_RUNOUT_PULLDOWN
-    #endif
-  #endif
-  #if NUM_RUNOUT_SENSORS >= 2
-    #ifndef FIL_RUNOUT2_STATE
-      #define FIL_RUNOUT2_STATE FIL_RUNOUT_STATE
-    #endif
-    #ifndef FIL_RUNOUT2_PULLUP
-      #define FIL_RUNOUT2_PULLUP FIL_RUNOUT_PULLUP
-    #endif
-    #ifndef FIL_RUNOUT2_PULLDOWN
-      #define FIL_RUNOUT2_PULLDOWN FIL_RUNOUT_PULLDOWN
-    #endif
-  #endif
-  #if NUM_RUNOUT_SENSORS >= 3
-    #ifndef FIL_RUNOUT3_STATE
-      #define FIL_RUNOUT3_STATE FIL_RUNOUT_STATE
-    #endif
-    #ifndef FIL_RUNOUT3_PULLUP
-      #define FIL_RUNOUT3_PULLUP FIL_RUNOUT_PULLUP
-    #endif
-    #ifndef FIL_RUNOUT3_PULLDOWN
-      #define FIL_RUNOUT3_PULLDOWN FIL_RUNOUT_PULLDOWN
-    #endif
-  #endif
-  #if NUM_RUNOUT_SENSORS >= 4
-    #ifndef FIL_RUNOUT4_STATE
-      #define FIL_RUNOUT4_STATE FIL_RUNOUT_STATE
-    #endif
-    #ifndef FIL_RUNOUT4_PULLUP
-      #define FIL_RUNOUT4_PULLUP FIL_RUNOUT_PULLUP
-    #endif
-    #ifndef FIL_RUNOUT4_PULLDOWN
-      #define FIL_RUNOUT4_PULLDOWN FIL_RUNOUT_PULLDOWN
-    #endif
-  #endif
-  #if NUM_RUNOUT_SENSORS >= 5
-    #ifndef FIL_RUNOUT5_STATE
-      #define FIL_RUNOUT5_STATE FIL_RUNOUT_STATE
-    #endif
-    #ifndef FIL_RUNOUT5_PULLUP
-      #define FIL_RUNOUT5_PULLUP FIL_RUNOUT_PULLUP
-    #endif
-    #ifndef FIL_RUNOUT5_PULLDOWN
-      #define FIL_RUNOUT5_PULLDOWN FIL_RUNOUT_PULLDOWN
-    #endif
-  #endif
-  #if NUM_RUNOUT_SENSORS >= 6
-    #ifndef FIL_RUNOUT6_STATE
-      #define FIL_RUNOUT6_STATE FIL_RUNOUT_STATE
-    #endif
-    #ifndef FIL_RUNOUT6_PULLUP
-      #define FIL_RUNOUT6_PULLUP FIL_RUNOUT_PULLUP
-    #endif
-    #ifndef FIL_RUNOUT6_PULLDOWN
-      #define FIL_RUNOUT6_PULLDOWN FIL_RUNOUT_PULLDOWN
-    #endif
-  #endif
-  #if NUM_RUNOUT_SENSORS >= 7
-    #ifndef FIL_RUNOUT7_STATE
-      #define FIL_RUNOUT7_STATE FIL_RUNOUT_STATE
-    #endif
-    #ifndef FIL_RUNOUT7_PULLUP
-      #define FIL_RUNOUT7_PULLUP FIL_RUNOUT_PULLUP
-    #endif
-    #ifndef FIL_RUNOUT7_PULLDOWN
-      #define FIL_RUNOUT7_PULLDOWN FIL_RUNOUT_PULLDOWN
-    #endif
-  #endif
-  #if NUM_RUNOUT_SENSORS >= 8
-    #ifndef FIL_RUNOUT8_STATE
-      #define FIL_RUNOUT8_STATE FIL_RUNOUT_STATE
-    #endif
-    #ifndef FIL_RUNOUT8_PULLUP
-      #define FIL_RUNOUT8_PULLUP FIL_RUNOUT_PULLUP
-    #endif
-    #ifndef FIL_RUNOUT8_PULLDOWN
-      #define FIL_RUNOUT8_PULLDOWN FIL_RUNOUT_PULLDOWN
-    #endif
-  #endif
-#endif // FILAMENT_RUNOUT_SENSOR
 
 // Homing to Min or Max
 #if X_HOME_DIR > 0
@@ -969,57 +718,12 @@
   #define HOME_Z_FIRST // If homing away from BED do Z first
 #endif
 
-/**
- * Conditionals based on the type of Bed Leveling
- */
-#if ENABLED(AUTO_BED_LEVELING_UBL)
-  #undef LCD_BED_LEVELING
-  #if ENABLED(DELTA)
-    #define UBL_SEGMENTED 1
-  #endif
-#endif
-#if EITHER(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_3POINT)
-  #define ABL_PLANAR 1
-#endif
-#if EITHER(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
-  #define ABL_USES_GRID 1
-#endif
-#if ANY(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR, AUTO_BED_LEVELING_3POINT)
-  #define HAS_ABL_NOT_UBL 1
-#endif
-#if ANY(AUTO_BED_LEVELING_BILINEAR, AUTO_BED_LEVELING_UBL, MESH_BED_LEVELING)
-  #define HAS_MESH 1
-#endif
-#if EITHER(AUTO_BED_LEVELING_UBL, AUTO_BED_LEVELING_3POINT)
-  #define NEEDS_THREE_PROBE_POINTS 1
-#endif
-#if EITHER(HAS_ABL_NOT_UBL, AUTO_BED_LEVELING_UBL)
-  #define HAS_ABL_OR_UBL 1
-  #if DISABLED(PROBE_MANUALLY)
-    #define HAS_AUTOLEVEL 1
-  #endif
-#endif
-#if EITHER(HAS_ABL_OR_UBL, MESH_BED_LEVELING)
-  #define HAS_LEVELING 1
-  #if DISABLED(AUTO_BED_LEVELING_UBL)
-    #define PLANNER_LEVELING 1
-  #endif
-#endif
-#if !HAS_LEVELING
   #undef RESTORE_LEVELING_AFTER_G28
   #undef ENABLE_LEVELING_AFTER_G28
   #undef G29_RETRY_AND_RECOVER
-#endif
-#if !HAS_LEVELING || EITHER(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL)
   #undef PROBE_MANUALLY
-#endif
 #if ANY(HAS_BED_PROBE, PROBE_MANUALLY, MESH_BED_LEVELING)
   #define PROBE_SELECTED 1
-#endif
-
-#ifdef GRID_MAX_POINTS_X
-  #define GRID_MAX_POINTS ((GRID_MAX_POINTS_X) * (GRID_MAX_POINTS_Y))
-  #define GRID_LOOP(A,B) LOOP_L_N(A, GRID_MAX_POINTS_X) LOOP_L_N(B, GRID_MAX_POINTS_Y)
 #endif
 
 // Slim menu optimizations
@@ -1064,10 +768,7 @@
   #define NORMAL_AXIS Z_AXIS
 #endif
 
-#if ANY(MORGAN_SCARA, MP_SCARA, AXEL_TPARA)
-  #define IS_SCARA 1
-  #define IS_KINEMATIC 1
-#elif EITHER(DELTA, POLARGRAPH)
+#if EITHER(DELTA, POLARGRAPH)
   #define IS_KINEMATIC 1
 #else
   #define IS_CARTESIAN 1
@@ -1087,11 +788,6 @@
 
 #if DISABLED(CLASSIC_JERK)
   #define HAS_JUNCTION_DEVIATION 1
-#endif
-
-// E jerk exists with JD disabled (of course) but also when Linear Advance is disabled on Delta/SCARA
-#if HAS_EXTRUDERS && (ENABLED(CLASSIC_JERK) || (IS_KINEMATIC && DISABLED(LIN_ADVANCE)))
-  #define HAS_CLASSIC_E_JERK 1
 #endif
 
 //
@@ -1142,46 +838,14 @@
 #ifndef Z4_DRIVER_TYPE
   #define Z4_DRIVER_TYPE A4988
 #endif
-#if E_STEPPERS <= 0
   #undef E0_DRIVER_TYPE
-#elif !defined(E0_DRIVER_TYPE)
-  #define E0_DRIVER_TYPE A4988
-#endif
-#if E_STEPPERS <= 1
   #undef E1_DRIVER_TYPE
-#elif !defined(E1_DRIVER_TYPE)
-  #define E1_DRIVER_TYPE A4988
-#endif
-#if E_STEPPERS <= 2
   #undef E2_DRIVER_TYPE
-#elif !defined(E2_DRIVER_TYPE)
-  #define E2_DRIVER_TYPE A4988
-#endif
-#if E_STEPPERS <= 3
   #undef E3_DRIVER_TYPE
-#elif !defined(E3_DRIVER_TYPE)
-  #define E3_DRIVER_TYPE A4988
-#endif
-#if E_STEPPERS <= 4
   #undef E4_DRIVER_TYPE
-#elif !defined(E4_DRIVER_TYPE)
-  #define E4_DRIVER_TYPE A4988
-#endif
-#if E_STEPPERS <= 5
   #undef E5_DRIVER_TYPE
-#elif !defined(E5_DRIVER_TYPE)
-  #define E5_DRIVER_TYPE A4988
-#endif
-#if E_STEPPERS <= 6
   #undef E6_DRIVER_TYPE
-#elif !defined(E6_DRIVER_TYPE)
-  #define E6_DRIVER_TYPE A4988
-#endif
-#if E_STEPPERS <= 7
   #undef E7_DRIVER_TYPE
-#elif !defined(E7_DRIVER_TYPE)
-  #define E7_DRIVER_TYPE A4988
-#endif
 
 // Fallback axis inverting
 #ifndef INVERT_X_DIR
@@ -1201,17 +865,6 @@
 #endif
 #if HAS_K_AXIS && !defined(INVERT_K_DIR)
   #define INVERT_K_DIR false
-#endif
-#if HAS_EXTRUDERS && !defined(INVERT_E_DIR)
-  #define INVERT_E_DIR false
-#endif
-
-/**
- * This setting is also used by M109 when trying to calculate
- * a ballpark safe margin to prevent wait-forever situation.
- */
-#ifndef EXTRUDE_MINTEMP
-  #define EXTRUDE_MINTEMP 170
 #endif
 
 /**

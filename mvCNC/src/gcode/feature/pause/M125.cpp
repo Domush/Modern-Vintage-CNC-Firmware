@@ -40,8 +40,6 @@
  *    P<bool>   = Always show a prompt and await a response
  */
 void GcodeSuite::M125() {
-  // Initial retract before move to filament change position
-  const float retract = TERN0(HAS_EXTRUDERS, -ABS(parser.axisunitsval('L', E_AXIS, PAUSE_PARK_RETRACT_LENGTH)));
 
   xyz_pos_t park_point = SPINDLE_PARK_POINT;
 
@@ -72,7 +70,7 @@ void GcodeSuite::M125() {
   if (pause_print(retract, park_point, show_lcd, 0)) {
     if (ENABLED(EXTENSIBLE_UI) || BOTH(EMERGENCY_PARSER, HOST_PROMPT_SUPPORT) || !sd_printing || show_lcd) {
       wait_for_confirmation(false, 0);
-      resume_print(0, 0, -retract, 0);
+      resume_print(0, 0, 0, 0);
     }
   }
 }

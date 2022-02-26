@@ -328,12 +328,6 @@ bool I2CPositionEncoder::test_axis() {
 
   planner.synchronize();
 
-  #if HAS_EXTRUDERS
-    startCoord.e = planner.get_axis_position_mm(E_AXIS);
-    planner.buffer_line(startCoord, fr_mm_s, 0);
-    planner.synchronize();
-  #endif
-
   // if the module isn't currently trusted, wait until it is (or until it should be if things are working)
   if (!trusted) {
     int32_t startWaitingTime = millis();
@@ -341,8 +335,7 @@ bool I2CPositionEncoder::test_axis() {
       safe_delay(500);
   }
 
-  if (trusted) { // if trusted, commence test
-    TERN_(HAS_EXTRUDERS, endCoord.e = planner.get_axis_position_mm(E_AXIS));
+  if (trusted) {  // if trusted, commence test
     planner.buffer_line(endCoord, fr_mm_s, 0);
     planner.synchronize();
   }
@@ -387,7 +380,6 @@ void I2CPositionEncoder::calibrate_steps_mm(const uint8_t iter) {
   planner.synchronize();
 
   LOOP_L_N(i, iter) {
-    TERN_(HAS_EXTRUDERS, startCoord.e = planner.get_axis_position_mm(E_AXIS));
     planner.buffer_line(startCoord, fr_mm_s, 0);
     planner.synchronize();
 
@@ -396,7 +388,6 @@ void I2CPositionEncoder::calibrate_steps_mm(const uint8_t iter) {
 
     //do_blocking_move_to(endCoord);
 
-    TERN_(HAS_EXTRUDERS, endCoord.e = planner.get_axis_position_mm(E_AXIS));
     planner.buffer_line(endCoord, fr_mm_s, 0);
     planner.synchronize();
 
@@ -482,7 +473,6 @@ void I2CPositionEncodersMgr::init() {
 
     encoders[i].set_active(encoders[i].passes_test(true));
 
-    TERN_(HAS_EXTRUDERS, if (I2CPE_ENC_1_AXIS == E_AXIS) encoders[i].set_homed());
   #endif
 
   #if I2CPE_ENCODER_CNT > 1
@@ -511,7 +501,6 @@ void I2CPositionEncodersMgr::init() {
 
     encoders[i].set_active(encoders[i].passes_test(true));
 
-    TERN_(HAS_EXTRUDERS, if (I2CPE_ENC_2_AXIS == E_AXIS) encoders[i].set_homed());
   #endif
 
   #if I2CPE_ENCODER_CNT > 2
@@ -540,7 +529,6 @@ void I2CPositionEncodersMgr::init() {
 
     encoders[i].set_active(encoders[i].passes_test(true));
 
-    TERN_(HAS_EXTRUDERS, if (I2CPE_ENC_3_AXIS == E_AXIS) encoders[i].set_homed());
   #endif
 
   #if I2CPE_ENCODER_CNT > 3
@@ -569,7 +557,6 @@ void I2CPositionEncodersMgr::init() {
 
     encoders[i].set_active(encoders[i].passes_test(true));
 
-    TERN_(HAS_EXTRUDERS, if (I2CPE_ENC_4_AXIS == E_AXIS) encoders[i].set_homed());
   #endif
 
   #if I2CPE_ENCODER_CNT > 4
@@ -598,7 +585,6 @@ void I2CPositionEncodersMgr::init() {
 
     encoders[i].set_active(encoders[i].passes_test(true));
 
-    TERN_(HAS_EXTRUDERS, if (I2CPE_ENC_5_AXIS == E_AXIS) encoders[i].set_homed());
   #endif
 
   #if I2CPE_ENCODER_CNT > 5
@@ -627,7 +613,6 @@ void I2CPositionEncodersMgr::init() {
 
     encoders[i].set_active(encoders[i].passes_test(true));
 
-    TERN_(HAS_EXTRUDERS, if (I2CPE_ENC_6_AXIS == E_AXIS) encoders[i].set_homed());
   #endif
 }
 

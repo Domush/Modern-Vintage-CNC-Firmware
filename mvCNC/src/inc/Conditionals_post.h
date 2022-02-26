@@ -191,18 +191,6 @@
 #endif
 
 /**
- * SCARA cannot use SLOWDOWN and requires QUICKHOME
- * CNCable radius assumes joints can fully extend
- */
-#if IS_SCARA
-  #undef SLOWDOWN
-  #if DISABLED(AXEL_TPARA)
-    #define QUICK_HOME
-  #endif
-  #define SCARA_PRINTABLE_RADIUS (SCARA_LINKAGE_1 + SCARA_LINKAGE_2)
-#endif
-
-/**
  * Set the home position based on settings or manual overrides
  */
 #ifdef MANUAL_X_HOME_POS
@@ -313,19 +301,6 @@
   #define DEFAULT_KEEPALIVE_INTERVAL 2
 #endif
 
-/**
- * Provide a MAX_AUTORETRACT for older configs
- */
-#if ENABLED(FWRETRACT) && !defined(MAX_AUTORETRACT)
-  #define MAX_AUTORETRACT 99
-#endif
-
-/**
- * Provide a DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT in case USE_VOLUMETRICS is enabled
- */
-#ifndef DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT
-  #define DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT 0.00
-#endif
 
 /**
  * LCD Contrast for Graphical Displays
@@ -1662,134 +1637,6 @@
   #undef DISABLE_INACTIVE_K
 #endif
 
-// Extruder steppers and solenoids
-#if HAS_EXTRUDERS
-
-  #if PIN_EXISTS(E0_ENABLE) || AXIS_IS_L64XX(E0) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(E0))
-    #define HAS_E0_ENABLE 1
-  #endif
-  #if PIN_EXISTS(E0_DIR)
-    #define HAS_E0_DIR 1
-  #endif
-  #if PIN_EXISTS(E0_STEP)
-    #define HAS_E0_STEP 1
-  #endif
-  #if PIN_EXISTS(E0_MS1)
-    #define HAS_E0_MS_PINS 1
-  #endif
-
-  #if E_STEPPERS > 1 || ENABLED(E_DUAL_STEPPER_DRIVERS)
-    #if PIN_EXISTS(E1_ENABLE) || AXIS_IS_L64XX(E1) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(E1))
-      #define HAS_E1_ENABLE 1
-    #endif
-    #if PIN_EXISTS(E1_DIR)
-      #define HAS_E1_DIR 1
-    #endif
-    #if PIN_EXISTS(E1_STEP)
-      #define HAS_E1_STEP 1
-    #endif
-    #if PIN_EXISTS(E1_MS1)
-      #define HAS_E1_MS_PINS 1
-    #endif
-  #endif
-
-  #if E_STEPPERS > 2
-    #if PIN_EXISTS(E2_ENABLE) || AXIS_IS_L64XX(E2) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(E2))
-      #define HAS_E2_ENABLE 1
-    #endif
-    #if PIN_EXISTS(E2_DIR)
-      #define HAS_E2_DIR 1
-    #endif
-    #if PIN_EXISTS(E2_STEP)
-      #define HAS_E2_STEP 1
-    #endif
-    #if PIN_EXISTS(E2_MS1)
-      #define HAS_E2_MS_PINS 1
-    #endif
-  #endif
-
-  #if E_STEPPERS > 3
-    #if PIN_EXISTS(E3_ENABLE) || AXIS_IS_L64XX(E3) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(E3))
-      #define HAS_E3_ENABLE 1
-    #endif
-    #if PIN_EXISTS(E3_DIR)
-      #define HAS_E3_DIR 1
-    #endif
-    #if PIN_EXISTS(E3_STEP)
-      #define HAS_E3_STEP 1
-    #endif
-    #if PIN_EXISTS(E3_MS1)
-      #define HAS_E3_MS_PINS 1
-    #endif
-  #endif
-
-  #if E_STEPPERS > 4
-    #if PIN_EXISTS(E4_ENABLE) || AXIS_IS_L64XX(E4) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(E4))
-      #define HAS_E4_ENABLE 1
-    #endif
-    #if PIN_EXISTS(E4_DIR)
-      #define HAS_E4_DIR 1
-    #endif
-    #if PIN_EXISTS(E4_STEP)
-      #define HAS_E4_STEP 1
-    #endif
-    #if PIN_EXISTS(E4_MS1)
-      #define HAS_E4_MS_PINS 1
-    #endif
-  #endif
-
-  #if E_STEPPERS > 5
-    #if PIN_EXISTS(E5_ENABLE) || AXIS_IS_L64XX(E5) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(E5))
-      #define HAS_E5_ENABLE 1
-    #endif
-    #if PIN_EXISTS(E5_DIR)
-      #define HAS_E5_DIR 1
-    #endif
-    #if PIN_EXISTS(E5_STEP)
-      #define HAS_E5_STEP 1
-    #endif
-    #if PIN_EXISTS(E5_MS1)
-      #define HAS_E5_MS_PINS 1
-    #endif
-  #endif
-
-  #if E_STEPPERS > 6
-    #if PIN_EXISTS(E6_ENABLE) || AXIS_IS_L64XX(E6) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(E6))
-      #define HAS_E6_ENABLE 1
-    #endif
-    #if PIN_EXISTS(E6_DIR)
-      #define HAS_E6_DIR 1
-    #endif
-    #if PIN_EXISTS(E6_STEP)
-      #define HAS_E6_STEP 1
-    #endif
-    #if PIN_EXISTS(E6_MS1)
-      #define HAS_E6_MS_PINS 1
-    #endif
-  #endif
-
-  #if E_STEPPERS > 7
-    #if PIN_EXISTS(E7_ENABLE) || AXIS_IS_L64XX(E7) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(E7))
-      #define HAS_E7_ENABLE 1
-    #endif
-    #if PIN_EXISTS(E7_DIR)
-      #define HAS_E7_DIR 1
-    #endif
-    #if PIN_EXISTS(E7_STEP)
-      #define HAS_E7_STEP 1
-    #endif
-    #if PIN_EXISTS(E7_MS1)
-      #define HAS_E7_MS_PINS 1
-    #endif
-  #endif
-
-  #if !defined(DISABLE_INACTIVE_E) && ENABLED(DISABLE_E)
-    #define DISABLE_INACTIVE_E 1
-  #endif
-#else
-  #undef DISABLE_INACTIVE_E
-#endif // HAS_EXTRUDERS
-
 /**
  * Set solenoid flags if any features use solenoids
  *   - EXT_SOLENOID (M380, M381) to enable/disable the extruder solenoid
@@ -1799,28 +1646,28 @@
  *   - Z_PROBE_SLED uses SOL1_PIN, when defined (unless EXT_SOLENOID is enabled)
  */
 #if ANY(EXT_SOLENOID, MANUAL_SOLENOID_CONTROL, PARKING_EXTRUDER, SOLENOID_PROBE, Z_PROBE_SLED)
-  #if PIN_EXISTS(SOL0) && (EITHER(MANUAL_SOLENOID_CONTROL, PARKING_EXTRUDER) || BOTH(EXT_SOLENOID, HAS_EXTRUDERS))
+  #if PIN_EXISTS(SOL0) && (EITHER(MANUAL_SOLENOID_CONTROL, PARKING_EXTRUDER))
     #define HAS_SOLENOID_0 1
   #endif
-  #if PIN_EXISTS(SOL1) && (ANY(MANUAL_SOLENOID_CONTROL, PARKING_EXTRUDER, SOLENOID_PROBE, Z_PROBE_SLED) || TERN0(EXT_SOLENOID, E_STEPPERS > 1))
+  #if PIN_EXISTS(SOL1) && (ANY(MANUAL_SOLENOID_CONTROL, PARKING_EXTRUDER, SOLENOID_PROBE, Z_PROBE_SLED))
     #define HAS_SOLENOID_1 1
   #endif
-  #if PIN_EXISTS(SOL2) && (ENABLED(MANUAL_SOLENOID_CONTROL) || TERN0(EXT_SOLENOID, E_STEPPERS > 2))
+  #if PIN_EXISTS(SOL2) && (ENABLED(MANUAL_SOLENOID_CONTROL))
     #define HAS_SOLENOID_2 2
   #endif
-  #if PIN_EXISTS(SOL3) && (ENABLED(MANUAL_SOLENOID_CONTROL) || TERN0(EXT_SOLENOID, E_STEPPERS > 3))
+  #if PIN_EXISTS(SOL3) && (ENABLED(MANUAL_SOLENOID_CONTROL))
     #define HAS_SOLENOID_3 3
   #endif
-  #if PIN_EXISTS(SOL4) && (ENABLED(MANUAL_SOLENOID_CONTROL) || TERN0(EXT_SOLENOID, E_STEPPERS > 4))
+  #if PIN_EXISTS(SOL4) && (ENABLED(MANUAL_SOLENOID_CONTROL))
     #define HAS_SOLENOID_4 4
   #endif
-  #if PIN_EXISTS(SOL5) && (ENABLED(MANUAL_SOLENOID_CONTROL) || TERN0(EXT_SOLENOID, E_STEPPERS > 5))
+  #if PIN_EXISTS(SOL5) && (ENABLED(MANUAL_SOLENOID_CONTROL))
     #define HAS_SOLENOID_5 5
   #endif
-  #if PIN_EXISTS(SOL6) && (ENABLED(MANUAL_SOLENOID_CONTROL) || TERN0(EXT_SOLENOID, E_STEPPERS > 6))
+  #if PIN_EXISTS(SOL6) && (ENABLED(MANUAL_SOLENOID_CONTROL))
     #define HAS_SOLENOID_6 6
   #endif
-  #if PIN_EXISTS(SOL7) && (ENABLED(MANUAL_SOLENOID_CONTROL) || TERN0(EXT_SOLENOID, E_STEPPERS > 7))
+  #if PIN_EXISTS(SOL7) && (ENABLED(MANUAL_SOLENOID_CONTROL))
     #define HAS_SOLENOID_7 7
   #endif
 #endif
@@ -1830,7 +1677,7 @@
 //
 
 #if HAS_TRINAMIC_CONFIG
-  #if ANY(STEALTHCHOP_E, STEALTHCHOP_XY, STEALTHCHOP_Z, STEALTHCHOP_I, STEALTHCHOP_J, STEALTHCHOP_K)
+  #if ANY(STEALTHCHOP_XY, STEALTHCHOP_Z, STEALTHCHOP_I, STEALTHCHOP_J, STEALTHCHOP_K)
     #define STEALTHCHOP_ENABLED 1
   #endif
   #if EITHER(SENSORLESS_HOMING, SENSORLESS_PROBING)
@@ -2056,118 +1903,6 @@
     #endif
   #endif
 
-  #if AXIS_IS_TMC(E0)
-    #if AXIS_HAS_STEALTHCHOP(E0)
-      #define E0_HAS_STEALTHCHOP 1
-    #endif
-    #ifndef E0_INTERPOLATE
-      #define E0_INTERPOLATE INTERPOLATE
-    #endif
-    #ifndef E0_HOLD_MULTIPLIER
-      #define E0_HOLD_MULTIPLIER HOLD_MULTIPLIER
-    #endif
-    #ifndef E0_SLAVE_ADDRESS
-      #define E0_SLAVE_ADDRESS 0
-    #endif
-  #endif
-  #if AXIS_IS_TMC(E1)
-    #if AXIS_HAS_STEALTHCHOP(E1)
-      #define E1_HAS_STEALTHCHOP 1
-    #endif
-    #ifndef E1_INTERPOLATE
-      #define E1_INTERPOLATE E0_INTERPOLATE
-    #endif
-    #ifndef E1_HOLD_MULTIPLIER
-      #define E1_HOLD_MULTIPLIER E0_HOLD_MULTIPLIER
-    #endif
-    #ifndef E1_SLAVE_ADDRESS
-      #define E1_SLAVE_ADDRESS 0
-    #endif
-  #endif
-  #if AXIS_IS_TMC(E2)
-    #if AXIS_HAS_STEALTHCHOP(E2)
-      #define E2_HAS_STEALTHCHOP 1
-    #endif
-    #ifndef E2_INTERPOLATE
-      #define E2_INTERPOLATE E0_INTERPOLATE
-    #endif
-    #ifndef E2_HOLD_MULTIPLIER
-      #define E2_HOLD_MULTIPLIER E0_HOLD_MULTIPLIER
-    #endif
-    #ifndef E2_SLAVE_ADDRESS
-      #define E2_SLAVE_ADDRESS 0
-    #endif
-  #endif
-  #if AXIS_IS_TMC(E3)
-    #if AXIS_HAS_STEALTHCHOP(E3)
-      #define E3_HAS_STEALTHCHOP 1
-    #endif
-    #ifndef E3_INTERPOLATE
-      #define E3_INTERPOLATE E0_INTERPOLATE
-    #endif
-    #ifndef E3_HOLD_MULTIPLIER
-      #define E3_HOLD_MULTIPLIER E0_HOLD_MULTIPLIER
-    #endif
-    #ifndef E3_SLAVE_ADDRESS
-      #define E3_SLAVE_ADDRESS 0
-    #endif
-  #endif
-  #if AXIS_IS_TMC(E4)
-    #if AXIS_HAS_STEALTHCHOP(E4)
-      #define E4_HAS_STEALTHCHOP 1
-    #endif
-    #ifndef E4_INTERPOLATE
-      #define E4_INTERPOLATE E0_INTERPOLATE
-    #endif
-    #ifndef E4_HOLD_MULTIPLIER
-      #define E4_HOLD_MULTIPLIER E0_HOLD_MULTIPLIER
-    #endif
-    #ifndef E4_SLAVE_ADDRESS
-      #define E4_SLAVE_ADDRESS 0
-    #endif
-  #endif
-  #if AXIS_IS_TMC(E5)
-    #if AXIS_HAS_STEALTHCHOP(E5)
-      #define E5_HAS_STEALTHCHOP 1
-    #endif
-    #ifndef E5_INTERPOLATE
-      #define E5_INTERPOLATE E0_INTERPOLATE
-    #endif
-    #ifndef E5_HOLD_MULTIPLIER
-      #define E5_HOLD_MULTIPLIER E0_HOLD_MULTIPLIER
-    #endif
-    #ifndef E5_SLAVE_ADDRESS
-      #define E5_SLAVE_ADDRESS 0
-    #endif
-  #endif
-  #if AXIS_IS_TMC(E6)
-    #if AXIS_HAS_STEALTHCHOP(E6)
-      #define E6_HAS_STEALTHCHOP 1
-    #endif
-    #ifndef E6_INTERPOLATE
-      #define E6_INTERPOLATE E0_INTERPOLATE
-    #endif
-    #ifndef E6_HOLD_MULTIPLIER
-      #define E6_HOLD_MULTIPLIER E0_HOLD_MULTIPLIER
-    #endif
-    #ifndef E6_SLAVE_ADDRESS
-      #define E6_SLAVE_ADDRESS 0
-    #endif
-  #endif
-  #if AXIS_IS_TMC(E7)
-    #if AXIS_HAS_STEALTHCHOP(E7)
-      #define E7_HAS_STEALTHCHOP 1
-    #endif
-    #ifndef E7_INTERPOLATE
-      #define E7_INTERPOLATE E0_INTERPOLATE
-    #endif
-    #ifndef E7_HOLD_MULTIPLIER
-      #define E7_HOLD_MULTIPLIER E0_HOLD_MULTIPLIER
-    #endif
-    #ifndef E7_SLAVE_ADDRESS
-      #define E7_SLAVE_ADDRESS 0
-    #endif
-  #endif
 #endif // HAS_TRINAMIC_CONFIG
 
 #if ANY_AXIS_HAS(HW_SERIAL)
@@ -2197,8 +1932,7 @@
 #define ANY_SERIAL_IS(N) (  CONF_SERIAL_IS(N) \
                          || TMC_UART_IS(X,  N) || TMC_UART_IS(Y , N) || TMC_UART_IS(Z , N) \
                          || TMC_UART_IS(I,  N) || TMC_UART_IS(J , N) || TMC_UART_IS(K , N) \
-                         || TMC_UART_IS(X2, N) || TMC_UART_IS(Y2, N) || TMC_UART_IS(Z2, N) || TMC_UART_IS(Z3, N) || TMC_UART_IS(Z4, N) \
-                         || TMC_UART_IS(E0, N) || TMC_UART_IS(E1, N) || TMC_UART_IS(E2, N) || TMC_UART_IS(E3, N) || TMC_UART_IS(E4, N) )
+                         || TMC_UART_IS(X2, N) || TMC_UART_IS(Y2, N) || TMC_UART_IS(Z2, N) || TMC_UART_IS(Z3, N) || TMC_UART_IS(Z4, N) )
 
 #define HW_Serial    501
 #define HW_Serial0   502
@@ -2378,33 +2112,6 @@
 // ADC Temp Sensors (Thermistor or Thermocouple with amplifier ADC interface)
 //
 #define HAS_ADC_TEST(P) (PIN_EXISTS(TEMP_##P) && TEMP_SENSOR_##P != 0 && NONE(TEMP_SENSOR_##P##_IS_MAX_TC, TEMP_SENSOR_##P##_IS_DUMMY))
-#if HOTENDS > 0 && HAS_ADC_TEST(0)
-  #define HAS_TEMP_ADC_0 1
-#endif
-#if HOTENDS > 1 && HAS_ADC_TEST(1)
-  #define HAS_TEMP_ADC_1 1
-#endif
-#if HOTENDS > 2 && HAS_ADC_TEST(2)
-  #define HAS_TEMP_ADC_2 1
-#endif
-#if HOTENDS > 3 && HAS_ADC_TEST(3)
-  #define HAS_TEMP_ADC_3 1
-#endif
-#if HOTENDS > 4 && HAS_ADC_TEST(4)
-  #define HAS_TEMP_ADC_4 1
-#endif
-#if HOTENDS > 5 && HAS_ADC_TEST(5)
-  #define HAS_TEMP_ADC_5 1
-#endif
-#if HOTENDS > 6 && HAS_ADC_TEST(6)
-  #define HAS_TEMP_ADC_6 1
-#endif
-#if HOTENDS > 7 && HAS_ADC_TEST(7)
-  #define HAS_TEMP_ADC_7 1
-#endif
-#if HAS_ADC_TEST(BED)
-  #define HAS_TEMP_ADC_BED 1
-#endif
 #if HAS_ADC_TEST(PROBE)
   #define HAS_TEMP_ADC_PROBE 1
 #endif
@@ -2422,12 +2129,6 @@
 #endif
 
 #define HAS_TEMP(N) ANY(HAS_TEMP_ADC_##N, TEMP_SENSOR_##N##_IS_MAX_TC, TEMP_SENSOR_##N##_IS_DUMMY)
-#if HAS_HOTEND && HAS_TEMP(0)
-  #define HAS_TEMP_HOTEND 1
-#endif
-#if HAS_TEMP(BED)
-  #define HAS_TEMP_BED 1
-#endif
 #if HAS_TEMP(CHAMBER)
   #define HAS_TEMP_CHAMBER 1
 #endif
@@ -2465,46 +2166,6 @@
   #endif
 #endif
 
-// Heaters
-#if PIN_EXISTS(HEATER_0)
-  #define HAS_HEATER_0 1
-#endif
-#if PIN_EXISTS(HEATER_1)
-  #define HAS_HEATER_1 1
-#endif
-#if PIN_EXISTS(HEATER_2)
-  #define HAS_HEATER_2 1
-#endif
-#if PIN_EXISTS(HEATER_3)
-  #define HAS_HEATER_3 1
-#endif
-#if PIN_EXISTS(HEATER_4)
-  #define HAS_HEATER_4 1
-#endif
-#if PIN_EXISTS(HEATER_5)
-  #define HAS_HEATER_5 1
-#endif
-#if PIN_EXISTS(HEATER_6)
-  #define HAS_HEATER_6 1
-#endif
-#if PIN_EXISTS(HEATER_7)
-  #define HAS_HEATER_7 1
-#endif
-#if PIN_EXISTS(HEATER_BED)
-  #define HAS_HEATER_BED 1
-#endif
-
-// Shorthand for common combinations
-#if HAS_TEMP_BED && HAS_HEATER_BED
-  #define HAS_HEATED_BED 1
-  #ifndef BED_OVERSHOOT
-    #define BED_OVERSHOOT 10
-  #endif
-  #define BED_MAX_TARGET (BED_MAXTEMP - (BED_OVERSHOOT))
-#else
-  #undef PIDTEMPBED
-#endif
-
 #if HAS_TEMP_COOLER && PIN_EXISTS(COOLER)
   #define HAS_COOLER 1
   #ifndef COOLER_OVERSHOOT
@@ -2514,11 +2175,11 @@
   #define COOLER_MAX_TARGET (COOLER_MAXTEMP - (COOLER_OVERSHOOT))
 #endif
 
-#if HAS_HEATED_BED || HAS_TEMP_CHAMBER
+#if HAS_TEMP_CHAMBER
   #define BED_OR_CHAMBER 1
 #endif
 
-#if HAS_TEMP_HOTEND || BED_OR_CHAMBER || HAS_TEMP_PROBE || HAS_TEMP_COOLER || HAS_TEMP_BOARD
+#if BED_OR_CHAMBER || HAS_TEMP_PROBE || HAS_TEMP_COOLER || HAS_TEMP_BOARD
   #define HAS_TEMP_SENSOR 1
 #endif
 
@@ -2533,19 +2194,13 @@
 #endif
 
 // PID heating
-#if ANY(PIDTEMP, PIDTEMPBED, PIDTEMPCHAMBER)
+#if ANY(PIDTEMPCHAMBER)
   #define HAS_PID_HEATING 1
 #endif
 
 // Thermal protection
 #if !HAS_HEATED_BED
   #undef THERMAL_PROTECTION_BED
-#endif
-#if ENABLED(THERMAL_PROTECTION_HOTENDS) && WATCH_TEMP_PERIOD > 0
-  #define WATCH_HOTENDS 1
-#endif
-#if ENABLED(THERMAL_PROTECTION_BED) && WATCH_BED_TEMP_PERIOD > 0
-  #define WATCH_BED 1
 #endif
 #if BOTH(HAS_HEATED_CHAMBER, THERMAL_PROTECTION_CHAMBER) && WATCH_CHAMBER_TEMP_PERIOD > 0
   #define WATCH_CHAMBER 1
@@ -2556,38 +2211,12 @@
 #if NONE(THERMAL_PROTECTION_HOTENDS, THERMAL_PROTECTION_CHAMBER, THERMAL_PROTECTION_BED, THERMAL_PROTECTION_COOLER)
   #undef THERMAL_PROTECTION_VARIANCE_MONITOR
 #endif
-#if  (ENABLED(THERMAL_PROTECTION_HOTENDS) || !EXTRUDERS) \
-  && (ENABLED(THERMAL_PROTECTION_BED)     || !HAS_HEATED_BED) \
-  && (ENABLED(THERMAL_PROTECTION_CHAMBER) || !HAS_HEATED_CHAMBER) \
+#if (ENABLED(THERMAL_PROTECTION_CHAMBER) || !HAS_HEATED_CHAMBER) \
   && (ENABLED(THERMAL_PROTECTION_COOLER)  || !HAS_COOLER)
   #define THERMALLY_SAFE 1
 #endif
 
 // Auto fans
-#if HAS_HOTEND && PIN_EXISTS(E0_AUTO_FAN)
-  #define HAS_AUTO_FAN_0 1
-#endif
-#if HAS_MULTI_HOTEND && PIN_EXISTS(E1_AUTO_FAN)
-  #define HAS_AUTO_FAN_1 1
-#endif
-#if HOTENDS > 2 && PIN_EXISTS(E2_AUTO_FAN)
-  #define HAS_AUTO_FAN_2 1
-#endif
-#if HOTENDS > 3 && PIN_EXISTS(E3_AUTO_FAN)
-  #define HAS_AUTO_FAN_3 1
-#endif
-#if HOTENDS > 4 && PIN_EXISTS(E4_AUTO_FAN)
-  #define HAS_AUTO_FAN_4 1
-#endif
-#if HOTENDS > 5 && PIN_EXISTS(E5_AUTO_FAN)
-  #define HAS_AUTO_FAN_5 1
-#endif
-#if HOTENDS > 6 && PIN_EXISTS(E6_AUTO_FAN)
-  #define HAS_AUTO_FAN_6 1
-#endif
-#if HOTENDS > 7 && PIN_EXISTS(E7_AUTO_FAN)
-  #define HAS_AUTO_FAN_7 1
-#endif
 #if HAS_TEMP_CHAMBER && PIN_EXISTS(CHAMBER_AUTO_FAN)
   #define HAS_AUTO_CHAMBER_FAN 1
 #endif
@@ -2595,44 +2224,12 @@
   #define HAS_AUTO_COOLER_FAN 1
 #endif
 
-#if ANY(HAS_AUTO_FAN_0, HAS_AUTO_FAN_1, HAS_AUTO_FAN_2, HAS_AUTO_FAN_3, HAS_AUTO_FAN_4, HAS_AUTO_FAN_5, HAS_AUTO_FAN_6, HAS_AUTO_FAN_7, HAS_AUTO_CHAMBER_FAN, HAS_AUTO_COOLER_FAN)
+#if ANY(HAS_AUTO_CHAMBER_FAN, HAS_AUTO_COOLER_FAN)
   #define HAS_AUTO_FAN 1
 #endif
 #define _FANOVERLAP(A,B) (A##_AUTO_FAN_PIN == E##B##_AUTO_FAN_PIN)
 #if HAS_AUTO_FAN && (_FANOVERLAP(CHAMBER,0) || _FANOVERLAP(CHAMBER,1) || _FANOVERLAP(CHAMBER,2) || _FANOVERLAP(CHAMBER,3) || _FANOVERLAP(CHAMBER,4) || _FANOVERLAP(CHAMBER,5) || _FANOVERLAP(CHAMBER,6) || _FANOVERLAP(CHAMBER,7))
   #define AUTO_CHAMBER_IS_E 1
-#endif
-
-// Fans check
-#if HAS_HOTEND && PIN_EXISTS(E0_FAN_TACHO)
-  #define HAS_E0_FAN_TACHO 1
-#endif
-#if HOTENDS > 1 && PIN_EXISTS(E1_FAN_TACHO)
-  #define HAS_E1_FAN_TACHO 1
-#endif
-#if HOTENDS > 2 && PIN_EXISTS(E2_FAN_TACHO)
-  #define HAS_E2_FAN_TACHO 1
-#endif
-#if HOTENDS > 3 && PIN_EXISTS(E3_FAN_TACHO)
-  #define HAS_E3_FAN_TACHO 1
-#endif
-#if HOTENDS > 4 && PIN_EXISTS(E4_FAN_TACHO)
-  #define HAS_E4_FAN_TACHO 1
-#endif
-#if HOTENDS > 5 && PIN_EXISTS(E5_FAN_TACHO)
-  #define HAS_E5_FAN_TACHO 1
-#endif
-#if HOTENDS > 6 && PIN_EXISTS(E6_FAN_TACHO)
-  #define HAS_E6_FAN_TACHO 1
-#endif
-#if HOTENDS > 7 && PIN_EXISTS(E7_FAN_TACHO)
-  #define HAS_E7_FAN_TACHO 1
-#endif
-#if ANY(HAS_E0_FAN_TACHO, HAS_E1_FAN_TACHO, HAS_E2_FAN_TACHO, HAS_E3_FAN_TACHO, HAS_E4_FAN_TACHO, HAS_E5_FAN_TACHO, HAS_E6_FAN_TACHO, HAS_E7_FAN_TACHO)
-  #define HAS_FANCHECK 1
-  #if HAS_AUTO_FAN && EXTRUDER_AUTO_FAN_SPEED != 255 && DISABLED(FOURWIRES_FANS)
-    #define HAS_PWMFANCHECK 1
-  #endif
 #endif
 
 #if !HAS_TEMP_SENSOR
@@ -2728,13 +2325,6 @@
 #endif
 
 /**
- * Part Cooling fan multipliexer
- */
-#if PIN_EXISTS(FANMUX0)
-  #define HAS_FANMUX 1
-#endif
-
-/**
  * MIN/MAX fan PWM scaling
  */
 #ifndef FAN_OFF_PWM
@@ -2806,11 +2396,6 @@
   #undef SERVO_DETACH_GCODE
 #endif
 
-// Sensors
-#if PIN_EXISTS(FILWIDTH)
-  #define HAS_FILAMENT_WIDTH_SENSOR 1
-#endif
-
 // User Interface
 #if ENABLED(FREEZE_FEATURE)
   #if !PIN_EXISTS(FREEZE) && PIN_EXISTS(KILL)
@@ -2842,20 +2427,14 @@
 #if PIN_EXISTS(DIGIPOTSS)
   #define HAS_MOTOR_CURRENT_SPI 1
 #endif
-#if HAS_EXTRUDERS && PIN_EXISTS(MOTOR_CURRENT_PWM_E)
-  #define HAS_MOTOR_CURRENT_PWM_E 1
-#endif
-#if HAS_MOTOR_CURRENT_PWM_E || ANY_PIN(MOTOR_CURRENT_PWM_X, MOTOR_CURRENT_PWM_Y, MOTOR_CURRENT_PWM_XY, MOTOR_CURRENT_PWM_Z, MOTOR_CURRENT_PWM_I, MOTOR_CURRENT_PWM_J, MOTOR_CURRENT_PWM_K)
+#if ANY_PIN(MOTOR_CURRENT_PWM_X, MOTOR_CURRENT_PWM_Y, MOTOR_CURRENT_PWM_XY, MOTOR_CURRENT_PWM_Z, MOTOR_CURRENT_PWM_I, MOTOR_CURRENT_PWM_J, MOTOR_CURRENT_PWM_K)
   #define HAS_MOTOR_CURRENT_PWM 1
 #endif
 
 #if ANY(HAS_Z_MS_PINS, HAS_Z2_MS_PINS, HAS_Z3_MS_PINS, HAS_Z4_MS_PINS)
   #define HAS_SOME_Z_MS_PINS 1
 #endif
-#if ANY(HAS_E0_MS_PINS, HAS_E1_MS_PINS, HAS_E2_MS_PINS, HAS_E3_MS_PINS, HAS_E4_MS_PINS, HAS_E5_MS_PINS, HAS_E6_MS_PINS, HAS_E7_MS_PINS)
-  #define HAS_SOME_E_MS_PINS 1
-#endif
-#if ANY(HAS_X_MS_PINS, HAS_X2_MS_PINS, HAS_Y_MS_PINS, HAS_Y2_MS_PINS, HAS_SOME_Z_MS_PINS, HAS_I_MS_PINS, HAS_J_MS_PINS, HAS_K_MS_PINS, HAS_SOME_E_MS_PINS)
+#if ANY(HAS_X_MS_PINS, HAS_X2_MS_PINS, HAS_Y_MS_PINS, HAS_Y2_MS_PINS, HAS_SOME_Z_MS_PINS, HAS_I_MS_PINS, HAS_J_MS_PINS, HAS_K_MS_PINS)
   #define HAS_MICROSTEPS 1
 #endif
 
@@ -2992,22 +2571,6 @@
 #endif
 
 /**
- * Heated bed requires settings
- */
-#if HAS_HEATED_BED
-  #ifndef MIN_BED_POWER
-    #define MIN_BED_POWER 0
-  #endif
-  #ifndef MAX_BED_POWER
-    #define MAX_BED_POWER 255
-  #endif
-  #ifndef HEATER_BED_INVERTING
-    #define HEATER_BED_INVERTING false
-  #endif
-  #define WRITE_HEATER_BED(v) WRITE(HEATER_BED_PIN, (v) ^ HEATER_BED_INVERTING)
-#endif
-
-/**
  * Heated chamber requires settings
  */
 #if HAS_HEATED_CHAMBER
@@ -3036,7 +2599,7 @@
   #define WRITE_HEATER_COOLER(v) WRITE(COOLER_PIN, (v) ^ COOLER_INVERTING)
 #endif
 
-#if HAS_HOTEND || HAS_HEATED_BED || HAS_HEATED_CHAMBER || HAS_COOLER
+#if HAS_HEATED_CHAMBER || HAS_COOLER
   #define HAS_TEMPERATURE 1
 #endif
 
@@ -3148,12 +2711,6 @@
 #if !BOTH(HAS_BED_PROBE, HAS_FAN)
   #undef PROBING_FANS_OFF
 #endif
-#if !BOTH(HAS_BED_PROBE, HAS_EXTRUDERS)
-  #undef PROBING_ESTEPPERS_OFF
-#elif ENABLED(PROBING_STEPPERS_OFF)
-  // PROBING_STEPPERS_OFF implies PROBING_ESTEPPERS_OFF, make sure it is defined
-  #define PROBING_ESTEPPERS_OFF
-#endif
 #if EITHER(ADVANCED_PAUSE_FEATURE, PROBING_HEATERS_OFF)
   #define HEATER_IDLE_HANDLER 1
 #endif
@@ -3245,45 +2802,10 @@
   #define LEVELED_SEGMENT_LENGTH 5
 #endif
 
-/**
- * Default mesh area is an area with an inset margin on the print area.
- */
-#if EITHER(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL)
-  #if IS_KINEMATIC
-    // Probing points may be verified at compile time within the radius
-    // using static_assert(HYPOT2(X2-X1,Y2-Y1)<=sq(DELTA_PRINTABLE_RADIUS),"bad probe point!")
-    // so that may be added to SanityCheck.h in the future.
-    #define _MESH_MIN_X (X_MIN_BED + MESH_INSET)
-    #define _MESH_MIN_Y (Y_MIN_BED + MESH_INSET)
-    #define _MESH_MAX_X (X_MAX_BED - (MESH_INSET))
-    #define _MESH_MAX_Y (Y_MAX_BED - (MESH_INSET))
-  #else
-    // Boundaries for Cartesian probing based on set limits
-    #define _MESH_MIN_X (_MAX(X_MIN_BED + MESH_INSET, X_MIN_POS))  // UBL is careful not to probe off the bed.  It does not
-    #define _MESH_MIN_Y (_MAX(Y_MIN_BED + MESH_INSET, Y_MIN_POS))  // need NOZZLE_TO_PROBE_OFFSET in the mesh dimensions
-    #define _MESH_MAX_X (_MIN(X_MAX_BED - (MESH_INSET), X_MAX_POS))
-    #define _MESH_MAX_Y (_MIN(Y_MAX_BED - (MESH_INSET), Y_MAX_POS))
-  #endif
-
-  // These may be overridden in Configuration.h if a smaller area is desired
-  #ifndef MESH_MIN_X
-    #define MESH_MIN_X _MESH_MIN_X
-  #endif
-  #ifndef MESH_MIN_Y
-    #define MESH_MIN_Y _MESH_MIN_Y
-  #endif
-  #ifndef MESH_MAX_X
-    #define MESH_MAX_X _MESH_MAX_X
-  #endif
-  #ifndef MESH_MAX_Y
-    #define MESH_MAX_Y _MESH_MAX_Y
-  #endif
-#else
-  #undef MESH_MIN_X
-  #undef MESH_MIN_Y
-  #undef MESH_MAX_X
-  #undef MESH_MAX_Y
-#endif
+#undef MESH_MIN_X
+#undef MESH_MIN_Y
+#undef MESH_MAX_X
+#undef MESH_MAX_Y
 
 #define _POINT_COUNT (defined(PROBE_PT_1_X) + defined(PROBE_PT_2_X) + defined(PROBE_PT_3_X) + defined(PROBE_PT_1_Y) + defined(PROBE_PT_2_Y) + defined(PROBE_PT_3_Y))
 #if _POINT_COUNT == 6

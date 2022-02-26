@@ -19,7 +19,6 @@
   #include "lib/wii_i2c/src/NintendoExtensionCtrl.h"
 
 WiiNunchuck wii;
-Nunchuk WiiNunchuck::state;
 
   #if ENABLED(EXTENSIBLE_UI)
     #include "../lcd/extui/ui_api.h"

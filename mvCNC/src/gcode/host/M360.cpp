@@ -11,10 +11,6 @@
 #include "../../module/motion.h"
 #include "../../module/planner.h"
 
-#if HAS_EXTRUDERS
-  #include "../../module/temperature.h"
-#endif
-
 static void config_prefix(PGM_P const name, PGM_P const pref=nullptr, const int8_t ind=-1) {
   SERIAL_ECHOPGM("Config:");
   if (pref) SERIAL_ECHOPGM_P(pref);
@@ -50,8 +46,7 @@ void GcodeSuite::M360() {
   //
   config_line(F("Baudrate"),                    BAUDRATE);
   config_line(F("InputBuffer"),                 MAX_CMD_SIZE);
-  config_line(F("CNClineCache"),              BUFSIZE);
-  config_line(F("MixingExtruder"),              ENABLED(MIXING_EXTRUDER));
+  config_line(F("CNClineCache"), BUFSIZE);
   config_line(F("SDCard"),                      ENABLED(SDSUPPORT));
   config_line(F("Fan"),                         ENABLED(HAS_FAN));
   config_line(F("LCD"),                         ENABLED(HAS_DISPLAY));
@@ -81,26 +76,6 @@ void GcodeSuite::M360() {
       config_line(Y_STR, planner.max_jerk.y, JERK_STR);
     }
     config_line(Z_STR, planner.max_jerk.z, JERK_STR);
-  #endif
-
-  //
-  // Firmware Retraction
-  //
-  config_line(F("SupportG10G11"), ENABLED(FWRETRACT));
-  #if ENABLED(FWRETRACT)
-    PGMSTR(RET_STR, "Retraction");
-    PGMSTR(UNRET_STR, "RetractionUndo");
-    PGMSTR(SPEED_STR, "Speed");
-    // M10 Retract with swap (long) moves
-    config_line(F("Length"),     fwretract.settings.retract_length, FPSTR(RET_STR));
-    config_line(SPEED_STR,       fwretract.settings.retract_feedrate_mm_s, RET_STR);
-    config_line(F("ZLift"),      fwretract.settings.retract_zraise, FPSTR(RET_STR));
-    config_line(F("LongLength"), fwretract.settings.swap_retract_length, FPSTR(RET_STR));
-    // M11 Recover (undo) with swap (long) moves
-    config_line(SPEED_STR,            fwretract.settings.retract_recover_feedrate_mm_s, UNRET_STR);
-    config_line(F("ExtraLength"),     fwretract.settings.retract_recover_extra, FPSTR(UNRET_STR));
-    config_line(F("ExtraLongLength"), fwretract.settings.swap_retract_recover_extra, FPSTR(UNRET_STR));
-    config_line(F("LongSpeed"),       fwretract.settings.swap_retract_recover_feedrate_mm_s, FPSTR(UNRET_STR));
   #endif
 
   //
@@ -155,20 +130,6 @@ void GcodeSuite::M360() {
   config_line(F("HeatedBed"), ENABLED(HAS_HEATED_BED));
   #if HAS_HEATED_BED
     config_line(F("MaxBedTemp"), BED_MAX_TARGET);
-  #endif
-
-  //
-  // Per-Extruder settings
-  //
-  config_line(F("NumExtruder"), EXTRUDERS);
-  #if HAS_EXTRUDERS
-    LOOP_L_N(e, EXTRUDERS) {
-      config_line_e(e, JERK_STR, TERN(HAS_LINEAR_E_JERK, planner.max_e_jerk[E_INDEX_N(e)], TERN(HAS_CLASSIC_JERK, planner.max_jerk.e, DEFAULT_EJERK)));
-      config_line_e(e, F("MaxSpeed"), planner.settings.max_feedrate_mm_s[E_AXIS_N(e)]);
-      config_line_e(e, F("Acceleration"), planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(e)]);
-      config_line_e(e, F("Diameter"), TERN(USE_VOLUMETRICS, planner.filament_size[e], DEFAULT_NOMINAL_FILAMENT_DIA));
-      config_line_e(e, F("MaxTemp"), thermalManager.hotend_maxtemp[e]);
-    }
   #endif
 }
 

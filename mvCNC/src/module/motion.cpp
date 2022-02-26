@@ -172,7 +172,6 @@ xyz_pos_t cartes;
 
 inline void report_more_positions() {
   stepper.report_positions();
-  TERN_(IS_SCARA, scara_report_positions());
 }
 
 // Report the logical position for a given machine position
@@ -187,9 +186,6 @@ inline void report_logical_position(const xyze_pos_t &rpos) {
       SP_J_LBL, lpos.j,
       SP_K_LBL, lpos.k
     )
-    #if HAS_EXTRUDERS
-      , SP_E_LBL, lpos.e
-    #endif
   );
 }
 
@@ -268,7 +264,6 @@ inline void report_machine_position(const xyze_pos_t &rpos) {
 void report_real_position() {
   get_cartesian_from_steppers();
   xyze_pos_t npos = LOGICAL_AXIS_ARRAY(
-    planner.get_axis_position_mm(E_AXIS),
     cartes.x, cartes.y, cartes.z,
     cartes.i, cartes.j, cartes.k
   );
@@ -344,7 +339,6 @@ void report_current_position_projected() {
         report_machine_position(cartes);
       #endif
       stepper.report_positions();
-      TERN_(IS_SCARA, scara_report_positions());
       report_current_grblstate_moving();
     #endif
   }
@@ -405,10 +399,6 @@ void sync_plan_position() {
   planner.set_position_mm(current_position);
 }
 
-#if HAS_EXTRUDERS
-  void sync_plan_position_e() { planner.set_e_position_mm(current_position.e); }
-#endif
-
 /**
  * Get the stepper positions in the cartes[] array.
  * Forward kinematics are applied for DELTA and SCARA.
@@ -421,12 +411,6 @@ void sync_plan_position() {
 void get_cartesian_from_steppers() {
   #if ENABLED(DELTA)
     forward_kinematics(planner.get_axis_positions_mm());
-  #elif IS_SCARA
-    forward_kinematics(
-      planner.get_axis_position_degrees(A_AXIS), planner.get_axis_position_degrees(B_AXIS)
-      OPTARG(AXEL_TPARA, planner.get_axis_position_degrees(C_AXIS))
-    );
-    cartes.z = planner.get_axis_position_mm(Z_AXIS);
   #else
     LINEAR_AXIS_CODE(
       cartes.x = planner.get_axis_position_mm(X_AXIS),
@@ -454,8 +438,6 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
   get_cartesian_from_steppers();
   xyze_pos_t pos = cartes;
 
-  TERN_(HAS_EXTRUDERS, pos.e = planner.get_axis_position_mm(E_AXIS));
-
   TERN_(HAS_POSITION_MODIFIERS, planner.unapply_modifiers(pos, true));
 
   if (axis == ALL_AXES_ENUM)
@@ -471,15 +453,6 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
 void line_to_current_position(const_feedRate_t fr_mm_s/*=feedrate_mm_s*/) {
   planner.buffer_line(current_position, fr_mm_s);
 }
-
-#if HAS_EXTRUDERS
-  void unscaled_e_move(const_float_t length, const_feedRate_t fr_mm_s) {
-    TERN_(HAS_FILAMENT_SENSOR, runout.reset());
-    current_position.e += length / planner.e_factor[active_extruder];
-    line_to_current_position(fr_mm_s);
-    planner.synchronize();
-  }
-#endif
 
 #if IS_KINEMATIC
 
@@ -517,11 +490,6 @@ void _internal_move_to_destination(const_feedRate_t fr_mm_s/*=0.0f*/
   const uint16_t old_pct = feedrate_percentage;
   feedrate_percentage = 100;
 
-  #if HAS_EXTRUDERS
-    const float old_fac = planner.e_factor[active_extruder];
-    planner.e_factor[active_extruder] = 1.0f;
-  #endif
-
   if (TERN0(IS_KINEMATIC, is_fast))
     TERN(IS_KINEMATIC, prepare_fast_move_to_destination(), NOOP);
   else
@@ -529,7 +497,6 @@ void _internal_move_to_destination(const_feedRate_t fr_mm_s/*=0.0f*/
 
   feedrate_mm_s = old_feedrate;
   feedrate_percentage = old_pct;
-  TERN_(HAS_EXTRUDERS, planner.e_factor[active_extruder] = old_fac);
 }
 
 /**
@@ -1012,9 +979,6 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     // Get the linear distance in XYZ
     float cartesian_mm = diff.magnitude();
 
-    // If the move is very short, check the E move distance
-    TERN_(HAS_EXTRUDERS, if (UNEAR_ZERO(cartesian_mm)) cartesian_mm = ABS(diff.e));
-
     // No E move either? Game over.
     if (UNEAR_ZERO(cartesian_mm)) return true;
 
@@ -1025,11 +989,6 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     // gives the number of segments
     uint16_t segments = segments_per_second * seconds;
 
-    // For SCARA enforce a minimum segment size
-    #if IS_SCARA
-      NOMORE(segments, cartesian_mm * RECIPROCAL(SCARA_MIN_SEGMENT_LENGTH));
-    #endif
-
     // At least one segment is required
     NOLESS(segments, 1U);
 
@@ -1037,10 +996,6 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     const float inv_segments = 1.0f / float(segments),
                 cartesian_segment_mm = cartesian_mm * inv_segments;
     const xyze_float_t segment_distance = diff * inv_segments;
-
-    #if ENABLED(SCARA_FEEDRATE_SCALING)
-      const float inv_duration = scaled_fr_mm_s / cartesian_segment_mm;
-    #endif
 
     /*
     SERIAL_ECHOPGM("mm=", cartesian_mm);
@@ -1092,7 +1047,6 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
       // If the move is very short, check the E move distance
       // No E move either? Game over.
       float cartesian_mm = diff.magnitude();
-      TERN_(HAS_EXTRUDERS, if (UNEAR_ZERO(cartesian_mm)) cartesian_mm = ABS(diff.e));
       if (UNEAR_ZERO(cartesian_mm)) return;
 
       // The length divided by the segment size
@@ -1104,10 +1058,6 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
       const float inv_segments = 1.0f / float(segments),
                   cartesian_segment_mm = cartesian_mm * inv_segments;
       const xyze_float_t segment_distance = diff * inv_segments;
-
-      #if ENABLED(SCARA_FEEDRATE_SCALING)
-        const float inv_duration = scaled_fr_mm_s / cartesian_segment_mm;
-      #endif
 
       //SERIAL_ECHOPGM("mm=", cartesian_mm);
       //SERIAL_ECHOLNPGM(" segments=", segments);

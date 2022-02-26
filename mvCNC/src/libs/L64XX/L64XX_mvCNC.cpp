@@ -515,13 +515,6 @@ uint8_t L64XX_mvCNC::get_user_input(uint8_t &driver_count, L64XX_axis_t axis_ind
       } break;
     #endif
 
-    #if HAS_EXTRUDERS
-      case 'E': {
-        position_min = E_center - displacement;
-        position_max = E_center + displacement;
-        echo_min_max('E', position_min, position_max);
-      } break;
-    #endif
   }
 
   //

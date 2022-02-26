@@ -175,30 +175,6 @@ void menu_tune() {
   #endif // HAS_FAN
 
   //
-  // Flow:
-  //
-  #if HAS_EXTRUDERS
-    EDIT_ITEM(int3, MSG_FLOW, &planner.flow_percentage[active_extruder], 10, 999, []{ planner.refresh_e_factor(active_extruder); });
-    // Flow En:
-    #if HAS_MULTI_EXTRUDER
-      LOOP_L_N(n, EXTRUDERS)
-        EDIT_ITEM_N(int3, n, MSG_FLOW_N, &planner.flow_percentage[n], 10, 999, []{ planner.refresh_e_factor(MenuItemBase::itemIndex); });
-    #endif
-  #endif
-
-  //
-  // Advance K:
-  //
-  #if ENABLED(LIN_ADVANCE) && DISABLED(SLIM_LCD_MENUS)
-    #if EXTRUDERS == 1
-      EDIT_ITEM(float42_52, MSG_ADVANCE_K, &planner.extruder_advance_K[0], 0, 10);
-    #elif HAS_MULTI_EXTRUDER
-      LOOP_L_N(n, EXTRUDERS)
-        EDIT_ITEM_N(float42_52, n, MSG_ADVANCE_K_E, &planner.extruder_advance_K[n], 0, 10);
-    #endif
-  #endif
-
-  //
   // Babystep X:
   // Babystep Y:
   // Babystep Z:

@@ -27,8 +27,6 @@ void GcodeSuite::G61() {
 
   const uint8_t slot = parser.byteval('S');
 
-  #define SYNC_E(POINT) TERN_(HAS_EXTRUDERS, planner.set_e_position_mm((destination.e = current_position.e = (POINT))))
-
   #if SAVED_POSITIONS < 256
     if (slot >= SAVED_POSITIONS) {
       SERIAL_ERROR_MSG(STR_INVALID_POS_SLOT STRINGIFY(SAVED_POSITIONS));
@@ -47,7 +45,6 @@ void GcodeSuite::G61() {
   if (!parser.seen_axis()) {
     DEBUG_ECHOLNPGM("Default position restore");
     do_blocking_move_to(stored_position[slot], feedrate_mm_s);
-    SYNC_E(stored_position[slot].e);
   }
   else {
     if (parser.seen(LINEAR_AXIS_GANG("X", "Y", "Z", STR_I, STR_J, STR_K))) {
@@ -63,12 +60,6 @@ void GcodeSuite::G61() {
       // Move to the saved position
       prepare_line_to_destination();
     }
-    #if HAS_EXTRUDERS
-      if (parser.seen_test('E')) {
-        DEBUG_ECHOLNPGM(STR_RESTORING_POS " S", slot, " E", current_position.e, "=>", stored_position[slot].e);
-        SYNC_E(stored_position[slot].e);
-      }
-    #endif
   }
 
   feedrate_mm_s = saved_feedrate;

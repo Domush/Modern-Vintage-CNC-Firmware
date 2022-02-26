@@ -30,9 +30,6 @@
  */
 void GcodeSuite::G92() {
 
-  #if HAS_EXTRUDERS
-    bool sync_E = false;
-  #endif
   bool sync_XYZE = false;
 
   #if USE_GCODE_SUBCODES
@@ -57,11 +54,7 @@ void GcodeSuite::G92() {
       case 9:                                                         // G92.9 - Set Current Position directly (like mvCNC 1.0)
         LOOP_LOGICAL_AXES(i) {
           if (parser.seenval(axis_codes[i])) {
-            if (TERN1(HAS_EXTRUDERS, i != E_AXIS))
-              sync_XYZE = true;
-            else {
-              TERN_(HAS_EXTRUDERS, sync_E = true);
-            }
+            sync_XYZE           = true;
             current_position[i] = parser.value_axis_units((AxisEnum)i);
           }
         }
@@ -71,29 +64,18 @@ void GcodeSuite::G92() {
     case 0:
       LOOP_LOGICAL_AXES(i) {
         if (parser.seenval(axis_codes[i])) {
-          const float l = parser.value_axis_units((AxisEnum)i),       // Given axis coordinate value, converted to millimeters
-                      v = TERN0(HAS_EXTRUDERS, i == E_AXIS) ? l : LOGICAL_TO_NATIVE(l, i),  // Axis position in NATIVE space (applying the existing offset)
-                      d = v - current_position[i];                    // How much is the current axis position altered by?
+          const float l =
+                        parser.value_axis_units((AxisEnum)i),  // Given axis coordinate value, converted to millimeters
+            v = LOGICAL_TO_NATIVE(l, i),  // Axis position in NATIVE space (applying the existing offset)
+            d = v - current_position[i];  // How much is the current axis position altered by?
           if (!NEAR_ZERO(d)) {
-            #if HAS_POSITION_SHIFT && !IS_SCARA                       // When using workspaces...
-              if (TERN1(HAS_EXTRUDERS, i != E_AXIS)) {
-                position_shift[i] += d;                               // ...most axes offset the workspace...
-                update_workspace_offset((AxisEnum)i);
-              }
-              else {
-                #if HAS_EXTRUDERS
-                  sync_E = true;
-                  current_position.e = v;                             // ...but E is set directly
-                #endif
-              }
-            #else                                                     // Without workspaces...
-              if (TERN1(HAS_EXTRUDERS, i != E_AXIS))
-                sync_XYZE = true;
-              else {
-                TERN_(HAS_EXTRUDERS, sync_E = true);
-              }
-              current_position[i] = v;                                // ...set Current Position directly (like mvCNC 1.0)
-            #endif
+#if HAS_POSITION_SHIFT && !IS_SCARA  // When using workspaces...
+            position_shift[i] += d;  // ...most axes offset the workspace...
+            update_workspace_offset((AxisEnum)i);
+#else  // Without workspaces...
+            sync_XYZE           = true;
+            current_position[i] = v;  // ...set Current Position directly (like mvCNC 1.0)
+#endif
           }
         }
       }
@@ -106,10 +88,7 @@ void GcodeSuite::G92() {
       coordinate_system[active_coordinate_system] = position_shift;
   #endif
 
-  if (sync_XYZE) sync_plan_position();
-  #if HAS_EXTRUDERS
-    else if (sync_E) sync_plan_position_e();
-  #endif
+    if (sync_XYZE) sync_plan_position();
 
-  IF_DISABLED(DIRECT_STEPPING, report_current_position());
+    IF_DISABLED(DIRECT_STEPPING, report_current_position());
 }

@@ -290,15 +290,7 @@ public:
       volumetric_unit_factor = POW(linear_unit_factor, 3);
     }
 
-    static float axis_unit_factor(const AxisEnum axis) {
-      return (
-        #if HAS_EXTRUDERS
-          axis >= E_AXIS && volumetric_enabled ? volumetric_unit_factor : linear_unit_factor
-        #else
-          linear_unit_factor
-        #endif
-      );
-    }
+    static float axis_unit_factor(const AxisEnum axis) { return (linear_unit_factor); }
 
     static float linear_value_to_mm(const_float_t v)                  { return v * linear_unit_factor; }
     static float axis_value_to_mm(const AxisEnum axis, const float v) { return v * axis_unit_factor(axis); }

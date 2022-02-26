@@ -944,12 +944,6 @@ void mvCNCUI::draw_status_screen() {
             }
             else
           #endif
-            {
-              #if HAS_EXTRUDERS
-                c = 'E';
-                per = planner.flow_percentage[0];
-              #endif
-            }
           lcd_put_wchar(c);
           lcd_put_u8str(i16tostr3rj(per));
           lcd_put_wchar('%');

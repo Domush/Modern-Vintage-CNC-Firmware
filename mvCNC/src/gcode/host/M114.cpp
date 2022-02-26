@@ -198,12 +198,6 @@ void GcodeSuite::M114() {
       report_current_position_detail();
       return;
     }
-    #if HAS_EXTRUDERS
-      if (parser.seen_test('E')) {
-        SERIAL_ECHOLNPGM("Count E:", stepper.position(E_AXIS));
-        return;
-      }
-    #endif
   #endif
 
   #if ENABLED(M114_REALTIME)

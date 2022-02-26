@@ -32,12 +32,8 @@ void GcodeSuite::G60() {
   {
     DEBUG_ECHOPGM(STR_SAVED_POS " S", slot);
     const xyze_pos_t &pos = stored_position[slot];
-    DEBUG_ECHOLNPAIR_F_P(
-      LIST_N(DOUBLE(LINEAR_AXES), PSTR(" : X"), pos.x, SP_Y_STR, pos.y, SP_Z_STR, pos.z, SP_I_STR, pos.i, SP_J_STR, pos.j, SP_K_STR, pos.k)
-      #if HAS_EXTRUDERS
-        , SP_E_STR, pos.e
-      #endif
-    );
+    DEBUG_ECHOLNPAIR_F_P(LIST_N(DOUBLE(LINEAR_AXES), PSTR(" : X"), pos.x, SP_Y_STR, pos.y, SP_Z_STR, pos.z, SP_I_STR,
+                                pos.i, SP_J_STR, pos.j, SP_K_STR, pos.k));
   }
   #endif
 }

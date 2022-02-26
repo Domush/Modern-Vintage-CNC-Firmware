@@ -3117,7 +3117,7 @@
 /**
  * Wii Nunchuck (joystick controller) jogging support
  */
-#define WII_NUNCHUCK_JOGGING
+// #define WII_NUNCHUCK_JOGGING
 #if ENABLED(WII_NUNCHUCK_JOGGING)
   // #define WII_SDA_PIN    5
   // #define WII_SCL_PIN    10

@@ -404,22 +404,7 @@ void DGUSScreenHandler::HandleTemperatureChanged(DGUS_VP_Variable &var, void *va
 }
 
 void DGUSScreenHandler::HandleFlowRateChanged(DGUS_VP_Variable &var, void *val_ptr) {
-  #if HAS_EXTRUDERS
-    uint16_t newvalue = swap16(*(uint16_t*)val_ptr);
-    uint8_t target_extruder;
-    switch (var.VP) {
-      default: return;
-      case VP_Flowrate_E0: target_extruder = 0; break;
-      #if HAS_MULTI_EXTRUDER
-        case VP_Flowrate_E1: target_extruder = 1; break;
-      #endif
-    }
-
-    planner.set_flow(target_extruder, newvalue);
-    skipVP = var.VP; // don't overwrite value the next update time as the display might autoincrement in parallel
-  #else
     UNUSED(var); UNUSED(val_ptr);
-  #endif
 }
 
 void DGUSScreenHandler::HandleManualExtrude(DGUS_VP_Variable &var, void *val_ptr) {
@@ -506,12 +491,6 @@ void DGUSScreenHandler::HandleStepPerMMExtruderChanged(DGUS_VP_Variable &var, vo
   ExtUI::extruder_t extruder;
   switch (var.VP) {
     default: return;
-      #if HAS_EXTRUDERS
-        case VP_E0_STEP_PER_MM: extruder = ExtUI::extruder_t::E0; break;
-        #if HAS_MULTI_EXTRUDER
-          case VP_E1_STEP_PER_MM: extruder = ExtUI::extruder_t::E1; break;
-        #endif
-      #endif
   }
   DEBUG_ECHOLNPGM("value:", value);
   ExtUI::setAxisSteps_per_mm(value, extruder);

@@ -36,10 +36,6 @@ uint32_t CNCJobRecovery::cmd_sdpos, // = 0
 #include "../module/temperature.h"
 #include "../core/serial.h"
 
-#if ENABLED(FWRETRACT)
-  #include "fwretract.h"
-#endif
-
 #define DEBUG_OUT ENABLED(DEBUG_POWER_LOSS_RECOVERY)
 #include "../core/debug_out.h"
 
@@ -170,35 +166,8 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
     TERN_(HAS_POSITION_SHIFT, info.position_shift = position_shift);
     E_TERN_(info.active_extruder = active_extruder);
 
-    #if ENABLED(USE_VOLUMETRICS)
-      info.flag.volumetric_enabled = parser.volumetric_enabled;
-      #if HAS_MULTI_EXTRUDER
-        for (int8_t e = 0; e < EXTRUDERS; e++) info.filament_size[e] = planner.filament_size[e];
-      #else
-        if (parser.volumetric_enabled) info.filament_size[0] = planner.filament_size[active_extruder];
-      #endif
-    #endif
-
-    #if HAS_EXTRUDERS
-      HOTEND_LOOP() info.target_temperature[e] = thermalManager.degTargetHotend(e);
-    #endif
-
-    TERN_(HAS_HEATED_BED, info.target_temperature_bed = thermalManager.degTargetBed());
-
     #if HAS_FAN
       COPY(info.fan_speed, thermalManager.fan_speed);
-    #endif
-
-    #if HAS_LEVELING
-      info.flag.leveling = planner.leveling_active;
-      info.fade = TERN0(ENABLE_LEVELING_FADE_HEIGHT, planner.z_fade_height);
-    #endif
-
-    TERN_(GRADIENT_MIX, memcpy(&info.gradient, &mixer.gradient, sizeof(info.gradient)));
-
-    #if ENABLED(FWRETRACT)
-      COPY(info.retract, fwretract.current_retract);
-      info.retract_hop = fwretract.current_hop;
     #endif
 
     // Elapsed CNC job time

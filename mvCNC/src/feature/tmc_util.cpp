@@ -792,33 +792,6 @@
       if (k) tmc_status(stepperK, n);
     #endif
 
-    if (TERN0(HAS_EXTRUDERS, e)) {
-      #if AXIS_IS_TMC(E0)
-        tmc_status(stepperE0, n);
-      #endif
-      #if AXIS_IS_TMC(E1)
-        tmc_status(stepperE1, n);
-      #endif
-      #if AXIS_IS_TMC(E2)
-        tmc_status(stepperE2, n);
-      #endif
-      #if AXIS_IS_TMC(E3)
-        tmc_status(stepperE3, n);
-      #endif
-      #if AXIS_IS_TMC(E4)
-        tmc_status(stepperE4, n);
-      #endif
-      #if AXIS_IS_TMC(E5)
-        tmc_status(stepperE5, n);
-      #endif
-      #if AXIS_IS_TMC(E6)
-        tmc_status(stepperE6, n);
-      #endif
-      #if AXIS_IS_TMC(E7)
-        tmc_status(stepperE7, n);
-      #endif
-    }
-
     SERIAL_EOL();
   }
 
@@ -865,33 +838,6 @@
     #if AXIS_IS_TMC(K)
       if (k) tmc_parse_drv_status(stepperK, n);
     #endif
-
-    if (TERN0(HAS_EXTRUDERS, e)) {
-      #if AXIS_IS_TMC(E0)
-        tmc_parse_drv_status(stepperE0, n);
-      #endif
-      #if AXIS_IS_TMC(E1)
-        tmc_parse_drv_status(stepperE1, n);
-      #endif
-      #if AXIS_IS_TMC(E2)
-        tmc_parse_drv_status(stepperE2, n);
-      #endif
-      #if AXIS_IS_TMC(E3)
-        tmc_parse_drv_status(stepperE3, n);
-      #endif
-      #if AXIS_IS_TMC(E4)
-        tmc_parse_drv_status(stepperE4, n);
-      #endif
-      #if AXIS_IS_TMC(E5)
-        tmc_parse_drv_status(stepperE5, n);
-      #endif
-      #if AXIS_IS_TMC(E6)
-        tmc_parse_drv_status(stepperE6, n);
-      #endif
-      #if AXIS_IS_TMC(E7)
-        tmc_parse_drv_status(stepperE7, n);
-      #endif
-    }
 
     SERIAL_EOL();
   }
@@ -1071,33 +1017,6 @@
       if (k) tmc_get_registers(stepperK, n);
     #endif
 
-    if (TERN0(HAS_EXTRUDERS, e)) {
-      #if AXIS_IS_TMC(E0)
-        tmc_get_registers(stepperE0, n);
-      #endif
-      #if AXIS_IS_TMC(E1)
-        tmc_get_registers(stepperE1, n);
-      #endif
-      #if AXIS_IS_TMC(E2)
-        tmc_get_registers(stepperE2, n);
-      #endif
-      #if AXIS_IS_TMC(E3)
-        tmc_get_registers(stepperE3, n);
-      #endif
-      #if AXIS_IS_TMC(E4)
-        tmc_get_registers(stepperE4, n);
-      #endif
-      #if AXIS_IS_TMC(E5)
-        tmc_get_registers(stepperE5, n);
-      #endif
-      #if AXIS_IS_TMC(E6)
-        tmc_get_registers(stepperE6, n);
-      #endif
-      #if AXIS_IS_TMC(E7)
-        tmc_get_registers(stepperE7, n);
-      #endif
-    }
-
     SERIAL_EOL();
   }
 
@@ -1196,30 +1115,6 @@
     #if AXIS_HAS_SPI(K)
       SET_CS_PIN(K);
     #endif
-    #if AXIS_HAS_SPI(E0)
-      SET_CS_PIN(E0);
-    #endif
-    #if AXIS_HAS_SPI(E1)
-      SET_CS_PIN(E1);
-    #endif
-    #if AXIS_HAS_SPI(E2)
-      SET_CS_PIN(E2);
-    #endif
-    #if AXIS_HAS_SPI(E3)
-      SET_CS_PIN(E3);
-    #endif
-    #if AXIS_HAS_SPI(E4)
-      SET_CS_PIN(E4);
-    #endif
-    #if AXIS_HAS_SPI(E5)
-      SET_CS_PIN(E5);
-    #endif
-    #if AXIS_HAS_SPI(E6)
-      SET_CS_PIN(E6);
-    #endif
-    #if AXIS_HAS_SPI(E7)
-      SET_CS_PIN(E7);
-    #endif
   }
 #endif // HAS_TMC_SPI
 
@@ -1289,33 +1184,6 @@ void test_tmc_connection(LOGICAL_AXIS_ARGS(const bool)) {
   #if AXIS_IS_TMC(K)
     if (k) axis_connection += test_connection(stepperK);
   #endif
-
-  if (TERN0(HAS_EXTRUDERS, e)) {
-    #if AXIS_IS_TMC(E0)
-      axis_connection += test_connection(stepperE0);
-    #endif
-    #if AXIS_IS_TMC(E1)
-      axis_connection += test_connection(stepperE1);
-    #endif
-    #if AXIS_IS_TMC(E2)
-      axis_connection += test_connection(stepperE2);
-    #endif
-    #if AXIS_IS_TMC(E3)
-      axis_connection += test_connection(stepperE3);
-    #endif
-    #if AXIS_IS_TMC(E4)
-      axis_connection += test_connection(stepperE4);
-    #endif
-    #if AXIS_IS_TMC(E5)
-      axis_connection += test_connection(stepperE5);
-    #endif
-    #if AXIS_IS_TMC(E6)
-      axis_connection += test_connection(stepperE6);
-    #endif
-    #if AXIS_IS_TMC(E7)
-      axis_connection += test_connection(stepperE7);
-    #endif
-  }
 
   if (axis_connection) LCD_MESSAGE(MSG_ERROR_TMC);
 }

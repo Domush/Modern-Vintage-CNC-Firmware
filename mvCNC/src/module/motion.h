@@ -272,19 +272,11 @@ void quickstop_stepper();
  */
 void sync_plan_position();
 
-#if HAS_EXTRUDERS
-  void sync_plan_position_e();
-#endif
-
 /**
  * Move the planner to the current position from wherever it last moved
  * (or from wherever it has been told it is located).
  */
 void line_to_current_position(const_feedRate_t fr_mm_s=feedrate_mm_s);
-
-#if HAS_EXTRUDERS
-  void unscaled_e_move(const_float_t length, const_feedRate_t fr_mm_s);
-#endif
 
 void prepare_line_to_destination();
 
@@ -479,10 +471,6 @@ void home_if_needed(const bool keeplev=false);
  */
 #if IS_KINEMATIC // (DELTA or SCARA)
 
-  #if HAS_SCARA_OFFSET
-    extern abc_pos_t scara_home_offset; // A and B angular offsets, Z mm offset
-  #endif
-
   // Return true if the given point is within the printable area
   inline bool position_is_reachable(const_float_t rx, const_float_t ry, const float inset=0) {
     #if ENABLED(DELTA)
@@ -500,16 +488,6 @@ void home_if_needed(const bool keeplev=false);
     #elif ENABLED(AXEL_TPARA)
 
       const float R2 = HYPOT2(rx - TPARA_OFFSET_X, ry - TPARA_OFFSET_Y);
-      return (
-        R2 <= sq(L1 + L2) - inset
-        #if MIDDLE_DEAD_ZONE_R > 0
-          && R2 >= sq(float(MIDDLE_DEAD_ZONE_R))
-        #endif
-      );
-
-    #elif IS_SCARA
-
-      const float R2 = HYPOT2(rx - SCARA_OFFSET_X, ry - SCARA_OFFSET_Y);
       return (
         R2 <= sq(L1 + L2) - inset
         #if MIDDLE_DEAD_ZONE_R > 0

@@ -396,11 +396,6 @@ void menu_backlash();
     // M204 P Acceleration
     EDIT_ITEM_FAST(float5_25, MSG_ACC, &planner.settings.acceleration, 25, max_accel);
 
-    #if HAS_EXTRUDERS
-      // M204 R Retract Acceleration
-      EDIT_ITEM_FAST(float5, MSG_A_RETRACT, &planner.settings.retract_acceleration, 100, planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(active_extruder)]);
-    #endif
-
     // M204 T Travel Acceleration
     EDIT_ITEM_FAST(float5_25, MSG_A_TRAVEL, &planner.settings.travel_acceleration, 25, max_accel);
 
@@ -465,10 +460,6 @@ void menu_backlash();
         EDIT_JERK(A), EDIT_JERK(B), EDIT_JERK_C(),
         EDIT_JERK(I), EDIT_JERK(J), EDIT_JERK(K)
       );
-
-      #if HAS_EXTRUDERS
-        EDIT_ITEM_FAST(float52sign, MSG_VE_JERK, &planner.max_jerk.e, 0.1f, max_jerk_edit.e);
-      #endif
 
       END_MENU();
     }

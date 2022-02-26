@@ -200,67 +200,6 @@ void GcodeSuite::dwell(millis_t time) {
 }
 
 /**
- * When G29_RETRY_AND_RECOVER is enabled, call G29() in
- * a loop with recovery and retry handling.
- */
-#if ENABLED(G29_RETRY_AND_RECOVER)
-
-  void GcodeSuite::event_probe_recover() {
-    TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_do(PROMPT_INFO, F("G29 Retrying"), FPSTR(DISMISS_STR)));
-    #ifdef ACTION_ON_G29_RECOVER
-      hostui.g29_recover();
-    #endif
-    #ifdef G29_RECOVER_COMMANDS
-      process_subcommands_now(F(G29_RECOVER_COMMANDS));
-    #endif
-  }
-
-  #if ENABLED(G29_HALT_ON_FAILURE)
-    #include "../lcd/mvcncui.h"
-  #endif
-
-  void GcodeSuite::event_probe_failure() {
-    #ifdef ACTION_ON_G29_FAILURE
-      hostui.g29_failure();
-    #endif
-    #ifdef G29_FAILURE_COMMANDS
-      process_subcommands_now(F(G29_FAILURE_COMMANDS));
-    #endif
-    #if ENABLED(G29_HALT_ON_FAILURE)
-      #ifdef ACTION_ON_CANCEL
-        hostui.cancel();
-      #endif
-      kill(GET_TEXT_F(MSG_LCD_PROBING_FAILED));
-    #endif
-  }
-
-  #ifndef G29_MAX_RETRIES
-    #define G29_MAX_RETRIES 0
-  #endif
-
-  void GcodeSuite::G29_with_retry() {
-    uint8_t retries = G29_MAX_RETRIES;
-    while (G29()) { // G29 should return true for failed probes ONLY
-      if (retries) {
-        event_probe_recover();
-        --retries;
-      }
-      else {
-        event_probe_failure();
-        return;
-      }
-    }
-
-    TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_end());
-
-    #ifdef G29_SUCCESS_COMMANDS
-      process_subcommands_now(F(G29_SUCCESS_COMMANDS));
-    #endif
-  }
-
-#endif // G29_RETRY_AND_RECOVER
-
-/**
  * Process the parsed command and dispatch it to its handler
  */
 void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
@@ -310,16 +249,8 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 6: G6(); break;                                      // G6: Direct Stepper Move
       #endif
 
-      #if EITHER(FWRETRACT, CNC_COORDINATE_SYSTEMS)
+#if ENABLED(CNC_COORDINATE_SYSTEMS)
         case 10: G10(); break;                                    // G10: Retract / Swap Retract, CNC work offsets
-      #endif
-
-      #if ENABLED(FWRETRACT)
-        case 11: G11(); break;                                    // G11: Recover / Swap Recover
-      #endif
-
-      #if ENABLED(NOZZLE_CLEAN_FEATURE)
-        case 12: G12(); break;                                    // G12: Nozzle Clean
       #endif
 
       #if ENABLED(CNC_WORKSPACE_PLANES)
@@ -332,11 +263,9 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 20: G20(); break;                                    // G20: Inch Mode
         case 21: G21(); break;                                    // G21: MM Mode
       #else
-        case 21: NOOP; break;                                     // No error on unknown G21
-      #endif
-
-      #if ENABLED(G26_MESH_VALIDATION)
-        case 26: G26(); break;                                    // G26: Mesh Validation Pattern generation
+      case 21:
+        NOOP;
+        break;                                                    // No error on unknown G21
       #endif
 
       #if ENABLED(SPINDLE_PARK_FEATURE)
@@ -344,12 +273,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #endif
 
       case 28: G28(); break;                                      // G28: Home one or more axes
-
-      #if HAS_LEVELING
-        case 29:                                                  // G29: Bed leveling calibration
-          TERN(G29_RETRY_AND_RECOVER, G29_with_retry, G29)();
-          break;
-      #endif
 
       #if HAS_BED_PROBE
         case 30: G30(); break;                                    // G30: Single Z probe
@@ -376,10 +299,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
           if (WITHIN(parser.subcode, 2, TERN(G38_PROBE_AWAY, 5, 3)))
             G38(parser.subcode);                                  // G38.4, G38.5: Probe away from target
           break;
-      #endif
-
-      #if HAS_MESH
-        case 42: G42(); break;                                    // G42: Coordinated move to a mesh point
       #endif
 
       #if ENABLED(CNC_COORDINATE_SYSTEMS)
@@ -520,11 +439,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 100: M100(); break;                                  // M100: Free Memory Report
       #endif
 
-      #if HAS_EXTRUDERS
-        case 104: M104(); break;                                  // M104: Set hot end temperature
-        case 109: M109(); break;                                  // M109: Wait for hotend temperature to reach target
-      #endif
-
       case 105: M105(); return;                                   // M105: Report Temperatures (and say "ok")
 
       #if HAS_FAN
@@ -554,11 +468,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 123: M123(); break;                                  // M123: Report fan states or set fans auto-report interval
       #endif
 
-      #if HAS_HEATED_BED
-        case 140: M140(); break;                                  // M140: Set bed temperature
-        case 190: M190(); break;                                  // M190: Wait for bed temperature to reach target
-      #endif
-
       #if HAS_HEATED_CHAMBER
         case 141: M141(); break;                                  // M141: Set chamber temperature
         case 191: M191(); break;                                  // M191: Wait for chamber temperature to reach target
@@ -585,29 +494,11 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 125: M125(); break;                                  // M125: Store current position and move to filament change position
       #endif
 
-      #if ENABLED(BARICUDA)
-        // PWM for HEATER_1_PIN
-        #if HAS_HEATER_1
-          case 126: M126(); break;                                // M126: valve open
-          case 127: M127(); break;                                // M127: valve closed
-        #endif
-
-        // PWM for HEATER_2_PIN
-        #if HAS_HEATER_2
-          case 128: M128(); break;                                // M128: valve open
-          case 129: M129(); break;                                // M129: valve closed
-        #endif
-      #endif // BARICUDA
-
       #if ENABLED(PSU_CONTROL)
         case 80: M80(); break;                                    // M80: Turn on Power Supply
       #endif
       case 81: M81(); break;                                      // M81: Turn off Power, including Power Supply, if possible
 
-      #if HAS_EXTRUDERS
-        case 82: M82(); break;                                    // M82: Set E axis normal mode (same as other axes)
-        case 83: M83(); break;                                    // M83: Set E axis relative mode
-      #endif
       case 18: case 84: M18_M84(); break;                         // M18/M84: Disable Steppers / Set Timeout
       case 85: M85(); break;                                      // M85: Set inactivity stepper shutdown timeout
       case 92: M92(); break;                                      // M92: Set the steps-per-unit for one or more axes
@@ -633,21 +524,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 150: M150(); break;                                  // M150: Set Status LED Color
       #endif
 
-      #if ENABLED(MIXING_EXTRUDER)
-        case 163: M163(); break;                                  // M163: Set a component weight for mixing extruder
-        case 164: M164(); break;                                  // M164: Save current mix as a virtual extruder
-        #if ENABLED(DIRECT_MIXING_IN_G1)
-          case 165: M165(); break;                                // M165: Set multiple mix weights
-        #endif
-        #if ENABLED(GRADIENT_MIX)
-          case 166: M166(); break;                                // M166: Set Gradient Mix
-        #endif
-      #endif
-
-      #if ENABLED(USE_VOLUMETRICS)
-        case 200: M200(); break;                                  // M200: Set filament diameter, E to cubic units
-      #endif
-
       case 201: M201(); break;                                    // M201: Set max acceleration for print moves (units/s^2)
 
       #if 0
@@ -662,33 +538,11 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 206: M206(); break;                                  // M206: Set home offsets
       #endif
 
-      #if ENABLED(FWRETRACT)
-        case 207: M207(); break;                                  // M207: Set Retract Length, Feedrate, and Z lift
-        case 208: M208(); break;                                  // M208: Set Recover (unretract) Additional Length and Feedrate
-        #if ENABLED(FWRETRACT_AUTORETRACT)
-          case 209:
-            if (MIN_AUTORETRACT <= MAX_AUTORETRACT) M209();       // M209: Turn Automatic Retract Detection on/off
-            break;
-        #endif
-      #endif
-
       #if HAS_SOFTWARE_ENDSTOPS
         case 211: M211(); break;                                  // M211: Enable, Disable, and/or Report software endstops
       #endif
 
-      #if HAS_MULTI_EXTRUDER
-        case 217: M217(); break;                                  // M217: Set filament swap parameters
-      #endif
-
-      #if HAS_HOTEND_OFFSET
-        case 218: M218(); break;                                  // M218: Set a tool offset
-      #endif
-
       case 220: M220(); break;                                    // M220: Set Feedrate Percentage: S<percent> ("FR" on your LCD)
-
-      #if HAS_EXTRUDERS
-        case 221: M221(); break;                                  // M221: Set Flow Percentage
-      #endif
 
       #if ENABLED(DIRECT_PIN_CONTROL)
         case 226: M226(); break;                                  // M226: Wait until a pin reaches a state
@@ -712,14 +566,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 300: M300(); break;                                  // M300: Play beep tone
       #endif
 
-      #if ENABLED(PIDTEMP)
-        case 301: M301(); break;                                  // M301: Set hotend PID parameters
-      #endif
-
-      #if ENABLED(PIDTEMPBED)
-        case 304: M304(); break;                                  // M304: Set bed PID parameters
-      #endif
-
       #if ENABLED(PIDTEMPCHAMBER)
         case 309: M309(); break;                                  // M309: Set chamber PID parameters
       #endif
@@ -741,28 +587,12 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 261: M261(); break;                                  // M261: Request data from an i2c slave
       #endif
 
-      #if ENABLED(PREVENT_COLD_EXTRUSION)
-        case 302: M302(); break;                                  // M302: Allow cold extrudes (set the minimum extrude temperature)
-      #endif
-
       #if HAS_PID_HEATING
         case 303: M303(); break;                                  // M303: PID autotune
       #endif
 
       #if HAS_USER_THERMISTORS
         case 305: M305(); break;                                  // M305: Set user thermistor parameters
-      #endif
-
-      #if ENABLED(REPETIER_GCODE_M360)
-        case 360: M360(); break;                                  // M360: Firmware settings
-      #endif
-
-      #if ENABLED(MORGAN_SCARA)
-        case 360: if (M360()) return; break;                      // M360: SCARA Theta pos1
-        case 361: if (M361()) return; break;                      // M361: SCARA Theta pos2
-        case 362: if (M362()) return; break;                      // M362: SCARA Psi pos1
-        case 363: if (M363()) return; break;                      // M363: SCARA Psi pos2
-        case 364: if (M364()) return; break;                      // M364: SCARA Psi pos3 (90 deg to Theta)
       #endif
 
       #if EITHER(EXT_SOLENOID, MANUAL_SOLENOID_CONTROL)
@@ -777,31 +607,8 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 402: M402(); break;                                  // M402: Stow probe
       #endif
 
-      #if HAS_PRUSA_MMU2
-        case 403: M403(); break;
-      #endif
-
-      #if ENABLED(FILAMENT_WIDTH_SENSOR)
-        case 404: M404(); break;                                  // M404: Enter the nominal filament width (3mm, 1.75mm ) N<3.0> or display nominal filament width
-        case 405: M405(); break;                                  // M405: Turn on filament sensor for control
-        case 406: M406(); break;                                  // M406: Turn off filament sensor for control
-        case 407: M407(); break;                                  // M407: Display measured filament diameter
-      #endif
-
-      #if HAS_FILAMENT_SENSOR
-        case 412: M412(); break;                                  // M412: Enable/Disable filament runout detection
-      #endif
-
       #if HAS_MULTI_LANGUAGE
         case 414: M414(); break;                                  // M414: Select multi language menu
-      #endif
-
-      #if HAS_LEVELING
-        case 420: M420(); break;                                  // M420: Enable/Disable Bed Leveling
-      #endif
-
-      #if HAS_MESH
-        case 421: M421(); break;                                  // M421: Set a Mesh Bed Leveling Z coordinate
       #endif
 
       #if ENABLED(BACKLASH_GCODE)
@@ -814,10 +621,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
       #if HAS_POWER_MONITOR
         case 430: M430(); break;                                  // M430: Read the system current (A), voltage (V), and power (W)
-      #endif
-
-      #if ENABLED(CANCEL_OBJECTS)
-        case 486: M486(); break;                                  // M486: Identify and cancel objects
       #endif
 
       case 500: M500(); break;                                    // M500: Store settings in EEPROM
@@ -875,10 +678,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 666: M666(); break;                                  // M666: Set delta or multiple endstop adjustment
       #endif
 
-      #if ENABLED(DUET_SMART_EFFECTOR) && PIN_EXISTS(SMART_EFFECTOR_MOD)
-        case 672: M672(); break;                                  // M672: Set/clear Duet Smart Effector sensitivity
-      #endif
-
       #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
         case 701: M701(); break;                                  // M701: Load Filament
         case 702: M702(); break;                                  // M702: Unload Filament
@@ -904,10 +703,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
       #if HAS_PTC
         case 871: M871(); break;                                  // M871: CNC/reset/clear first layer temperature offset values
-      #endif
-
-      #if ENABLED(LIN_ADVANCE)
-        case 900: M900(); break;                                  // M900: Set advance K factor.
       #endif
 
       #if ANY(HAS_MOTOR_CURRENT_SPI, HAS_MOTOR_CURRENT_PWM, HAS_MOTOR_CURRENT_I2C, HAS_MOTOR_CURRENT_DAC)
@@ -938,14 +733,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
           case 914: M914(); break;                                // M914: Set StallGuard sensitivity.
         #endif
         case 919: M919(); break;                                  // M919: Set stepper Chopper Times
-      #endif
-
-      #if HAS_L64XX
-        case 122: M122(); break;                                   // M122: Report status
-        case 906: M906(); break;                                   // M906: Set or get motor drive level
-        case 916: M916(); break;                                   // M916: L6470 tuning: Increase drive level until thermal warning
-        case 917: M917(); break;                                   // M917: L6470 tuning: Find minimum current thresholds
-        case 918: M918(); break;                                   // M918: L6470 tuning: Increase speed until max or error
       #endif
 
       #if HAS_MICROSTEPS
@@ -1012,10 +799,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
       #if ENABLED(DGUS_LCD_UI_MKS)
         case 1002: M1002(); break;                                // M1002: [INTERNAL] Tool-change and Relative E Move
-      #endif
-
-      #if ENABLED(UBL_MESH_WIZARD)
-        case 1004: M1004(); break;                                // M1004: UBL Mesh Wizard
       #endif
 
       #if ENABLED(MAX7219_GCODE)

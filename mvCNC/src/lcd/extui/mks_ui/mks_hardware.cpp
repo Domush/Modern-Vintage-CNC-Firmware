@@ -165,12 +165,6 @@
     #if HAS_Z_AXIS
       OUT_WRITE(Z_ENABLE_PIN, LOW);
     #endif
-    #if HAS_EXTRUDERS
-      OUT_WRITE(E0_ENABLE_PIN, LOW);
-    #endif
-    #if HAS_MULTI_EXTRUDER && DISABLED(MKS_HARDWARE_TEST_ONLY_E0)
-      OUT_WRITE(E1_ENABLE_PIN, LOW);
-    #endif
 
     #if ENABLED(MKS_HARDWARE_TEST_ONLY_E0)
       SET_INPUT_PULLUP(PA1);
@@ -232,21 +226,6 @@
         #if HAS_Z_AXIS
           WRITE(Z_DIR_PIN, LOW);
         #endif
-        #if HAS_EXTRUDERS
-          WRITE(E0_DIR_PIN, LOW);
-        #endif
-        #if HAS_MULTI_EXTRUDER && DISABLED(MKS_HARDWARE_TEST_ONLY_E0)
-          WRITE(E1_DIR_PIN, LOW);
-        #endif
-        #if HAS_MULTI_HOTEND && DISABLED(MKS_HARDWARE_TEST_ONLY_E0)
-          WRITE(HEATER_1_PIN, HIGH); // HE1
-        #endif
-        #if HAS_HOTEND
-          WRITE(HEATER_0_PIN, HIGH); // HE0
-        #endif
-        #if HAS_HEATED_BED
-          WRITE(HEATER_BED_PIN, HIGH); // HOT-BED
-        #endif
       }
       else {
         thermalManager.fan_speed[0] = 0;
@@ -256,21 +235,6 @@
         #endif
         #if HAS_Y_AXIS
           WRITE(Z_DIR_PIN, HIGH);
-        #endif
-        #if HAS_EXTRUDERS
-          WRITE(E0_DIR_PIN, HIGH);
-        #endif
-        #if HAS_MULTI_EXTRUDER && DISABLED(MKS_HARDWARE_TEST_ONLY_E0)
-          WRITE(E1_DIR_PIN, HIGH);
-        #endif
-        #if HAS_MULTI_HOTEND && DISABLED(MKS_HARDWARE_TEST_ONLY_E0)
-          WRITE(HEATER_1_PIN, LOW); // HE1
-        #endif
-        #if HAS_HOTEND
-          WRITE(HEATER_0_PIN, LOW); // HE0
-        #endif
-        #if HAS_HEATED_BED
-          WRITE(HEATER_BED_PIN, LOW); // HOT-BED
         #endif
       }
 

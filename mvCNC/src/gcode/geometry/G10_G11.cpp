@@ -53,11 +53,9 @@ void GcodeSuite::G10() {
         case 2:
           LOOP_LOGICAL_AXES(i) {
             if (parser.seen(axis_codes[i])) {
-              if (TERN1(HAS_EXTRUDERS, i != E_AXIS)) {
-                const float axis_shift = parser.axis_value_to_mm((AxisEnum)i, parser.value_float());
-                position_shift[i]      = -axis_shift;
-                update_workspace_offset((AxisEnum)i);
-              }
+              const float axis_shift = parser.axis_value_to_mm((AxisEnum)i, parser.value_float());
+              position_shift[i]      = -axis_shift;
+              update_workspace_offset((AxisEnum)i);
             }
           }
           break;
@@ -67,11 +65,9 @@ void GcodeSuite::G10() {
         case 20:
           LOOP_LOGICAL_AXES(i) {
             if (parser.seen(axis_codes[i])) {
-              if (TERN1(HAS_EXTRUDERS, i != E_AXIS)) {
-                const float axis_value = parser.axis_value_to_mm((AxisEnum)i, parser.value_float());
-                position_shift[i]       = -current_position[i] + axis_value;
-                update_workspace_offset((AxisEnum)i);
-              }
+              const float axis_value = parser.axis_value_to_mm((AxisEnum)i, parser.value_float());
+              position_shift[i]      = -current_position[i] + axis_value;
+              update_workspace_offset((AxisEnum)i);
             }
           }
           break;

@@ -204,12 +204,6 @@ const uint16_t VPList_StepPerMM[] PROGMEM = {
   VP_X_STEP_PER_MM,
   VP_Y_STEP_PER_MM,
   VP_Z_STEP_PER_MM,
-  #if HAS_EXTRUDERS
-    VP_E0_STEP_PER_MM,
-    #if HAS_MULTI_EXTRUDER
-      VP_E1_STEP_PER_MM,
-    #endif
-  #endif
   0x0000
 };
 
@@ -416,12 +410,6 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   VPHELPER(VP_X_STEP_PER_MM, &planner.settings.axis_steps_per_mm[X_AXIS], ScreenHandler.HandleStepPerMMChanged, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
   VPHELPER(VP_Y_STEP_PER_MM, &planner.settings.axis_steps_per_mm[Y_AXIS], ScreenHandler.HandleStepPerMMChanged, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
   VPHELPER(VP_Z_STEP_PER_MM, &planner.settings.axis_steps_per_mm[Z_AXIS], ScreenHandler.HandleStepPerMMChanged, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
-  #if HAS_EXTRUDERS
-    VPHELPER(VP_E0_STEP_PER_MM, &planner.settings.axis_steps_per_mm[E_AXIS_N(0)], ScreenHandler.HandleStepPerMMExtruderChanged, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
-    #if HAS_MULTI_EXTRUDER
-      VPHELPER(VP_E1_STEP_PER_MM, &planner.settings.axis_steps_per_mm[E_AXIS_N(1)], ScreenHandler.HandleStepPerMMExtruderChanged, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
-    #endif
-  #endif
 
   // SDCard File listing.
   #if ENABLED(SDSUPPORT)

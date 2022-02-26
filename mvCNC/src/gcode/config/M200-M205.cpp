@@ -34,28 +34,13 @@ void GcodeSuite::M201() {
 
 void GcodeSuite::M201_report(const bool forReplay/*=true*/) {
   report_heading_etc(forReplay, F(STR_MAX_ACCELERATION));
-  SERIAL_ECHOLNPGM_P(
-    LIST_N(DOUBLE(LINEAR_AXES),
-      PSTR("  M201 X"), LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[X_AXIS]),
-      SP_Y_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Y_AXIS]),
-      SP_Z_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Z_AXIS]),
-      SP_I_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[I_AXIS]),
-      SP_J_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[J_AXIS]),
-      SP_K_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[K_AXIS])
-    )
-    #if HAS_EXTRUDERS && DISABLED(DISTINCT_E_FACTORS)
-      , SP_E_STR, VOLUMETRIC_UNIT(planner.settings.max_acceleration_mm_per_s2[E_AXIS])
-    #endif
-  );
-  #if ENABLED(DISTINCT_E_FACTORS)
-    LOOP_L_N(i, E_STEPPERS) {
-      report_echo_start(forReplay);
-      SERIAL_ECHOLNPGM_P(
-          PSTR("  M201 T"), i
-        , SP_E_STR, VOLUMETRIC_UNIT(planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(i)])
-      );
-    }
-  #endif
+  SERIAL_ECHOLNPGM_P(LIST_N(DOUBLE(LINEAR_AXES), PSTR("  M201 X"),
+                            LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[X_AXIS]), SP_Y_STR,
+                            LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Y_AXIS]), SP_Z_STR,
+                            LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Z_AXIS]), SP_I_STR,
+                            LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[I_AXIS]), SP_J_STR,
+                            LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[J_AXIS]), SP_K_STR,
+                            LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[K_AXIS])));
 }
 
 /**
@@ -79,28 +64,13 @@ void GcodeSuite::M203() {
 
 void GcodeSuite::M203_report(const bool forReplay/*=true*/) {
   report_heading_etc(forReplay, F(STR_MAX_FEEDRATES));
-  SERIAL_ECHOLNPGM_P(
-    LIST_N(DOUBLE(LINEAR_AXES),
-      PSTR("  M203 X"), LINEAR_UNIT(planner.settings.max_feedrate_mm_s[X_AXIS]),
-      SP_Y_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Y_AXIS]),
-      SP_Z_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Z_AXIS]),
-      SP_I_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[I_AXIS]),
-      SP_J_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[J_AXIS]),
-      SP_K_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[K_AXIS])
-    )
-    #if HAS_EXTRUDERS && DISABLED(DISTINCT_E_FACTORS)
-      , SP_E_STR, VOLUMETRIC_UNIT(planner.settings.max_feedrate_mm_s[E_AXIS])
-    #endif
-  );
-  #if ENABLED(DISTINCT_E_FACTORS)
-    LOOP_L_N(i, E_STEPPERS) {
-      SERIAL_ECHO_START();
-      SERIAL_ECHOLNPGM_P(
-          PSTR("  M203 T"), i
-        , SP_E_STR, VOLUMETRIC_UNIT(planner.settings.max_feedrate_mm_s[E_AXIS_N(i)])
-      );
-    }
-  #endif
+  SERIAL_ECHOLNPGM_P(LIST_N(DOUBLE(LINEAR_AXES), PSTR("  M203 X"),
+                            LINEAR_UNIT(planner.settings.max_feedrate_mm_s[X_AXIS]), SP_Y_STR,
+                            LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Y_AXIS]), SP_Z_STR,
+                            LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Z_AXIS]), SP_I_STR,
+                            LINEAR_UNIT(planner.settings.max_feedrate_mm_s[I_AXIS]), SP_J_STR,
+                            LINEAR_UNIT(planner.settings.max_feedrate_mm_s[J_AXIS]), SP_K_STR,
+                            LINEAR_UNIT(planner.settings.max_feedrate_mm_s[K_AXIS])));
 }
 
 /**
@@ -160,7 +130,6 @@ void GcodeSuite::M205() {
       const float junc_dev = parser.value_linear_units();
       if (WITHIN(junc_dev, 0.01f, 0.3f)) {
         planner.junction_deviation_mm = junc_dev;
-        TERN_(LIN_ADVANCE, planner.recalculate_max_e_jerk());
       }
       else
         SERIAL_ERROR_MSG("?J out of range (0.01 to 0.3)");
@@ -185,37 +154,26 @@ void GcodeSuite::M205() {
 }
 
 void GcodeSuite::M205_report(const bool forReplay/*=true*/) {
-  report_heading_etc(forReplay, F(
-    "Advanced (B<min_segment_time_us> S<min_feedrate> T<min_travel_feedrate>"
-    TERN_(HAS_JUNCTION_DEVIATION, " J<junc_dev>")
+  report_heading_etc(
+    forReplay, F("Advanced (B<min_segment_time_us> S<min_feedrate> T<min_travel_feedrate>" TERN_(HAS_JUNCTION_DEVIATION,
+                                                                                                 " J<junc_dev>")
     #if HAS_CLASSIC_JERK
-      LINEAR_AXIS_GANG(
-        " X<max_jerk>", " Y<max_jerk>", " Z<max_jerk>",
-        " " STR_I "<max_jerk>", " " STR_J "<max_jerk>", " " STR_K "<max_jerk>"
-      )
-    #endif
-    TERN_(HAS_CLASSIC_E_JERK, " E<max_jerk>")
-    ")"
-  ));
+                   LINEAR_AXIS_GANG(" X<max_jerk>", " Y<max_jerk>", " Z<max_jerk>", " " STR_I "<max_jerk>",
+                                    " " STR_J "<max_jerk>", " " STR_K "<max_jerk>")
+#endif
+                     ")"));
   SERIAL_ECHOLNPGM_P(
-      PSTR("  M205 B"), LINEAR_UNIT(planner.settings.min_segment_time_us)
-    , PSTR(" S"), LINEAR_UNIT(planner.settings.min_feedrate_mm_s)
-    , SP_T_STR, LINEAR_UNIT(planner.settings.min_travel_feedrate_mm_s)
+    PSTR("  M205 B"), LINEAR_UNIT(planner.settings.min_segment_time_us), PSTR(" S"),
+    LINEAR_UNIT(planner.settings.min_feedrate_mm_s), SP_T_STR, LINEAR_UNIT(planner.settings.min_travel_feedrate_mm_s)
     #if HAS_JUNCTION_DEVIATION
-      , PSTR(" J"), LINEAR_UNIT(planner.junction_deviation_mm)
+                                                                 ,
+    PSTR(" J"), LINEAR_UNIT(planner.junction_deviation_mm)
     #endif
     #if HAS_CLASSIC_JERK
-      , LIST_N(DOUBLE(LINEAR_AXES),
-        SP_X_STR, LINEAR_UNIT(planner.max_jerk.x),
-        SP_Y_STR, LINEAR_UNIT(planner.max_jerk.y),
-        SP_Z_STR, LINEAR_UNIT(planner.max_jerk.z),
-        SP_I_STR, LINEAR_UNIT(planner.max_jerk.i),
-        SP_J_STR, LINEAR_UNIT(planner.max_jerk.j),
-        SP_K_STR, LINEAR_UNIT(planner.max_jerk.k)
-      )
-      #if HAS_CLASSIC_E_JERK
-        , SP_E_STR, LINEAR_UNIT(planner.max_jerk.e)
-      #endif
+                  ,
+    LIST_N(DOUBLE(LINEAR_AXES), SP_X_STR, LINEAR_UNIT(planner.max_jerk.x), SP_Y_STR, LINEAR_UNIT(planner.max_jerk.y),
+           SP_Z_STR, LINEAR_UNIT(planner.max_jerk.z), SP_I_STR, LINEAR_UNIT(planner.max_jerk.i), SP_J_STR,
+           LINEAR_UNIT(planner.max_jerk.j), SP_K_STR, LINEAR_UNIT(planner.max_jerk.k))
     #endif
   );
 }

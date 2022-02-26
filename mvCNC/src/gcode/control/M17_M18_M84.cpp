@@ -17,17 +17,6 @@
 
 inline axis_flags_t selected_axis_bits() {
   axis_flags_t selected{0};
-  #if HAS_EXTRUDERS
-    if (parser.seen('E')) {
-      if (E_TERN0(parser.has_value())) {
-        const uint8_t e = parser.value_int();
-        if (e < EXTRUDERS)
-          selected.bits = _BV(INDEX_OF_AXIS(E_AXIS, e));
-      }
-      else
-        selected.bits = selected.e_bits();
-    }
-  #endif
   selected.bits |= LINEAR_AXIS_GANG(
       (parser.seen_test('X')        << X_AXIS),
     | (parser.seen_test('Y')        << Y_AXIS),
@@ -58,24 +47,9 @@ void do_enable(const axis_flags_t to_enable) {
       also_enabled |= enable_overlap[a];
     }
   }
-  #if HAS_EXTRUDERS
-    LOOP_L_N(e, EXTRUDERS) {
-      const uint8_t a = INDEX_OF_AXIS(E_AXIS, e);
-      if (TEST(shall_enable, a)) {
-        stepper.ENABLE_EXTRUDER(e);
-        DEBUG_ECHOLNPGM("Enabled E", AS_DIGIT(e), " (", a, ") with overlap ", hex_word(enable_overlap[a]), " ... ", hex_word(stepper.axis_enabled.bits));
-        also_enabled |= enable_overlap[a];
-      }
-    }
-  #endif
-
   if ((also_enabled &= ~(shall_enable | was_enabled))) {
     SERIAL_CHAR('(');
     LOOP_LINEAR_AXES(a) if (TEST(also_enabled, a)) SERIAL_CHAR(axis_codes[a], ' ');
-    #if HAS_EXTRUDERS
-      #define _EN_ALSO(N) if (TEST(also_enabled, INDEX_OF_AXIS(E_AXIS, N))) SERIAL_CHAR('E', '0' + N, ' ');
-      REPEAT(EXTRUDERS, _EN_ALSO)
-    #endif
     SERIAL_ECHOLNPGM("also enabled)");
   }
 
@@ -97,16 +71,6 @@ void GcodeSuite::M17() {
     if (any_enable_overlap())
       do_enable(selected_axis_bits());
     else {
-      #if HAS_EXTRUDERS
-        if (parser.seen('E')) {
-          if (parser.has_value()) {
-            const uint8_t e = parser.value_int();
-            if (e < EXTRUDERS) stepper.ENABLE_EXTRUDER(e);
-          }
-          else
-            stepper.enable_e_steppers();
-        }
-      #endif
       LINEAR_AXIS_CODE(
         if (parser.seen_test('X'))        stepper.enable_axis(X_AXIS),
         if (parser.seen_test('Y'))        stepper.enable_axis(Y_AXIS),
@@ -142,29 +106,9 @@ void try_to_disable(const axis_flags_t to_disable) {
         DEBUG_ECHOPGM("OVERLAP");
       DEBUG_ECHOLNPGM(" ... still_enabled=", hex_word(still_enabled));
     }
-  #if HAS_EXTRUDERS
-    LOOP_L_N(e, EXTRUDERS) {
-      const uint8_t a = INDEX_OF_AXIS(E_AXIS, e);
-      if (TEST(to_disable.bits, a)) {
-        DEBUG_ECHOPGM("Try to disable E", AS_DIGIT(e), " (", a, ") with overlap ", hex_word(enable_overlap[a]), " ... ");
-        if (stepper.DISABLE_EXTRUDER(e)) {
-          DEBUG_ECHOPGM("OK");
-          still_enabled &= ~(_BV(a) | enable_overlap[a]);
-        }
-        else
-          DEBUG_ECHOPGM("OVERLAP");
-        DEBUG_ECHOLNPGM(" ... still_enabled=", hex_word(still_enabled));
-      }
-    }
-  #endif
-
   auto overlap_warning = [](const ena_mask_t axis_bits) {
     SERIAL_ECHOPGM(" not disabled. Shared with");
     LOOP_LINEAR_AXES(a) if (TEST(axis_bits, a)) SERIAL_CHAR(' ', axis_codes[a]);
-    #if HAS_EXTRUDERS
-      #define _EN_STILLON(N) if (TEST(axis_bits, INDEX_OF_AXIS(E_AXIS, N))) SERIAL_CHAR(' ', 'E', '0' + N);
-      REPEAT(EXTRUDERS, _EN_STILLON)
-    #endif
     SERIAL_ECHOLNPGM(".");
   };
 
@@ -175,16 +119,6 @@ void try_to_disable(const axis_flags_t to_disable) {
       overlap_warning(stepper.axis_enabled.bits & enable_overlap[a]);
     }
   }
-  #if HAS_EXTRUDERS
-    LOOP_L_N(e, EXTRUDERS) {
-      const uint8_t a = INDEX_OF_AXIS(E_AXIS, e);
-      if (TEST(still_enabled, a)) {
-        SERIAL_CHAR('E', '0' + e);
-        overlap_warning(stepper.axis_enabled.bits & enable_overlap[a]);
-      }
-    }
-  #endif
-
   DEBUG_ECHOLNPGM("Enabled Now: ", hex_word(stepper.axis_enabled.bits));
 }
 
@@ -203,14 +137,6 @@ void GcodeSuite::M18_M84() {
       if (any_enable_overlap())
         try_to_disable(selected_axis_bits());
       else {
-        #if HAS_EXTRUDERS
-          if (parser.seen('E')) {
-            if (E_TERN0(parser.has_value()))
-              stepper.DISABLE_EXTRUDER(parser.value_int());
-            else
-              stepper.disable_e_steppers();
-          }
-        #endif
         LINEAR_AXIS_CODE(
           if (parser.seen_test('X'))        stepper.disable_axis(X_AXIS),
           if (parser.seen_test('Y'))        stepper.disable_axis(Y_AXIS),

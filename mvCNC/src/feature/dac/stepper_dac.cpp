@@ -74,9 +74,6 @@ void StepperDAC::print_values() {
   #if HAS_Z_AXIS
     SERIAL_ECHOPGM_P(SP_Z_LBL, dac_perc(Z_AXIS), PSTR(" ("), dac_amps(Z_AXIS), PSTR(")"));
   #endif
-  #if HAS_EXTRUDERS
-    SERIAL_ECHOLNPGM_P(SP_E_LBL, dac_perc(E_AXIS), PSTR(" ("), dac_amps(E_AXIS), PSTR(")"));
-  #endif
 }
 
 void StepperDAC::commit_eeprom() {

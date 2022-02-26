@@ -4421,10 +4421,6 @@ void CrealityDWINClass::CNC_Screen_Control() {
                 cmnd[sprintf_P(cmnd, PSTR("M140 S%i"), pausebed)] = '\0';
                 gcode.process_subcommands_now(cmnd);
               #endif
-              #if HAS_EXTRUDERS
-                cmnd[sprintf_P(cmnd, PSTR("M109 S%i"), pausetemp)] = '\0';
-                gcode.process_subcommands_now(cmnd);
-              #endif
               TERN_(HAS_FAN, thermalManager.fan_speed[0] = pausefan);
               planner.synchronize();
               TERN_(SDSUPPORT, queue.inject(F("M24")));

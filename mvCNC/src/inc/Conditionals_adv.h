@@ -61,7 +61,6 @@
   #define SERVO_DELAY { 50 }
 #endif
 
-#if !HAS_EXTRUDERS
   #undef USE_VOLUMETRICS
   #undef TEMP_SENSOR_0
   #undef TEMP_SENSOR_1
@@ -92,7 +91,6 @@
   #undef LCD_SHOW_E_TOTAL
   #undef MANUAL_E_MOVES_RELATIVE
   #undef STEALTHCHOP_E
-#endif
 
 /**
  * Temperature Sensors; define what sensor(s) we have.
@@ -513,29 +511,12 @@
   #endif
 #endif
 
-#if ENABLED(MIXING_EXTRUDER) && (ENABLED(RETRACT_SYNC_MIXING) || BOTH(FILAMENT_LOAD_UNLOAD_GCODES, FILAMENT_UNLOAD_ALL_EXTRUDERS))
-  #define HAS_MIXER_SYNC_CHANNEL 1
-#endif
-
 #if EITHER(DUAL_X_CARRIAGE, MULTI_NOZZLE_DUPLICATION)
   #define HAS_DUPLICATION_MODE 1
 #endif
 
 #if ENABLED(JOBCOUNTER) && (SERVICE_INTERVAL_1 > 0 || SERVICE_INTERVAL_2 > 0 || SERVICE_INTERVAL_3 > 0)
   #define HAS_SERVICE_INTERVALS 1
-#endif
-
-#if ENABLED(FILAMENT_RUNOUT_SENSOR)
-  #define HAS_FILAMENT_SENSOR 1
-  #if NUM_RUNOUT_SENSORS > 1
-    #define MULTI_FILAMENT_SENSOR 1
-  #endif
-  #ifdef FILAMENT_RUNOUT_DISTANCE_MM
-    #define HAS_FILAMENT_RUNOUT_DISTANCE 1
-  #endif
-  #if ENABLED(MIXING_EXTRUDER)
-    #define WATCH_ALL_RUNOUT_SENSORS
-  #endif
 #endif
 
 // Probe Temperature Compensation
@@ -545,9 +526,7 @@
 #if !TEMP_SENSOR_BED
   #undef PTC_BED
 #endif
-#if !HAS_EXTRUDERS
   #undef PTC_HOTEND
-#endif
 #if ANY(PTC_PROBE, PTC_BED, PTC_HOTEND)
   #define HAS_PTC 1
 #endif
@@ -584,7 +563,7 @@
   #endif
 #endif
 
-#if ANY(FWRETRACT, HAS_LEVELING, SKEW_CORRECTION)
+#if ENABLED(SKEW_CORRECTION)
   #define HAS_POSITION_MODIFIERS 1
 #endif
 
@@ -702,22 +681,6 @@
   #endif
   #ifndef SHUTDOWN_ACTION
     #define SHUTDOWN_ACTION   "shutdown"
-  #endif
-  #if HAS_FILAMENT_SENSOR
-    #ifndef ACTION_ON_FILAMENT_RUNOUT
-      #define ACTION_ON_FILAMENT_RUNOUT "filament_runout"
-    #endif
-    #ifndef ACTION_REASON_ON_FILAMENT_RUNOUT
-      #define ACTION_REASON_ON_FILAMENT_RUNOUT "filament_runout"
-    #endif
-  #endif
-  #if ENABLED(G29_RETRY_AND_RECOVER)
-    #ifndef ACTION_ON_G29_RECOVER
-      #define ACTION_ON_G29_RECOVER "probe_rewipe"
-    #endif
-    #ifndef ACTION_ON_G29_FAILURE
-      #define ACTION_ON_G29_FAILURE "probe_failed"
-    #endif
   #endif
 #endif
 

@@ -36,15 +36,9 @@ struct IF<true, L, R> { typedef L type; };
 
 #define LOGICAL_AXES_STRING LOGICAL_AXIS_GANG("E", "X", "Y", "Z", STR_I, STR_J, STR_K)
 
-#if HAS_EXTRUDERS
-  #define LIST_ITEM_E(N) , N
-  #define CODE_ITEM_E(N) ; N
-  #define GANG_ITEM_E(N) N
-#else
   #define LIST_ITEM_E(N)
   #define CODE_ITEM_E(N)
-  #define GANG_ITEM_E(N)
-#endif
+#define GANG_ITEM_E(N)
 
 #define AXIS_COLLISION(L) (AXIS4_NAME == L || AXIS5_NAME == L || AXIS6_NAME == L)
 
@@ -68,27 +62,28 @@ enum AxisEnum : uint8_t {
   // Core also keeps toolhead directions
   #if ANY(IS_CORE, MARKFORGED_XY, MARKFORGED_YX)
     , X_HEAD, Y_HEAD, Z_HEAD
-  #endif
+#endif
 
   // Distinct axes, including all E and Core
-  , NUM_AXIS_ENUMS
+  ,
+  NUM_AXIS_ENUMS
 
-  // Most of the time we refer only to the single E_AXIS
-  #if HAS_EXTRUDERS
-    , E_AXIS = E0_AXIS
-  #endif
+    // A, B, and C are for DELTA, SCARA, etc.
+    ,
+  A_AXIS = X_AXIS
+#if HAS_Y_AXIS
+    ,
+  B_AXIS = Y_AXIS
+#endif
+#if HAS_Z_AXIS
+    ,
+  C_AXIS = Z_AXIS
+#endif
 
-  // A, B, and C are for DELTA, SCARA, etc.
-  , A_AXIS = X_AXIS
-  #if HAS_Y_AXIS
-    , B_AXIS = Y_AXIS
-  #endif
-  #if HAS_Z_AXIS
-    , C_AXIS = Z_AXIS
-  #endif
-
-  // To refer to all or none
-  , ALL_AXES_ENUM = 0xFE, NO_AXIS_ENUM = 0xFF
+    // To refer to all or none
+    ,
+  ALL_AXES_ENUM = 0xFE,
+  NO_AXIS_ENUM  = 0xFF
 };
 
 typedef IF<(NUM_AXIS_ENUMS > 8), uint16_t, uint8_t>::type axis_bits_t;
