@@ -149,7 +149,6 @@
 #endif
 
 // Macros to chain up to 40 conditions
-#define _DO_0(W, C, A)     (_##W##_1(A)) // Not actually called. Just defined to avoid code check errors
 #define _DO_1(W,C,A)       (_##W##_1(A))
 #define _DO_2(W,C,A,B)     (_##W##_1(A) C _##W##_1(B))
 #define _DO_3(W,C,A,V...)  (_##W##_1(A) C _DO_2(W,C,V))
@@ -386,6 +385,14 @@
 #define _TWO_ARGS(_,n,m,l,k,j,i,h,g,f,e,d,c,b,a,Z,Y,X,W,V,U,T,S,R,Q,P,O,N,M,L,K,J,I,H,G,F,E,D,C,B,A,OUT,...) OUT
 #define TWO_ARGS(V...) _TWO_ARGS(0,V,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,1,0)
 
+// Defer expansion
+#define EMPTY()
+#define DEFER(M)  M EMPTY()
+#define DEFER2(M) M EMPTY EMPTY()()
+#define DEFER3(M) M EMPTY EMPTY EMPTY()()()
+#define DEFER4(M) M EMPTY EMPTY EMPTY EMPTY()()()()
+
+
 #ifdef __cplusplus
 
   #ifndef _MINMAX_H_
@@ -495,6 +502,13 @@
   }
 
 #else
+  // Defer expansion
+  #define EMPTY()
+  #define DEFER(M)  M EMPTY()
+  #define DEFER2(M) M EMPTY EMPTY()()
+  #define DEFER3(M) M EMPTY EMPTY EMPTY()()()
+  #define DEFER4(M) M EMPTY EMPTY EMPTY EMPTY()()()()
+
 
   #define __MIN_N(N,V...) MIN_##N(V)
   #define _MIN_N(N,V...)  __MIN_N(N,V)

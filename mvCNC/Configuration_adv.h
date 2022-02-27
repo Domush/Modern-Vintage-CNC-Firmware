@@ -3044,7 +3044,7 @@
 #define PINS_DEBUGGING
 
 // Enable mvCNC dev mode which adds some special commands
-//#define MVCNC_DEV_MODE
+#define MVCNC_DEV_MODE
 
 #if ENABLED(MVCNC_DEV_MODE)
 /**
