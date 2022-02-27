@@ -28,7 +28,7 @@ class Joystick {
       static void report();
     #endif
     static void calculate(xyz_float_t &norm_jog);
-    static void inject_jog_moves();
+    static void injectJogMoves();
 };
 
 extern Joystick joystick;

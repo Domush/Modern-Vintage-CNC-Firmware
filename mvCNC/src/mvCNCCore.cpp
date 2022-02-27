@@ -99,14 +99,13 @@
   #include "feature/leds/leds.h"
 #endif
 
-#if ENABLED(POLL_JOG)
   #if ENABLED(JOYSTICK)
     #include "feature/joystick.h"
   #endif
+
   #if ENABLED(WII_NUNCHUCK_JOGGING)
     #include "feature/wii_i2c.h"
   #endif
-#endif
 
 #if HAS_SERVOS
   #include "module/servo.h"
@@ -732,14 +731,12 @@ void idle(bool no_stepper_sleep/*=false*/) {
   #endif
 
   // Handle Joystick jogging
-  #if BOTH(POLL_JOG, JOYSTICK)
-    joystick.inject_jog_moves();
+  TERN_(JOYSTICK, joystick.injectJogMoves());
+    joystick.injectJogMoves();
   #endif
 
   // Handle Wii Nunchuck jogging
-  #if BOTH(POLL_JOG, WII_NUNCHUCK_JOGGING)
-    wii.inject_jog_moves();
-  #endif
+  TERN_(WII_NUNCHUCK_JOGGING, wii.injectJogMoves());
 
   // Direct Stepping
   TERN_(DIRECT_STEPPING, page_manager.write_responses());

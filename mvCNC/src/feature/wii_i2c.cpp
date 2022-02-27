@@ -127,8 +127,6 @@ void WiiNunchuck::calculate(xyz_float_t &joy_value_normalized) {
   }
 }
 
-  #if ENABLED(POLL_JOG)
-
 void WiiNunchuck::injectJogMoves() {
   // Do nothing if enable pin (active-low) is not LOW
   #if HAS_WII_EN
@@ -233,6 +231,5 @@ void WiiNunchuck::report() {
     SERIAL_ECHOLN(buffer);
   }
 }
-  #endif
 
 #endif  // WII_NUNCHUCK

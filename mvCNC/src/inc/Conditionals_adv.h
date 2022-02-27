@@ -757,11 +757,6 @@
   #define TOUCH_UI_ULTIPANEL 1
 #endif
 
-// Poll-based jogging for joystick and other devices
-#if EITHER(JOYSTICK, WII_NUNCHUCK_JOGGING)
-  #define POLL_JOG
-#endif
-
 #if X2_HOME_DIR > 0
   #define X2_HOME_TO_MAX 1
 #elif X2_HOME_DIR < 0
