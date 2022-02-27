@@ -74,14 +74,14 @@ void Temperature::lcd_preheat(const uint8_t e, const int8_t indh, const int8_t i
       ACTION_ITEM_N_S(E, ui.get_preheat_label(M), MSG_PREHEAT_M_END_E, []{ _preheat_end(M, MenuItemBase::itemIndex); }); \
     }while(0)
 
-  #elif HAS_MULTI_HOTEND
+  #elif TOOL_CHANGE_SUPPORT
 
     // No heated bed, so just indexed "Preheat ABC" items
     #define PREHEAT_ITEMS(M,E) ACTION_ITEM_N_S(E, ui.get_preheat_label(M), MSG_PREHEAT_M_H, []{ _preheat_end(M, MenuItemBase::itemIndex); })
 
   #endif
 
-  #if HAS_MULTI_HOTEND || HAS_HEATED_BED
+  #if TOOL_CHANGE_SUPPORT || HAS_HEATED_BED
 
     // Set editable.int8 to the Material index before entering this menu
     // because MenuItemBase::itemIndex will be re-used by PREHEAT_ITEMS
@@ -100,7 +100,7 @@ void Temperature::lcd_preheat(const uint8_t e, const int8_t indh, const int8_t i
           ACTION_ITEM_S(ui.get_preheat_label(m), MSG_PREHEAT_M, do_preheat_end_m);
         #endif
 
-      #elif HAS_MULTI_HOTEND
+      #elif TOOL_CHANGE_SUPPORT
 
         HOTEND_LOOP() PREHEAT_ITEMS(editable.int8, e);
         ACTION_ITEM_S(ui.get_preheat_label(m), MSG_PREHEAT_M_ALL, []() {
@@ -118,7 +118,7 @@ void Temperature::lcd_preheat(const uint8_t e, const int8_t indh, const int8_t i
       END_MENU();
     }
 
-  #endif // HAS_MULTI_HOTEND || HAS_HEATED_BED
+  #endif // TOOL_CHANGE_SUPPORT || HAS_HEATED_BED
 
 #endif // HAS_PREHEAT
 
@@ -153,7 +153,7 @@ void menu_temperature() {
   #if HOTENDS == 1
     editable.celsius = thermalManager.temp_hotend[0].target;
     EDIT_ITEM_FAST(int3, MSG_NOZZLE, &editable.celsius, 0, thermalManager.hotend_max_target(0), []{ thermalManager.setTargetHotend(editable.celsius, 0); });
-  #elif HAS_MULTI_HOTEND
+  #elif TOOL_CHANGE_SUPPORT
     HOTEND_LOOP() {
       editable.celsius = thermalManager.temp_hotend[e].target;
       EDIT_ITEM_FAST_N(int3, e, MSG_NOZZLE_N, &editable.celsius, 0, thermalManager.hotend_max_target(e), []{ thermalManager.setTargetHotend(editable.celsius, MenuItemBase::itemIndex); });
@@ -250,7 +250,7 @@ void menu_temperature() {
     //
     LOOP_L_N(m, PREHEAT_COUNT) {
       editable.int8 = m;
-      #if HAS_MULTI_HOTEND || HAS_HEATED_BED
+      #if TOOL_CHANGE_SUPPORT || HAS_HEATED_BED
         SUBMENU_S(ui.get_preheat_label(m), MSG_PREHEAT_M, menu_preheat_m);
       #elif HAS_HOTEND
         ACTION_ITEM_S(ui.get_preheat_label(m), MSG_PREHEAT_M, do_preheat_end_m);
@@ -277,7 +277,7 @@ void menu_temperature() {
 
     LOOP_L_N(m, PREHEAT_COUNT) {
       editable.int8 = m;
-      #if HAS_MULTI_HOTEND || HAS_HEATED_BED
+      #if TOOL_CHANGE_SUPPORT || HAS_HEATED_BED
         SUBMENU_S(ui.get_preheat_label(m), MSG_PREHEAT_M, menu_preheat_m);
       #else
         ACTION_ITEM_S(ui.get_preheat_label(m), MSG_PREHEAT_M, do_preheat_end_m);

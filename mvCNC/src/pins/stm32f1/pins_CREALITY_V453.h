@@ -7,7 +7,7 @@
  * Creality v4.5.3 (STM32F103RE / STM32F103RC) board pin assignments
  */
 
-#if HAS_MULTI_HOTEND || E_STEPPERS > 1
+#if TOOL_CHANGE_SUPPORT || E_STEPPERS > 1
   #error "Creality v4.5.3 only supports one hotend / E-stepper. Comment out this line to continue."
 #endif
 

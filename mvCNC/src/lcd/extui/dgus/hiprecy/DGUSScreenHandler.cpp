@@ -57,10 +57,10 @@
 
   void DGUSScreenHandler::DGUSLCD_SD_ResumePauseAbort(DGUS_VP_Variable &var, void *val_ptr) {
 
-    if (!ExtUI::isPrintingFromMedia()) return; // avoid race condition when user stays in this menu and cnc finishes.
+    if (!ExtUI::jobRunningFromMedia()) return; // avoid race condition when user stays in this menu and cnc finishes.
     switch (swap16(*(uint16_t*)val_ptr)) {
       case 0: { // Resume
-        if (ExtUI::isPrintingFromMediaPaused()) {
+        if (ExtUI::jobRunningFromMediaPaused()) {
           ExtUI::resumePrint();
         }
       } break;
@@ -68,7 +68,7 @@
       case 1: // Pause
 
         GotoScreen(MKSLCD_SCREEN_PAUSE);
-        if (!ExtUI::isPrintingFromMediaPaused()) {
+        if (!ExtUI::jobRunningFromMediaPaused()) {
           ExtUI::pausePrint();
           //ExtUI::mks_pausePrint();
         }

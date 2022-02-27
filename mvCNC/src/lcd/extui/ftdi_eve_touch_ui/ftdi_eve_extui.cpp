@@ -35,7 +35,7 @@ namespace ExtUI {
 
   void onMediaRemoved() {
     #if ENABLED(SDSUPPORT)
-      if (isPrintingFromMedia()) {
+      if (jobRunningFromMedia()) {
         stopPrint();
         InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::PRINTING_FAILED);
       }

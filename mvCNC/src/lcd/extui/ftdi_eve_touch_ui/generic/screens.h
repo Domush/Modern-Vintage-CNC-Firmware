@@ -60,7 +60,7 @@ enum {
     STEPPER_CURRENT_SCREEN_CACHE,
     STEPPER_BUMP_SENSITIVITY_SCREEN_CACHE,
   #endif
-  #if HAS_MULTI_HOTEND
+  #if TOOL_CHANGE_SUPPORT
     NOZZLE_OFFSET_SCREEN_CACHE,
   #endif
   #if ENABLED(BACKLASH_GCODE)
@@ -150,7 +150,7 @@ enum {
   #include "stepper_bump_sensitivity_screen.h"
 #endif
 
-#if HAS_MULTI_HOTEND
+#if TOOL_CHANGE_SUPPORT
   #include "nozzle_offsets_screen.h"
 #endif
 

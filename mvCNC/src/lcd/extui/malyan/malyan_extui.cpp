@@ -69,13 +69,13 @@ namespace ExtUI {
       // If there was a print in progress, we need to emit the final
       // print status as {TQ:100}. Reset last percent done so a new print will
       // issue a percent of 0.
-      const uint8_t percent_done = (ExtUI::isPrinting() || ExtUI::isPrintingFromMediaPaused()) ? ExtUI::getProgress_percent() : last_printing_status ? 100 : 0;
+      const uint8_t percent_done = (ExtUI::jobRunning() || ExtUI::jobRunningFromMediaPaused()) ? ExtUI::getProgress_percent() : last_printing_status ? 100 : 0;
       if (percent_done != last_percent_done) {
         char message_buffer[16];
         sprintf_P(message_buffer, PSTR("{TQ:%03i}"), percent_done);
         write_to_lcd(message_buffer);
         last_percent_done = percent_done;
-        last_printing_status = ExtUI::isPrinting();
+        last_printing_status = ExtUI::jobRunning();
       }
     #endif
   }

@@ -980,7 +980,7 @@ void HMI_SDCardUpdate() {
       // clean file icon
       if (checkkey == SelectFile) {
         Redraw_SD_List();
-      } else if (sdprint && card.isPrinting() && jobIsActive()) {
+      } else if (sdprint && card.jobRunning() && jobIsActive()) {
         // TODO: Move card removed abort handling
         //       to CardReader::manage_media.
         card.abortFilePrintSoon();
@@ -1505,7 +1505,7 @@ void EachMomentUpdate() {
 
     duration_t elapsed = print_job_timer.duration(); // print timer
 
-    if (sdprint && card.isPrinting()) {
+    if (sdprint && card.jobRunning()) {
       uint8_t percentDone = card.percentDone();
       static uint8_t last_percentValue = 101;
       if (last_percentValue != percentDone) { // print percent
@@ -1776,7 +1776,7 @@ void DWIN_Startup() {
 
 // Started a CNC Job
 void DWIN_Print_Started(const bool sd) {
-  sdprint = card.isPrinting() || sd;
+  sdprint = card.jobRunning() || sd;
   _percent_done = 0;
   _remain_time = 0;
   HMI_flag.print_finish = false;

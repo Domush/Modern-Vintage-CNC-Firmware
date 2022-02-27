@@ -37,7 +37,7 @@ void AdvancedSettingsMenu::onRedraw(draw_mode_t what) {
   }
 
     #if ENABLED(TOUCH_UI_PORTRAIT)
-      #if EITHER(HAS_MULTI_HOTEND, SENSORLESS_HOMING)
+      #if EITHER(TOOL_CHANGE_SUPPORT, SENSORLESS_HOMING)
         #define GRID_ROWS 9
       #else
         #define GRID_ROWS 8
@@ -58,7 +58,7 @@ void AdvancedSettingsMenu::onRedraw(draw_mode_t what) {
       #define BACKLASH_POS            BTN_POS(2,7), BTN_SIZE(1,1)
       #define OFFSETS_POS             BTN_POS(1,8), BTN_SIZE(1,1)
       #define TMC_HOMING_THRS_POS     BTN_POS(2,8), BTN_SIZE(1,1)
-      #if EITHER(HAS_MULTI_HOTEND, SENSORLESS_HOMING)
+      #if EITHER(TOOL_CHANGE_SUPPORT, SENSORLESS_HOMING)
         #define BACK_POS              BTN_POS(1,9), BTN_SIZE(2,1)
       #else
         #define BACK_POS              BTN_POS(1,8), BTN_SIZE(2,1)
@@ -97,7 +97,7 @@ void AdvancedSettingsMenu::onRedraw(draw_mode_t what) {
       .tag(13).button(TMC_CURRENT_POS,        GET_TEXT_F(MSG_TMC_CURRENT))
       .enabled(ENABLED(SENSORLESS_HOMING))
       .tag(14).button(TMC_HOMING_THRS_POS,    GET_TEXT_F(MSG_TMC_HOMING_THRS))
-      .enabled(ENABLED(HAS_MULTI_HOTEND))
+      .enabled(ENABLED(TOOL_CHANGE_SUPPORT))
       .tag(4) .button(OFFSETS_POS,            GET_TEXT_F(MSG_OFFSETS_MENU))
       .enabled(EITHER(LIN_ADVANCE, FILAMENT_RUNOUT_SENSOR))
       .tag(11).button(FILAMENT_POS,           GET_TEXT_F(MSG_FILAMENT))
@@ -122,7 +122,7 @@ bool AdvancedSettingsMenu::onTouchEnd(uint8_t tag) {
     case  2: GOTO_SCREEN(ZOffsetScreen);              break;
     #endif
     case  3: GOTO_SCREEN(StepsScreen);                break;
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
     case  4: GOTO_SCREEN(NozzleOffsetScreen);         break;
     #endif
     case  5: GOTO_SCREEN(MaxVelocityScreen);          break;

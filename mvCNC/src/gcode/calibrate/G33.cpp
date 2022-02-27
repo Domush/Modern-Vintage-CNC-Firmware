@@ -17,7 +17,7 @@
   #include "../../module/probe.h"
 #endif
 
-#if HAS_MULTI_HOTEND
+#if TOOL_CHANGE_SUPPORT
   #include "../../module/tool_change.h"
 #endif
 
@@ -45,7 +45,7 @@ enum CalEnum : char {                        // the 7 main calibration points - 
 #define LOOP_CAL_RAD(VAR) LOOP_CAL_PT(VAR, __A, _7P_STEP)
 #define LOOP_CAL_ACT(VAR, _4P, _OP) LOOP_CAL_PT(VAR, _OP ? _AB : __A, _4P ? _4P_STEP : _7P_STEP)
 
-#if HAS_MULTI_HOTEND
+#if TOOL_CHANGE_SUPPORT
   const uint8_t old_tool_index = active_extruder;
 #endif
 
@@ -60,7 +60,7 @@ void ac_home() {
 }
 
 void ac_setup(const bool reset_bed) {
-  TERN_(HAS_MULTI_HOTEND, tool_change(0, true));
+  TERN_(TOOL_CHANGE_SUPPORT, tool_change(0, true));
 
   planner.synchronize();
   remember_feedrate_scaling_off();
@@ -70,11 +70,11 @@ void ac_setup(const bool reset_bed) {
   #endif
 }
 
-void ac_cleanup(TERN_(HAS_MULTI_HOTEND, const uint8_t old_tool_index)) {
+void ac_cleanup(TERN_(TOOL_CHANGE_SUPPORT, const uint8_t old_tool_index)) {
   TERN_(DELTA_HOME_TO_SAFE_ZONE, do_blocking_move_to_z(delta_clip_start_height));
   TERN_(HAS_BED_PROBE, probe.stow());
   restore_feedrate_and_scaling();
-  TERN_(HAS_MULTI_HOTEND, tool_change(old_tool_index, true));
+  TERN_(TOOL_CHANGE_SUPPORT, tool_change(old_tool_index, true));
 }
 
 void print_signed_float(FSTR_P const prefix, const_float_t f) {
@@ -469,7 +469,7 @@ void GcodeSuite::G33() {
     zero_std_dev_old = zero_std_dev;
     if (!probe_calibration_points(z_at_pt, probe_points, dcr, towers_set, stow_after_each, probe_at_offset)) {
       SERIAL_ECHOLNPGM("Correct delta settings with M665 and M666");
-      return ac_cleanup(TERN_(HAS_MULTI_HOTEND, old_tool_index));
+      return ac_cleanup(TERN_(TOOL_CHANGE_SUPPORT, old_tool_index));
     }
     zero_std_dev = std_dev_points(z_at_pt, _0p_calibration, _1p_calibration, _4p_calibration, _4p_opposite_points);
 
@@ -640,7 +640,7 @@ void GcodeSuite::G33() {
   }
   while (((zero_std_dev < test_precision && iterations < 31) || iterations <= force_iterations) && zero_std_dev > calibration_precision);
 
-  ac_cleanup(TERN_(HAS_MULTI_HOTEND, old_tool_index));
+  ac_cleanup(TERN_(TOOL_CHANGE_SUPPORT, old_tool_index));
 
   TERN_(REPORT_STATUS_TO_HOST, set_and_report_grblstate(M_IDLE));
 }

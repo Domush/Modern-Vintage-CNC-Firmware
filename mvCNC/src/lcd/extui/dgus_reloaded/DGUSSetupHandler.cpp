@@ -31,7 +31,7 @@
 #endif
 
 bool DGUSSetupHandler::CNCStatus() {
-  if (ExtUI::isPrinting() || ExtUI::isPrintingPaused()) {
+  if (ExtUI::jobRunning() || ExtUI::jobRunningPaused()) {
     return true;
   }
 
@@ -40,7 +40,7 @@ bool DGUSSetupHandler::CNCStatus() {
 }
 
 bool DGUSSetupHandler::CNCAdjust() {
-  if (ExtUI::isPrinting() || ExtUI::isPrintingPaused()) {
+  if (ExtUI::jobRunning() || ExtUI::jobRunningPaused()) {
     return true;
   }
 

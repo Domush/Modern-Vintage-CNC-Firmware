@@ -198,7 +198,7 @@ void DGUSTxHandler::Percent(DGUS_VP &vp) {
 void DGUSTxHandler::StatusIcons(DGUS_VP &vp) {
   uint16_t icons = 0;
 
-  if (ExtUI::isPrinting()) {
+  if (ExtUI::jobRunning()) {
     icons |= (uint16_t)DGUS_Data::StatusIcon::PAUSE;
 
     dgus_display.EnableControl(DGUS_Screen::PRINT_STATUS,
@@ -211,7 +211,7 @@ void DGUSTxHandler::StatusIcons(DGUS_VP &vp) {
                                 DGUS_Control::PAUSE);
   }
 
-  if (ExtUI::isPrintingPaused()) {
+  if (ExtUI::jobRunningPaused()) {
     icons |= (uint16_t)DGUS_Data::StatusIcon::RESUME;
 
     dgus_display.EnableControl(DGUS_Screen::PRINT_STATUS,
@@ -259,7 +259,7 @@ void DGUSTxHandler::TempMax(DGUS_VP &vp) {
     case DGUS_Addr::TEMP_Max_H0:
       temp = HEATER_0_MAXTEMP - HOTEND_OVERSHOOT;
       break;
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       case DGUS_Addr::TEMP_Max_H1:
         temp = HEATER_1_MAXTEMP - HOTEND_OVERSHOOT;
         break;
@@ -412,7 +412,7 @@ void DGUSTxHandler::PIDKp(DGUS_VP &vp) {
       case DGUS_Data::Heater::H0:
         value = ExtUI::getPIDValues_Kp(ExtUI::E0);
         break;
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         case DGUS_Data::Heater::H1:
           value = ExtUI::getPIDValues_Kp(ExtUI::E1);
           break;
@@ -438,7 +438,7 @@ void DGUSTxHandler::PIDKi(DGUS_VP &vp) {
       case DGUS_Data::Heater::H0:
         value = ExtUI::getPIDValues_Ki(ExtUI::E0);
         break;
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         case DGUS_Data::Heater::H1:
           value = ExtUI::getPIDValues_Ki(ExtUI::E1);
           break;
@@ -464,7 +464,7 @@ void DGUSTxHandler::PIDKd(DGUS_VP &vp) {
       case DGUS_Data::Heater::H0:
         value = ExtUI::getPIDValues_Kd(ExtUI::E0);
         break;
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         case DGUS_Data::Heater::H1:
           value = ExtUI::getPIDValues_Kd(ExtUI::E1);
           break;
@@ -535,7 +535,7 @@ void DGUSTxHandler::FilamentUsed(DGUS_VP &vp) {
 void DGUSTxHandler::WaitIcons(DGUS_VP &vp) {
   uint16_t icons = 0;
 
-  if (ExtUI::isPrintingPaused()) {
+  if (ExtUI::jobRunningPaused()) {
     icons |= (uint16_t)DGUS_Data::WaitIcon::ABORT;
 
     dgus_display.EnableControl(DGUS_Screen::WAIT,

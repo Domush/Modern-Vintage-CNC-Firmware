@@ -57,10 +57,10 @@
 
   void DGUSScreenHandler::DGUSLCD_SD_ResumePauseAbort(DGUS_VP_Variable &var, void *val_ptr) {
 
-    if (!ExtUI::isPrintingFromMedia()) return; // avoid race condition when user stays in this menu and cnc finishes.
+    if (!ExtUI::jobRunningFromMedia()) return; // avoid race condition when user stays in this menu and cnc finishes.
     switch (swap16(*(uint16_t*)val_ptr)) {
       case 0: { // Resume
-        if (ExtUI::isPrintingFromMediaPaused()) {
+        if (ExtUI::jobRunningFromMediaPaused()) {
           ExtUI::resumePrint();
         }
       } break;
@@ -68,7 +68,7 @@
       case 1: // Pause
 
         GotoScreen(DGUSLCD_SCREEN_SDPRINTMANIPULATION);
-        if (!ExtUI::isPrintingFromMediaPaused()) {
+        if (!ExtUI::jobRunningFromMediaPaused()) {
           ExtUI::pausePrint();
           //ExtUI::mks_pausePrint();
         }
@@ -238,7 +238,7 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
           case VP_E0_PID_I: newvalue = scalePID_i(value); break;
           case VP_E0_PID_D: newvalue = scalePID_d(value); break;
         #endif
-        #if HAS_MULTI_HOTEND
+        #if TOOL_CHANGE_SUPPORT
           case VP_E1_PID_P: newvalue = value; break;
           case VP_E1_PID_I: newvalue = scalePID_i(value); break;
           case VP_E1_PID_D: newvalue = scalePID_d(value); break;
@@ -316,7 +316,7 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
       #if HAS_HOTEND
         thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
       #endif
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E1);
       #endif
       GotoScreen(DGUSLCD_SCREEN_UTILITY);

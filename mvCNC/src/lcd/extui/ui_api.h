@@ -340,10 +340,10 @@ namespace ExtUI {
    * Should be used by the EXTENSIBLE_UI to operate on files
    */
   bool isMediaInserted();
-  bool isPrintingFromMediaPaused();
-  bool isPrintingFromMedia();
-  bool isPrinting();
-  bool isPrintingPaused();
+  bool jobRunningFromMediaPaused();
+  bool jobRunningFromMedia();
+  bool jobRunning();
+  bool jobRunningPaused();
 
   void printFile(const char *filename);
   void stopPrint();

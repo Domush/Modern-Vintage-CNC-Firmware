@@ -171,7 +171,7 @@ void ChironTFT::FilamentRunout()  {
   #endif
   // 1 Signal filament out
   last_error = AC_error_filament_runout;
-  SendtoTFTLN(isPrintingFromMedia() ? AC_msg_filament_out_alert : AC_msg_filament_out_block);
+  SendtoTFTLN(jobRunningFromMedia() ? AC_msg_filament_out_alert : AC_msg_filament_out_block);
   PlayTune(BEEPER_PIN, FilamentOut, 1);
 }
 
@@ -529,7 +529,7 @@ void ChironTFT::PanelInfo(uint8_t req) {
       break;
 
     case 6:   // A6 Get printing progress
-      if (isPrintingFromMedia()) {
+      if (jobRunningFromMedia()) {
         SendtoTFT(F("A6V "));
         TFTSer.println(ui8tostr2(getProgress_percent()));
       }
@@ -568,7 +568,7 @@ void ChironTFT::PanelInfo(uint8_t req) {
 void ChironTFT::PanelAction(uint8_t req) {
   switch (req) {
     case  9:   // A9 Pause SD print
-      if (isPrintingFromMedia()) {
+      if (jobRunningFromMedia()) {
         SendtoTFTLN(AC_msg_pause);
         pausePrint();
         cnc_state = AC_cnc_pausing;
@@ -585,7 +585,7 @@ void ChironTFT::PanelAction(uint8_t req) {
       break;
 
     case 11:   // A11 Stop SD print
-      if (isPrintingFromMedia()) {
+      if (jobRunningFromMedia()) {
         cnc_state = AC_cnc_stopping;
         stopPrint();
       }
@@ -648,7 +648,7 @@ void ChironTFT::PanelAction(uint8_t req) {
       break;
 
     case 19:   // A19 Motors off
-      if (!isPrinting()) {
+      if (!jobRunning()) {
         stepper.disable_all_steppers();
         SendtoTFTLN(AC_msg_ready);
       }
@@ -664,7 +664,7 @@ void ChironTFT::PanelAction(uint8_t req) {
       break;
 
     case 21:   // A21 Home Axis  A21 X
-      if (!isPrinting()) {
+      if (!jobRunning()) {
         switch ((char)panel_command[4]) {
           case 'X': injectCommands(F("G28X")); break;
           case 'Y': injectCommands(F("G28Y")); break;
@@ -682,7 +682,7 @@ void ChironTFT::PanelAction(uint8_t req) {
       // lets just wrap this in a gcode relative nonprint move and let the controller deal with it
       // G91 G0 <panel command> G90
 
-      if (!isPrinting()) { // Ignore request if printing
+      if (!jobRunning()) { // Ignore request if printing
         char MoveCmnd[30];
         sprintf_P(MoveCmnd, PSTR("G91\nG0%s\nG90"), panel_command + 3);
         #if ACDEBUG(AC_ACTION)
@@ -695,7 +695,7 @@ void ChironTFT::PanelAction(uint8_t req) {
 
     case 23:   // A23 Preheat PLA
       // Ignore request if printing
-      if (!isPrinting()) {
+      if (!jobRunning()) {
         // Temps defined in configuration.h
         setTargetTemp_celsius(PREHEAT_1_TEMP_BED, BED);
         setTargetTemp_celsius(PREHEAT_1_TEMP_HOTEND, E0);
@@ -707,7 +707,7 @@ void ChironTFT::PanelAction(uint8_t req) {
 
     case 24:   // A24 Preheat ABS
       // Ignore request if printing
-      if (!isPrinting()) {
+      if (!jobRunning()) {
         setTargetTemp_celsius(PREHEAT_2_TEMP_BED, BED);
         setTargetTemp_celsius(PREHEAT_2_TEMP_HOTEND, E0);
         SendtoTFTLN();
@@ -718,7 +718,7 @@ void ChironTFT::PanelAction(uint8_t req) {
 
     case 25:   // A25 Cool Down
       // Ignore request if printing
-      if (!isPrinting()) {
+      if (!jobRunning()) {
         setTargetTemp_celsius(0, E0);
         setTargetTemp_celsius(0, BED);
         SendtoTFTLN(AC_msg_ready);
@@ -739,7 +739,7 @@ void ChironTFT::PanelAction(uint8_t req) {
 
     case 28:   // A28 Filament set A28 O/C
       // Ignore request if printing
-      if (isPrinting()) break;
+      if (jobRunning()) break;
       SendtoTFTLN();
       break;
   }
@@ -756,7 +756,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
 
       SendtoTFT(F("A29V "));
       TFTSer.println(pos_z * 100);
-      if (!isPrinting()) {
+      if (!jobRunning()) {
         setSoftEndstopState(true);  // disable endstops
         // If the same meshpoint is selected twice in a row, move the head to that ready for adjustment
         if ((selectedmeshpoint.x == pos.x) && (selectedmeshpoint.y == pos.y)) {
@@ -786,7 +786,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
     case 30: {   // A30 Auto leveling
       if (FindToken('S') != -1) { // Start probing New panel adds spaces..
         // Ignore request if printing
-        if (isPrinting())
+        if (jobRunning())
           SendtoTFTLN(AC_msg_probing_not_allowed); // forbid auto leveling
         else {
 
@@ -805,7 +805,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
       // The tokens can occur in different places on the new panel so we need to find it.
 
       if (FindToken('C') != -1) { // Restore and apply original offsets
-        if (!isPrinting()) {
+        if (!jobRunning()) {
           injectCommands(F("M501\nM420 S1"));
           selectedmeshpoint.x = selectedmeshpoint.y = 99;
           SERIAL_ECHOLNF(AC_msg_mesh_changes_abandoned);
@@ -813,7 +813,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
       }
 
       else if (FindToken('D') != -1) { // Save Z Offset tables and restore leveling state
-        if (!isPrinting()) {
+        if (!jobRunning()) {
           setAxisPosition_mm(1.0,Z); // Lift nozzle before any further movements are made
           injectCommands(F("M500"));
           SERIAL_ECHOLNF(AC_msg_mesh_changes_saved);
@@ -825,7 +825,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
         SendtoTFT(F("A31V "));
         // When printing use the live z Offset position
         // we will use babystepping to move the print head
-        if (isPrinting())
+        if (jobRunning())
           TFTSer.println(live_Zoffset);
         else {
           TFTSer.println(getZOffset_mm());
@@ -840,7 +840,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
           setSoftEndstopState(false);  // disable endstops
           // Allow temporary Z position nudging during a CNC job
           // From the leveling panel use the all points UI to adjust the print pos.
-          if (isPrinting()) {
+          if (jobRunning()) {
             #if ACDEBUG(AC_INFO)
               SERIAL_ECHOLNPGM("Change Zoffset from:", live_Zoffset, " to ", live_Zoffset + Zshift);
             #endif
@@ -893,7 +893,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
 
     case 32: { // A32 clean leveling beep flag
       // Ignore request if printing
-      //if (isPrinting()) break;
+      //if (jobRunning()) break;
       //injectCommands(F("M500\nM420 S1\nG1 Z10 F240\nG1 X0 Y0 F6000"));
       //TFTSer.println();
     } break;
@@ -919,7 +919,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
         #endif
         // Update Meshpoint
         setMeshPoint(pos,newval);
-        if (cnc_state == AC_cnc_idle || cnc_state == AC_cnc_probing /*!isPrinting()*/) {
+        if (cnc_state == AC_cnc_idle || cnc_state == AC_cnc_probing /*!jobRunning()*/) {
           // if we are at the current mesh point indicated on the panel Move Z pos +/- 0.05mm
           // (The panel changes the mesh value by +/- 0.05mm on each button press)
           if (selectedmeshpoint.x == pos.x && selectedmeshpoint.y == pos.y) {

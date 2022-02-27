@@ -191,7 +191,7 @@
 //
 #define HEATER_BED_PIN                     P2_05
 #define HEATER_0_PIN                       P2_07
-#if HAS_MULTI_HOTEND
+#if TOOL_CHANGE_SUPPORT
   #ifndef HEATER_1_PIN
     #define HEATER_1_PIN                   P2_06
   #endif

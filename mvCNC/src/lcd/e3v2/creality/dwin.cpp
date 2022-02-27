@@ -4137,7 +4137,7 @@ void EachMomentUpdate() {
     queue.inject(F("G1 F1200 X0 Y0"));
   }
 
-  if (card.isPrinting() && checkkey == CNCProcess) { // print process
+  if (card.jobRunning() && checkkey == CNCProcess) { // print process
     const uint8_t card_pct = card.percentDone();
     static uint8_t last_cardpercentValue = 101;
     if (last_cardpercentValue != card_pct) { // print percent

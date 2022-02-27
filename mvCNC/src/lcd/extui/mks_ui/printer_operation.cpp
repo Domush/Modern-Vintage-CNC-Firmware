@@ -89,7 +89,7 @@ void cnc_state_polling() {
         HOTEND_LOOP() {
           const int16_t et = recovery.info.target_temperature[e];
           if (et) {
-            #if HAS_MULTI_HOTEND
+            #if TOOL_CHANGE_SUPPORT
               sprintf_P(public_buf_m, PSTR("T%i"), e);
               gcode.process_subcommands_now(public_buf_m);
             #endif

@@ -48,13 +48,13 @@ void DGUSRxHandler::ScreenChange(DGUS_VP &vp, void *data_ptr) {
   }
 
   if (vp.addr == DGUS_Addr::SCREENCHANGE_Idle
-      && (ExtUI::isPrinting() || ExtUI::isPrintingPaused())) {
+      && (ExtUI::jobRunning() || ExtUI::jobRunningPaused())) {
     dgus_screen_handler.SetStatusMessage(F("Impossible while printing"));
     return;
   }
 
   if (vp.addr == DGUS_Addr::SCREENCHANGE_Printing
-      && (!ExtUI::isPrinting() && !ExtUI::isPrintingPaused())) {
+      && (!ExtUI::jobRunning() && !ExtUI::jobRunningPaused())) {
     dgus_screen_handler.SetStatusMessage(F("Impossible while idle"));
     return;
   }
@@ -151,7 +151,7 @@ void DGUSRxHandler::CNCAbort(DGUS_VP &vp, void *data_ptr) {
     return;
   }
 
-  if (!ExtUI::isPrinting() && !ExtUI::isPrintingPaused()) {
+  if (!ExtUI::jobRunning() && !ExtUI::jobRunningPaused()) {
     dgus_screen_handler.TriggerFullUpdate();
     return;
   }
@@ -168,7 +168,7 @@ void DGUSRxHandler::PrintPause(DGUS_VP &vp, void *data_ptr) {
     return;
   }
 
-  if (!ExtUI::isPrinting()) {
+  if (!ExtUI::jobRunning()) {
     dgus_screen_handler.TriggerFullUpdate();
     return;
   }
@@ -185,7 +185,7 @@ void DGUSRxHandler::CNCResume(DGUS_VP &vp, void *data_ptr) {
     return;
   }
 
-  if (!ExtUI::isPrintingPaused()) {
+  if (!ExtUI::jobRunningPaused()) {
     dgus_screen_handler.TriggerFullUpdate();
     return;
   }
@@ -311,7 +311,7 @@ void DGUSRxHandler::TempTarget(DGUS_VP &vp, void *data_ptr) {
     case DGUS_Addr::TEMP_SetTarget_H0:
       ExtUI::setTargetTemp_celsius(temp, ExtUI::H0);
       break;
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       case DGUS_Addr::TEMP_SetTarget_H1:
         ExtUI::setTargetTemp_celsius(temp, ExtUI::H1);
         break;
@@ -331,7 +331,7 @@ void DGUSRxHandler::TempCool(DGUS_VP &vp, void *data_ptr) {
     case DGUS_Data::Heater::ALL:
       ExtUI::setTargetTemp_celsius(0, ExtUI::BED);
       ExtUI::setTargetTemp_celsius(0, ExtUI::H0);
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         ExtUI::setTargetTemp_celsius(0, ExtUI::H1);
       #endif
       break;
@@ -341,7 +341,7 @@ void DGUSRxHandler::TempCool(DGUS_VP &vp, void *data_ptr) {
     case DGUS_Data::Heater::H0:
       ExtUI::setTargetTemp_celsius(0, ExtUI::H0);
       break;
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       case DGUS_Data::Heater::H1:
         ExtUI::setTargetTemp_celsius(0, ExtUI::H1);
         break;
@@ -811,7 +811,7 @@ void DGUSRxHandler::PIDSelect(DGUS_VP &vp, void *data_ptr) {
       dgus_screen_handler.pid_heater = heater;
       break;
     case DGUS_Data::Heater::H0:
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       case DGUS_Data::Heater::H1:
     #endif
       dgus_screen_handler.pid_temp = DGUS_PLA_TEMP_HOTEND;
@@ -842,7 +842,7 @@ void DGUSRxHandler::PIDSetTemp(DGUS_VP &vp, void *data_ptr) {
     case DGUS_Data::Heater::H0:
       temp = constrain(temp, HEATER_0_MINTEMP, (HEATER_0_MAXTEMP - HOTEND_OVERSHOOT));
       break;
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       case DGUS_Data::Heater::H1:
         temp = constrain(temp, HEATER_1_MINTEMP, (HEATER_1_MAXTEMP - HOTEND_OVERSHOOT));
         break;
@@ -884,7 +884,7 @@ void DGUSRxHandler::PIDRun(DGUS_VP &vp, void *data_ptr) {
         dgus_screen_handler.SetStatusMessage(F("PID disabled"));
         return;
       #endif
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       case DGUS_Data::Heater::H1:
         #if ENABLED(PIDTEMP)
           heater = H_E1;
@@ -963,7 +963,7 @@ void DGUSRxHandler::WaitAbort(DGUS_VP &vp, void *data_ptr) {
     return;
   }
 
-  if (!ExtUI::isPrintingPaused()) {
+  if (!ExtUI::jobRunningPaused()) {
     dgus_screen_handler.TriggerFullUpdate();
     return;
   }

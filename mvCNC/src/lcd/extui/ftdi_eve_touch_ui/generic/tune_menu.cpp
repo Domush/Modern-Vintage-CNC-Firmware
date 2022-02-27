@@ -66,8 +66,8 @@ void TuneMenu::onRedraw(draw_mode_t what) {
   #endif
 
   if (what & FOREGROUND) {
-    const bool sdOrHostPrinting = ExtUI::isPrinting();
-    const bool sdOrHostPaused   = ExtUI::isPrintingPaused();
+    const bool sdOrHostPrinting = ExtUI::jobRunning();
+    const bool sdOrHostPaused   = ExtUI::jobRunningPaused();
 
     CommandProcessor cmd;
     cmd.colors(normal_btn)
@@ -77,7 +77,7 @@ void TuneMenu::onRedraw(draw_mode_t what) {
        .tag(3).button(FIL_CHANGE_POS,  GET_TEXT_F(MSG_FILAMENTCHANGE))
        .enabled(EITHER(LIN_ADVANCE, FILAMENT_RUNOUT_SENSOR))
        .tag(9).button(FILAMENT_POS, GET_TEXT_F(MSG_FILAMENT))
-       #if ENABLED(BABYSTEPPING) && HAS_MULTI_HOTEND
+       #if ENABLED(BABYSTEPPING) && TOOL_CHANGE_SUPPORT
          .tag(4).button(NUDGE_NOZ_POS, GET_TEXT_F(MSG_NUDGE_NOZZLE))
        #elif BOTH(HAS_LEVELING, HAS_BED_PROBE)
          .tag(4).button(NUDGE_NOZ_POS, GET_TEXT_F(MSG_ZPROBE_ZOFFSET))
@@ -106,7 +106,7 @@ bool TuneMenu::onTouchEnd(uint8_t tag) {
     case  2: GOTO_SCREEN(TemperatureScreen);     break;
     case  3: GOTO_SCREEN(ChangeFilamentScreen);  break;
     case  4:
-      #if ENABLED(BABYSTEPPING) && HAS_MULTI_HOTEND
+      #if ENABLED(BABYSTEPPING) && TOOL_CHANGE_SUPPORT
         GOTO_SCREEN(NudgeNozzleScreen);
       #elif BOTH(HAS_LEVELING, HAS_BED_PROBE)
         GOTO_SCREEN(ZOffsetScreen);
@@ -135,7 +135,7 @@ bool TuneMenu::onTouchEnd(uint8_t tag) {
 
 void TuneMenu::pausePrint() {
   sound.play(twinkle, PLAY_ASYNCHRONOUS);
-  if (ExtUI::isPrintingFromMedia())
+  if (ExtUI::jobRunningFromMedia())
     ExtUI::pausePrint();
   #ifdef ACTION_ON_PAUSE
     else hostui.pause();
@@ -147,7 +147,7 @@ void TuneMenu::resumePrint() {
   sound.play(twinkle, PLAY_ASYNCHRONOUS);
   if (ExtUI::awaitingUserConfirm())
     ExtUI::setUserConfirmed();
-  else if (ExtUI::isPrintingFromMedia())
+  else if (ExtUI::jobRunningFromMedia())
     ExtUI::resumePrint();
   #ifdef ACTION_ON_RESUME
     else hostui.resume();

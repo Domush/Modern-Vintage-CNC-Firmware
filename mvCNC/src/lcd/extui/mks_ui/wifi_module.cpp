@@ -1122,7 +1122,7 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
 
             strcat_P(outBuf, PSTR(" T1:"));
             outBuf += 4;
-            #if HAS_MULTI_HOTEND
+            #if TOOL_CHANGE_SUPPORT
               sprintf_P(outBuf, PSTR("%d /%d"), thermalManager.wholeDegHotend(1), thermalManager.degTargetHotend(1));
             #else
               strcpy_P(outBuf, PSTR("0 /0"));
@@ -1137,8 +1137,8 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
               TERN0(HAS_HEATED_BED, thermalManager.wholeDegBed()),
               TERN0(HAS_HEATED_BED, thermalManager.degTargetBed()),
               thermalManager.wholeDegHotend(0), thermalManager.degTargetHotend(0),
-              TERN0(HAS_MULTI_HOTEND, thermalManager.wholeDegHotend(1)),
-              TERN0(HAS_MULTI_HOTEND, thermalManager.degTargetHotend(1))
+              TERN0(TOOL_CHANGE_SUPPORT, thermalManager.wholeDegHotend(1)),
+              TERN0(TOOL_CHANGE_SUPPORT, thermalManager.degTargetHotend(1))
             );
           }
 

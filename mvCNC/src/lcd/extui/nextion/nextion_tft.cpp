@@ -194,7 +194,7 @@ void NextionTFT::PanelInfo(uint8_t req) {
   case 0: break;
 
   case 1: // Get SD Card list
-    if (!isPrinting()) {
+    if (!jobRunning()) {
       if (!isMediaInserted()) safe_delay(500);
       if (!isMediaInserted()) { // Make sure the card is removed
         //SEND_TXT("tmppage.M117", msg_no_sd_card);
@@ -205,7 +205,7 @@ void NextionTFT::PanelInfo(uint8_t req) {
     break;
 
   case 2: // CNC Info
-    if (!isPrinting()) {
+    if (!jobRunning()) {
       SEND_VAL("tmppage.connected", 1);
       SEND_VALasTXT("tmppage.mvcnc", SHORT_BUILD_VERSION);
       SEND_VALasTXT("tmppage.compiled", __DATE__ " / " __TIME__);
@@ -320,7 +320,7 @@ void NextionTFT::PanelInfo(uint8_t req) {
 
   case 29: // Preheat
     #if HAS_PREHEAT
-      if (!isPrinting()) {
+      if (!jobRunning()) {
         // Preheat PLA
         if (nextion_command[4] == 'P') {
           SEND_VALasTXT("pe", getMaterial_preset_E(0));
@@ -476,7 +476,7 @@ void NextionTFT::PanelAction(uint8_t req) {
   switch (req) {
 
     case 50: // Pause SD print
-      //if (isPrintingFromMedia()) {
+      //if (jobRunningFromMedia()) {
         //SEND_TXT("tmppage.M117", "Paused");
         pausePrint();
         SEND_TXT_END("qpause.picc=29");
@@ -489,7 +489,7 @@ void NextionTFT::PanelAction(uint8_t req) {
       break;
 
     case 52: // Stop SD print
-      //if (isPrintingFromMedia()) {
+      //if (jobRunningFromMedia()) {
         stopPrint();
         SEND_TXT_END("page prepare");
       //}
@@ -500,11 +500,11 @@ void NextionTFT::PanelAction(uint8_t req) {
       break;
 
     case 65: // Cool Down
-      if (!isPrinting()) coolDown();
+      if (!jobRunning()) coolDown();
       break;
 
     case 66: // Refresh SD
-      if (!isPrinting()) {
+      if (!jobRunning()) {
         injectCommands(F("M21"));
         filenavigator.reset();
       }
@@ -519,7 +519,7 @@ void NextionTFT::PanelAction(uint8_t req) {
       break;
 
     case 57: // Disable Motors
-      if (!isPrinting()) {
+      if (!jobRunning()) {
         stepper.disable_all_steppers();
         SEND_TXT("tmppage.M117", "Motors disabled");
       }
@@ -544,7 +544,7 @@ void NextionTFT::PanelAction(uint8_t req) {
 
     case 63: // Preheat // Temps defined in configuration.h
       #if HAS_PREHEAT
-        if (!isPrinting()) switch (nextion_command[4]) {
+        if (!jobRunning()) switch (nextion_command[4]) {
           // Preheat PLA
           case 'P':
             #if HAS_HEATED_BED
@@ -633,7 +633,7 @@ void NextionTFT::UpdateOnChange() {
   static float last_get_axis_position_mmX = 999, last_get_axis_position_mmY = 999, last_get_axis_position_mmZ = 999;
 
   // tmppage Progress + Layer + Time
-  if (isPrinting()) {
+  if (jobRunning()) {
 
     if (ELAPSED(ms, next_event_ms)) {
       next_event_ms = ms + 1000;

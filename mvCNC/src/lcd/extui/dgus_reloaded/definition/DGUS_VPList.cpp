@@ -86,7 +86,7 @@ const struct DGUS_VP vp_list[] PROGMEM = {
   VP_HELPER_RX(DGUS_Addr::TEMP_Preset,        &DGUSRxHandler::TempPreset),
   VP_HELPER_RX(DGUS_Addr::TEMP_SetTarget_Bed, &DGUSRxHandler::TempTarget),
   VP_HELPER_RX(DGUS_Addr::TEMP_SetTarget_H0,  &DGUSRxHandler::TempTarget),
-  #if HAS_MULTI_HOTEND
+  #if TOOL_CHANGE_SUPPORT
     VP_HELPER_RX(DGUS_Addr::TEMP_SetTarget_H1,  &DGUSRxHandler::TempTarget),
   #endif
   VP_HELPER_RX(DGUS_Addr::TEMP_Cool,          &DGUSRxHandler::TempCool),
@@ -201,7 +201,7 @@ const struct DGUS_VP vp_list[] PROGMEM = {
                     &thermalManager.temp_hotend[ExtUI::heater_t::H0].target,
                     &DGUSTxHandler::ExtraToInteger<int16_t>),
   VP_HELPER_TX(DGUS_Addr::TEMP_Max_H0, &DGUSTxHandler::TempMax),
-  #if HAS_MULTI_HOTEND
+  #if TOOL_CHANGE_SUPPORT
     VP_HELPER_TX_AUTO(DGUS_Addr::TEMP_Current_H1,
                       &thermalManager.temp_hotend[ExtUI::heater_t::H1].celsius,
                       &DGUSTxHandler::ExtraToInteger<float>),

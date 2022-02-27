@@ -48,7 +48,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
           if (uiCfg.extruderIndex == 0)
             max_target = HEATER_0_MAXTEMP - (WATCH_TEMP_INCREASE + TEMP_HYSTERESIS + 1);
           else {
-            #if HAS_MULTI_HOTEND
+            #if TOOL_CHANGE_SUPPORT
               max_target = HEATER_1_MAXTEMP - (WATCH_TEMP_INCREASE + TEMP_HYSTERESIS + 1);
             #endif
           }

@@ -150,7 +150,7 @@ void process_lcd_eb_command(const char *command) {
       uint8_t done_pct = print_job_timer.isRunning() ? (iteration * 10) : 100;
       iteration = (iteration + 1) % 10; // Provide progress animation
       #if ENABLED(SDSUPPORT)
-        if (ExtUI::isPrintingFromMedia() || ExtUI::isPrintingFromMediaPaused())
+        if (ExtUI::jobRunningFromMedia() || ExtUI::jobRunningFromMediaPaused())
           done_pct = card.percentDone();
       #endif
 

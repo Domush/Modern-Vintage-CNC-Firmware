@@ -186,7 +186,7 @@ void ChangeFilamentScreen::onRedraw(draw_mode_t what) {
     const bool tog3  = mydata.t_tag == 3;
     const bool tog4  = mydata.t_tag == 4;
     const bool tog10 = mydata.e_tag == 10;
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       const bool tog11 = mydata.e_tag == 11;
     #endif
 

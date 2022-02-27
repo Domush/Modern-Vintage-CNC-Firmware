@@ -517,7 +517,7 @@ void AnycubicTFTClass::OnPrintTimerStarted() {
 
 void AnycubicTFTClass::OnPrintTimerPaused() {
   #if ENABLED(SDSUPPORT)
-    if (isPrintingFromMedia()) {
+    if (jobRunningFromMedia()) {
       mediaPrintingState = AMPRINTSTATE_PAUSED;
       mediaPauseState    = AMPAUSESTATE_PARKING;
     }
@@ -601,7 +601,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
 
           case 6: // A6 GET SD CARD PRINTING STATUS
             #if ENABLED(SDSUPPORT)
-              if (isPrintingFromMedia()) {
+              if (jobRunningFromMedia()) {
                 SEND_PGM("A6V ");
                 if (isMediaInserted())
                   SENDLINE(ui8tostr3rj(getProgress_percent()));
@@ -637,14 +637,14 @@ void AnycubicTFTClass::GetCommandFromTFT() {
 
           case 9: // A9 pause sd print
             #if ENABLED(SDSUPPORT)
-              if (isPrintingFromMedia())
+              if (jobRunningFromMedia())
                 PausePrint();
             #endif
             break;
 
           case 10: // A10 resume sd print
             #if ENABLED(SDSUPPORT)
-              if (isPrintingFromMediaPaused())
+              if (jobRunningFromMediaPaused())
                 ResumePrint();
             #endif
             break;
@@ -688,7 +688,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
 
           case 14: // A14 START PRINTING
             #if ENABLED(SDSUPPORT)
-              if (!isPrinting() && strlen(SelectedFile) > 0)
+              if (!jobRunning() && strlen(SelectedFile) > 0)
                 StartPrint();
             #endif
             break;
@@ -703,7 +703,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
               tempvalue = constrain(CodeValue(), 0, 275);
               setTargetTemp_celsius(tempvalue, (extruder_t)E0);
             }
-            else if (CodeSeen('C') && !isPrinting()) {
+            else if (CodeSeen('C') && !jobRunning()) {
               if (getAxisPosition_mm(Z) < 10)
                 injectCommands(F("G1 Z10")); // RASE Z AXIS
               tempvalue = constrain(CodeValue(), 0, 275);
@@ -737,7 +737,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
           break;
 
           case 19: // A19 stop stepper drivers - sent on stop extrude command and on turn motors off command
-            if (!isPrinting()) {
+            if (!jobRunning()) {
               quickstop_stepper();
               stepper.disable_all_steppers();
             }
@@ -753,7 +753,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
             break;
 
           case 21: // A21 all home
-            if (!isPrinting() && !isPrintingFromMediaPaused()) {
+            if (!jobRunning() && !jobRunningFromMediaPaused()) {
               if (CodeSeen('X') || CodeSeen('Y') || CodeSeen('Z')) {
                 if (CodeSeen('X'))
                   injectCommands(F("G28X"));
@@ -769,7 +769,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
             break;
 
           case 22: // A22 move X/Y/Z or extrude
-            if (!isPrinting()) {
+            if (!jobRunning()) {
               float coorvalue;
               unsigned int movespeed = 0;
               char commandStr[30];
@@ -829,7 +829,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
             break;
 
           case 23: // A23 preheat pla
-            if (!isPrinting()) {
+            if (!jobRunning()) {
               if (getAxisPosition_mm(Z) < 10)
                 injectCommands(F("G1 Z10")); // RASE Z AXIS
 
@@ -840,7 +840,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
             break;
 
           case 24:// A24 preheat abs
-            if (!isPrinting()) {
+            if (!jobRunning()) {
               if (getAxisPosition_mm(Z) < 10)
                 injectCommands(F("G1 Z10")); // RASE Z AXIS
 
@@ -851,7 +851,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
             break;
 
           case 25: // A25 cool down
-            if (!isPrinting()) {
+            if (!jobRunning()) {
               setTargetTemp_celsius(0, (heater_t) BED);
               setTargetTemp_celsius(0, (extruder_t) E0);
 
@@ -947,10 +947,10 @@ void AnycubicTFTClass::DoFilamentRunoutCheck() {
 
 void AnycubicTFTClass::StartPrint() {
   #if ENABLED(SDSUPPORT)
-    if (!isPrinting() && strlen(SelectedFile) > 0) {
+    if (!jobRunning() && strlen(SelectedFile) > 0) {
       #if ENABLED(ANYCUBIC_LCD_DEBUG)
         SERIAL_ECHOPGM("TFT Serial Debug: About to print file ... ");
-        SERIAL_ECHO(isPrinting());
+        SERIAL_ECHO(jobRunning());
         SERIAL_ECHOPGM(" ");
         SERIAL_ECHOLN(SelectedFile);
       #endif
@@ -963,7 +963,7 @@ void AnycubicTFTClass::StartPrint() {
 
 void AnycubicTFTClass::PausePrint() {
   #if ENABLED(SDSUPPORT)
-    if (isPrintingFromMedia() && mediaPrintingState != AMPRINTSTATE_STOP_REQUESTED && mediaPauseState == AMPAUSESTATE_NOT_PAUSED) {
+    if (jobRunningFromMedia() && mediaPrintingState != AMPRINTSTATE_STOP_REQUESTED && mediaPauseState == AMPAUSESTATE_NOT_PAUSED) {
       mediaPrintingState = AMPRINTSTATE_PAUSE_REQUESTED;
       mediaPauseState    = AMPAUSESTATE_NOT_PAUSED; // need the userconfirm method to update pause state
       SENDLINE_DBG_PGM("J05", "TFT Serial Debug: SD print pause started... J05"); // J05 printing pause

@@ -84,7 +84,7 @@ bool TemperatureScreen::onTouchHeld(uint8_t tag) {
       case  2: UI_DECREMENT(TargetTemp_celsius, E0); break;
       case  3: UI_INCREMENT(TargetTemp_celsius, E0); break;
     #endif
-  #if TOOL_CHANGE_SUPPORT
+    #if TOOL_CHANGE_SUPPORT
       case  4: UI_DECREMENT(TargetTemp_celsius, E1); break;
       case  5: UI_INCREMENT(TargetTemp_celsius, E1); break;
     #endif

@@ -178,9 +178,9 @@ void StatusScreen::draw_syringe(draw_mode_t what) {
 void StatusScreen::draw_buttons(draw_mode_t what) {
   int16_t x, y, h, v;
 
-  const bool can_print        = isMediaInserted() && !isPrintingFromMedia();
-  const bool sdOrHostPrinting = ExtUI::isPrinting();
-  const bool sdOrHostPaused   = ExtUI::isPrintingPaused();
+  const bool can_print        = isMediaInserted() && !jobRunningFromMedia();
+  const bool sdOrHostPrinting = ExtUI::jobRunning();
+  const bool sdOrHostPaused   = ExtUI::jobRunningPaused();
 
   CommandProcessor cmd;
   PolyUI ui(cmd, what);
@@ -239,7 +239,7 @@ bool StatusScreen::onTouchEnd(uint8_t tag) {
     case  4: GOTO_SCREEN(MainMenu); break;
     case  5:
       sound.play(twinkle, PLAY_ASYNCHRONOUS);
-      if (ExtUI::isPrintingFromMedia())
+      if (ExtUI::jobRunningFromMedia())
         ExtUI::pausePrint();
       #ifdef ACTION_ON_PAUSE
         else hostui.pause();
@@ -248,7 +248,7 @@ bool StatusScreen::onTouchEnd(uint8_t tag) {
       break;
     case  6:
       sound.play(twinkle, PLAY_ASYNCHRONOUS);
-      if (ExtUI::isPrintingFromMedia())
+      if (ExtUI::jobRunningFromMedia())
         ExtUI::resumePrint();
       #ifdef ACTION_ON_RESUME
         else hostui.resume();
@@ -300,7 +300,7 @@ void StatusScreen::onMediaInserted() {
 }
 
 void StatusScreen::onMediaRemoved() {
-  if (AT_SCREEN(StatusScreen) || ExtUI::isPrintingFromMedia())
+  if (AT_SCREEN(StatusScreen) || ExtUI::jobRunningFromMedia())
     setStatusMessage(GET_TEXT_F(MSG_MEDIA_REMOVED));
 }
 

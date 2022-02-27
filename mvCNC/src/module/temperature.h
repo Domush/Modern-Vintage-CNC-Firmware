@@ -27,8 +27,8 @@
   #define SOFT_PWM_SCALE 0
 #endif
 
-#define HOTEND_INDEX TERN(HAS_MULTI_HOTEND, e, 0)
-#define E_NAME TERN_(HAS_MULTI_HOTEND, e)
+#define HOTEND_INDEX TERN(TOOL_CHANGE_SUPPORT, e, 0)
+#define E_NAME TERN_(TOOL_CHANGE_SUPPORT, e)
 
 // Element identifiers. Positive values are hotends. Negative values are other heaters or coolers.
 typedef enum : int8_t {

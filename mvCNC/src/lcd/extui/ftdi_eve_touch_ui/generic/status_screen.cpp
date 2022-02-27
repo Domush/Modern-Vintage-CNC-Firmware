@@ -310,14 +310,14 @@ void StatusScreen::draw_interaction_buttons(draw_mode_t what) {
     #define MENU_BTN_POS   BTN_POS(3,13), BTN_SIZE(2,4)
   #endif
 
-    const bool has_media = isMediaInserted() && !isPrintingFromMedia();
+    const bool has_media = isMediaInserted() && !jobRunningFromMedia();
 
     CommandProcessor cmd;
     cmd.colors(normal_btn)
        .font(Theme::font_medium)
        .colors(has_media ? action_btn : normal_btn)
-       .enabled(has_media && !isPrinting())
-       .tag(3).button(MEDIA_BTN_POS, isPrinting() ? GET_TEXT_F(MSG_PRINTING) : GET_TEXT_F(MSG_BUTTON_MEDIA))
+       .enabled(has_media && !jobRunning())
+       .tag(3).button(MEDIA_BTN_POS, jobRunning() ? GET_TEXT_F(MSG_PRINTING) : GET_TEXT_F(MSG_BUTTON_MEDIA))
        .colors(!has_media ? action_btn : normal_btn)
        .tag(4).button(MENU_BTN_POS, GET_TEXT_F(MSG_BUTTON_MENU));
   }
@@ -429,7 +429,7 @@ bool StatusScreen::onTouchEnd(uint8_t tag) {
       case 3: GOTO_SCREEN(FilesScreen); break;
     #endif
     case 4:
-      if (isPrinting()) {
+      if (jobRunning()) {
         GOTO_SCREEN(TuneMenu);
       }
       else {
@@ -438,7 +438,7 @@ bool StatusScreen::onTouchEnd(uint8_t tag) {
       break;
     case 5:  GOTO_SCREEN(TemperatureScreen); break;
     case 6:
-      if (isPrinting()) {
+      if (jobRunning()) {
         #if ENABLED(BABYSTEPPING)
           GOTO_SCREEN(NudgeNozzleScreen);
         #elif HAS_BED_PROBE
@@ -467,7 +467,7 @@ void StatusScreen::onMediaInserted() {
 }
 
 void StatusScreen::onMediaRemoved() {
-  if (AT_SCREEN(StatusScreen) || ExtUI::isPrintingFromMedia())
+  if (AT_SCREEN(StatusScreen) || ExtUI::jobRunningFromMedia())
     setStatusMessage(GET_TEXT_F(MSG_MEDIA_REMOVED));
 }
 

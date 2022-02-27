@@ -167,7 +167,7 @@ void DGUSScreenHandler::DGUSLCD_SendStringToDisplayPGM(DGUS_VP_Variable &var) {
         case VP_E0_PID_I: valuesend = unscalePID_i(value); break;
         case VP_E0_PID_D: valuesend = unscalePID_d(value); break;
       #endif
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         case VP_E1_PID_P: valuesend = value; break;
         case VP_E1_PID_I: valuesend = unscalePID_i(value); break;
         case VP_E1_PID_D: valuesend = unscalePID_d(value); break;
@@ -259,7 +259,7 @@ void DGUSScreenHandler::DGUSLCD_SendHeaterStatusToDisplay(DGUS_VP_Variable &var)
 
   void DGUSScreenHandler::ScreenChangeHookIfSD(DGUS_VP_Variable &var, void *val_ptr) {
     // default action executed when there is a SD card, but not printing
-    if (ExtUI::isMediaInserted() && !ExtUI::isPrintingFromMedia()) {
+    if (ExtUI::isMediaInserted() && !ExtUI::jobRunningFromMedia()) {
       ScreenChangeHook(var, val_ptr);
       dgusdisplay.RequestScreen(current_screen);
       return;
@@ -268,7 +268,7 @@ void DGUSScreenHandler::DGUSLCD_SendHeaterStatusToDisplay(DGUS_VP_Variable &var)
     // if we are printing, we jump to two screens after the requested one.
     // This should host e.g a print pause / print abort / print resume dialog.
     // This concept allows to recycle this hook for other file
-    if (ExtUI::isPrintingFromMedia() && !card.flag.abort_sd_printing) {
+    if (ExtUI::jobRunningFromMedia() && !card.flag.abort_sd_printing) {
       GotoScreen(DGUSLCD_SCREEN_SDPRINTMANIPULATION);
       return;
     }
@@ -316,7 +316,7 @@ void DGUSScreenHandler::DGUSLCD_SendHeaterStatusToDisplay(DGUS_VP_Variable &var)
   }
 
   void DGUSScreenHandler::DGUSLCD_SD_PrintTune(DGUS_VP_Variable &var, void *val_ptr) {
-    if (!ExtUI::isPrintingFromMedia()) return; // avoid race condition when user stays in this menu and cnc finishes.
+    if (!ExtUI::jobRunningFromMedia()) return; // avoid race condition when user stays in this menu and cnc finishes.
     GotoScreen(DGUSLCD_SCREEN_SDPRINTTUNE);
   }
 
@@ -358,7 +358,7 @@ const DGUS_VP_Variable* DGUSLCD_FindVPVar(const uint16_t vp) {
 }
 
 void DGUSScreenHandler::ScreenChangeHookIfIdle(DGUS_VP_Variable &var, void *val_ptr) {
-  if (!ExtUI::isPrinting()) {
+  if (!ExtUI::jobRunning()) {
     ScreenChangeHook(var, val_ptr);
     dgusdisplay.RequestScreen(current_screen);
   }
@@ -382,7 +382,7 @@ void DGUSScreenHandler::HandleTemperatureChanged(DGUS_VP_Variable &var, void *va
         acceptedvalue = thermalManager.degTargetHotend(0);
         break;
     #endif
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       case VP_T_E1_Set:
         NOMORE(newvalue, HEATER_1_MAXTEMP);
         thermalManager.setTargetHotend(newvalue, 1);
@@ -512,7 +512,7 @@ void DGUSScreenHandler::HandleStepPerMMExtruderChanged(DGUS_VP_Variable &var, vo
               sprintf_P(buf, PSTR("M303 E%d C5 S210 U1"), ExtUI::extruder_t::E0);
               break;
           #endif
-          #if HAS_MULTI_HOTEND
+          #if TOOL_CHANGE_SUPPORT
             case VP_PID_AUTOTUNE_E1:
               sprintf_P(buf, PSTR("M303 E%d C5 S210 U1"), ExtUI::extruder_t::E1);
               break;
@@ -559,7 +559,7 @@ void DGUSScreenHandler::HandleHeaterControl(DGUS_VP_Variable &var, void *val_ptr
   switch (var.VP) {
     #if HAS_HOTEND
       case VP_E0_CONTROL:
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         case VP_E1_CONTROL:
         #if HOTENDS >= 3
           case VP_E2_CONTROL:
@@ -588,7 +588,7 @@ void DGUSScreenHandler::HandleHeaterControl(DGUS_VP_Variable &var, void *val_ptr
       switch (var.VP) {
         default: return;
         case VP_E0_BED_PREHEAT: TERN_(HAS_HOTEND,       ui.preheat_all(0)); break;
-        case VP_E1_BED_PREHEAT: TERN_(HAS_MULTI_HOTEND, ui.preheat_all(1)); break;
+        case VP_E1_BED_PREHEAT: TERN_(TOOL_CHANGE_SUPPORT, ui.preheat_all(1)); break;
       }
       case 7: break; // Custom preheat
       case 9: thermalManager.cooldown(); break; // Cool down

@@ -856,7 +856,7 @@ int16_t Temperature::getHeaterPower(const heater_id_t heater_id) {
     #define _EFAN(B,A) _EFANOVERLAP(A,B) ? B :
     static const uint8_t fanBit[] PROGMEM = {
       0
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         #define _NEXT_FAN(N) , REPEAT2(N,_EFAN,N) N
         RREPEAT_S(1, HOTENDS, _NEXT_FAN)
       #endif
@@ -2072,7 +2072,7 @@ void Temperature::updateTemperaturesFromRawValues() {
       #else
         TEMPDIR(0)
       #endif
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         #if TEMP_SENSOR_IS_ANY_MAX_TC(1)
           , 0
         #else
@@ -3578,7 +3578,7 @@ void Temperature::isr() {
       #endif
     }
     SERIAL_CHAR(' ', k);
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       if (e >= 0) SERIAL_CHAR('0' + e);
     #endif
     #ifdef SERIAL_FLOAT_PRECISION
@@ -3622,7 +3622,7 @@ void Temperature::isr() {
     #if HAS_TEMP_REDUNDANT
       if (include_r) print_heater_state(H_REDUNDANT, degRedundant(), degRedundantTarget() OPTARG(SHOW_TEMP_ADC_VALUES, rawRedundantTemp()));
     #endif
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       HOTEND_LOOP() print_heater_state((heater_id_t)e, degHotend(e), degTargetHotend(e) OPTARG(SHOW_TEMP_ADC_VALUES, rawHotendTemp(e)));
     #endif
     SERIAL_ECHOPGM(" @:", getHeaterPower((heater_id_t)target_extruder));
@@ -3635,7 +3635,7 @@ void Temperature::isr() {
     #if HAS_COOLER
       SERIAL_ECHOPGM(" C@:", getHeaterPower(H_COOLER));
     #endif
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       HOTEND_LOOP() {
         SERIAL_ECHOPGM(" @", e);
         SERIAL_CHAR(':');
@@ -3653,7 +3653,7 @@ void Temperature::isr() {
     void Temperature::set_heating_message(const uint8_t e) {
       const bool heating = isHeatingHotend(e);
       ui.status_printf(0,
-        #if HAS_MULTI_HOTEND
+        #if TOOL_CHANGE_SUPPORT
           F("E%c " S_FMT), '1' + e
         #else
           F("E1 " S_FMT)

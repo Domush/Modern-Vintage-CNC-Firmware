@@ -172,7 +172,7 @@ void DGUSScreenHandler::DGUSLCD_SendTMCStepValue(DGUS_VP_Variable &var) {
 
   void DGUSScreenHandler::DGUSLCD_SD_ResumePauseAbort(DGUS_VP_Variable &var, void *val_ptr) {
 
-    if (!ExtUI::isPrintingFromMedia()) return; // avoid race condition when user stays in this menu and cnc finishes.
+    if (!ExtUI::jobRunningFromMedia()) return; // avoid race condition when user stays in this menu and cnc finishes.
     switch (swap16(*(uint16_t*)val_ptr)) {
       case 0: { // Resume
 
@@ -187,7 +187,7 @@ void DGUSScreenHandler::DGUSLCD_SendTMCStepValue(DGUS_VP_Variable &var) {
 
         GotoScreen(MKSLCD_SCREEN_PRINT);
 
-        if (ExtUI::isPrintingFromMediaPaused()) {
+        if (ExtUI::jobRunningFromMediaPaused()) {
           nozzle_park_mks.print_pause_start_flag = 0;
           nozzle_park_mks.blstatus = true;
           ExtUI::resumePrint();
@@ -197,7 +197,7 @@ void DGUSScreenHandler::DGUSLCD_SendTMCStepValue(DGUS_VP_Variable &var) {
       case 1: // Pause
 
         GotoScreen(MKSLCD_SCREEN_PAUSE);
-        if (!ExtUI::isPrintingFromMediaPaused()) {
+        if (!ExtUI::jobRunningFromMediaPaused()) {
           nozzle_park_mks.print_pause_start_flag = 1;
           nozzle_park_mks.blstatus = true;
           ExtUI::pausePrint();
@@ -936,7 +936,7 @@ void DGUSScreenHandler::HandleStepPerMMExtruderChanged_MKS(DGUS_VP_Variable &var
     #if HAS_HOTEND
       case VP_E0_STEP_PER_MM: extruder = ExtUI::extruder_t::E0; break;
     #endif
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       case VP_E1_STEP_PER_MM: extruder = ExtUI::extruder_t::E1; break;
     #endif
   }
@@ -983,7 +983,7 @@ void DGUSScreenHandler::HandleExtruderMaxSpeedChange_MKS(DGUS_VP_Variable &var, 
       #if HAS_HOTEND
         case VP_E0_MAX_SPEED: extruder = ExtUI::extruder_t::E0; break;
       #endif
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
       #endif
     case VP_E1_MAX_SPEED: extruder = ExtUI::extruder_t::E1; break;
   }
@@ -1027,7 +1027,7 @@ void DGUSScreenHandler::HandleExtruderAccChange_MKS(DGUS_VP_Variable &var, void 
     #if HAS_HOTEND
       case VP_E0_ACC_MAX_SPEED: extruder = ExtUI::extruder_t::E0; settings.load(); break;
     #endif
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       case VP_E1_ACC_MAX_SPEED: extruder = ExtUI::extruder_t::E1; settings.load(); break;
     #endif
   }
@@ -1085,7 +1085,7 @@ void DGUSScreenHandler::HandleAccChange_MKS(DGUS_VP_Variable &var, void *val_ptr
           case VP_E0_PID_I: newvalue = scalePID_i(value); break;
           case VP_E0_PID_D: newvalue = scalePID_d(value); break;
         #endif
-        #if HAS_MULTI_HOTEND
+        #if TOOL_CHANGE_SUPPORT
           case VP_E1_PID_P: newvalue = value; break;
           case VP_E1_PID_I: newvalue = scalePID_i(value); break;
           case VP_E1_PID_D: newvalue = scalePID_d(value); break;
@@ -1176,7 +1176,7 @@ void DGUSScreenHandler::GetManualFilamentSpeed(DGUS_VP_Variable &var, void *val_
 }
 
 void DGUSScreenHandler::MKS_FilamentLoadUnload(DGUS_VP_Variable &var, void *val_ptr, const int filamentDir) {
-  #if EITHER(HAS_MULTI_HOTEND, SINGLENOZZLE)
+  #if EITHER(TOOL_CHANGE_SUPPORT, SINGLENOZZLE)
     uint8_t swap_tool = 0;
   #else
     constexpr uint8_t swap_tool = 1; // T0 (or none at all)
@@ -1197,14 +1197,14 @@ void DGUSScreenHandler::MKS_FilamentLoadUnload(DGUS_VP_Variable &var, void *val_
         if (thermalManager.tooColdToExtrude(0))
           hotend_too_cold = 1;
         else {
-          #if EITHER(HAS_MULTI_HOTEND, SINGLENOZZLE)
+          #if EITHER(TOOL_CHANGE_SUPPORT, SINGLENOZZLE)
             swap_tool = 1;
           #endif
         }
       #endif
       break;
     case 1:
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         if (thermalManager.tooColdToExtrude(1)) hotend_too_cold = 2; else swap_tool = 2;
       #elif ENABLED(SINGLENOZZLE)
         if (thermalManager.tooColdToExtrude(0)) hotend_too_cold = 1; else swap_tool = 2;
@@ -1224,7 +1224,7 @@ void DGUSScreenHandler::MKS_FilamentLoadUnload(DGUS_VP_Variable &var, void *val_
   if (swap_tool) {
     char buf[30];
     snprintf_P(buf, 30
-      #if EITHER(HAS_MULTI_HOTEND, SINGLENOZZLE)
+      #if EITHER(TOOL_CHANGE_SUPPORT, SINGLENOZZLE)
         , PSTR("M1002T%cE%dF%d"), char('0' + swap_tool - 1)
       #else
         , PSTR("M1002E%dF%d")
@@ -1240,7 +1240,7 @@ void DGUSScreenHandler::MKS_FilamentLoadUnload(DGUS_VP_Variable &var, void *val_
  *        within the G-code execution window for best concurrency.
  */
 void GcodeSuite::M1002() {
-  #if EITHER(HAS_MULTI_HOTEND, SINGLENOZZLE)
+  #if EITHER(TOOL_CHANGE_SUPPORT, SINGLENOZZLE)
   {
     char buf[3];
     sprintf_P(buf, PSTR("T%c"), char('0' + parser.intval('T')));
@@ -1315,7 +1315,7 @@ void DGUSScreenHandler::MKS_FilamentUnLoad(DGUS_VP_Variable &var, void *val_ptr)
       #if HAS_HOTEND
         thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
       #endif
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E1);
       #endif
       GotoScreen(DGUSLCD_SCREEN_UTILITY);
@@ -1329,7 +1329,7 @@ void DGUSScreenHandler::MKS_FilamentUnLoad(DGUS_VP_Variable &var, void *val_ptr)
               thermalManager.setTargetHotend(e_temp, filament_data.extruder);
               break;
           #endif
-          #if HAS_MULTI_HOTEND
+          #if TOOL_CHANGE_SUPPORT
             case VP_E1_FILAMENT_LOAD_UNLOAD:
               filament_data.extruder = ExtUI::extruder_t::E1;
               thermalManager.setTargetHotend(e_temp, filament_data.extruder);

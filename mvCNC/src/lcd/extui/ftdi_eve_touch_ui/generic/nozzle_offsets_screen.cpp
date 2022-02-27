@@ -45,7 +45,7 @@ void NozzleOffsetScreen::onRedraw(draw_mode_t what) {
   w.color(Theme::y_axis).adjuster(4,  GET_TEXT_F(MSG_AXIS_Y), ExtUI::getNozzleOffset_mm(Y, E1));
   w.color(Theme::z_axis).adjuster(6,  GET_TEXT_F(MSG_AXIS_Z), ExtUI::getNozzleOffset_mm(Z, E1));
   #if ENABLED(CALIBRATION_GCODE)
-  w.button(8, GET_TEXT_F(MSG_MEASURE_AUTOMATICALLY), !isPrinting());
+  w.button(8, GET_TEXT_F(MSG_MEASURE_AUTOMATICALLY), !jobRunning());
   #endif
   w.increments();
 }

@@ -83,7 +83,7 @@
   #define FAN1_PIN                          PD12
 #elif DISABLED(FET_ORDER_SF)                      // Not Spindle, Fan (i.e., "EFBF" or "EFBE")
   #define HEATER_BED_PIN                    PD12
-  #if EITHER(HAS_MULTI_HOTEND, HEATERS_PARALLEL)
+  #if EITHER(TOOL_CHANGE_SUPPORT, HEATERS_PARALLEL)
     #define HEATER_1_PIN                    PB9
   #else
     #define FAN1_PIN                        PB9

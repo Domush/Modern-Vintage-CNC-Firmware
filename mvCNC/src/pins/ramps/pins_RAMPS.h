@@ -200,7 +200,7 @@
   #define FAN1_PIN                  MOSFET_C_PIN
 #elif DISABLED(FET_ORDER_SF)                      // Not Spindle, Fan (i.e., "EFBF" or "EFBE")
   #define HEATER_BED_PIN            MOSFET_C_PIN
-  #if EITHER(HAS_MULTI_HOTEND, HEATERS_PARALLEL)
+  #if EITHER(TOOL_CHANGE_SUPPORT, HEATERS_PARALLEL)
     #define HEATER_1_PIN            MOSFET_D_PIN
   #else
     #define FAN1_PIN                MOSFET_D_PIN

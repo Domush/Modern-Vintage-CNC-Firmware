@@ -45,7 +45,7 @@ void BioPrintingDialogBox::draw_progress(draw_mode_t what) {
   if (what & FOREGROUND) {
     CommandProcessor cmd;
     cmd.font(font_large)
-       .text(BTN_POS(1,1), BTN_SIZE(2,2), isPrinting() ? F("CNCing...") : F("Finished."))
+       .text(BTN_POS(1,1), BTN_SIZE(2,2), jobRunning() ? F("CNCing...") : F("Finished."))
        .tag(1)
        .font(font_xlarge);
 
@@ -73,12 +73,12 @@ void BioPrintingDialogBox::draw_interaction_buttons(draw_mode_t what) {
     CommandProcessor cmd;
     cmd.colors(normal_btn)
        .font(font_medium)
-       .colors(isPrinting() ? action_btn : normal_btn)
+       .colors(jobRunning() ? action_btn : normal_btn)
        .tag(2).button(BTN_POS(1,9), BTN_SIZE(1,1), F("Menu"))
-       .enabled(isPrinting() ? TERN0(SDSUPPORT, isPrintingFromMedia()) : 1)
+       .enabled(jobRunning() ? TERN0(SDSUPPORT, jobRunningFromMedia()) : 1)
        .tag(3)
-       .colors(isPrinting() ? normal_btn : action_btn)
-       .button(BTN_POS(2,9), BTN_SIZE(1,1), isPrinting() ? F("Cancel") : F("Back"));
+       .colors(jobRunning() ? normal_btn : action_btn)
+       .button(BTN_POS(2,9), BTN_SIZE(1,1), jobRunning() ? F("Cancel") : F("Back"));
   }
 }
 
@@ -95,7 +95,7 @@ bool BioPrintingDialogBox::onTouchEnd(uint8_t tag) {
     case 1: GOTO_SCREEN(FeedratePercentScreen); break;
     case 2: GOTO_SCREEN(TuneMenu); break;
     case 3:
-      if (isPrinting())
+      if (jobRunning())
         GOTO_SCREEN(ConfirmAbortPrintDialogBox);
       else
         GOTO_SCREEN(StatusScreen);

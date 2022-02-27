@@ -33,7 +33,7 @@ extern lv_group_t*  g;
 static lv_obj_t *scr;
 static lv_obj_t *buttonExt1, *labelExt1, *buttonFanstate, *labelFan;
 
-#if HAS_MULTI_HOTEND
+#if TOOL_CHANGE_SUPPORT
   static lv_obj_t *labelExt2;
   static lv_obj_t *buttonExt2;
 #endif
@@ -94,7 +94,7 @@ void mks_disp_test() {
     sprintf_P(buf, PSTR("e1:%d"), thermalManager.wholeDegHotend(0));
     lv_label_set_text(e1, buf);
   #endif
-  #if HAS_MULTI_HOTEND
+  #if TOOL_CHANGE_SUPPORT
     sprintf_P(buf, PSTR("e2:%d"), thermalManager.wholeDegHotend(1));
     lv_label_set_text(e2, buf);
   #endif
@@ -130,7 +130,7 @@ void lv_draw_ready_print() {
       sprintf_P(buf, PSTR("e1:  %d"), thermalManager.wholeDegHotend(0));
       lv_label_set_text(e1, buf);
     #endif
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       e2 = lv_label_create_empty(scr);
       lv_obj_set_pos(e2, 20, 45);
       sprintf_P(buf, PSTR("e2:  %d"), thermalManager.wholeDegHotend(1));
@@ -174,15 +174,15 @@ void lv_draw_ready_print() {
     #if HAS_HOTEND
       buttonExt1 = lv_big_button_create(scr, "F:/bmp_ext1_state.bin", " ", 20, ICON_POS_Y, event_handler, ID_INFO_EXT);
     #endif
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       buttonExt2 = lv_big_button_create(scr, "F:/bmp_ext2_state.bin", " ", 180, ICON_POS_Y, event_handler, ID_INFO_EXT);
     #endif
     #if HAS_HEATED_BED
-      buttonBedstate = lv_big_button_create(scr, "F:/bmp_bed_state.bin", " ", TERN(HAS_MULTI_HOTEND, 271, 210), ICON_POS_Y, event_handler, ID_INFO_BED);
+      buttonBedstate = lv_big_button_create(scr, "F:/bmp_bed_state.bin", " ", TERN(TOOL_CHANGE_SUPPORT, 271, 210), ICON_POS_Y, event_handler, ID_INFO_BED);
     #endif
 
     TERN_(HAS_HOTEND, labelExt1 = lv_label_create_empty(scr));
-    TERN_(HAS_MULTI_HOTEND, labelExt2 = lv_label_create_empty(scr));
+    TERN_(TOOL_CHANGE_SUPPORT, labelExt2 = lv_label_create_empty(scr));
     TERN_(HAS_HEATED_BED, labelBed = lv_label_create_empty(scr));
     TERN_(HAS_FAN, labelFan = lv_label_create_empty(scr));
 
@@ -204,7 +204,7 @@ void lv_temp_refr() {
     lv_label_set_text(labelExt1, public_buf_l);
     lv_obj_align(labelExt1, buttonExt1, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
   #endif
-  #if HAS_MULTI_HOTEND
+  #if TOOL_CHANGE_SUPPORT
     sprintf(public_buf_l, printing_menu.temp1, thermalManager.wholeDegHotend(1), thermalManager.degTargetHotend(1));
     lv_label_set_text(labelExt2, public_buf_l);
     lv_obj_align(labelExt2, buttonExt2, LV_ALIGN_OUT_RIGHT_MID, 0, 0);

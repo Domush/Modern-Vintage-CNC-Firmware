@@ -794,7 +794,7 @@ void mvCNCUI::draw_status_screen() {
         //
         // Hotend 1 or Bed Temperature
         //
-        #if HAS_MULTI_HOTEND
+        #if TOOL_CHANGE_SUPPORT
   lcd_moveto(8, 0);
   _draw_heater_status(H_E1, LCD_STR_THERMOMETER[0], blink);
         #elif HAS_HEATED_BED
@@ -814,7 +814,7 @@ void mvCNCUI::draw_status_screen() {
         //
         // Hotend 1 or Bed Temperature
         //
-        #if HAS_MULTI_HOTEND
+        #if TOOL_CHANGE_SUPPORT
   lcd_moveto(10, 0);
   _draw_heater_status(H_E1, LCD_STR_THERMOMETER[0], blink);
         #elif HAS_HEATED_BED
@@ -847,7 +847,7 @@ void mvCNCUI::draw_status_screen() {
         // If the first line has two extruder temps,
         // show more temperatures on the next line
 
-        #if HOTENDS > 2 || (HAS_MULTI_HOTEND && HAS_HEATED_BED)
+        #if HOTENDS > 2 || (TOOL_CHANGE_SUPPORT && HAS_HEATED_BED)
 
           #if HOTENDS > 2
   _draw_heater_status(H_E2, LCD_STR_THERMOMETER[0], blink);
@@ -966,7 +966,7 @@ void mvCNCUI::draw_status_screen() {
     lcd_moveto(LCD_WIDTH - 9, 0);
     _draw_axis_value(Z_AXIS, ftostr52sp(LOGICAL_Z_POSITION(current_position.z)), blink);
 
-    #if HAS_LEVELING && (HAS_MULTI_HOTEND || !HAS_HEATED_BED)
+    #if HAS_LEVELING && (TOOL_CHANGE_SUPPORT || !HAS_HEATED_BED)
       lcd_put_wchar(LCD_WIDTH - 1, 0, planner.leveling_active || blink ? '_' : ' ');
     #endif
 
@@ -976,7 +976,7 @@ void mvCNCUI::draw_status_screen() {
     // Hotend 1 or Bed Temperature
     //
     lcd_moveto(0, 1);
-    #if HAS_MULTI_HOTEND
+    #if TOOL_CHANGE_SUPPORT
       _draw_heater_status(H_E1, LCD_STR_THERMOMETER[0], blink);
     #elif HAS_HEATED_BED
       _draw_bed_status(blink);
@@ -994,7 +994,7 @@ void mvCNCUI::draw_status_screen() {
     lcd_moveto(0, 2);
     #if HOTENDS > 2
       _draw_heater_status(H_E2, LCD_STR_THERMOMETER[0], blink);
-    #elif HAS_MULTI_HOTEND && HAS_HEATED_BED
+    #elif TOOL_CHANGE_SUPPORT && HAS_HEATED_BED
       _draw_bed_status(blink);
     #elif HAS_PRINT_PROGRESS
       #define DREW_PRINT_PROGRESS 1
@@ -1136,7 +1136,7 @@ void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t extruder) {
         ) leds |= LED_C;
       #endif // HAS_FAN
 
-      if (TERN0(HAS_MULTI_HOTEND, thermalManager.degTargetHotend(1) > 0)) leds |= LED_C;
+      if (TERN0(TOOL_CHANGE_SUPPORT, thermalManager.degTargetHotend(1) > 0)) leds |= LED_C;
 
       if (leds != ledsprev) {
         lcd.setBacklight(leds);

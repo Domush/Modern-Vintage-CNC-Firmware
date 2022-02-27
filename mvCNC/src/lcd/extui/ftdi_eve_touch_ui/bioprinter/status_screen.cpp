@@ -244,7 +244,7 @@ void StatusScreen::draw_overlay_icons(draw_mode_t what) {
 void StatusScreen::draw_buttons(draw_mode_t what) {
   int16_t x, y, h, v;
 
-  const bool has_media = isMediaInserted() && !isPrintingFromMedia();
+  const bool has_media = isMediaInserted() && !jobRunningFromMedia();
 
   CommandProcessor cmd;
   PolyUI ui(cmd, what);
@@ -255,7 +255,7 @@ void StatusScreen::draw_buttons(draw_mode_t what) {
      .enabled(has_media)
      .colors(has_media ? action_btn : normal_btn)
      .tag(9).button(x, y, h, v,
-        isPrintingFromMedia() ?
+        jobRunningFromMedia() ?
           GET_TEXT_F(MSG_PRINTING) :
           GET_TEXT_F(MSG_BUTTON_MEDIA)
       );
@@ -367,7 +367,7 @@ void StatusScreen::onIdle() {
   if (refresh_timer.elapsed(STATUS_UPDATE_INTERVAL)) {
     if (!EventLoop::is_touch_held())
       onRefresh();
-    if (isPrintingFromMedia())
+    if (jobRunningFromMedia())
       BioPrintingDialogBox::show();
     refresh_timer.start();
   }
