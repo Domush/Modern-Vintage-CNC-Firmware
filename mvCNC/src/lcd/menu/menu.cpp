@@ -145,7 +145,7 @@ void MenuEditItemBase::goto_edit_screen(
 #include "../../mvCNCCore.h"
 
 bool cnc_busy() {
-  return planner.movesplanned() || printingIsActive();
+  return planner.movesplanned() || jobIsActive();
 }
 
 /**

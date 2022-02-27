@@ -1556,9 +1556,6 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
       #if HAS_K_AXIS
         " " STR_K ":", target.k, " (", dk, " steps)"
       #endif
-      #if HAS_EXTRUDERS
-        " E:", target.e, " (", de, " steps)"
-      #endif
     );
   //*/
 
@@ -2427,12 +2424,7 @@ bool Planner::buffer_segment(const abce_pos_t &abce
       SERIAL_ECHOPGM(" (", position.k, "->", target.k);
       SERIAL_CHAR(')');
     #endif
-    #if HAS_EXTRUDERS
-      SERIAL_ECHOPGM_P(SP_E_LBL, abce.e);
-      SERIAL_ECHOLNPGM(" (", position.e, "->", target.e, ")");
-    #else
       SERIAL_EOL();
-    #endif
   //*/
 
   // Queue the movement. Return 'false' if the move was not queued.
@@ -2483,16 +2475,7 @@ bool Planner::buffer_line(const xyze_pos_t &cart, const_feedRate_t fr_mm_s, cons
     // Cartesian XYZ to kinematic ABC, stored in global 'delta'
     inverse_kinematics(machine);
 
-    #if ENABLED(SCARA_FEEDRATE_SCALING)
-      // For SCARA scale the feed rate from mm/s to degrees/s
-      // i.e., Complete the angular vector in the given time.
-      const float duration_recip = inv_duration ?: fr_mm_s / mm;
-      const xyz_pos_t diff = delta - position_float;
-      const feedRate_t feedrate = diff.magnitude() * duration_recip;
-    #else
       const feedRate_t feedrate = fr_mm_s;
-    #endif
-    TERN_(HAS_EXTRUDERS, delta.e = machine.e);
     if (buffer_segment(delta OPTARG(HAS_DIST_MM_ARG, cart_dist_mm), feedrate, extruder, mm)) {
       position_cart = cart;
       return true;
@@ -2597,34 +2580,11 @@ void Planner::set_position_mm(const xyze_pos_t &xyze) {
   #if IS_KINEMATIC
     position_cart = xyze;
     inverse_kinematics(machine);
-    TERN_(HAS_EXTRUDERS, delta.e = machine.e);
     set_machine_position_mm(delta);
   #else
     set_machine_position_mm(machine);
   #endif
 }
-
-#if HAS_EXTRUDERS
-
-  /**
-   * Setters for planner position (also setting stepper position).
-   */
-  void Planner::set_e_position_mm(const_float_t e) {
-    const uint8_t axis_index = E_AXIS_N(active_extruder);
-    TERN_(DISTINCT_E_FACTORS, last_extruder = active_extruder);
-
-    const float e_new = DIFF_TERN(FWRETRACT, e, fwretract.current_retract[active_extruder]);
-    position.e = LROUND(settings.axis_steps_per_mm[axis_index] * e_new);
-    TERN_(HAS_POSITION_FLOAT, position_float.e = e_new);
-    TERN_(IS_KINEMATIC, TERN_(HAS_EXTRUDERS, position_cart.e = e));
-
-    if (has_blocks_queued())
-      buffer_sync_block();
-    else
-      stepper.set_axis_position(E_AXIS, position.e);
-  }
-
-#endif
 
 // Recalculate the steps/s^2 acceleration rates, based on the mm/s^2
 void Planner::reset_acceleration_rates() {

@@ -15,20 +15,12 @@
 #include "../../module/probe.h"
 #include "../../lcd/mvcncui.h" // for LCD_MESSAGE
 
-#if HAS_LEVELING
-  #include "../../feature/bedlevel/bedlevel.h"
-#endif
-
-#if HAS_MULTI_HOTEND
+#if TOOL_CHANGE_SUPPORT
   #include "../../module/tool_change.h"
 #endif
 
 #if ENABLED(Z_STEPPER_ALIGN_KNOWN_STEPPER_POSITIONS)
   #include "../../libs/least_squares_fit.h"
-#endif
-
-#if ENABLED(BLTOUCH)
-  #include "../../feature/bltouch.h"
 #endif
 
 #define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
@@ -125,7 +117,7 @@ void GcodeSuite::G34() {
       TERN_(CNC_WORKSPACE_PLANES, workspace_plane = PLANE_XY);
 
       // Always home with tool 0 active
-      #if HAS_MULTI_HOTEND
+      #if TOOL_CHANGE_SUPPORT
         const uint8_t old_tool_index = active_extruder;
         tool_change(0, true);
       #endif
@@ -429,7 +421,7 @@ void GcodeSuite::G34() {
       #endif
 
       // Restore the active tool after homing
-      TERN_(HAS_MULTI_HOTEND, tool_change(old_tool_index, DISABLED(PARKING_EXTRUDER))); // Fetch previous tool for parking extruder
+      TERN_(TOOL_CHANGE_SUPPORT, tool_change(old_tool_index, DISABLED(PARKING_EXTRUDER))); // Fetch previous tool for parking extruder
 
       #if BOTH(HAS_LEVELING, RESTORE_LEVELING_AFTER_G34)
         set_bed_leveling_enabled(leveling_was_active);

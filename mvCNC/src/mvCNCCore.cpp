@@ -91,20 +91,12 @@
   #include "feature/digipot/digipot.h"
 #endif
 
-#if ENABLED(MIXING_EXTRUDER)
-  #include "feature/mixing.h"
-#endif
-
 #if ENABLED(MAX7219_DEBUG)
   #include "feature/max7219.h"
 #endif
 
 #if HAS_COLOR_LEDS
   #include "feature/leds/leds.h"
-#endif
-
-#if ENABLED(BLTOUCH)
-  #include "feature/bltouch.h"
 #endif
 
 #if ENABLED(POLL_JOG)
@@ -151,14 +143,6 @@
 
 #if ENABLED(DELTA)
   #include "module/delta.h"
-#elif ENABLED(POLARGRAPH)
-  #include "module/polargraph.h"
-#elif IS_SCARA
-  #include "module/scara.h"
-#endif
-
-#if HAS_LEVELING
-  #include "feature/bedlevel/bedlevel.h"
 #endif
 
 #if ENABLED(GCODE_REPEAT_MARKERS)
@@ -169,20 +153,8 @@
   #include "feature/powerloss.h"
 #endif
 
-#if ENABLED(CANCEL_OBJECTS)
-  #include "feature/cancel_object.h"
-#endif
-
-#if HAS_FILAMENT_SENSOR
-  #include "feature/runout.h"
-#endif
-
 #if EITHER(PROBE_TARE, HAS_Z_SERVO_PROBE)
   #include "module/probe.h"
-#endif
-
-#if ENABLED(HOTEND_IDLE_TIMEOUT)
-  #include "feature/hotend_idle.h"
 #endif
 
 #if ENABLED(TEMP_STAT_LEDS)
@@ -205,18 +177,6 @@
 
 #if ENABLED(USE_CONTROLLER_FAN)
   #include "feature/controllerfan.h"
-#endif
-
-#if HAS_PRUSA_MMU1
-  #include "feature/mmu/mmu.h"
-#endif
-
-#if HAS_PRUSA_MMU2
-  #include "feature/mmu/mmu2.h"
-#endif
-
-#if HAS_L64XX
-  #include "libs/L64XX/L64XX_mvCNC.h"
 #endif
 
 #if ENABLED(PASSWORD_FEATURE)
@@ -310,22 +270,22 @@ bool pin_is_protected(const pin_t pin) {
 /**
  * A CNC Job exists when the timer is running or SD is printing
  */
-bool printJobOngoing() { return print_job_timer.isRunning() || IS_SD_PRINTING(); }
+bool jobIsOngoing() { return print_job_timer.isRunning() || IS_SD_PRINTING(); }
 
 /**
  * CNCing is active when a job is underway but not paused
  */
-bool printingIsActive() { return !did_pause_print && printJobOngoing(); }
+bool jobIsActive() { return !did_pause_print && jobIsOngoing(); }
 
 /**
  * CNCing is paused according to SD or host indicators
  */
-bool printingIsPaused() {
+bool jobIsPaused() {
   return did_pause_print || print_job_timer.isPaused() || IS_SD_PAUSED();
 }
 
 void startOrResumeJob() {
-  if (!printingIsPaused()) {
+  if (!jobIsPaused()) {
     TERN_(GCODE_REPEAT_MARKERS, repeat.reset());
     TERN_(CANCEL_OBJECTS, cancelable.reset());
     TERN_(LCD_SHOW_E_TOTAL, e_move_accumulator = 0);
@@ -423,9 +383,6 @@ inline void manage_inactivity(const bool no_stepper_sleep=false) {
         TERN_(DISABLE_INACTIVE_I, stepper.disable_axis(I_AXIS));
         TERN_(DISABLE_INACTIVE_J, stepper.disable_axis(J_AXIS));
         TERN_(DISABLE_INACTIVE_K, stepper.disable_axis(K_AXIS));
-        TERN_(DISABLE_INACTIVE_E, stepper.disable_e_steppers());
-
-        TERN_(AUTO_BED_LEVELING_UBL, ubl.steppers_were_disabled());
       }
     }
     else
@@ -481,7 +438,7 @@ inline void manage_inactivity(const bool no_stepper_sleep=false) {
 
   #if ENABLED(CUSTOM_USER_BUTTONS)
     // Handle a custom user button if defined
-    const bool cnc_not_busy = !printingIsActive();
+    const bool cnc_not_busy = !jobIsActive();
     #define HAS_CUSTOM_USER_BUTTON(N) (PIN_EXISTS(BUTTON##N) && defined(BUTTON##N##_HIT_STATE) && defined(BUTTON##N##_GCODE))
     #define HAS_BETTER_USER_BUTTON(N) HAS_CUSTOM_USER_BUTTON(N) && defined(BUTTON##N##_DESC)
     #define _CHECK_CUSTOM_USER_BUTTON(N, CODE) do{                     \
@@ -632,65 +589,9 @@ inline void manage_inactivity(const bool no_stepper_sleep=false) {
 
   TERN_(USE_CONTROLLER_FAN, controllerFan.update()); // Check if fan should be turned on to cool stepper drivers down
 
-  TERN_(AUTO_POWER_CONTROL, powerManager.check(!ui.on_status_screen() || printJobOngoing() || printingIsPaused()));
+  TERN_(AUTO_POWER_CONTROL, powerManager.check(!ui.on_status_screen() || jobIsOngoing() || jobIsPaused()));
 
   TERN_(HOTEND_IDLE_TIMEOUT, hotend_idle.check());
-
-  #if ENABLED(EXTRUDER_RUNOUT_PREVENT)
-    if (thermalManager.degHotend(active_extruder) > (EXTRUDER_RUNOUT_MINTEMP)
-      && ELAPSED(ms, gcode.previous_move_ms + SEC_TO_MS(EXTRUDER_RUNOUT_SECONDS))
-      && !planner.has_blocks_queued()
-    ) {
-      #if ENABLED(SWITCHING_EXTRUDER)
-        bool oldstatus;
-        switch (active_extruder) {
-          default: oldstatus = stepper.AXIS_IS_ENABLED(E_AXIS, 0); stepper.ENABLE_EXTRUDER(0); break;
-          #if E_STEPPERS > 1
-            case 2: case 3: oldstatus = stepper.AXIS_IS_ENABLED(E_AXIS, 1); stepper.ENABLE_EXTRUDER(1); break;
-            #if E_STEPPERS > 2
-              case 4: case 5: oldstatus = stepper.AXIS_IS_ENABLED(E_AXIS, 2); stepper.ENABLE_EXTRUDER(2); break;
-              #if E_STEPPERS > 3
-                case 6: case 7: oldstatus = stepper.AXIS_IS_ENABLED(E_AXIS, 3); stepper.ENABLE_EXTRUDER(3); break;
-              #endif // E_STEPPERS > 3
-            #endif // E_STEPPERS > 2
-          #endif // E_STEPPERS > 1
-        }
-      #else // !SWITCHING_EXTRUDER
-        bool oldstatus;
-        switch (active_extruder) {
-          default:
-          #define _CASE_EN(N) case N: oldstatus = stepper.AXIS_IS_ENABLED(E_AXIS, N); stepper.ENABLE_EXTRUDER(N); break;
-          REPEAT(E_STEPPERS, _CASE_EN);
-        }
-      #endif
-
-      const float olde = current_position.e;
-      current_position.e += EXTRUDER_RUNOUT_EXTRUDE;
-      line_to_current_position(MMM_TO_MMS(EXTRUDER_RUNOUT_SPEED));
-      current_position.e = olde;
-      planner.set_e_position_mm(olde);
-      planner.synchronize();
-
-      #if ENABLED(SWITCHING_EXTRUDER)
-        switch (active_extruder) {
-          default: if (oldstatus) stepper.ENABLE_EXTRUDER(0); else stepper.DISABLE_EXTRUDER(0); break;
-          #if E_STEPPERS > 1
-            case 2: case 3: if (oldstatus) stepper.ENABLE_EXTRUDER(1); else stepper.DISABLE_EXTRUDER(1); break;
-            #if E_STEPPERS > 2
-              case 4: case 5: if (oldstatus) stepper.ENABLE_EXTRUDER(2); else stepper.DISABLE_EXTRUDER(2); break;
-            #endif // E_STEPPERS > 2
-          #endif // E_STEPPERS > 1
-        }
-      #else // !SWITCHING_EXTRUDER
-        switch (active_extruder) {
-          #define _CASE_RESTORE(N) case N: if (oldstatus) stepper.ENABLE_EXTRUDER(N); else stepper.DISABLE_EXTRUDER(N); break;
-          REPEAT(E_STEPPERS, _CASE_RESTORE);
-        }
-      #endif // !SWITCHING_EXTRUDER
-
-      gcode.reset_stepper_timeout(ms);
-    }
-  #endif // EXTRUDER_RUNOUT_PREVENT
 
   #if ENABLED(DUAL_X_CARRIAGE)
     // handle delayed move timeout
@@ -770,12 +671,6 @@ void idle(bool no_stepper_sleep/*=false*/) {
   // TODO: Still causing errors
   (void)check_tool_sensor_stats(active_extruder, true);
 
-  // Handle filament runout sensors
-  #if HAS_FILAMENT_SENSOR
-    if (TERN1(HAS_PRUSA_MMU2, !mmu2.enabled()))
-      runout.run();
-  #endif
-
   // Run HAL idle tasks
   TERN_(HAL_IDLETASK, HAL_idletask());
 
@@ -835,9 +730,6 @@ void idle(bool no_stepper_sleep/*=false*/) {
       TERN_(BUFFER_MONITORING, queue.auto_report_buffer_statistics());
     }
   #endif
-
-  // Update the Průša MMU2
-  TERN_(HAS_PRUSA_MMU2, mmu2.mmu_loop());
 
   // Handle Joystick jogging
   #if BOTH(POLL_JOG, JOYSTICK)
@@ -986,30 +878,6 @@ inline void tmc_standby_setup() {
   #endif
   #if PIN_EXISTS(K_STDBY)
     SET_INPUT_PULLDOWN(K_STDBY_PIN);
-  #endif
-  #if PIN_EXISTS(E0_STDBY)
-    SET_INPUT_PULLDOWN(E0_STDBY_PIN);
-  #endif
-  #if PIN_EXISTS(E1_STDBY)
-    SET_INPUT_PULLDOWN(E1_STDBY_PIN);
-  #endif
-  #if PIN_EXISTS(E2_STDBY)
-    SET_INPUT_PULLDOWN(E2_STDBY_PIN);
-  #endif
-  #if PIN_EXISTS(E3_STDBY)
-    SET_INPUT_PULLDOWN(E3_STDBY_PIN);
-  #endif
-  #if PIN_EXISTS(E4_STDBY)
-    SET_INPUT_PULLDOWN(E4_STDBY_PIN);
-  #endif
-  #if PIN_EXISTS(E5_STDBY)
-    SET_INPUT_PULLDOWN(E5_STDBY_PIN);
-  #endif
-  #if PIN_EXISTS(E6_STDBY)
-    SET_INPUT_PULLDOWN(E6_STDBY_PIN);
-  #endif
-  #if PIN_EXISTS(E7_STDBY)
-    SET_INPUT_PULLDOWN(E7_STDBY_PIN);
   #endif
 }
 
@@ -1228,10 +1096,6 @@ void setup() {
     SETUP_RUN(recovery.setup());
   #endif
 
-  #if HAS_L64XX
-    SETUP_RUN(L64xxManager.init());  // Set up SPI, init drivers
-  #endif
-
   #if HAS_STEPPER_RESET
     SETUP_RUN(disableStepperDrivers());
   #endif
@@ -1428,51 +1292,6 @@ void setup() {
     #if HAS_CUSTOM_USER_BUTTON(10)
       INIT_CUSTOM_USER_BUTTON_PIN(10);
     #endif
-    #if HAS_CUSTOM_USER_BUTTON(11)
-      INIT_CUSTOM_USER_BUTTON_PIN(11);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(12)
-      INIT_CUSTOM_USER_BUTTON_PIN(12);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(13)
-      INIT_CUSTOM_USER_BUTTON_PIN(13);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(14)
-      INIT_CUSTOM_USER_BUTTON_PIN(14);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(15)
-      INIT_CUSTOM_USER_BUTTON_PIN(15);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(16)
-      INIT_CUSTOM_USER_BUTTON_PIN(16);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(17)
-      INIT_CUSTOM_USER_BUTTON_PIN(17);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(18)
-      INIT_CUSTOM_USER_BUTTON_PIN(18);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(19)
-      INIT_CUSTOM_USER_BUTTON_PIN(19);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(20)
-      INIT_CUSTOM_USER_BUTTON_PIN(20);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(21)
-      INIT_CUSTOM_USER_BUTTON_PIN(21);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(22)
-      INIT_CUSTOM_USER_BUTTON_PIN(22);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(23)
-      INIT_CUSTOM_USER_BUTTON_PIN(23);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(24)
-      INIT_CUSTOM_USER_BUTTON_PIN(24);
-    #endif
-    #if HAS_CUSTOM_USER_BUTTON(25)
-      INIT_CUSTOM_USER_BUTTON_PIN(25);
-    #endif
   #endif
 
   #if PIN_EXISTS(STAT_LED_RED)
@@ -1486,20 +1305,8 @@ void setup() {
     SETUP_RUN(caselight.init());
   #endif
 
-  #if HAS_PRUSA_MMU1
-    SETUP_RUN(mmu_init());
-  #endif
-
   #if HAS_FANMUX
     SETUP_RUN(fanmux_init());
-  #endif
-
-  #if ENABLED(MIXING_EXTRUDER)
-    SETUP_RUN(mixer.init());
-  #endif
-
-  #if ENABLED(BLTOUCH)
-    SETUP_RUN(bltouch.init(/*set_voltage=*/true));
   #endif
 
   #if ENABLED(MAGLEV4)
@@ -1564,10 +1371,6 @@ void setup() {
 
   #if HAS_DRIVER_SAFE_POWER_PROTECT
     SETUP_RUN(stepper_driver_backward_report());
-  #endif
-
-  #if HAS_PRUSA_MMU2
-    SETUP_RUN(mmu2.init());
   #endif
 
   #if ENABLED(IIC_BL24CXX_EEPROM)

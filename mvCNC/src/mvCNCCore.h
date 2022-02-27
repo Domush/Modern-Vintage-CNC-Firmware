@@ -38,9 +38,9 @@ extern mvCNCState mvcnc_state;
 inline bool IsRunning() { return mvcnc_state >= MF_RUNNING; }
 inline bool IsStopped() { return mvcnc_state == MF_STOPPED; }
 
-bool printingIsActive();
-bool printJobOngoing();
-bool printingIsPaused();
+bool jobIsActive();
+bool jobIsOngoing();
+bool jobIsPaused();
 void startOrResumeJob();
 
 extern bool wait_for_heatup;

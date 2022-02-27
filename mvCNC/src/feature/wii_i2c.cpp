@@ -144,7 +144,7 @@ void WiiNunchuck::calculate(xyz_float_t &norm_jog) {
 void WiiNunchuck::inject_jog_moves() {
   // Recursion barrier
   static bool injecting_now;  // = false;
-  if (injecting_now || printJobOngoing()) return;
+  if (injecting_now || jobIsOngoing()) return;
     #if HAS_CUTTER
   if (cutter.power) return;
     #endif

@@ -23,7 +23,7 @@
 #include "../../gcode/parser.h" // for units (and volumetric)
 
 #if ENABLED(LCD_SHOW_E_TOTAL)
-  #include "../../mvCNCCore.h" // for printingIsActive()
+    #include "../../mvCNCCore.h"  // for jobIsActive()
 #endif
 
 #if ENABLED(FILAMENT_LCD_DISPLAY)
@@ -465,37 +465,37 @@ void mvCNCUI::draw_status_screen() {
     #endif
   #endif
 
-  const bool show_e_total = TERN0(LCD_SHOW_E_TOTAL, printingIsActive());
+        const bool show_e_total = TERN0(LCD_SHOW_E_TOTAL, jobIsActive());
 
-  // At the first page, generate new display values
-  if (first_page) {
-    #if ANIM_HBCC
-      uint8_t new_bits = 0;
-      #if ANIM_HOTEND
-        HOTEND_LOOP() if (thermalManager.isHeatingHotend(e)) SBI(new_bits, DRAWBIT_HOTEND + e);
-      #endif
-      if (TERN0(ANIM_BED, thermalManager.isHeatingBed())) SBI(new_bits, DRAWBIT_BED);
-      #if DO_DRAW_CHAMBER && HAS_HEATED_CHAMBER
-        if (thermalManager.isHeatingChamber()) SBI(new_bits, DRAWBIT_CHAMBER);
-      #endif
-      if (TERN0(ANIM_CUTTER, cutter.enabled())) SBI(new_bits, DRAWBIT_CUTTER);
-      draw_bits = new_bits;
+        // At the first page, generate new display values
+        if (first_page) {
+  #if ANIM_HBCC
+          uint8_t new_bits = 0;
+    #if ANIM_HOTEND
+          HOTEND_LOOP() if (thermalManager.isHeatingHotend(e)) SBI(new_bits, DRAWBIT_HOTEND + e);
     #endif
+          if (TERN0(ANIM_BED, thermalManager.isHeatingBed())) SBI(new_bits, DRAWBIT_BED);
+    #if DO_DRAW_CHAMBER && HAS_HEATED_CHAMBER
+          if (thermalManager.isHeatingChamber()) SBI(new_bits, DRAWBIT_CHAMBER);
+    #endif
+          if (TERN0(ANIM_CUTTER, cutter.enabled())) SBI(new_bits, DRAWBIT_CUTTER);
+          draw_bits = new_bits;
+  #endif
 
-    const xyz_pos_t lpos = current_position.asLogical();
-    const bool is_inch = parser.using_inch_units();
-    strcpy(zstring, is_inch ? ftostr42_52(LINEAR_UNIT(lpos.z)) : ftostr52sp(lpos.z));
+          const xyz_pos_t lpos = current_position.asLogical();
+          const bool is_inch   = parser.using_inch_units();
+          strcpy(zstring, is_inch ? ftostr42_52(LINEAR_UNIT(lpos.z)) : ftostr52sp(lpos.z));
 
-    if (show_e_total) {
-      #if ENABLED(LCD_SHOW_E_TOTAL)
-        const uint8_t escale = e_move_accumulator >= 100000.0f ? 10 : 1; // After 100m switch to cm
-        sprintf_P(xstring, PSTR("%ld%cm"), uint32_t(_MAX(e_move_accumulator, 0.0f)) / escale, escale == 10 ? 'c' : 'm'); // 1234567mm
-      #endif
-    }
-    else {
-      strcpy(xstring, is_inch ? ftostr53_63(LINEAR_UNIT(lpos.x)) : ftostr4sign(lpos.x));
-      strcpy(ystring, is_inch ? ftostr53_63(LINEAR_UNIT(lpos.y)) : ftostr4sign(lpos.y));
-    }
+          if (show_e_total) {
+  #if ENABLED(LCD_SHOW_E_TOTAL)
+            const uint8_t escale = e_move_accumulator >= 100000.0f ? 10 : 1;  // After 100m switch to cm
+            sprintf_P(xstring, PSTR("%ld%cm"), uint32_t(_MAX(e_move_accumulator, 0.0f)) / escale,
+                      escale == 10 ? 'c' : 'm');  // 1234567mm
+  #endif
+          } else {
+            strcpy(xstring, is_inch ? ftostr53_63(LINEAR_UNIT(lpos.x)) : ftostr4sign(lpos.x));
+            strcpy(ystring, is_inch ? ftostr53_63(LINEAR_UNIT(lpos.y)) : ftostr4sign(lpos.y));
+          }
 
     #if ENABLED(FILAMENT_LCD_DISPLAY)
       strcpy(wstring, ftostr12ns(filwidth.measured_mm));

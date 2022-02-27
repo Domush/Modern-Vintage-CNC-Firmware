@@ -335,7 +335,7 @@
 
     constexpr uint8_t status_hotend_x[HOTENDS] = { REPEAT2_S(1, INCREMENT(HOTENDS), _SHNAME, X) };
     #define STATUS_HOTEND_X(N) status_hotend_x[N]
-  #elif HAS_MULTI_HOTEND
+  #elif TOOL_CHANGE_SUPPORT
     #define STATUS_HOTEND_X(N) ((N) ? STATUS_HOTEND2_X : STATUS_HOTEND1_X)
   #else
     #define STATUS_HOTEND_X(N) STATUS_HOTEND1_X

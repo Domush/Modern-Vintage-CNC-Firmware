@@ -10,10 +10,6 @@
 #include "../../module/motion.h"
 #include "../../module/probe.h"
 
-#ifdef BLTOUCH_HS_MODE
-  #include "../../feature/bltouch.h"
-#endif
-
 /**
  * M401: Deploy and activate the Z probe
  *

@@ -494,39 +494,6 @@ bool Stepper::disable_axis(const AxisEnum axis) {
   return can_disable;
 }
 
-#if HAS_EXTRUDERS
-
-  void Stepper::enable_extruder(E_TERN_(const uint8_t eindex)) {
-    IF_DISABLED(HAS_MULTI_EXTRUDER, constexpr uint8_t eindex = 0);
-    #define _CASE_ENA_E(N) case N: ENABLE_AXIS_E##N(); mark_axis_enabled(E_AXIS E_OPTARG(eindex)); break;
-    switch (eindex) {
-      REPEAT(E_STEPPERS, _CASE_ENA_E)
-    }
-  }
-
-  bool Stepper::disable_extruder(E_TERN_(const uint8_t eindex/*=0*/)) {
-    IF_DISABLED(HAS_MULTI_EXTRUDER, constexpr uint8_t eindex = 0);
-    mark_axis_disabled(E_AXIS E_OPTARG(eindex));
-    const bool can_disable = can_axis_disable(E_AXIS E_OPTARG(eindex));
-    if (can_disable) {
-      #define _CASE_DIS_E(N) case N: DISABLE_AXIS_E##N(); break;
-      switch (eindex) { REPEAT(E_STEPPERS, _CASE_DIS_E) }
-    }
-    return can_disable;
-  }
-
-  void Stepper::enable_e_steppers() {
-    #define _ENA_E(N) ENABLE_EXTRUDER(N);
-    REPEAT(EXTRUDERS, _ENA_E)
-  }
-
-  void Stepper::disable_e_steppers() {
-    #define _DIS_E(N) DISABLE_EXTRUDER(N);
-    REPEAT(EXTRUDERS, _DIS_E)
-  }
-
-#endif
-
 void Stepper::enable_all_steppers() {
   TERN_(AUTO_POWER_CONTROL, powerManager.power_on());
   LINEAR_AXIS_CODE(
@@ -575,30 +542,6 @@ void Stepper::set_directions() {
   TERN_(HAS_I_DIR, SET_STEP_DIR(I));
   TERN_(HAS_J_DIR, SET_STEP_DIR(J));
   TERN_(HAS_K_DIR, SET_STEP_DIR(K));
-
-  #if DISABLED(LIN_ADVANCE)
-    #if ENABLED(MIXING_EXTRUDER)
-       // Because this is valid for the whole block we don't know
-       // what e-steppers will step. Likely all. Set all.
-      if (motor_direction(E_AXIS)) {
-        MIXER_STEPPER_LOOP(j) REV_E_DIR(j);
-        count_direction.e = -1;
-      }
-      else {
-        MIXER_STEPPER_LOOP(j) NORM_E_DIR(j);
-        count_direction.e = 1;
-      }
-    #elif HAS_EXTRUDERS
-      if (motor_direction(E_AXIS)) {
-        REV_E_DIR(stepper_extruder);
-        count_direction.e = -1;
-      }
-      else {
-        NORM_E_DIR(stepper_extruder);
-        count_direction.e = 1;
-      }
-    #endif
-  #endif // !LIN_ADVANCE
 
   #if HAS_L64XX
     if (L64XX_OK_to_power_up) { // OK to send the direction commands (which powers up the L64XX steppers)
@@ -1713,7 +1656,6 @@ void Stepper::pulse_phase_isr() {
           PAGE_PULSE_PREP(X);
           PAGE_PULSE_PREP(Y);
           PAGE_PULSE_PREP(Z);
-          TERN_(HAS_EXTRUDERS, PAGE_PULSE_PREP(E));
 
           page_step_state.segment_steps++;
 
@@ -1746,7 +1688,6 @@ void Stepper::pulse_phase_isr() {
           PAGE_PULSE_PREP(X);
           PAGE_PULSE_PREP(Y);
           PAGE_PULSE_PREP(Z);
-          TERN_(HAS_EXTRUDERS, PAGE_PULSE_PREP(E));
 
           page_step_state.segment_steps++;
 
@@ -2796,7 +2737,6 @@ void Stepper::_set_position(const abce_long_t &spos) {
     #elif ENABLED(MARKFORGED_YX)
       count_position.set(spos.a, spos.b - spos.a, spos.c);
     #endif
-    TERN_(HAS_EXTRUDERS, count_position.e = spos.e);
   #else
     // default non-h-bot planning
     count_position = spos;

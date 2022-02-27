@@ -283,38 +283,6 @@ void CNCJobRecovery::resume() {
   // Apply the dry-run flag if enabled
   if (info.flag.dryrun) mvcnc_debug_flags |= MVCNC_DEBUG_DRYRUN;
 
-  // Restore cold extrusion permission
-  TERN_(PREVENT_COLD_EXTRUSION, thermalManager.allow_cold_extrude = info.flag.allow_cold_extrusion);
-
-  #if HAS_LEVELING
-    // Make sure leveling is off before any G92 and G28
-    gcode.process_subcommands_now(F("M420 S0 Z0"));
-  #endif
-
-  #if HAS_HEATED_BED
-    const celsius_t bt = info.target_temperature_bed;
-    if (bt) {
-      // Restore the bed temperature
-      sprintf_P(cmd, PSTR("M190S%i"), bt);
-      gcode.process_subcommands_now(cmd);
-    }
-  #endif
-
-  // Heat hotend enough to soften material
-  #if HAS_HOTEND
-    HOTEND_LOOP() {
-      const celsius_t et = _MAX(info.target_temperature[e], 180);
-      if (et) {
-        #if HAS_MULTI_HOTEND
-          sprintf_P(cmd, PSTR("T%iS"), e);
-          gcode.process_subcommands_now(cmd);
-        #endif
-        sprintf_P(cmd, PSTR("M109S%i"), et);
-        gcode.process_subcommands_now(cmd);
-      }
-    }
-  #endif
-
   // Interpret the saved Z according to flags
   const float z_print = info.current_position.z,
               z_raised = z_print + info.zraise;
@@ -375,20 +343,6 @@ void CNCJobRecovery::resume() {
   // Mark all axes as having been homed (no effect on current_position)
   set_all_homed();
 
-  #if HAS_LEVELING
-    // Restore Z fade and possibly re-enable bed leveling compensation.
-    // Leveling may already be enabled due to the ENABLE_LEVELING_AFTER_G28 option.
-    // TODO: Add a G28 parameter to leave leveling disabled.
-    sprintf_P(cmd, PSTR("M420S%cZ%s"), '0' + (char)info.flag.leveling, dtostrf(info.fade, 1, 1, str_1));
-    gcode.process_subcommands_now(cmd);
-
-    #if HOME_XY_ONLY
-      // The physical Z was adjusted at power-off so undo the M420S1 correction to Z with G92.9.
-      sprintf_P(cmd, PSTR("G92.9Z%s"), dtostrf(z_now, 1, 1, str_1));
-      gcode.process_subcommands_now(cmd);
-    #endif
-  #endif
-
   #if ENABLED(POWER_LOSS_RECOVER_ZHOME)
     // Z was homed down to the bed, so move up to the raised height.
     z_now = z_raised;
@@ -396,42 +350,8 @@ void CNCJobRecovery::resume() {
     gcode.process_subcommands_now(cmd);
   #endif
 
-  // Recover volumetric extrusion state
-  #if ENABLED(USE_VOLUMETRICS)
-    #if HAS_MULTI_EXTRUDER
-      for (int8_t e = 0; e < EXTRUDERS; e++) {
-        sprintf_P(cmd, PSTR("M200T%iD%s"), e, dtostrf(info.filament_size[e], 1, 3, str_1));
-        gcode.process_subcommands_now(cmd);
-      }
-      if (!info.flag.volumetric_enabled) {
-        sprintf_P(cmd, PSTR("M200T%iD0"), info.active_extruder);
-        gcode.process_subcommands_now(cmd);
-      }
-    #else
-      if (info.flag.volumetric_enabled) {
-        sprintf_P(cmd, PSTR("M200D%s"), dtostrf(info.filament_size[0], 1, 3, str_1));
-        gcode.process_subcommands_now(cmd);
-      }
-    #endif
-  #endif
-
-  // Restore all hotend temperatures
-  #if HAS_HOTEND
-    HOTEND_LOOP() {
-      const celsius_t et = info.target_temperature[e];
-      if (et) {
-        #if HAS_MULTI_HOTEND
-          sprintf_P(cmd, PSTR("T%iS"), e);
-          gcode.process_subcommands_now(cmd);
-        #endif
-        sprintf_P(cmd, PSTR("M109S%i"), et);
-        gcode.process_subcommands_now(cmd);
-      }
-    }
-  #endif
-
   // Restore the previously active tool (with no_move)
-  #if HAS_MULTI_EXTRUDER || HAS_MULTI_HOTEND
+  #if HAS_MULTI_EXTRUDER || TOOL_CHANGE_SUPPORT
     sprintf_P(cmd, PSTR("T%i S"), info.active_extruder);
     gcode.process_subcommands_now(cmd);
   #endif
@@ -445,36 +365,6 @@ void CNCJobRecovery::resume() {
         gcode.process_subcommands_now(cmd);
       }
     }
-  #endif
-
-  // Restore retract and hop state from an active `G10` command
-  #if ENABLED(FWRETRACT)
-    LOOP_L_N(e, EXTRUDERS) {
-      if (info.retract[e] != 0.0) {
-        fwretract.current_retract[e] = info.retract[e];
-        fwretract.retracted[e] = true;
-      }
-    }
-    fwretract.current_hop = info.retract_hop;
-  #endif
-
-  #if ENABLED(GRADIENT_MIX)
-    memcpy(&mixer.gradient, &info.gradient, sizeof(info.gradient));
-  #endif
-
-  // Un-retract if there was a retract at outage
-  #if ENABLED(BACKUP_POWER_SUPPLY) && POWER_LOSS_RETRACT_LEN > 0
-    gcode.process_subcommands_now(F("G1E" STRINGIFY(POWER_LOSS_RETRACT_LEN) "F3000"));
-  #endif
-
-  // Additional purge on resume if configured
-  #if POWER_LOSS_PURGE_LEN
-    sprintf_P(cmd, PSTR("G1 E%d F3000"), (POWER_LOSS_PURGE_LEN) + (POWER_LOSS_RETRACT_LEN));
-    gcode.process_subcommands_now(cmd);
-  #endif
-
-  #if ENABLED(NOZZLE_CLEAN_FEATURE)
-    gcode.process_subcommands_now(F("G12"));
   #endif
 
   // Move back over to the saved XY
@@ -570,25 +460,6 @@ void CNCJobRecovery::resume() {
           DEBUG_ECHOLNPGM("active_extruder: ", info.active_extruder);
         #endif
 
-        #if ENABLED(USE_VOLUMETRICS)
-          DEBUG_ECHOPGM("filament_size:");
-          LOOP_L_N(i, EXTRUDERS) DEBUG_ECHOLNPGM(" ", info.filament_size[i]);
-          DEBUG_EOL();
-        #endif
-
-        #if HAS_HOTEND
-          DEBUG_ECHOPGM("target_temperature: ");
-          HOTEND_LOOP() {
-            DEBUG_ECHO(info.target_temperature[e]);
-            if (e < HOTENDS - 1) DEBUG_CHAR(',');
-          }
-          DEBUG_EOL();
-        #endif
-
-        #if HAS_HEATED_BED
-          DEBUG_ECHOLNPGM("target_temperature_bed: ", info.target_temperature_bed);
-        #endif
-
         #if HAS_FAN
           DEBUG_ECHOPGM("fan_speed: ");
           FANS_LOOP(i) {
@@ -596,25 +467,6 @@ void CNCJobRecovery::resume() {
             if (i < FAN_COUNT - 1) DEBUG_CHAR(',');
           }
           DEBUG_EOL();
-        #endif
-
-        #if HAS_LEVELING
-          DEBUG_ECHOLNPGM("leveling: ", info.flag.leveling ? "ON" : "OFF", "  fade: ", info.fade);
-        #endif
-
-        #if ENABLED(FWRETRACT)
-          DEBUG_ECHOPGM("retract: ");
-          for (int8_t e = 0; e < EXTRUDERS; e++) {
-            DEBUG_ECHO(info.retract[e]);
-            if (e < EXTRUDERS - 1) DEBUG_CHAR(',');
-          }
-          DEBUG_EOL();
-          DEBUG_ECHOLNPGM("retract_hop: ", info.retract_hop);
-        #endif
-
-        // Mixing extruder and gradient
-        #if BOTH(MIXING_EXTRUDER, GRADIENT_MIX)
-          DEBUG_ECHOLNPGM("gradient: ", info.gradient.enabled ? "ON" : "OFF");
         #endif
 
         DEBUG_ECHOLNPGM("sd_filename: ", info.sd_filename);
@@ -625,9 +477,6 @@ void CNCJobRecovery::resume() {
         if (TEST(info.axis_relative, REL_X)) DEBUG_ECHOPGM(" REL_X");
         if (TEST(info.axis_relative, REL_Y)) DEBUG_ECHOPGM(" REL_Y");
         if (TEST(info.axis_relative, REL_Z)) DEBUG_ECHOPGM(" REL_Z");
-        if (TEST(info.axis_relative, REL_E)) DEBUG_ECHOPGM(" REL_E");
-        if (TEST(info.axis_relative, E_MODE_ABS)) DEBUG_ECHOPGM(" E_MODE_ABS");
-        if (TEST(info.axis_relative, E_MODE_REL)) DEBUG_ECHOPGM(" E_MODE_REL");
         DEBUG_EOL();
 
         DEBUG_ECHOLNPGM("flag.dryrun: ", AS_DIGIT(info.flag.dryrun));

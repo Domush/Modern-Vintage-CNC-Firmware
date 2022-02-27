@@ -9,7 +9,7 @@
 #include "../../module/stepper.h"
 #include "../../module/endstops.h"
 
-#if HAS_MULTI_HOTEND
+#if TOOL_CHANGE_SUPPORT
   #include "../../module/tool_change.h"
 #endif
 
@@ -23,10 +23,6 @@
 
 #include "../../module/probe.h"
 
-#if ENABLED(BLTOUCH)
-  #include "../../feature/bltouch.h"
-#endif
-
 #include "../../lcd/mvcncui.h"
 
 #if ENABLED(EXTENSIBLE_UI)
@@ -35,10 +31,6 @@
   #include "../../lcd/e3v2/creality/dwin.h"
 #elif ENABLED(DWIN_CREALITY_LCD_ENHANCED)
   #include "../../lcd/e3v2/proui/dwin.h"
-#endif
-
-#if HAS_L64XX                         // set L6470 absolute position registers to counts
-  #include "../../libs/L64XX/L64XX_mvCNC.h"
 #endif
 
 #if ENABLED(LASER_MOVE_G28_OFF)
@@ -314,7 +306,7 @@ void GcodeSuite::G28() {
   #endif
 
   // Always home with tool 0 active
-  #if HAS_MULTI_HOTEND
+  #if TOOL_CHANGE_SUPPORT
     #if DISABLED(DELTA) || ENABLED(DELTA_HOME_TO_SAFE_ZONE)
       const uint8_t old_tool_index = active_extruder;
     #endif
@@ -383,7 +375,6 @@ void GcodeSuite::G28() {
       // Raise Z before homing any other axes and z is not already high enough (never lower z)
       if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Raise Z (before homing) by ", z_homing_height);
       do_z_clearance(z_homing_height);
-      TERN_(BLTOUCH, bltouch.init());
     }
 
     // Diagonal move first if both are homing
@@ -493,7 +484,7 @@ void GcodeSuite::G28() {
   restore_feedrate_and_scaling();
 
   // Restore the active tool after homing
-  #if HAS_MULTI_HOTEND && (DISABLED(DELTA) || ENABLED(DELTA_HOME_TO_SAFE_ZONE))
+  #if TOOL_CHANGE_SUPPORT && (DISABLED(DELTA) || ENABLED(DELTA_HOME_TO_SAFE_ZONE))
     tool_change(old_tool_index, TERN(PARKING_EXTRUDER, !pe_final_change_must_unpark, DISABLED(DUAL_X_CARRIAGE)));   // Do move if one of these
   #endif
 

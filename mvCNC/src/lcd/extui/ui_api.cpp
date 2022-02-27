@@ -1031,18 +1031,16 @@ namespace ExtUI {
     TERN(SDSUPPORT, card.openAndPrintFile(filename), UNUSED(filename));
   }
 
-  bool isPrintingFromMediaPaused() {
+  bool jobRunningFromMediaPaused() {
     return TERN0(SDSUPPORT, IS_SD_PAUSED());
   }
 
-  bool isPrintingFromMedia() { return TERN0(SDSUPPORT, IS_SD_PRINTING() || IS_SD_PAUSED()); }
+  bool jobRunningFromMedia() { return TERN0(SDSUPPORT, IS_SD_PRINTING() || IS_SD_PAUSED()); }
 
-  bool isPrinting() {
-    return commandsInQueue() || isPrintingFromMedia() || printJobOngoing() || printingIsPaused();
-  }
+  bool jobRunning() { return commandsInQueue() || jobRunningFromMedia() || jobIsOngoing() || jobIsPaused(); }
 
-  bool isPrintingPaused() {
-    return isPrinting() && (isPrintingFromMediaPaused() || print_job_timer.isPaused());
+  bool jobRunningPaused() {
+    return jobRunning() && (jobRunningFromMediaPaused() || print_job_timer.isPaused());
   }
 
   bool isMediaInserted() { return TERN0(SDSUPPORT, IS_SD_INSERTED()); }

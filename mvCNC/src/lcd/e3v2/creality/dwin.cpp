@@ -317,7 +317,7 @@ void ICON_Resume() {
 }
 
 void ICON_ResumeOrPause() {
-  if (printingIsPaused() || HMI_flag.pause_flag || HMI_flag.pause_action)
+  if (jobIsPaused() || HMI_flag.pause_flag || HMI_flag.pause_action)
     ICON_Resume();
   else
     ICON_Pause();
@@ -1366,75 +1366,87 @@ void HMI_Move_Z() {
 
 #if HAS_ZOFFSET_ITEM
 
-  bool cnc_busy() { return planner.movesplanned() || printingIsActive(); }
+  bool cnc_busy() {
+    return planner.movesplanned() || jobIsActive();
+  }
 
   void HMI_Zoffset() {
     EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
     if (encoder_diffState == ENCODER_DIFF_NO) return;
     uint8_t zoff_line;
     switch (HMI_ValueStruct.show_mode) {
-      case -4: zoff_line = PREPARE_CASE_ZOFF + MROWS - index_prepare; break;
-      default: zoff_line = TUNE_CASE_ZOFF + MROWS - index_tune;
+      case -4:
+        zoff_line = PREPARE_CASE_ZOFF + MROWS - index_prepare;
+        break;
+      default:
+        zoff_line = TUNE_CASE_ZOFF + MROWS - index_tune;
     }
     if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.offset_value)) {
       EncoderRate.enabled = false;
-      #if HAS_BED_PROBE
-        probe.offset.z = dwin_zoffset;
-        TERN_(EEPROM_SETTINGS, settings.save());
-      #endif
+    #if HAS_BED_PROBE
+      probe.offset.z = dwin_zoffset;
+      TERN_(EEPROM_SETTINGS, settings.save());
+    #endif
       checkkey = HMI_ValueStruct.show_mode == -4 ? Prepare : Tune;
       Draw_Edit_Signed_Float2(zoff_line, TERN(HAS_BED_PROBE, BABY_Z_VAR * 100, HMI_ValueStruct.offset_value));
       DWIN_UpdateLCD();
       return;
     }
-    LIMIT(HMI_ValueStruct.offset_value, (Z_PROBE_OFFSET_RANGE_MIN) * 100, (Z_PROBE_OFFSET_RANGE_MAX) * 100);
+    LIMIT(HMI_ValueStruct.offset_value, (Z_PROBE_OFFSET_RANGE_MIN)*100, (Z_PROBE_OFFSET_RANGE_MAX)*100);
     last_zoffset = dwin_zoffset;
     dwin_zoffset = HMI_ValueStruct.offset_value / 100.0f;
     #if EITHER(BABYSTEP_ZPROBE_OFFSET, JUST_BABYSTEP)
-      if (BABYSTEP_ALLOWED()) babystep.add_mm(Z_AXIS, dwin_zoffset - last_zoffset);
+    if (BABYSTEP_ALLOWED()) babystep.add_mm(Z_AXIS, dwin_zoffset - last_zoffset);
     #endif
     Draw_Edit_Signed_Float2(zoff_line, HMI_ValueStruct.offset_value, true);
     DWIN_UpdateLCD();
   }
 
-#endif // HAS_ZOFFSET_ITEM
+  #endif  // HAS_ZOFFSET_ITEM
 
-#if HAS_HOTEND
+  #if HAS_HOTEND
 
   void HMI_ETemp() {
     EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
     if (encoder_diffState == ENCODER_DIFF_NO) return;
     uint8_t temp_line;
     switch (HMI_ValueStruct.show_mode) {
-      case -1: temp_line = TEMP_CASE_TEMP; break;
-      #if HAS_PREHEAT
-        case -2: temp_line = PREHEAT_CASE_TEMP; break;
-        #if PREHEAT_COUNT > 1
-          case -3: temp_line = PREHEAT_CASE_TEMP; break;
-        #endif
+      case -1:
+        temp_line = TEMP_CASE_TEMP;
+        break;
+    #if HAS_PREHEAT
+      case -2:
+        temp_line = PREHEAT_CASE_TEMP;
+        break;
+      #if PREHEAT_COUNT > 1
+      case -3:
+        temp_line = PREHEAT_CASE_TEMP;
+        break;
       #endif
-      default: temp_line = TUNE_CASE_TEMP + MROWS - index_tune;
+    #endif
+      default:
+        temp_line = TUNE_CASE_TEMP + MROWS - index_tune;
     }
     if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.E_Temp)) {
       EncoderRate.enabled = false;
-      #if HAS_PREHEAT
-        if (HMI_ValueStruct.show_mode == -2) {
-          checkkey = PLAPreheat;
-          ui.material_preset[0].hotend_temp = HMI_ValueStruct.E_Temp;
-          Draw_Edit_Integer3(temp_line, ui.material_preset[0].hotend_temp);
-          return;
-        }
-        #if PREHEAT_COUNT > 1
-          if (HMI_ValueStruct.show_mode == -3) {
-            checkkey = ABSPreheat;
-            ui.material_preset[1].hotend_temp = HMI_ValueStruct.E_Temp;
-            Draw_Edit_Integer3(temp_line, ui.material_preset[1].hotend_temp);
-            return;
-          }
-        #endif
+    #if HAS_PREHEAT
+      if (HMI_ValueStruct.show_mode == -2) {
+        checkkey                          = PLAPreheat;
+        ui.material_preset[0].hotend_temp = HMI_ValueStruct.E_Temp;
+        Draw_Edit_Integer3(temp_line, ui.material_preset[0].hotend_temp);
+        return;
+      }
+      #if PREHEAT_COUNT > 1
+      if (HMI_ValueStruct.show_mode == -3) {
+        checkkey                          = ABSPreheat;
+        ui.material_preset[1].hotend_temp = HMI_ValueStruct.E_Temp;
+        Draw_Edit_Integer3(temp_line, ui.material_preset[1].hotend_temp);
+        return;
+      }
       #endif
+    #endif
 
-      if (HMI_ValueStruct.show_mode == -1) // Temperature
+      if (HMI_ValueStruct.show_mode == -1)  // Temperature
         checkkey = TemperatureID;
       else
         checkkey = Tune;
@@ -1448,42 +1460,49 @@ void HMI_Move_Z() {
     Draw_Edit_Integer3(temp_line, HMI_ValueStruct.E_Temp, true);
   }
 
-#endif // HAS_HOTEND
+  #endif  // HAS_HOTEND
 
-#if HAS_HEATED_BED
+  #if HAS_HEATED_BED
 
   void HMI_BedTemp() {
     EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
     if (encoder_diffState == ENCODER_DIFF_NO) return;
     uint8_t bed_line;
     switch (HMI_ValueStruct.show_mode) {
-      case -1: bed_line = TEMP_CASE_BED; break;
-      #if HAS_PREHEAT
-        case -2: bed_line = PREHEAT_CASE_BED; break;
-        #if PREHEAT_COUNT > 1
-          case -3: bed_line = PREHEAT_CASE_BED; break;
-        #endif
+      case -1:
+        bed_line = TEMP_CASE_BED;
+        break;
+    #if HAS_PREHEAT
+      case -2:
+        bed_line = PREHEAT_CASE_BED;
+        break;
+      #if PREHEAT_COUNT > 1
+      case -3:
+        bed_line = PREHEAT_CASE_BED;
+        break;
       #endif
-      default: bed_line = TUNE_CASE_BED + MROWS - index_tune;
+    #endif
+      default:
+        bed_line = TUNE_CASE_BED + MROWS - index_tune;
     }
     if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.Bed_Temp)) {
       EncoderRate.enabled = false;
-      #if HAS_PREHEAT
-        if (HMI_ValueStruct.show_mode == -2) {
-          checkkey = PLAPreheat;
-          ui.material_preset[0].bed_temp = HMI_ValueStruct.Bed_Temp;
-          Draw_Edit_Integer3(bed_line, ui.material_preset[0].bed_temp);
-          return;
-        }
-        #if PREHEAT_COUNT > 1
-          if (HMI_ValueStruct.show_mode == -3) {
-            checkkey = ABSPreheat;
-            ui.material_preset[1].bed_temp = HMI_ValueStruct.Bed_Temp;
-            Draw_Edit_Integer3(bed_line, ui.material_preset[1].bed_temp);
-            return;
-          }
-        #endif
+    #if HAS_PREHEAT
+      if (HMI_ValueStruct.show_mode == -2) {
+        checkkey                       = PLAPreheat;
+        ui.material_preset[0].bed_temp = HMI_ValueStruct.Bed_Temp;
+        Draw_Edit_Integer3(bed_line, ui.material_preset[0].bed_temp);
+        return;
+      }
+      #if PREHEAT_COUNT > 1
+      if (HMI_ValueStruct.show_mode == -3) {
+        checkkey                       = ABSPreheat;
+        ui.material_preset[1].bed_temp = HMI_ValueStruct.Bed_Temp;
+        Draw_Edit_Integer3(bed_line, ui.material_preset[1].bed_temp);
+        return;
+      }
       #endif
+    #endif
       checkkey = HMI_ValueStruct.show_mode == -1 ? TemperatureID : Tune;
       Draw_Edit_Integer3(bed_line, HMI_ValueStruct.Bed_Temp);
       thermalManager.setTargetBed(HMI_ValueStruct.Bed_Temp);
@@ -1495,37 +1514,44 @@ void HMI_Move_Z() {
     Draw_Edit_Integer3(bed_line, HMI_ValueStruct.Bed_Temp, true);
   }
 
-#endif // HAS_HEATED_BED
+  #endif  // HAS_HEATED_BED
 
-#if HAS_PREHEAT && HAS_FAN
+  #if HAS_PREHEAT && HAS_FAN
 
   void HMI_FanSpeed() {
     EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
     if (encoder_diffState == ENCODER_DIFF_NO) return;
     uint8_t fan_line;
     switch (HMI_ValueStruct.show_mode) {
-      case -1: fan_line = TEMP_CASE_FAN; break;
-      case -2: fan_line = PREHEAT_CASE_FAN; break;
-      case -3: fan_line = PREHEAT_CASE_FAN; break;
-      default: fan_line = TUNE_CASE_FAN + MROWS - index_tune;
+      case -1:
+        fan_line = TEMP_CASE_FAN;
+        break;
+      case -2:
+        fan_line = PREHEAT_CASE_FAN;
+        break;
+      case -3:
+        fan_line = PREHEAT_CASE_FAN;
+        break;
+      default:
+        fan_line = TUNE_CASE_FAN + MROWS - index_tune;
     }
 
     if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.Fan_speed)) {
       EncoderRate.enabled = false;
       if (HMI_ValueStruct.show_mode == -2) {
-        checkkey = PLAPreheat;
+        checkkey                        = PLAPreheat;
         ui.material_preset[0].fan_speed = HMI_ValueStruct.Fan_speed;
         Draw_Edit_Integer3(fan_line, ui.material_preset[0].fan_speed);
         return;
       }
-      #if PREHEAT_COUNT > 1
-        if (HMI_ValueStruct.show_mode == -3) {
-          checkkey = ABSPreheat;
-          ui.material_preset[1].fan_speed = HMI_ValueStruct.Fan_speed;
-          Draw_Edit_Integer3(fan_line, ui.material_preset[1].fan_speed);
-          return;
-        }
-      #endif
+    #if PREHEAT_COUNT > 1
+      if (HMI_ValueStruct.show_mode == -3) {
+        checkkey                        = ABSPreheat;
+        ui.material_preset[1].fan_speed = HMI_ValueStruct.Fan_speed;
+        Draw_Edit_Integer3(fan_line, ui.material_preset[1].fan_speed);
+        return;
+      }
+    #endif
       checkkey = HMI_ValueStruct.show_mode == -1 ? TemperatureID : Tune;
       Draw_Edit_Integer3(fan_line, HMI_ValueStruct.Fan_speed);
       thermalManager.set_fan_speed(0, HMI_ValueStruct.Fan_speed);
@@ -1537,71 +1563,71 @@ void HMI_Move_Z() {
     Draw_Edit_Integer3(fan_line, HMI_ValueStruct.Fan_speed, true);
   }
 
-#endif // HAS_PREHEAT && HAS_FAN
+  #endif  // HAS_PREHEAT && HAS_FAN
 
-void HMI_PrintSpeed() {
-  EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
-  if (encoder_diffState == ENCODER_DIFF_NO) return;
-  if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.print_speed)) {
-    checkkey = Tune;
-    EncoderRate.enabled = false;
-    feedrate_percentage = HMI_ValueStruct.print_speed;
-    Draw_Edit_Integer3(select_tune.now + MROWS - index_tune, HMI_ValueStruct.print_speed);
-    return;
+  void HMI_PrintSpeed() {
+    EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
+    if (encoder_diffState == ENCODER_DIFF_NO) return;
+    if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.print_speed)) {
+      checkkey            = Tune;
+      EncoderRate.enabled = false;
+      feedrate_percentage = HMI_ValueStruct.print_speed;
+      Draw_Edit_Integer3(select_tune.now + MROWS - index_tune, HMI_ValueStruct.print_speed);
+      return;
+    }
+    // print_speed limit
+    LIMIT(HMI_ValueStruct.print_speed, MIN_PRINT_SPEED, MAX_PRINT_SPEED);
+    // print_speed value
+    Draw_Edit_Integer3(select_tune.now + MROWS - index_tune, HMI_ValueStruct.print_speed, true);
   }
-  // print_speed limit
-  LIMIT(HMI_ValueStruct.print_speed, MIN_PRINT_SPEED, MAX_PRINT_SPEED);
-  // print_speed value
-  Draw_Edit_Integer3(select_tune.now + MROWS - index_tune, HMI_ValueStruct.print_speed, true);
-}
 
-#define LAST_AXIS TERN(HAS_HOTEND, E_AXIS, Z_AXIS)
+  #define LAST_AXIS TERN(HAS_HOTEND, E_AXIS, Z_AXIS)
 
-void HMI_MaxFeedspeedXYZE() {
-  EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
-  if (encoder_diffState == ENCODER_DIFF_NO) return;
-  if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.Max_Feedspeed)) {
-    checkkey = MaxSpeed;
-    EncoderRate.enabled = false;
+  void HMI_MaxFeedspeedXYZE() {
+    EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
+    if (encoder_diffState == ENCODER_DIFF_NO) return;
+    if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.Max_Feedspeed)) {
+      checkkey            = MaxSpeed;
+      EncoderRate.enabled = false;
+      if (WITHIN(HMI_flag.feedspeed_axis, X_AXIS, LAST_AXIS))
+        planner.set_max_feedrate(HMI_flag.feedspeed_axis, HMI_ValueStruct.Max_Feedspeed);
+      Draw_Edit_Integer4(select_speed.now, HMI_ValueStruct.Max_Feedspeed);
+      return;
+    }
+    // MaxFeedspeed limit
     if (WITHIN(HMI_flag.feedspeed_axis, X_AXIS, LAST_AXIS))
-      planner.set_max_feedrate(HMI_flag.feedspeed_axis, HMI_ValueStruct.Max_Feedspeed);
-    Draw_Edit_Integer4(select_speed.now, HMI_ValueStruct.Max_Feedspeed);
-    return;
+      NOMORE(HMI_ValueStruct.Max_Feedspeed, default_max_feedrate[HMI_flag.feedspeed_axis] * 2);
+    if (HMI_ValueStruct.Max_Feedspeed < MIN_MAXFEEDSPEED) HMI_ValueStruct.Max_Feedspeed = MIN_MAXFEEDSPEED;
+    // MaxFeedspeed value
+    Draw_Edit_Integer4(select_speed.now, HMI_ValueStruct.Max_Feedspeed, true);
   }
-  // MaxFeedspeed limit
-  if (WITHIN(HMI_flag.feedspeed_axis, X_AXIS, LAST_AXIS))
-    NOMORE(HMI_ValueStruct.Max_Feedspeed, default_max_feedrate[HMI_flag.feedspeed_axis] * 2);
-  if (HMI_ValueStruct.Max_Feedspeed < MIN_MAXFEEDSPEED) HMI_ValueStruct.Max_Feedspeed = MIN_MAXFEEDSPEED;
-  // MaxFeedspeed value
-  Draw_Edit_Integer4(select_speed.now, HMI_ValueStruct.Max_Feedspeed, true);
-}
 
-void HMI_MaxAccelerationXYZE() {
-  EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
-  if (encoder_diffState == ENCODER_DIFF_NO) return;
-  if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.Max_Acceleration)) {
-    checkkey = MaxAcceleration;
-    EncoderRate.enabled = false;
+  void HMI_MaxAccelerationXYZE() {
+    EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
+    if (encoder_diffState == ENCODER_DIFF_NO) return;
+    if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.Max_Acceleration)) {
+      checkkey            = MaxAcceleration;
+      EncoderRate.enabled = false;
+      if (WITHIN(HMI_flag.acc_axis, X_AXIS, LAST_AXIS))
+        planner.set_max_acceleration(HMI_flag.acc_axis, HMI_ValueStruct.Max_Acceleration);
+      Draw_Edit_Integer4(select_acc.now, HMI_ValueStruct.Max_Acceleration);
+      return;
+    }
+    // MaxAcceleration limit
     if (WITHIN(HMI_flag.acc_axis, X_AXIS, LAST_AXIS))
-      planner.set_max_acceleration(HMI_flag.acc_axis, HMI_ValueStruct.Max_Acceleration);
-    Draw_Edit_Integer4(select_acc.now, HMI_ValueStruct.Max_Acceleration);
-    return;
+      NOMORE(HMI_ValueStruct.Max_Acceleration, default_max_acceleration[HMI_flag.acc_axis] * 2);
+    if (HMI_ValueStruct.Max_Acceleration < MIN_MAXACCELERATION) HMI_ValueStruct.Max_Acceleration = MIN_MAXACCELERATION;
+    // MaxAcceleration value
+    Draw_Edit_Integer4(select_acc.now, HMI_ValueStruct.Max_Acceleration, true);
   }
-  // MaxAcceleration limit
-  if (WITHIN(HMI_flag.acc_axis, X_AXIS, LAST_AXIS))
-    NOMORE(HMI_ValueStruct.Max_Acceleration, default_max_acceleration[HMI_flag.acc_axis] * 2);
-  if (HMI_ValueStruct.Max_Acceleration < MIN_MAXACCELERATION) HMI_ValueStruct.Max_Acceleration = MIN_MAXACCELERATION;
-  // MaxAcceleration value
-  Draw_Edit_Integer4(select_acc.now, HMI_ValueStruct.Max_Acceleration, true);
-}
 
-#if HAS_CLASSIC_JERK
+  #if HAS_CLASSIC_JERK
 
   void HMI_MaxJerkXYZE() {
     EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
     if (encoder_diffState == ENCODER_DIFF_NO) return;
     if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.Max_Jerk_scaled)) {
-      checkkey = MaxJerk;
+      checkkey            = MaxJerk;
       EncoderRate.enabled = false;
       if (WITHIN(HMI_flag.jerk_axis, X_AXIS, LAST_AXIS))
         planner.set_max_jerk(HMI_flag.jerk_axis, HMI_ValueStruct.Max_Jerk_scaled / 10);
@@ -1611,83 +1637,79 @@ void HMI_MaxAccelerationXYZE() {
     // MaxJerk limit
     if (WITHIN(HMI_flag.jerk_axis, X_AXIS, LAST_AXIS))
       NOMORE(HMI_ValueStruct.Max_Jerk_scaled, default_max_jerk[HMI_flag.jerk_axis] * 2 * MINUNITMULT);
-    NOLESS(HMI_ValueStruct.Max_Jerk_scaled, (MIN_MAXJERK) * MINUNITMULT);
+    NOLESS(HMI_ValueStruct.Max_Jerk_scaled, (MIN_MAXJERK)*MINUNITMULT);
     // MaxJerk value
     Draw_Edit_Float3(select_jerk.now, HMI_ValueStruct.Max_Jerk_scaled, true);
   }
 
-#endif // HAS_CLASSIC_JERK
+  #endif  // HAS_CLASSIC_JERK
 
-void HMI_StepXYZE() {
-  EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
-  if (encoder_diffState == ENCODER_DIFF_NO) return;
-  if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.Max_Step_scaled)) {
-    checkkey = Step;
-    EncoderRate.enabled = false;
-    if (WITHIN(HMI_flag.step_axis, X_AXIS, LAST_AXIS))
-      planner.settings.axis_steps_per_mm[HMI_flag.step_axis] = HMI_ValueStruct.Max_Step_scaled / 10;
-    Draw_Edit_Float3(select_step.now, HMI_ValueStruct.Max_Step_scaled);
-    return;
+  void HMI_StepXYZE() {
+    EncoderState encoder_diffState = Encoder_ReceiveAnalyze();
+    if (encoder_diffState == ENCODER_DIFF_NO) return;
+    if (Apply_Encoder(encoder_diffState, HMI_ValueStruct.Max_Step_scaled)) {
+      checkkey            = Step;
+      EncoderRate.enabled = false;
+      if (WITHIN(HMI_flag.step_axis, X_AXIS, LAST_AXIS))
+        planner.settings.axis_steps_per_mm[HMI_flag.step_axis] = HMI_ValueStruct.Max_Step_scaled / 10;
+      Draw_Edit_Float3(select_step.now, HMI_ValueStruct.Max_Step_scaled);
+      return;
+    }
+    // Step limit
+    if (WITHIN(HMI_flag.step_axis, X_AXIS, LAST_AXIS)) NOMORE(HMI_ValueStruct.Max_Step_scaled, 999.9 * MINUNITMULT);
+    NOLESS(HMI_ValueStruct.Max_Step_scaled, MIN_STEP);
+    // Step value
+    Draw_Edit_Float3(select_step.now, HMI_ValueStruct.Max_Step_scaled, true);
   }
-  // Step limit
-  if (WITHIN(HMI_flag.step_axis, X_AXIS, LAST_AXIS))
-    NOMORE(HMI_ValueStruct.Max_Step_scaled, 999.9 * MINUNITMULT);
-  NOLESS(HMI_ValueStruct.Max_Step_scaled, MIN_STEP);
-  // Step value
-  Draw_Edit_Float3(select_step.now, HMI_ValueStruct.Max_Step_scaled, true);
-}
 
-// Draw X, Y, Z and blink if in an un-homed or un-trusted state
-void _update_axis_value(const AxisEnum axis, const uint16_t x, const uint16_t y, const bool blink, const bool force) {
-  const bool draw_qmark = axis_should_home(axis),
-             draw_empty = NONE(HOME_AFTER_DEACTIVATE, DISABLE_REDUCED_ACCURACY_WARNING) && !draw_qmark && !axis_is_trusted(axis);
+  // Draw X, Y, Z and blink if in an un-homed or un-trusted state
+  void _update_axis_value(const AxisEnum axis, const uint16_t x, const uint16_t y, const bool blink, const bool force) {
+    const bool draw_qmark = axis_should_home(axis),
+               draw_empty =
+                 NONE(HOME_AFTER_DEACTIVATE, DISABLE_REDUCED_ACCURACY_WARNING) && !draw_qmark && !axis_is_trusted(axis);
 
-  // Check for a position change
-  static xyz_pos_t oldpos = { -1, -1, -1 };
-  const float p = current_position[axis];
-  const bool changed = oldpos[axis] != p;
-  if (changed) oldpos[axis] = p;
+    // Check for a position change
+    static xyz_pos_t oldpos = {-1, -1, -1};
+    const float p           = current_position[axis];
+    const bool changed      = oldpos[axis] != p;
+    if (changed) oldpos[axis] = p;
 
-  if (force || changed || draw_qmark || draw_empty) {
-    if (blink && draw_qmark)
-      DWIN_Draw_String(true, font8x16, Color_White, Color_Bg_Black, x, y, F("???.?"));
-    else if (blink && draw_empty)
-      DWIN_Draw_String(true, font8x16, Color_White, Color_Bg_Black, x, y, F("     "));
-    else
-      DWIN_Draw_FloatValue(true, true, 0, font8x16, Color_White, Color_Bg_Black, 3, 1, x, y, p);
+    if (force || changed || draw_qmark || draw_empty) {
+      if (blink && draw_qmark)
+        DWIN_Draw_String(true, font8x16, Color_White, Color_Bg_Black, x, y, F("???.?"));
+      else if (blink && draw_empty)
+        DWIN_Draw_String(true, font8x16, Color_White, Color_Bg_Black, x, y, F("     "));
+      else
+        DWIN_Draw_FloatValue(true, true, 0, font8x16, Color_White, Color_Bg_Black, 3, 1, x, y, p);
+    }
   }
-}
 
-void _draw_xyz_position(const bool force) {
-  //SERIAL_ECHOPGM("Draw XYZ:");
-  static bool _blink = false;
-  const bool blink = !!(millis() & 0x400UL);
-  if (force || blink != _blink) {
-    _blink = blink;
-    //SERIAL_ECHOPGM(" (blink)");
-    _update_axis_value(X_AXIS,  35, 459, blink, true);
-    _update_axis_value(Y_AXIS, 120, 459, blink, true);
-    _update_axis_value(Z_AXIS, 205, 459, blink, true);
+  void _draw_xyz_position(const bool force) {
+    //SERIAL_ECHOPGM("Draw XYZ:");
+    static bool _blink = false;
+    const bool blink   = !!(millis() & 0x400UL);
+    if (force || blink != _blink) {
+      _blink = blink;
+      //SERIAL_ECHOPGM(" (blink)");
+      _update_axis_value(X_AXIS, 35, 459, blink, true);
+      _update_axis_value(Y_AXIS, 120, 459, blink, true);
+      _update_axis_value(Z_AXIS, 205, 459, blink, true);
+    }
+    //SERIAL_EOL();
   }
-  //SERIAL_EOL();
-}
 
-void update_variable() {
+  void update_variable() {
   #if HAS_HOTEND
     static celsius_t _hotendtemp = 0, _hotendtarget = 0;
-    const celsius_t hc = thermalManager.wholeDegHotend(0),
-                    ht = thermalManager.degTargetHotend(0);
-    const bool _new_hotend_temp = _hotendtemp != hc,
-               _new_hotend_target = _hotendtarget != ht;
+    const celsius_t hc = thermalManager.wholeDegHotend(0), ht = thermalManager.degTargetHotend(0);
+    const bool _new_hotend_temp = _hotendtemp != hc, _new_hotend_target = _hotendtarget != ht;
     if (_new_hotend_temp) _hotendtemp = hc;
     if (_new_hotend_target) _hotendtarget = ht;
   #endif
   #if HAS_HEATED_BED
     static celsius_t _bedtemp = 0, _bedtarget = 0;
-    const celsius_t bc = thermalManager.wholeDegBed(),
-                    bt = thermalManager.degTargetBed();
-    const bool _new_bed_temp = _bedtemp != bc,
-               _new_bed_target = _bedtarget != bt;
+    const celsius_t bc = thermalManager.wholeDegBed(), bt = thermalManager.degTargetBed();
+    const bool _new_bed_temp = _bedtemp != bc, _new_bed_target = _bedtarget != bt;
     if (_new_bed_temp) _bedtemp = bc;
     if (_new_bed_target) _bedtarget = bt;
   #endif
@@ -1697,41 +1719,35 @@ void update_variable() {
     if (_new_fanspeed) _fanspeed = thermalManager.fan_speed[0];
   #endif
 
-  if (checkkey == Tune) {
+    if (checkkey == Tune) {
     // Tune page temperature update
-    #if HAS_HOTEND
-      if (_new_hotend_target)
-        Draw_Edit_Integer3(TUNE_CASE_TEMP + MROWS - index_tune, _hotendtarget);
-    #endif
-    #if HAS_HEATED_BED
-      if (_new_bed_target)
-        Draw_Edit_Integer3(TUNE_CASE_BED + MROWS - index_tune, _bedtarget);
-    #endif
-    #if HAS_FAN
-      if (_new_fanspeed)
-        Draw_Edit_Integer3(TUNE_CASE_FAN + MROWS - index_tune, _fanspeed);
-    #endif
-  }
-  else if (checkkey == TemperatureID) {
+  #if HAS_HOTEND
+      if (_new_hotend_target) Draw_Edit_Integer3(TUNE_CASE_TEMP + MROWS - index_tune, _hotendtarget);
+  #endif
+  #if HAS_HEATED_BED
+      if (_new_bed_target) Draw_Edit_Integer3(TUNE_CASE_BED + MROWS - index_tune, _bedtarget);
+  #endif
+  #if HAS_FAN
+      if (_new_fanspeed) Draw_Edit_Integer3(TUNE_CASE_FAN + MROWS - index_tune, _fanspeed);
+  #endif
+    } else if (checkkey == TemperatureID) {
     // Temperature page temperature update
-    #if HAS_HOTEND
+  #if HAS_HOTEND
       if (_new_hotend_target) Draw_Edit_Integer3(TEMP_CASE_TEMP, _hotendtarget);
-    #endif
-    #if HAS_HEATED_BED
+  #endif
+  #if HAS_HEATED_BED
       if (_new_bed_target) Draw_Edit_Integer3(TEMP_CASE_BED, _bedtarget);
-    #endif
-    #if HAS_FAN
+  #endif
+  #if HAS_FAN
       if (_new_fanspeed) Draw_Edit_Integer3(TEMP_CASE_FAN, _fanspeed);
-    #endif
-  }
+  #endif
+    }
 
-  // Bottom temperature update
+    // Bottom temperature update
 
   #if HAS_HOTEND
-    if (_new_hotend_temp)
-      Draw_Stat_Int(28, 384, _hotendtemp);
-    if (_new_hotend_target)
-      Draw_Stat_Int(25 + 4 * STAT_CHR_W + 6, 384, _hotendtarget);
+    if (_new_hotend_temp) Draw_Stat_Int(28, 384, _hotendtemp);
+    if (_new_hotend_target) Draw_Stat_Int(25 + 4 * STAT_CHR_W + 6, 384, _hotendtarget);
 
     static int16_t _flow = 0;
     if (_flow != planner.flow_percentage[0]) {
@@ -1741,17 +1757,15 @@ void update_variable() {
   #endif
 
   #if HAS_HEATED_BED
-    if (_new_bed_temp)
-      Draw_Stat_Int(28, 417, _bedtemp);
-    if (_new_bed_target)
-      Draw_Stat_Int(25 + 4 * STAT_CHR_W + 6, 417, _bedtarget);
+    if (_new_bed_temp) Draw_Stat_Int(28, 417, _bedtemp);
+    if (_new_bed_target) Draw_Stat_Int(25 + 4 * STAT_CHR_W + 6, 417, _bedtarget);
   #endif
 
-  static int16_t _feedrate = 0;
-  if (_feedrate != feedrate_percentage) {
-    _feedrate = feedrate_percentage;
-    Draw_Stat_Int(116 + 2 * STAT_CHR_W, 384, _feedrate);
-  }
+    static int16_t _feedrate = 0;
+    if (_feedrate != feedrate_percentage) {
+      _feedrate = feedrate_percentage;
+      Draw_Stat_Int(116 + 2 * STAT_CHR_W, 384, _feedrate);
+    }
 
   #if HAS_FAN
     if (_new_fanspeed) {
@@ -1760,23 +1774,22 @@ void update_variable() {
     }
   #endif
 
-  static float _offset = 0;
-  if (BABY_Z_VAR != _offset) {
-    _offset = BABY_Z_VAR;
-    if (BABY_Z_VAR < 0) {
-      Draw_Stat_Float(207, 417, -_offset);
-      DWIN_Draw_String(true, font8x16, Color_White, Color_Bg_Black, 205, 419, F("-"));
+    static float _offset = 0;
+    if (BABY_Z_VAR != _offset) {
+      _offset = BABY_Z_VAR;
+      if (BABY_Z_VAR < 0) {
+        Draw_Stat_Float(207, 417, -_offset);
+        DWIN_Draw_String(true, font8x16, Color_White, Color_Bg_Black, 205, 419, F("-"));
+      } else {
+        Draw_Stat_Float(207, 417, _offset);
+        DWIN_Draw_String(true, font8x16, Color_White, Color_Bg_Black, 205, 419, F(" "));
+      }
     }
-    else {
-      Draw_Stat_Float(207, 417, _offset);
-      DWIN_Draw_String(true, font8x16, Color_White, Color_Bg_Black, 205, 419, F(" "));
-    }
+
+    _draw_xyz_position(false);
   }
 
-  _draw_xyz_position(false);
-}
-
-/**
+  /**
  * Read and cache the working directory.
  *
  * TODO: New code can follow the pattern of menu_media.cpp
@@ -1784,83 +1797,89 @@ void update_variable() {
  * cache files here.
  */
 
-#ifndef strcasecmp_P
-  #define strcasecmp_P(a, b) strcasecmp((a), (b))
-#endif
+  #ifndef strcasecmp_P
+    #define strcasecmp_P(a, b) strcasecmp((a), (b))
+  #endif
 
-void make_name_without_ext(char *dst, char *src, size_t maxlen=MENU_CHAR_LIMIT) {
-  char * const name = card.longest_filename();
-  size_t pos        = strlen(name); // index of ending nul
+  void make_name_without_ext(char *dst, char *src, size_t maxlen = MENU_CHAR_LIMIT) {
+    char *const name = card.longest_filename();
+    size_t pos       = strlen(name);  // index of ending nul
 
-  // For files, remove the extension
-  // which may be .gcode, .gco, or .g
-  if (!card.flag.filenameIsDir)
-    while (pos && src[pos] != '.') pos--; // find last '.' (stop at 0)
+    // For files, remove the extension
+    // which may be .gcode, .gco, or .g
+    if (!card.flag.filenameIsDir)
+      while (pos && src[pos] != '.') pos--;  // find last '.' (stop at 0)
 
-  size_t len = pos;   // nul or '.'
-  if (len > maxlen) { // Keep the name short
-    pos        = len = maxlen; // move nul down
-    dst[--pos] = '.'; // insert dots
-    dst[--pos] = '.';
-    dst[--pos] = '.';
+    size_t len = pos;       // nul or '.'
+    if (len > maxlen) {     // Keep the name short
+      pos = len  = maxlen;  // move nul down
+      dst[--pos] = '.';     // insert dots
+      dst[--pos] = '.';
+      dst[--pos] = '.';
+    }
+
+    dst[len] = '\0';  // end it
+
+    // Copy down to 0
+    while (pos--) dst[pos] = src[pos];
   }
 
-  dst[len] = '\0';    // end it
+  void HMI_SDCardInit() {
+    card.cdroot();
+  }
 
-  // Copy down to 0
-  while (pos--) dst[pos] = src[pos];
-}
+  // Initialize or re-initialize the LCD
+  void mvCNCUI::init_lcd() {
+    DWIN_Startup();
+  }
 
-void HMI_SDCardInit() { card.cdroot(); }
+  void mvCNCUI::refresh() { /* Nothing to see here */
+  }
 
-// Initialize or re-initialize the LCD
-void mvCNCUI::init_lcd() { DWIN_Startup(); }
+  #if HAS_LCD_BRIGHTNESS
+  void mvCNCUI::_set_brightness() {
+    DWIN_LCD_Brightness(backlight ? brightness : 0);
+  }
+  #endif
 
-void mvCNCUI::refresh() { /* Nothing to see here */ }
-
-#if HAS_LCD_BRIGHTNESS
-  void mvCNCUI::_set_brightness() { DWIN_LCD_Brightness(backlight ? brightness : 0); }
-#endif
-
-#if ENABLED(SCROLL_LONG_FILENAMES)
+  #if ENABLED(SCROLL_LONG_FILENAMES)
 
   char shift_name[LONG_FILENAME_LENGTH + 1];
-  int8_t shift_amt; // = 0
-  millis_t shift_ms; // = 0
+  int8_t shift_amt;   // = 0
+  millis_t shift_ms;  // = 0
 
   // Init the shift name based on the highlighted item
   void Init_Shift_Name() {
-    const bool is_subdir = !card.flag.workDirIsRoot;
-    const int8_t filenum = select_file.now - 1 - is_subdir; // Skip "Back" and ".."
+    const bool is_subdir   = !card.flag.workDirIsRoot;
+    const int8_t filenum   = select_file.now - 1 - is_subdir;  // Skip "Back" and ".."
     const uint16_t fileCnt = card.get_num_Files();
     if (WITHIN(filenum, 0, fileCnt - 1)) {
       card.getfilename_sorted(SD_ORDER(filenum, fileCnt));
-      char * const name = card.longest_filename();
+      char *const name = card.longest_filename();
       make_name_without_ext(shift_name, name, 100);
     }
   }
 
   void Init_SDItem_Shift() {
     shift_amt = 0;
-    shift_ms  = select_file.now != CASE_BACK && strlen(shift_name) > MENU_CHAR_LIMIT
-           ? millis() + 750UL : 0;
+    shift_ms  = select_file.now != CASE_BACK && strlen(shift_name) > MENU_CHAR_LIMIT ? millis() + 750UL : 0;
   }
 
-#endif
+  #endif
 
-/**
+  /**
  * Display an SD item, adding a CDUP for subfolders.
  */
-void Draw_SDItem(const uint16_t item, int16_t row=-1) {
-  if (row < 0) row = item + 1 + MROWS - index_file;
-  const bool is_subdir = !card.flag.workDirIsRoot;
-  if (is_subdir && item == 0) {
-    Draw_Menu_Line(row, ICON_Folder, F(".."));
-    return;
-  }
+  void Draw_SDItem(const uint16_t item, int16_t row = -1) {
+    if (row < 0) row = item + 1 + MROWS - index_file;
+    const bool is_subdir = !card.flag.workDirIsRoot;
+    if (is_subdir && item == 0) {
+      Draw_Menu_Line(row, ICON_Folder, F(".."));
+      return;
+    }
 
-  card.getfilename_sorted(SD_ORDER(item - is_subdir, card.get_num_Files()));
-  char * const name = card.longest_filename();
+    card.getfilename_sorted(SD_ORDER(item - is_subdir, card.get_num_Files()));
+    char *const name = card.longest_filename();
 
   #if ENABLED(SCROLL_LONG_FILENAMES)
     // Init the current selected name
@@ -1871,13 +1890,13 @@ void Draw_SDItem(const uint16_t item, int16_t row=-1) {
     }
   #endif
 
-  // Draw the file/folder with name aligned left
-  char str[strlen(name) + 1];
-  make_name_without_ext(str, name);
-  Draw_Menu_Line(row, card.flag.filenameIsDir ? ICON_Folder : ICON_File, str);
-}
+    // Draw the file/folder with name aligned left
+    char str[strlen(name) + 1];
+    make_name_without_ext(str, name);
+    Draw_Menu_Line(row, card.flag.filenameIsDir ? ICON_Folder : ICON_File, str);
+  }
 
-#if ENABLED(SCROLL_LONG_FILENAMES)
+  #if ENABLED(SCROLL_LONG_FILENAMES)
 
   void Draw_SDItem_Shifted(uint8_t &shift) {
     // Limit to the number of chars past the cutoff
@@ -1887,82 +1906,79 @@ void Draw_SDItem(const uint16_t item, int16_t row=-1) {
     // Shorten to the available space
     const size_t lastchar = _MIN((signed)len, shift + MENU_CHAR_LIMIT);
 
-    const char c = shift_name[lastchar];
-    shift_name[lastchar] = '\0';
+    const char c          = shift_name[lastchar];
+    shift_name[lastchar]  = '\0';
 
-    const uint8_t row = select_file.now + MROWS - index_file; // skip "Back" and scroll
+    const uint8_t row     = select_file.now + MROWS - index_file;  // skip "Back" and scroll
     Erase_Menu_Text(row);
     Draw_Menu_Line(row, 0, &shift_name[shift]);
 
     shift_name[lastchar] = c;
   }
 
-#endif
+  #endif
 
-// Redraw the first set of SD Files
-void Redraw_SD_List() {
-  select_file.reset();
-  index_file = MROWS;
+  // Redraw the first set of SD Files
+  void Redraw_SD_List() {
+    select_file.reset();
+    index_file = MROWS;
 
-  Clear_Menu_Area(); // Leave title bar unchanged
+    Clear_Menu_Area();  // Leave title bar unchanged
 
-  Draw_Back_First();
+    Draw_Back_First();
 
-  if (card.isMounted()) {
-    // As many files as will fit
-    LOOP_L_N(i, _MIN(nr_sd_menu_items(), MROWS))
+    if (card.isMounted()) {
+      // As many files as will fit
+      LOOP_L_N(i, _MIN(nr_sd_menu_items(), MROWS))
       Draw_SDItem(i, i + 1);
 
-    TERN_(SCROLL_LONG_FILENAMES, Init_SDItem_Shift());
-  }
-  else {
-    DWIN_Draw_Rectangle(1, Color_Bg_Red, 10, MBASE(3) - 10, DWIN_WIDTH - 10, MBASE(4));
-    DWIN_Draw_String(false, font16x32, Color_Yellow, Color_Bg_Red, ((DWIN_WIDTH) - 8 * 16) / 2, MBASE(3), F("No Media"));
-  }
-}
-
-bool DWIN_lcd_sd_status = false;
-
-void SDCard_Up() {
-  card.cdup();
-  Redraw_SD_List();
-  DWIN_lcd_sd_status = false; // On next DWIN_Update
-}
-
-void SDCard_Folder(char * const dirname) {
-  card.cd(dirname);
-  Redraw_SD_List();
-  DWIN_lcd_sd_status = false; // On next DWIN_Update
-}
-
-//
-// Watch for media mount / unmount
-//
-void HMI_SDCardUpdate() {
-  if (HMI_flag.home_flag) return;
-  if (DWIN_lcd_sd_status != card.isMounted()) {
-    DWIN_lcd_sd_status = card.isMounted();
-    //SERIAL_ECHOLNPGM("HMI_SDCardUpdate: ", DWIN_lcd_sd_status);
-    if (DWIN_lcd_sd_status) {
-      if (checkkey == SelectFile)
-        Redraw_SD_List();
+      TERN_(SCROLL_LONG_FILENAMES, Init_SDItem_Shift());
+    } else {
+      DWIN_Draw_Rectangle(1, Color_Bg_Red, 10, MBASE(3) - 10, DWIN_WIDTH - 10, MBASE(4));
+      DWIN_Draw_String(false, font16x32, Color_Yellow, Color_Bg_Red, ((DWIN_WIDTH)-8 * 16) / 2, MBASE(3),
+                       F("No Media"));
     }
-    else {
-      // clean file icon
-      if (checkkey == SelectFile) {
-        Redraw_SD_List();
-      }
-      else if (checkkey == CNCProcess || checkkey == Tune || printingIsActive()) {
-        // TODO: Move card removed abort handling
-        //       to CardReader::manage_media.
-        card.abortFilePrintSoon();
-        wait_for_heatup = wait_for_user = false;
-        dwin_abort_flag = true; // Reset feedrate, return to Home
-      }
-    }
-    DWIN_UpdateLCD();
   }
-}
+
+  bool DWIN_lcd_sd_status = false;
+
+  void SDCard_Up() {
+    card.cdup();
+    Redraw_SD_List();
+    DWIN_lcd_sd_status = false;  // On next DWIN_Update
+  }
+
+  void SDCard_Folder(char *const dirname) {
+    card.cd(dirname);
+    Redraw_SD_List();
+    DWIN_lcd_sd_status = false;  // On next DWIN_Update
+  }
+
+  //
+  // Watch for media mount / unmount
+  //
+  void HMI_SDCardUpdate() {
+    if (HMI_flag.home_flag) return;
+    if (DWIN_lcd_sd_status != card.isMounted()) {
+      DWIN_lcd_sd_status = card.isMounted();
+      //SERIAL_ECHOLNPGM("HMI_SDCardUpdate: ", DWIN_lcd_sd_status);
+      if (DWIN_lcd_sd_status) {
+        if (checkkey == SelectFile) Redraw_SD_List();
+      } else {
+        // clean file icon
+        if (checkkey == SelectFile) {
+          Redraw_SD_List();
+        } else if (checkkey == CNCProcess || checkkey == Tune || jobIsActive()) {
+          // TODO: Move card removed abort handling
+          //       to CardReader::manage_media.
+          card.abortFilePrintSoon();
+          wait_for_heatup = wait_for_user = false;
+          dwin_abort_flag                 = true;  // Reset feedrate, return to Home
+        }
+      }
+      DWIN_UpdateLCD();
+    }
+  }
 
 //
 // The status area is always on-screen, except during
@@ -4103,16 +4119,15 @@ void EachMomentUpdate() {
       // show print done confirm
       DWIN_Draw_Rectangle(1, Color_Bg_Black, 0, 250, DWIN_WIDTH - 1, STATUS_Y);
       DWIN_ICON_Show(ICON, HMI_IsChinese() ? ICON_Confirm_C : ICON_Confirm_E, 86, 283);
-    }
-    else if (HMI_flag.pause_flag != printingIsPaused()) {
+    } else if (HMI_flag.pause_flag != jobIsPaused()) {
       // print status update
-      HMI_flag.pause_flag = printingIsPaused();
+      HMI_flag.pause_flag = jobIsPaused();
       ICON_ResumeOrPause();
     }
   }
 
   // pause after homing
-  if (HMI_flag.pause_action && printingIsPaused() && !planner.has_blocks_queued()) {
+  if (HMI_flag.pause_action && jobIsPaused() && !planner.has_blocks_queued()) {
     HMI_flag.pause_action = false;
     #if ENABLED(PAUSE_HEAT)
       TERN_(HAS_HOTEND, resume_hotend_temp = thermalManager.degTargetHotend(0));

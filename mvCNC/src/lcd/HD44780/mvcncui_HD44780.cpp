@@ -749,20 +749,20 @@ inline uint8_t draw_elapsed_or_remaining_time(uint8_t timepos, const bool blink)
   char buffer[14];
 
   #if ENABLED(SHOW_REMAINING_TIME)
-    const bool show_remain = TERN1(ROTATE_PROGRESS_DISPLAY, blink) && printingIsActive();
-    if (show_remain) {
-      #if ENABLED(USE_M73_REMAINING_TIME)
-        duration_t remaining = ui.get_remaining_time();
-      #else
-        uint8_t progress = ui.get_progress_percent();
-        uint32_t elapsed = print_job_timer.duration();
-        duration_t remaining = (progress > 0) ? ((elapsed * 25600 / progress) >> 8) - elapsed : 0;
-      #endif
-      timepos -= remaining.toDigital(buffer);
-      lcd_put_wchar(timepos, 2, 'R');
-    }
+  const bool show_remain = TERN1(ROTATE_PROGRESS_DISPLAY, blink) && jobIsActive();
+  if (show_remain) {
+    #if ENABLED(USE_M73_REMAINING_TIME)
+    duration_t remaining = ui.get_remaining_time();
+    #else
+    uint8_t progress     = ui.get_progress_percent();
+    uint32_t elapsed     = print_job_timer.duration();
+    duration_t remaining = (progress > 0) ? ((elapsed * 25600 / progress) >> 8) - elapsed : 0;
+    #endif
+    timepos -= remaining.toDigital(buffer);
+    lcd_put_wchar(timepos, 2, 'R');
+  }
   #else
-    constexpr bool show_remain = false;
+  constexpr bool show_remain = false;
   #endif
 
   if (!show_remain) {
@@ -789,45 +789,45 @@ void mvCNCUI::draw_status_screen() {
       // Hotend 0 Temperature
       //
       #if HAS_HOTEND
-        _draw_heater_status(H_E0, -1, blink);
+  _draw_heater_status(H_E0, -1, blink);
 
         //
         // Hotend 1 or Bed Temperature
         //
         #if HAS_MULTI_HOTEND
-          lcd_moveto(8, 0);
-          _draw_heater_status(H_E1, LCD_STR_THERMOMETER[0], blink);
+  lcd_moveto(8, 0);
+  _draw_heater_status(H_E1, LCD_STR_THERMOMETER[0], blink);
         #elif HAS_HEATED_BED
-          lcd_moveto(8, 0);
-          _draw_bed_status(blink);
+  lcd_moveto(8, 0);
+  _draw_bed_status(blink);
         #endif
       #endif
 
-    #else // LCD_WIDTH >= 20
+    #else  // LCD_WIDTH >= 20
 
       //
       // Hotend 0 Temperature
       //
       #if HAS_HOTEND
-        _draw_heater_status(H_E0, LCD_STR_THERMOMETER[0], blink);
+  _draw_heater_status(H_E0, LCD_STR_THERMOMETER[0], blink);
 
         //
         // Hotend 1 or Bed Temperature
         //
         #if HAS_MULTI_HOTEND
-          lcd_moveto(10, 0);
-          _draw_heater_status(H_E1, LCD_STR_THERMOMETER[0], blink);
+  lcd_moveto(10, 0);
+  _draw_heater_status(H_E1, LCD_STR_THERMOMETER[0], blink);
         #elif HAS_HEATED_BED
-          lcd_moveto(10, 0);
-          _draw_bed_status(blink);
+  lcd_moveto(10, 0);
+  _draw_bed_status(blink);
         #endif
       #endif
 
-      TERN_(HAS_COOLER, _draw_cooler_status('*', blink));
-      TERN_(LASER_COOLANT_FLOW_METER, _draw_flowmeter_status());
-      TERN_(I2C_AMMETER, _draw_ammeter_status());
+  TERN_(HAS_COOLER, _draw_cooler_status('*', blink));
+  TERN_(LASER_COOLANT_FLOW_METER, _draw_flowmeter_status());
+  TERN_(I2C_AMMETER, _draw_ammeter_status());
 
-    #endif // LCD_WIDTH >= 20
+    #endif  // LCD_WIDTH >= 20
 
     // ========== Line 2 ==========
 
@@ -836,13 +836,13 @@ void mvCNCUI::draw_status_screen() {
       #if LCD_WIDTH < 20
 
         #if HAS_PRINT_PROGRESS
-          lcd_moveto(0, 2);
-          _draw_print_progress();
+  lcd_moveto(0, 2);
+  _draw_print_progress();
         #endif
 
-      #else // LCD_WIDTH >= 20
+      #else  // LCD_WIDTH >= 20
 
-        lcd_moveto(0, 1);
+  lcd_moveto(0, 1);
 
         // If the first line has two extruder temps,
         // show more temperatures on the next line
@@ -850,52 +850,51 @@ void mvCNCUI::draw_status_screen() {
         #if HOTENDS > 2 || (HAS_MULTI_HOTEND && HAS_HEATED_BED)
 
           #if HOTENDS > 2
-            _draw_heater_status(H_E2, LCD_STR_THERMOMETER[0], blink);
-            lcd_moveto(10, 1);
+  _draw_heater_status(H_E2, LCD_STR_THERMOMETER[0], blink);
+  lcd_moveto(10, 1);
           #endif
 
-          _draw_bed_status(blink);
+  _draw_bed_status(blink);
 
-        #else // HOTENDS <= 2 && (HOTENDS <= 1 || !HAS_HEATED_BED)
+        #else  // HOTENDS <= 2 && (HOTENDS <= 1 || !HAS_HEATED_BED)
 
           #if HAS_DUAL_MIXING
 
-            // Two-component mix / gradient instead of XY
+  // Two-component mix / gradient instead of XY
 
-            char mixer_messages[12];
-            const char *mix_label;
+  char mixer_messages[12];
+  const char *mix_label;
             #if ENABLED(GRADIENT_MIX)
-              if (mixer.gradient.enabled) {
-                mixer.update_mix_from_gradient();
-                mix_label = "Gr";
-              }
-              else
+  if (mixer.gradient.enabled) {
+    mixer.update_mix_from_gradient();
+    mix_label = "Gr";
+  } else
             #endif
-              {
-                mixer.update_mix_from_vtool();
-                mix_label = "Mx";
-              }
-            sprintf_P(mixer_messages, PSTR("%s %d;%d%% "), mix_label, int(mixer.mix[0]), int(mixer.mix[1]));
-            lcd_put_u8str(mixer_messages);
+  {
+    mixer.update_mix_from_vtool();
+    mix_label = "Mx";
+  }
+  sprintf_P(mixer_messages, PSTR("%s %d;%d%% "), mix_label, int(mixer.mix[0]), int(mixer.mix[1]));
+  lcd_put_u8str(mixer_messages);
 
-          #else // !HAS_DUAL_MIXING
+          #else  // !HAS_DUAL_MIXING
 
-            const bool show_e_total = TERN0(LCD_SHOW_E_TOTAL, printingIsActive());
+  const bool show_e_total = TERN0(LCD_SHOW_E_TOTAL, jobIsActive());
 
-            if (show_e_total) {
-              #if ENABLED(LCD_SHOW_E_TOTAL)
-                char tmp[20];
-                const uint8_t escale = e_move_accumulator >= 100000.0f ? 10 : 1; // After 100m switch to cm
-                sprintf_P(tmp, PSTR("E %ld%cm       "), uint32_t(_MAX(e_move_accumulator, 0.0f)) / escale, escale == 10 ? 'c' : 'm'); // 1234567mm
-                lcd_put_u8str(tmp);
-              #endif
-            }
-            else {
-              const xy_pos_t lpos = current_position.asLogical();
-              _draw_axis_value(X_AXIS, ftostr4sign(lpos.x), blink);
-              lcd_put_wchar(' ');
-              _draw_axis_value(Y_AXIS, ftostr4sign(lpos.y), blink);
-            }
+  if (show_e_total) {
+            #if ENABLED(LCD_SHOW_E_TOTAL)
+    char tmp[20];
+    const uint8_t escale = e_move_accumulator >= 100000.0f ? 10 : 1;  // After 100m switch to cm
+    sprintf_P(tmp, PSTR("E %ld%cm       "), uint32_t(_MAX(e_move_accumulator, 0.0f)) / escale,
+              escale == 10 ? 'c' : 'm');  // 1234567mm
+    lcd_put_u8str(tmp);
+            #endif
+  } else {
+    const xy_pos_t lpos = current_position.asLogical();
+    _draw_axis_value(X_AXIS, ftostr4sign(lpos.x), blink);
+    lcd_put_wchar(' ');
+    _draw_axis_value(Y_AXIS, ftostr4sign(lpos.y), blink);
+  }
 
           #endif // !HAS_DUAL_MIXING
 
@@ -1027,17 +1026,17 @@ void mvCNCUI::draw_status_screen() {
   draw_status_message(blink);
 }
 
-#if HAS_MVCNCUI_MENU
+  #if HAS_MVCNCUI_MENU
 
-  #include "../menu/menu.h"
+    #include "../menu/menu.h"
 
-  #if ENABLED(ADVANCED_PAUSE_FEATURE)
+    #if ENABLED(ADVANCED_PAUSE_FEATURE)
 
-    void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t extruder) {
-      if (row < LCD_HEIGHT) {
-        lcd_moveto(LCD_WIDTH - 9, row);
-        _draw_heater_status((heater_id_t)extruder, LCD_STR_THERMOMETER[0], get_blink());
-      }
+void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t extruder) {
+  if (row < LCD_HEIGHT) {
+    lcd_moveto(LCD_WIDTH - 9, row);
+    _draw_heater_status((heater_id_t)extruder, LCD_STR_THERMOMETER[0], get_blink());
+  }
     }
 
   #endif // ADVANCED_PAUSE_FEATURE

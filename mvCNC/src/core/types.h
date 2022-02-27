@@ -54,11 +54,6 @@ enum AxisEnum : uint8_t {
   // Linear axes may be controlled directly or indirectly
   LINEAR_AXIS_LIST(X_AXIS, Y_AXIS, Z_AXIS, I_AXIS, J_AXIS, K_AXIS)
 
-  // Extruder axes may be considered distinctly
-  #define _EN_ITEM(N) , E##N##_AXIS
-  REPEAT(EXTRUDERS, _EN_ITEM)
-  #undef _EN_ITEM
-
   // Core also keeps toolhead directions
   #if ANY(IS_CORE, MARKFORGED_XY, MARKFORGED_YX)
     , X_HEAD, Y_HEAD, Z_HEAD

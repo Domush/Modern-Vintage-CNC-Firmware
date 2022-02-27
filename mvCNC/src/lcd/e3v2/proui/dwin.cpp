@@ -37,10 +37,6 @@
 #include "../../../gcode/gcode.h"
 #include "../../../gcode/queue.h"
 
-#if HAS_FILAMENT_SENSOR
-  #include "../../../feature/runout.h"
-#endif
-
 #if ENABLED(EEPROM_SETTINGS)
   #include "../../../module/settings.h"
 #endif
@@ -49,16 +45,8 @@
   #include "../../../feature/host_actions.h"
 #endif
 
-#if HAS_MESH || HAS_ONESTEP_LEVELING
-  #include "../../../feature/bedlevel/bedlevel.h"
-#endif
-
 #if HAS_BED_PROBE
   #include "../../../module/probe.h"
-#endif
-
-#ifdef BLTOUCH_HS_MODE
-  #include "../../../feature/bltouch.h"
 #endif
 
 #if EITHER(BABYSTEP_ZPROBE_OFFSET, JUST_BABYSTEP)
@@ -75,10 +63,6 @@
 
 #if HAS_ESDIAG
   #include "endstop_diag.h"
-#endif
-
-#if HAS_MESH
-  #include "meshviewer.h"
 #endif
 
 #if ENABLED(JOBCOUNTER)
@@ -193,12 +177,6 @@ static uint32_t _remain_time = 0;
 static bool sdprint = false;
 
 #if ENABLED(PAUSE_HEAT)
-  #if HAS_HOTEND
-    celsius_t resume_hotend_temp = 0;
-  #endif
-  #if HAS_HEATED_BED
-    celsius_t resume_bed_temp = 0;
-  #endif
   #if HAS_FAN
     uint16_t resume_fan = 0;
   #endif
@@ -206,10 +184,6 @@ static bool sdprint = false;
 
 #if HAS_ZOFFSET_ITEM
   float dwin_zoffset = 0, last_zoffset = 0;
-#endif
-
-#if HAS_HOTEND
-  float last_E = 0;
 #endif
 
 // New menu system pointers
@@ -229,20 +203,11 @@ MenuClass *SelectColorMenu = nullptr;
 MenuClass *GetColorMenu = nullptr;
 MenuClass *TuneMenu = nullptr;
 MenuClass *MotionMenu = nullptr;
-MenuClass *FilamentMenu = nullptr;
-#if ENABLED(MESH_BED_LEVELING)
-  MenuClass *ManualMesh = nullptr;
-#endif
-#if HAS_HOTEND
-  MenuClass *PreheatMenu = nullptr;
-#endif
 MenuClass *TemperatureMenu = nullptr;
 MenuClass *MaxSpeedMenu = nullptr;
 MenuClass *MaxAccelMenu = nullptr;
 MenuClass *MaxJerkMenu = nullptr;
 MenuClass *StepsMenu = nullptr;
-MenuClass *HotendPIDMenu = nullptr;
-MenuClass *BedPIDMenu = nullptr;
 #if ENABLED(CASELIGHT_USES_BRIGHTNESS)
   MenuClass *CaseLightMenu = nullptr;
 #endif
@@ -257,10 +222,7 @@ MenuClass *BedPIDMenu = nullptr;
 #endif
 
 // Updatable menuitems pointers
-MenuItemClass *HotendTargetItem = nullptr;
-MenuItemClass *BedTargetItem = nullptr;
 MenuItemClass *FanSpeedItem = nullptr;
-MenuItemClass *MMeshMoveZItem = nullptr;
 
 #define DWIN_LANGUAGE_EEPROM_ADDRESS 0x01   // Between 0x01 and 0x63 (EEPROM_OFFSET-1)
                                             // BL24CXX::check() uses 0x00
@@ -339,15 +301,6 @@ void ICON_StartInfo() {
   constexpr frame_rect_t ico = { 145, 226, 110, 100 };
   constexpr text_info_t txt = { 91, { 405, TERN(USE_STOCK_DWIN_SET, 446, 447) }, 27, 15 };
   ICON_Button(select_page.now == PAGE_INFO_LEV_ADV, ICON_Info_0, ico, txt, GET_TEXT_F(MSG_BUTTON_INFO));
-}
-
-//
-// Main Menu: "Level"
-//
-void ICON_Leveling() {
-  constexpr frame_rect_t ico = { 145, 226, 110, 100 };
-  constexpr text_info_t txt = { 211, { 405, TERN(USE_STOCK_DWIN_SET, 446, 447) }, 27, 15 };
-  ICON_Button(select_page.now == PAGE_INFO_LEV_ADV, ICON_Leveling_0, ico, txt, GET_TEXT_F(MSG_BUTTON_LEVEL));
 }
 
 //
@@ -647,7 +600,7 @@ void Draw_Print_ProgressRemain() {
 }
 
 void ICON_ResumeOrPause() {
-  if (printingIsPaused() || HMI_flag.pause_flag || HMI_flag.pause_action)
+  if (jobIsPaused() || HMI_flag.pause_flag || HMI_flag.pause_action)
     ICON_Resume();
   else
     ICON_Pause();
@@ -1027,8 +980,7 @@ void HMI_SDCardUpdate() {
       // clean file icon
       if (checkkey == SelectFile) {
         Redraw_SD_List();
-      }
-      else if (sdprint && card.isPrinting() && printingIsActive()) {
+      } else if (sdprint && card.isPrinting() && jobIsActive()) {
         // TODO: Move card removed abort handling
         //       to CardReader::manage_media.
         card.abortFilePrintSoon();
@@ -1530,16 +1482,15 @@ void EachMomentUpdate() {
       planner.finish_and_disable();
       checkkey = CNCDone;
       Draw_PrintDone();
-    }
-    else if (HMI_flag.pause_flag != printingIsPaused()) {
+    } else if (HMI_flag.pause_flag != jobIsPaused()) {
       // print status update
-      HMI_flag.pause_flag = printingIsPaused();
+      HMI_flag.pause_flag = jobIsPaused();
       ICON_ResumeOrPause();
     }
   }
 
   // pause after homing
-  if (HMI_flag.pause_action && printingIsPaused() && !planner.has_blocks_queued()) {
+  if (HMI_flag.pause_action && jobIsPaused() && !planner.has_blocks_queued()) {
     HMI_flag.pause_action = false;
     #if ENABLED(PAUSE_HEAT)
       TERN_(HAS_HOTEND, resume_hotend_temp = sdprint ? thermalManager.degTargetHotend(0) : thermalManager.wholeDegHotend(0));
@@ -1834,7 +1785,7 @@ void DWIN_Print_Started(const bool sd) {
 
 // Ended CNC job
 void DWIN_Print_Finished() {
-  if (checkkey == CNCProcess || printingIsActive()) {
+  if (checkkey == CNCProcess || jobIsActive()) {
     thermalManager.cooldown();
     HMI_flag.print_finish = true;
   }
@@ -2225,7 +2176,9 @@ void SetHome() {
 }
 
 #if HAS_ZOFFSET_ITEM
-  bool cnc_busy() { return planner.movesplanned() || printingIsActive(); }
+bool cnc_busy() {
+  return planner.movesplanned() || jobIsActive();
+}
   void ApplyZOffset() { TERN_(EEPROM_SETTINGS, settings.save()); }
   void LiveZOffset() {
     last_zoffset = dwin_zoffset;

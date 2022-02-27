@@ -4,7 +4,7 @@
 
 #include "../inc/mvCNCConfig.h"
 
-#include "../mvCNCCore.h" // for printingIsPaused
+#include "../mvCNCCore.h" // for jobIsPaused
 
 #if LED_POWEROFF_TIMEOUT > 0 || BOTH(HAS_WIRED_LCD, PRINTER_EVENT_LEDS)
   #include "../feature/leds/leds.h"
@@ -1384,7 +1384,7 @@ void mvCNCUI::init() {
       static PGMSTR(service3, "> " SERVICE_NAME_3 "!");
     #endif
     FSTR_P msg;
-    if (printingIsPaused())
+    if (jobIsPaused())
       msg = GET_TEXT_F(MSG_PRINT_PAUSED);
     #if ENABLED(SDSUPPORT)
       else if (IS_SD_PRINTING())

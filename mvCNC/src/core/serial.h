@@ -33,14 +33,7 @@ enum mvCNCDebugFlags : uint8_t {
   MVCNC_DEBUG_ERRORS        = _BV(2),  ///< Not implemented
   MVCNC_DEBUG_DRYRUN        = _BV(3),  ///< Ignore temperature setting and E movement commands
   MVCNC_DEBUG_COMMUNICATION = _BV(4),  ///< Not implemented
-  #if ENABLED(DEBUG_LEVELING_FEATURE)
-  MVCNC_DEBUG_LEVELING    = _BV(5),  ///< Print detailed output for homing and leveling
-  MVCNC_DEBUG_MESH_ADJUST = _BV(6),  ///< UBL bed leveling
-  #else
-  MVCNC_DEBUG_LEVELING    = 0,
-  MVCNC_DEBUG_MESH_ADJUST = 0,
-  #endif
-    MVCNC_DEBUG_ALL = 0xFF
+  MVCNC_DEBUG_ALL = 0xFF
 };
 
 extern uint8_t mvcnc_debug_flags;

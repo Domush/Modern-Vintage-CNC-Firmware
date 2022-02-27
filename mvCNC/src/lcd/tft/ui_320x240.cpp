@@ -238,30 +238,29 @@ void mvCNCUI::draw_status_screen() {
   tft.set_background(COLOR_BACKGROUND);
   tft.add_rectangle(0, 0, 312, 24, COLOR_AXIS_HOMED);
 
-  if (TERN0(LCD_SHOW_E_TOTAL, printingIsActive())) {
-    #if ENABLED(LCD_SHOW_E_TOTAL)
-      tft.add_text( 10, 3, COLOR_AXIS_HOMED , "E");
-      const uint8_t escale = e_move_accumulator >= 100000.0f ? 10 : 1; // After 100m switch to cm
-      tft_string.set(ftostr4sign(e_move_accumulator / escale));
-      tft_string.add(escale == 10 ? 'c' : 'm');
-      tft_string.add('m');
-      tft.add_text(127 - tft_string.width(), 3, COLOR_AXIS_HOMED, tft_string);
-    #endif
-  }
-  else {
-    tft.add_text( 10, 3, COLOR_AXIS_HOMED , "X");
+  if (TERN0(LCD_SHOW_E_TOTAL, jobIsActive())) {
+  #if ENABLED(LCD_SHOW_E_TOTAL)
+    tft.add_text(10, 3, COLOR_AXIS_HOMED, "E");
+    const uint8_t escale = e_move_accumulator >= 100000.0f ? 10 : 1;  // After 100m switch to cm
+    tft_string.set(ftostr4sign(e_move_accumulator / escale));
+    tft_string.add(escale == 10 ? 'c' : 'm');
+    tft_string.add('m');
+    tft.add_text(127 - tft_string.width(), 3, COLOR_AXIS_HOMED, tft_string);
+  #endif
+  } else {
+    tft.add_text(10, 3, COLOR_AXIS_HOMED, "X");
     const bool nhx = axis_should_home(X_AXIS);
     tft_string.set(blink && nhx ? "?" : ftostr4sign(LOGICAL_X_POSITION(current_position.x)));
-    tft.add_text( 68 - tft_string.width(), 3, nhx ? COLOR_AXIS_NOT_HOMED : COLOR_AXIS_HOMED, tft_string);
+    tft.add_text(68 - tft_string.width(), 3, nhx ? COLOR_AXIS_NOT_HOMED : COLOR_AXIS_HOMED, tft_string);
 
-    tft.add_text(127, 3, COLOR_AXIS_HOMED , "Y");
+    tft.add_text(127, 3, COLOR_AXIS_HOMED, "Y");
     const bool nhy = axis_should_home(Y_AXIS);
     tft_string.set(blink && nhy ? "?" : ftostr4sign(LOGICAL_Y_POSITION(current_position.y)));
     tft.add_text(185 - tft_string.width(), 3, nhy ? COLOR_AXIS_NOT_HOMED : COLOR_AXIS_HOMED, tft_string);
   }
 
-  tft.add_text(219, 3, COLOR_AXIS_HOMED , "Z");
-  const bool nhz = axis_should_home(Z_AXIS);
+  tft.add_text(219, 3, COLOR_AXIS_HOMED, "Z");
+  const bool nhz  = axis_should_home(Z_AXIS);
   uint16_t offset = 25;
   if (blink && nhz)
     tft_string.set("?");
@@ -284,7 +283,7 @@ void mvCNCUI::draw_status_screen() {
   tft.add_image(0, 0, imgFeedRate, color);
   tft_string.set(i16tostr3rj(feedrate_percentage));
   tft_string.add('%');
-  tft.add_text(32, 6, color , tft_string);
+  tft.add_text(32, 6, color, tft_string);
   TERN_(TOUCH_SCREEN, touch.add_control(FEEDRATE, 70, 136, 80, 32));
 
   // flow rate
@@ -294,7 +293,7 @@ void mvCNCUI::draw_status_screen() {
   tft.add_image(0, 0, imgFlowRate, color);
   tft_string.set(i16tostr3rj(planner.flow_percentage[active_extruder]));
   tft_string.add('%');
-  tft.add_text(32, 6, color , tft_string);
+  tft.add_text(32, 6, color, tft_string);
   TERN_(TOUCH_SCREEN, touch.add_control(FLOWRATE, 170, 136, 80, 32, active_extruder));
 
   // print duration
@@ -312,8 +311,7 @@ void mvCNCUI::draw_status_screen() {
   tft.canvas(4, 198, 312, 9);
   tft.set_background(COLOR_PROGRESS_BG);
   tft.add_rectangle(0, 0, 312, 9, COLOR_PROGRESS_FRAME);
-  if (progress)
-    tft.add_bar(1, 1, (310 * progress) / 100, 7, COLOR_PROGRESS_BAR);
+  if (progress) tft.add_bar(1, 1, (310 * progress) / 100, 7, COLOR_PROGRESS_BAR);
 
   // status message
   tft.canvas(0, 216, 320, 20);
@@ -323,8 +321,9 @@ void mvCNCUI::draw_status_screen() {
   tft.add_text(tft_string.center(TFT_WIDTH), 0, COLOR_STATUS_MESSAGE, tft_string);
 
   #if ENABLED(TOUCH_SCREEN)
-    add_control(256, 130, menu_main, imgSettings);
-    TERN_(SDSUPPORT, add_control(0, 130, menu_media, imgSD, !printingIsActive(), COLOR_CONTROL_ENABLED, card.isMounted() && printingIsActive() ? COLOR_BUSY : COLOR_CONTROL_DISABLED));
+  add_control(256, 130, menu_main, imgSettings);
+  TERN_(SDSUPPORT, add_control(0, 130, menu_media, imgSD, !jobIsActive(), COLOR_CONTROL_ENABLED,
+                               card.isMounted() && jobIsActive() ? COLOR_BUSY : COLOR_CONTROL_DISABLED));
   #endif
 }
 
@@ -798,7 +797,7 @@ void mvCNCUI::move_axis_screen() {
 
   TERN_(TOUCH_SCREEN, touch.clear());
 
-  const bool busy = printingIsActive();
+  const bool busy = jobIsActive();
 
   // Babysteps during a CNC job? Select babystep for Z probe offset
   if (busy && ENABLED(BABYSTEP_ZPROBE_OFFSET))

@@ -75,7 +75,7 @@ void EasythreedUI::blinkLED() {
 // Load/Unload buttons are a 3 position switch with a common center ground.
 //
 void EasythreedUI::loadButton() {
-  if (printingIsActive()) return;
+  if (jobIsActive()) return;
 
   enum FilamentStatus : uint8_t { FS_IDLE, FS_PRESS, FS_CHECK, FS_PROCEED };
   static uint8_t filament_status = FS_IDLE;
@@ -169,7 +169,8 @@ void EasythreedUI::printButton() {
       if (PENDING(ms, key_time + 1200 - BTN_DEBOUNCE_MS)) {         // Register a press < 1.2 seconds
         switch (print_key_flag) {
           case PF_START: {                                          // The "CNC" button starts an SD card print
-            if (printingIsActive()) break;                          // Already printing? (find another line that checks for 'is planner doing anything else right now?')
+            if (jobIsActive())
+              break;  // Already printing? (find another line that checks for 'is planner doing anything else right now?')
             blink_interval_ms = LED_BLINK_2;                        // Blink the indicator LED at 1 second intervals
             print_key_flag = PF_PAUSE;                              // The "CNC" button now pauses the print
             card.mount();                                           // Force SD card to mount - now!
@@ -186,14 +187,14 @@ void EasythreedUI::printButton() {
             break;
           }
           case PF_PAUSE: {                                          // Pause printing (not currently firing)
-            if (!printingIsActive()) break;
+            if (!jobIsActive()) break;
             blink_interval_ms = LED_ON;                             // Set indicator to steady ON
             queue.inject(F("M25"));                                 // Queue Pause
             print_key_flag = PF_RESUME;                             // The "CNC" button now resumes the print
             break;
             }
           case PF_RESUME: {                                         // Resume printing
-            if (printingIsActive()) break;
+            if (jobIsActive()) break;
             blink_interval_ms = LED_BLINK_2;                        // Blink the indicator LED at 1 second intervals
             queue.inject(F("M24"));                                 // Queue resume
             print_key_flag = PF_PAUSE;                              // The "CNC" button now pauses the print
@@ -202,11 +203,10 @@ void EasythreedUI::printButton() {
         }
       }
       else {                                                        // Register a longer press
-        if (print_key_flag == PF_START && !printingIsActive())  {   // While not printing, this moves Z up 10mm
+        if (print_key_flag == PF_START && !jobIsActive()) {         // While not printing, this moves Z up 10mm
           blink_interval_ms = LED_ON;
           queue.inject(F("G91\nG0 Z10 F600\nG90"));                 // Raise Z soon after returning to main loop
-        }
-        else {                                                      // While printing, cancel print
+        } else {                                                    // While printing, cancel print
           card.abortFilePrintSoon();                                // There is a delay while the current steps play out
           blink_interval_ms = LED_OFF;                              // Turn off LED
         }

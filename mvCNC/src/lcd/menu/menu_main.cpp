@@ -205,12 +205,12 @@ void menu_configuration();
 #endif // CUSTOM_MENU_MAIN
 
 void menu_main() {
-  const bool busy = printingIsActive()
-    #if ENABLED(SDSUPPORT)
-      , card_detected = card.isMounted()
-      , card_open = card_detected && card.isFileOpen()
-    #endif
-  ;
+  const bool busy = jobIsActive()
+  #if ENABLED(SDSUPPORT)
+    ,
+             card_detected = card.isMounted(), card_open = card_detected && card.isFileOpen()
+  #endif
+    ;
 
   START_MENU();
   BACK_ITEM(MSG_INFO_SCREEN);
@@ -285,8 +285,7 @@ void menu_main() {
       sdcard_menu_items();
     #endif
 
-    if (TERN0(MACHINE_CAN_PAUSE, printingIsPaused()))
-      ACTION_ITEM(MSG_RESUME_PRINT, ui.resume_print);
+      if (TERN0(MACHINE_CAN_PAUSE, jobIsPaused())) ACTION_ITEM(MSG_RESUME_PRINT, ui.resume_print);
 
     #if ENABLED(HOST_START_MENU_ITEM) && defined(ACTION_ON_START)
       ACTION_ITEM(MSG_HOST_START_PRINT, hostui.start);

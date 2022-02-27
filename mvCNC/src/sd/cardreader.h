@@ -147,8 +147,8 @@ public:
   static void fileHasFinished();
   static void abortFilePrintSoon() { flag.abort_sd_printing = isFileOpen(); }
   static void pauseSDPrint()       { flag.sdprinting = false; }
-  static bool isPrinting()         { return flag.sdprinting; }
-  static bool isPaused()           { return isFileOpen() && !isPrinting(); }
+  static bool jobRunning()         { return flag.sdprinting; }
+  static bool isPaused()           { return isFileOpen() && !jobRunning(); }
   #if HAS_PRINT_PROGRESS_PERMYRIAD
     static uint16_t permyriadDone() {
       if (flag.sdprintdone) return 10000;

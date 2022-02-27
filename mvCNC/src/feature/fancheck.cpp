@@ -15,9 +15,6 @@
 #include "fancheck.h"
 #include "../module/temperature.h"
 
-#if HAS_AUTO_FAN && EXTRUDER_AUTO_FAN_SPEED != 255 && DISABLED(FOURWIRES_FANS)
-  bool FanCheck::measuring = false;
-#endif
 bool FanCheck::tacho_state[TACHO_COUNT];
 uint16_t FanCheck::edge_counter[TACHO_COUNT];
 uint8_t FanCheck::rps[TACHO_COUNT];
@@ -127,7 +124,7 @@ void FanCheck::compute_speed(uint16_t elapsedTime) {
   // Drop the error when all fans are ok
   if (!fan_error_msk && error == TachoError::REPORTED) error = TachoError::FIXED;
 
-  if (error == TachoError::FIXED && !printJobOngoing() && !printingIsPaused()) {
+  if (error == TachoError::FIXED && !jobIsOngoing() && !jobIsPaused()) {
     error = TachoError::NONE; // if the issue has been fixed while the cnc is idle, reenable immediately
     ui.reset_alert_level();
   }
@@ -140,7 +137,7 @@ void FanCheck::compute_speed(uint16_t elapsedTime) {
 }
 
 void FanCheck::report_speed_error(uint8_t fan) {
-  if (printJobOngoing()) {
+  if (jobIsOngoing()) {
     if (error == TachoError::NONE) {
       if (thermalManager.degTargetHotend(fan) != 0) {
         kill(GET_TEXT_F(MSG_FAN_SPEED_FAULT));
@@ -150,7 +147,7 @@ void FanCheck::report_speed_error(uint8_t fan) {
         error = TachoError::DETECTED;   // Plans error for next processed command
     }
   }
-  else if (!printingIsPaused()) {
+  else if (!jobIsPaused()) {
     thermalManager.setTargetHotend(0, fan); // Always disable heating
     if (error == TachoError::NONE) error = TachoError::REPORTED;
   }

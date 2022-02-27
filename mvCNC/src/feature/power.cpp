@@ -163,7 +163,7 @@ void Power::power_off() {
     // If any of the stepper drivers are enabled...
     if (stepper.axis_enabled.bits) return true;
 
-    if (printJobOngoing() || printingIsPaused()) return true;
+    if (jobIsOngoing() || jobIsPaused()) return true;
 
     #if ENABLED(AUTO_POWER_FANS)
       FANS_LOOP(i) if (thermalManager.fan_speed[i]) return true;

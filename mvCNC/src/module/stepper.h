@@ -141,9 +141,6 @@
 #if HAS_K_STEP
   #define ISR_K_STEPPER_CYCLES  ISR_STEPPER_CYCLES
 #endif
-#if HAS_EXTRUDERS
-  #define ISR_E_STEPPER_CYCLES  ISR_STEPPER_CYCLES    // E is always interpolated, even for mixing extruders
-#endif
 
 // And the total minimum loop time, not including the base
 #define MIN_ISR_LOOP_CYCLES (ISR_MIXING_STEPPER_CYCLES LOGICAL_AXIS_GANG(+ ISR_E_STEPPER_CYCLES, + ISR_X_STEPPER_CYCLES, + ISR_Y_STEPPER_CYCLES, + ISR_Z_STEPPER_CYCLES, + ISR_I_STEPPER_CYCLES, + ISR_J_STEPPER_CYCLES, + ISR_K_STEPPER_CYCLES))
@@ -226,10 +223,7 @@ typedef struct {
   union {
     ena_mask_t bits;
     struct {
-      bool LINEAR_AXIS_LIST(X:1, Y:1, Z:1, I:1, J:1, K:1);
-      #if HAS_EXTRUDERS
-        bool LIST_N(EXTRUDERS, E0:1, E1:1, E2:1, E3:1, E4:1, E5:1, E6:1, E7:1);
-      #endif
+      bool LINEAR_AXIS_LIST(X :1, Y :1, Z :1, I :1, J :1, K :1);
     };
   };
   constexpr ena_mask_t linear_bits() { return _BV(LINEAR_AXES) - 1; }
@@ -273,13 +267,8 @@ constexpr bool any_enable_overlap(const uint8_t a=0) {
 // TODO: Consider cases where >=2 steppers are used by a linear axis or extruder
 //       (e.g., CoreXY, Dual XYZ, or E with multiple steppers, etc.).
 constexpr ena_mask_t enable_overlap[] = {
-  #define _OVERLAP(N) ena_overlap(INDEX_OF_AXIS(AxisEnum(N))),
-  REPEAT(LINEAR_AXES, _OVERLAP)
-  #if HAS_EXTRUDERS
-    #define _E_OVERLAP(N) ena_overlap(INDEX_OF_AXIS(E_AXIS, N)),
-    REPEAT(E_STEPPERS, _E_OVERLAP)
-  #endif
-};
+#define _OVERLAP(N) ena_overlap(INDEX_OF_AXIS(AxisEnum(N))),
+  REPEAT(LINEAR_AXES, _OVERLAP)};
 
 //static_assert(!any_enable_overlap(), "There is some overlap.");
 
@@ -587,17 +576,10 @@ class Stepper {
     static void enable_axis(const AxisEnum axis);
     static bool disable_axis(const AxisEnum axis);
 
-    #if HAS_EXTRUDERS
-      static void enable_extruder(E_TERN_(const uint8_t eindex=0));
-      static bool disable_extruder(E_TERN_(const uint8_t eindex=0));
-      static void enable_e_steppers();
-      static void disable_e_steppers();
-    #else
       static void enable_extruder() {}
       static bool disable_extruder() { return true; }
       static void enable_e_steppers() {}
       static void disable_e_steppers() {}
-    #endif
 
     #define  ENABLE_EXTRUDER(N)  enable_extruder(E_TERN_(N))
     #define DISABLE_EXTRUDER(N) disable_extruder(E_TERN_(N))

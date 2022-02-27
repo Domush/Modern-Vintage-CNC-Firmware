@@ -27,10 +27,6 @@
   #include "../../../libs/duration_t.h"
 #endif
 
-#if ENABLED(LCD_SHOW_E_TOTAL)
-  #include "../../../mvCNCCore.h" // for printingIsActive
-#endif
-
 #if ENABLED(DWIN_mvCNCUI_PORTRAIT)
   #define STATUS_HEATERS_X    15
   #define STATUS_HEATERS_Y    56
@@ -301,7 +297,7 @@ void mvCNCUI::draw_status_screen() {
     _draw_heater_status(H_E0, hx, STATUS_HEATERS_Y);
     hx += STATUS_HEATERS_XSPACE;
   #endif
-  #if HAS_MULTI_HOTEND
+  #if TOOL_CHANGE_SUPPORT
     _draw_heater_status(H_E1, hx, STATUS_HEATERS_Y);
     hx += STATUS_HEATERS_XSPACE;
   #endif
@@ -315,7 +311,8 @@ void mvCNCUI::draw_status_screen() {
 
   // Axis values
   const xyz_pos_t lpos = current_position.asLogical();
-  const bool show_e_total = TERN0(LCD_SHOW_E_TOTAL, printingIsActive()); UNUSED(show_e_total);
+  const bool show_e_total = TERN0(LCD_SHOW_E_TOTAL, jobIsActive());
+  UNUSED(show_e_total);
 
   constexpr int16_t cpy = TERN(DWIN_mvCNCUI_PORTRAIT, 195, 117);
   if (show_e_total) {

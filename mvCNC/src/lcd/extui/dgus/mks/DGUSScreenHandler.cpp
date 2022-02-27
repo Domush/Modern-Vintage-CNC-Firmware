@@ -271,7 +271,7 @@ void DGUSScreenHandler::ScreenChangeHook(DGUS_VP_Variable &var, void *val_ptr) {
   // if robin nano is printing. when it is, dgus will enter the printing
   // page to continue print;
   //
-  //if (printJobOngoing() || printingIsPaused()) {
+  //if (jobIsOngoing() || jobIsPaused()) {
   //  if (target == MKSLCD_PAUSE_SETTING_MOVE || target == MKSLCD_PAUSE_SETTING_EX
   //    || target == MKSLCD_SCREEN_PRINT || target == MKSLCD_SCREEN_PAUSE
   //  ) {
@@ -306,7 +306,7 @@ void DGUSScreenHandler::ScreenBackChange(DGUS_VP_Variable &var, void *val_ptr) {
 
 void DGUSScreenHandler::ZoffsetConfirm(DGUS_VP_Variable &var, void *val_ptr) {
   settings.save();
-  if (printJobOngoing())
+  if (jobIsOngoing())
     GotoScreen(MKSLCD_SCREEN_PRINT);
   else if (print_job_timer.isPaused)
     GotoScreen(MKSLCD_SCREEN_PAUSE);
@@ -1419,7 +1419,7 @@ bool DGUSScreenHandler::loop() {
     }
 
     #if ENABLED(DGUS_MKS_RUNOUT_SENSOR)
-      if (booted && printingIsActive()) DGUS_Runout_Idle();
+    if (booted && jobIsActive()) DGUS_Runout_Idle();
     #endif
   #endif // SHOW_BOOTSCREEN
 
