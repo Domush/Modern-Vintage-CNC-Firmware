@@ -2937,7 +2937,6 @@
   // Use M119 with WII_NUNCHUCK_DEBUG to find reasonable values after connecting:
   #define WII_X_LIMITS { 0, 128-10, 128+10, 255 } // min, deadzone start, deadzone end, max
   #define WII_Y_LIMITS { 0, 128-10, 128+10, 255 }
-  #define WII_Z_LIMITS { 0, 128-10, 128+10, 255 }
   #define WII_NUNCHUCK_DEBUG
 #endif
 
