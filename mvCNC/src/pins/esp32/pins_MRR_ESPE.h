@@ -15,7 +15,7 @@
 
 #if EXTRUDERS > 2 || E_STEPPERS > 2
   #error "MRR ESPE only supports two E Steppers. Comment out this line to continue."
-#elif HAS_MULTI_HOTEND
+#elif TOOL_CHANGE_SUPPORT
   #error "MRR ESPE only supports one hotend / E-stepper. Comment out this line to continue."
 #endif
 

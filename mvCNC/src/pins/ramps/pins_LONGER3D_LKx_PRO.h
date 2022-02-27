@@ -10,7 +10,7 @@
 #define REQUIRE_MEGA2560
 #include "env_validate.h"
 
-#if HAS_MULTI_HOTEND || E_STEPPERS > 1
+#if TOOL_CHANGE_SUPPORT || E_STEPPERS > 1
   #error "Longer3D LGT KIT V1.0 board only supports one hotend / E-stepper. Comment out this line to continue."
 #endif
 

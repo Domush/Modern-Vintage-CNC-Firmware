@@ -12,7 +12,7 @@
 
 #include "env_validate.h"
 
-#if HAS_MULTI_HOTEND || E_STEPPERS > 1
+#if TOOL_CHANGE_SUPPORT || E_STEPPERS > 1
   #error "CREALITY supports up to 1 hotends / E-steppers. Comment out this line to continue."
 #endif
 
