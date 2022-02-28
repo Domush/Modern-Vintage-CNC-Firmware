@@ -18,7 +18,7 @@
 #endif
 
 #if BOTH(SD_ABORT_ON_ENDSTOP_HIT, SDSUPPORT)
-  #include "jobcounter.h" // for print_job_timer
+  #include "jobcounter.h" // for JobTimer
 #endif
 
 #if ENABLED(JOYSTICK)
@@ -453,7 +453,7 @@ void Endstops::event_handler() {
         card.abortFilePrintNow();
         quickstop_stepper();
         fanManager.disable_all_heaters();
-        print_job_timer.stop();
+        JobTimer.stop();
       }
     #endif
   }

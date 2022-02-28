@@ -70,7 +70,7 @@
 #define HAS_DRIVER(T) (  AXIS_DRIVER_TYPE_X(T)  || AXIS_DRIVER_TYPE_Y(T)  || AXIS_DRIVER_TYPE_Z(T)  \
                       || AXIS_DRIVER_TYPE_I(T)  || AXIS_DRIVER_TYPE_J(T)  || AXIS_DRIVER_TYPE_K(T)  \
                       || AXIS_DRIVER_TYPE_X2(T) || AXIS_DRIVER_TYPE_Y2(T) || AXIS_DRIVER_TYPE_Z2(T) \
-                      || AXIS_DRIVER_TYPE_Z3(T) || AXIS_DRIVER_TYPE_Z4(T) || HAS_E_DRIVER(T) )
+                      || AXIS_DRIVER_TYPE_Z3(T) || AXIS_DRIVER_TYPE_Z4(T) )
 
 //
 // Trinamic Stepper Drivers
@@ -142,8 +142,7 @@
 #define ANY_AXIS_HAS(T) (    AXIS_HAS_##T(X) || AXIS_HAS_##T(X2) \
                           || AXIS_HAS_##T(Y) || AXIS_HAS_##T(Y2) \
                           || AXIS_HAS_##T(Z) || AXIS_HAS_##T(Z2) || AXIS_HAS_##T(Z3) || AXIS_HAS_##T(Z4) \
-                          || AXIS_HAS_##T(I) || AXIS_HAS_##T(J)  || AXIS_HAS_##T(K) \
-                          || E_AXIS_HAS(T) )
+                          || AXIS_HAS_##T(I) || AXIS_HAS_##T(J)  || AXIS_HAS_##T(K) )
 
 #if ANY_AXIS_HAS(STEALTHCHOP)
   #define HAS_STEALTHCHOP 1
@@ -170,16 +169,3 @@
 #if HAS_DRIVER(TMC26X)
   #define HAS_TMC26X 1
 #endif
-
-//
-// L64XX Stepper Drivers
-//
-
-#if HAS_DRIVER(L6470) || HAS_DRIVER(L6474) || HAS_DRIVER(L6480) || HAS_DRIVER(POWERSTEP01)
-  #define HAS_L64XX 1
-#endif
-#if HAS_L64XX && !HAS_DRIVER(L6474)
-  #define HAS_L64XX_NOT_L6474 1
-#endif
-
-#define AXIS_IS_L64XX(A) (AXIS_DRIVER_TYPE_##A(L6470) || AXIS_DRIVER_TYPE_##A(L6474) ||  AXIS_DRIVER_TYPE_##A(L6480) || AXIS_DRIVER_TYPE_##A(POWERSTEP01))

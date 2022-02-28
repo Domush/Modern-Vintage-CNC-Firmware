@@ -75,7 +75,7 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
 
   #else // !DWIN_mvCNCUI_PORTRAIT
 
-    if (!ui.did_first_redraw || ui.old_is_printing != print_job_timer.isRunning()) {
+    if (!ui.did_first_redraw || ui.old_is_printing != JobTimer.isRunning()) {
       dwin_string.set();
       dwin_string.add('X' + axis);
       DWIN_Draw_String(true, font16x32, Color_IconBlue, Color_Bg_Black, x, y, S(dwin_string.string()));
@@ -98,7 +98,7 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
     }
 
     // For E_TOTAL there may be some characters to cover up
-    if (ENABLED(LCD_SHOW_E_TOTAL) && (!ui.did_first_redraw  || ui.old_is_printing != print_job_timer.isRunning()) && axis == X_AXIS)
+    if (ENABLED(LCD_SHOW_E_TOTAL) && (!ui.did_first_redraw  || ui.old_is_printing != JobTimer.isRunning()) && axis == X_AXIS)
       dwin_string.add("   ");
 
     DWIN_Draw_String(true, font14x28, Color_White, Color_Bg_Black, x + 32, y + 4, S(dwin_string.string()));
@@ -127,7 +127,7 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
 
     #else // !DWIN_mvCNCUI_PORTRAIT
 
-      if (!ui.did_first_redraw || ui.old_is_printing != print_job_timer.isRunning()) {
+      if (!ui.did_first_redraw || ui.old_is_printing != JobTimer.isRunning()) {
         dwin_string.set("E ");
         DWIN_Draw_String(true, font16x32, Color_IconBlue, Color_Bg_Black, x, y, S(dwin_string.string()));
       }
@@ -349,13 +349,13 @@ void mvCNCUI::draw_status_screen() {
     dwin_string.set();
     char prefix = ' ';
     #if ENABLED(SHOW_REMAINING_TIME)
-      if (TERN1(ROTATE_PROGRESS_DISPLAY, blink) && print_job_timer.isRunning()) {
+      if (TERN1(ROTATE_PROGRESS_DISPLAY, blink) && JobTimer.isRunning()) {
         time = get_remaining_time();
         prefix = 'R';
       }
       else
     #endif
-        time = print_job_timer.duration();
+        time = JobTimer.duration();
 
     time.toDigital(buffer);
     dwin_string.add(prefix);
@@ -365,17 +365,17 @@ void mvCNCUI::draw_status_screen() {
   #else
 
     // landscape mode shows both elapsed and remaining (if SHOW_REMAINING_TIME)
-    time = print_job_timer.duration();
+    time = JobTimer.duration();
     time.toDigital(buffer);
     dwin_string.set(" ");
     dwin_string.add(buffer);
     DWIN_Draw_String(true, font14x28, Color_White, Color_Bg_Black, 230, 170, S(dwin_string.string()));
 
     #if ENABLED(SHOW_REMAINING_TIME)
-      if (print_job_timer.isRunning()) {
+      if (JobTimer.isRunning()) {
         time = get_remaining_time();
         DWIN_Draw_String(true, font14x28, Color_IconBlue, Color_Bg_Black, 336, 170, S(" R "));
-        if (print_job_timer.isPaused() && blink)
+        if (JobTimer.isPaused() && blink)
           dwin_string.set("     ");
         else {
           time.toDigital(buffer);
@@ -383,7 +383,7 @@ void mvCNCUI::draw_status_screen() {
         }
         DWIN_Draw_String(true, font14x28, Color_White, Color_Bg_Black, 378, 170, S(dwin_string.string()));
       }
-      else if (!ui.did_first_redraw || ui.old_is_printing != print_job_timer.isRunning()) {
+      else if (!ui.did_first_redraw || ui.old_is_printing != JobTimer.isRunning()) {
         dwin_string.set("        ");
         DWIN_Draw_String(true, font14x28, Color_IconBlue, Color_Bg_Black, 336, 170, S(dwin_string.string()));
       }
@@ -437,7 +437,7 @@ void mvCNCUI::draw_status_screen() {
   draw_status_message(blink);
 
   ui.did_first_redraw = true;
-  ui.old_is_printing = print_job_timer.isRunning();
+  ui.old_is_printing = JobTimer.isRunning();
 }
 
 #endif // IS_DWIN_MVCNCUI

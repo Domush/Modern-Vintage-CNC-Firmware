@@ -181,7 +181,7 @@ class CNCCounter: public Stopwatch {
 
 // Global CNC Job Timer instance
 #if ENABLED(JOBCOUNTER)
-  extern CNCCounter print_job_timer;
+  extern CNCCounter JobTimer;
 #else
-  extern Stopwatch print_job_timer;
+  extern Stopwatch JobTimer;
 #endif

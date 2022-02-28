@@ -711,7 +711,7 @@ void CrealityDWINClass::Draw_Print_ProgressBar() {
 #endif
 
 void CrealityDWINClass::Draw_Print_ProgressElapsed() {
-  duration_t elapsed = print_job_timer.duration();
+  duration_t elapsed = JobTimer.duration();
   DWIN_Draw_IntValue(true, true, 1, DWIN_FONT_MENU, GetColor(eeprom_settings.progress_time, Color_White), Color_Bg_Black, 2, 42, 187, elapsed.value / 3600);
   DWIN_Draw_IntValue(true, true, 1, DWIN_FONT_MENU, GetColor(eeprom_settings.progress_time, Color_White), Color_Bg_Black, 2, 66, 187, (elapsed.value % 3600) / 60);
   if (eeprom_settings.time_format_textual) {
@@ -3016,15 +3016,15 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
 
             #if ENABLED(JOBCOUNTER)
               char row1[50], row2[50], buf[32];
-              printStatistics ps = print_job_timer.getStats();
+              printStatistics ps = JobTimer.getStats();
 
               sprintf_P(row1, PSTR("%i prints, %i finished"), ps.totalPrints, ps.finishedPrints);
               sprintf_P(row2, PSTR("%s m filament used"), dtostrf(ps.filamentUsed / 1000, 1, 2, str_1));
               Draw_Menu_Item(INFO_PRINTCOUNT, ICON_HotendTemp, row1, row2, false, true);
 
-              duration_t(print_job_timer.getStats().printTime).toString(buf);
+              duration_t(JobTimer.getStats().printTime).toString(buf);
               sprintf_P(row1, PSTR("CNCed: %s"), buf);
-              duration_t(print_job_timer.getStats().longestPrint).toString(buf);
+              duration_t(JobTimer.getStats().longestPrint).toString(buf);
               sprintf_P(row2, PSTR("Longest: %s"), buf);
               Draw_Menu_Item(INFO_PRINTTIME, ICON_PrintTime, row1, row2, false, true);
             #endif
@@ -4743,16 +4743,16 @@ void mvCNCUI::update() { CrealityDWIN.Update(); }
 #endif
 
 void CrealityDWINClass::State_Update() {
-  if ((print_job_timer.isRunning() || print_job_timer.isPaused()) != printing) {
+  if ((JobTimer.isRunning() || JobTimer.isPaused()) != printing) {
     if (!printing) Start_Print(card.isFileOpen() || TERN0(POWER_LOSS_RECOVERY, recovery.valid()));
     else Stop_Print();
   }
-  if (print_job_timer.isPaused() != paused) {
-    paused = print_job_timer.isPaused();
+  if (JobTimer.isPaused() != paused) {
+    paused = JobTimer.isPaused();
     if (process == CNC) CNC_Screen_Icons();
     if (process == Wait && !paused) Redraw_Menu(true, true);
   }
-  if (wait_for_user && !(process == Confirm) && !print_job_timer.isPaused())
+  if (wait_for_user && !(process == Confirm) && !JobTimer.isPaused())
     Confirm_Handler(UserInput);
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
     if (process == Popup && popup == PurgeMore) {

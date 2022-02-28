@@ -13,10 +13,6 @@
   #include "../../module/tool_change.h"
 #endif
 
-#if HAS_LEVELING
-  #include "../../feature/bedlevel/bedlevel.h"
-#endif
-
 #if ENABLED(SENSORLESS_HOMING)
   #include "../../feature/tmc_util.h"
 #endif
@@ -183,9 +179,6 @@
  *  Z   Home to the Z endstop
  */
 void GcodeSuite::G28() {
-  DEBUG_SECTION(log_G28, "G28", DEBUGGING(LEVELING));
-  if (DEBUGGING(LEVELING)) log_machine_info();
-
   TERN_(LASER_MOVE_G28_OFF, cutter.set_inline_enabled(false));  // turn off laser
 
   TERN_(REPORT_STATUS_TO_HOST, set_and_report_grblstate(M_HOMING));
@@ -207,7 +200,6 @@ void GcodeSuite::G28() {
 
   // Home (O)nly if position is unknown
   if (!axes_should_home() && parser.seen_test('O')) {
-    if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("> homing not needed, skip");
     return;
   }
 
@@ -373,7 +365,6 @@ void GcodeSuite::G28() {
 
     if (z_homing_height && (LINEAR_AXIS_GANG(doX, || doY, || TERN0(Z_SAFE_HOMING, doZ), || doI, || doJ, || doK))) {
       // Raise Z before homing any other axes and z is not already high enough (never lower z)
-      if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Raise Z (before homing) by ", z_homing_height);
       do_z_clearance(z_homing_height);
     }
 

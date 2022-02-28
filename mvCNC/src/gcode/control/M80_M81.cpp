@@ -6,7 +6,7 @@
 
 #include "../../module/fan_control.h"
 #include "../../module/planner.h"       // for planner.finish_and_disable
-#include "../../module/jobcounter.h"  // for print_job_timer.stop
+#include "../../module/jobcounter.h"  // for JobTimer.stop
 #include "../../lcd/mvcncui.h"         // for LCD_MESSAGE_F
 
 #include "../../inc/mvCNCConfig.h"
@@ -59,7 +59,7 @@ void GcodeSuite::M81() {
   planner.finish_and_disable();
   fanManager.cooldown();
 
-  print_job_timer.stop();
+  JobTimer.stop();
 
   #if BOTH(HAS_FAN, PROBING_FANS_OFF)
     fanManager.fans_paused = false;

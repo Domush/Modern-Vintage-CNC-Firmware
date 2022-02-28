@@ -373,7 +373,7 @@ void menu_main() {
 
   #if HAS_SERVICE_INTERVALS
     static auto _service_reset = [](const int index) {
-      print_job_timer.resetServiceInterval(index);
+      JobTimer.resetServiceInterval(index);
       ui.completion_feedback();
       ui.reset_status();
       ui.return_to_status();

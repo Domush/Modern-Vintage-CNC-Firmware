@@ -123,7 +123,7 @@ void DGUSScreenHandler::DGUSLCD_SendPrintProgressToDisplay(DGUS_VP_Variable &var
 // Send the current print time to the display.
 // It is using a hex display for that: It expects BSD coded data in the format xxyyzz
 void DGUSScreenHandler::DGUSLCD_SendPrintTimeToDisplay(DGUS_VP_Variable &var) {
-  duration_t elapsed = print_job_timer.duration();
+  duration_t elapsed = JobTimer.duration();
   char buf[32];
   elapsed.toString(buf);
   dgusdisplay.WriteVariable(VP_PrintTime, buf, var.size, true);
@@ -195,7 +195,7 @@ void DGUSScreenHandler::DGUSLCD_SendStringToDisplayPGM(DGUS_VP_Variable &var) {
   // Send the accumulate print time to the display.
   // It is using a hex display for that: It expects BSD coded data in the format xxyyzz
   void DGUSScreenHandler::DGUSLCD_SendPrintAccTimeToDisplay(DGUS_VP_Variable &var) {
-    printStatistics state = print_job_timer.getStats();
+    printStatistics state = JobTimer.getStats();
     char buf[22];
     duration_t elapsed = state.printTime;
     elapsed.toString(buf);
@@ -203,7 +203,7 @@ void DGUSScreenHandler::DGUSLCD_SendStringToDisplayPGM(DGUS_VP_Variable &var) {
   }
 
   void DGUSScreenHandler::DGUSLCD_SendPrintsTotalToDisplay(DGUS_VP_Variable &var) {
-    printStatistics state = print_job_timer.getStats();
+    printStatistics state = JobTimer.getStats();
     char buf[10];
     sprintf_P(buf, PSTR("%u"), state.totalPrints);
     dgusdisplay.WriteVariable(VP_PrintsTotal, buf, var.size, true);
@@ -453,7 +453,7 @@ void DGUSScreenHandler::HandleSettings(DGUS_VP_Variable &var, void *val_ptr) {
   switch (value) {
     default: break;
     case 1:
-      TERN_(JOBCOUNTER, print_job_timer.initStats());
+      TERN_(JOBCOUNTER, JobTimer.initStats());
       settings.reset();
       settings.save();
       break;

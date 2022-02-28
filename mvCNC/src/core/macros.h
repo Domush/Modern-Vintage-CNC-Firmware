@@ -502,13 +502,6 @@
   }
 
 #else
-  // Defer expansion
-  #define EMPTY()
-  #define DEFER(M)  M EMPTY()
-  #define DEFER2(M) M EMPTY EMPTY()()
-  #define DEFER3(M) M EMPTY EMPTY EMPTY()()()
-  #define DEFER4(M) M EMPTY EMPTY EMPTY EMPTY()()()()
-
 
   #define __MIN_N(N,V...) MIN_##N(V)
   #define _MIN_N(N,V...)  __MIN_N(N,V)
@@ -604,13 +597,6 @@
 #define FIRST(a,...)     a
 #define SECOND(a,b,...)  b
 #define THIRD(a,b,c,...) c
-
-// Defer expansion
-#define EMPTY()
-#define DEFER(M)  M EMPTY()
-#define DEFER2(M) M EMPTY EMPTY()()
-#define DEFER3(M) M EMPTY EMPTY EMPTY()()()
-#define DEFER4(M) M EMPTY EMPTY EMPTY EMPTY()()()()
 
 // Force define expansion
 #define EVAL(V...)     EVAL16(V)

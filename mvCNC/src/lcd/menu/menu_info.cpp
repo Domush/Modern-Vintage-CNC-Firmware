@@ -29,7 +29,7 @@
   void menu_info_stats() {
     if (ui.use_click()) return ui.go_back();
 
-    printStatistics stats = print_job_timer.getStats();
+    printStatistics stats = JobTimer.getStats();
 
     char buffer[21];
 

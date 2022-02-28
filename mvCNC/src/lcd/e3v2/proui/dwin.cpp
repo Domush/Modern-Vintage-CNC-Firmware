@@ -588,7 +588,7 @@ void Draw_Print_ProgressBar() {
 
 void Draw_Print_ProgressElapsed() {
   char buf[10];
-  duration_t elapsed = print_job_timer.duration(); // print timer
+  duration_t elapsed = JobTimer.duration(); // print timer
   sprintf_P(buf, PSTR("%02i:%02i"), (uint16_t)(elapsed.value / 3600), ((uint16_t)elapsed.value % 3600) / 60);
   DWINUI::Draw_String(HMI_data.Text_Color, HMI_data.Background_Color, 47, 192, buf);
 }
@@ -1503,7 +1503,7 @@ void EachMomentUpdate() {
 
   if (checkkey == CNCProcess) { // print process
 
-    duration_t elapsed = print_job_timer.duration(); // print timer
+    duration_t elapsed = JobTimer.duration(); // print timer
 
     if (sdprint && card.jobRunning()) {
       uint8_t percentDone = card.percentDone();

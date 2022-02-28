@@ -298,7 +298,7 @@ void mvCNCUI::draw_status_screen() {
 
   // print duration
   char buffer[14];
-  duration_t elapsed = print_job_timer.duration();
+  duration_t elapsed = JobTimer.duration();
   elapsed.toDigital(buffer);
 
   tft.canvas(96, 176, 128, 20);

@@ -191,7 +191,7 @@ bool pause_print(const_float_t retract, const xyz_pos_t &park_point, const bool 
     }
   #endif
 
-  print_job_timer.pause();
+  JobTimer.pause();
 
   // Save current position
   resume_position = current_position;
@@ -344,7 +344,7 @@ void resume_print(const_float_t slow_load_length/*=0*/, const_float_t fast_load_
   TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_open(PROMPT_INFO, F("Resuming"), FPSTR(DISMISS_STR)));
 
   // Resume the CNC job timer if it was running
-  if (print_job_timer.isPaused()) print_job_timer.start();
+  if (JobTimer.isPaused()) JobTimer.start();
 
   #if ENABLED(SDSUPPORT)
     if (did_pause_print) {

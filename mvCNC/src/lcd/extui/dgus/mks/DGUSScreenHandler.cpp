@@ -81,7 +81,7 @@ void DGUSScreenHandler::DGUSLCD_SendBabyStepToDisplay_MKS(DGUS_VP_Variable &var)
 }
 
 void DGUSScreenHandler::DGUSLCD_SendPrintTimeToDisplay_MKS(DGUS_VP_Variable &var) {
-  duration_t elapsed = print_job_timer.duration();
+  duration_t elapsed = JobTimer.duration();
   uint32_t time = elapsed.value;
   dgusdisplay.WriteVariable(VP_PrintTime_H, uint16_t(time / 3600));
   dgusdisplay.WriteVariable(VP_PrintTime_M, uint16_t(time % 3600 / 60));
@@ -308,7 +308,7 @@ void DGUSScreenHandler::ZoffsetConfirm(DGUS_VP_Variable &var, void *val_ptr) {
   settings.save();
   if (jobIsOngoing())
     GotoScreen(MKSLCD_SCREEN_PRINT);
-  else if (print_job_timer.isPaused)
+  else if (JobTimer.isPaused)
     GotoScreen(MKSLCD_SCREEN_PAUSE);
 }
 
@@ -740,7 +740,7 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
 
   DEBUG_ECHOLNPGM("QUEUE LEN:", queue.ring_buffer.length);
 
-  if (!print_job_timer.isPaused() && !queue.ring_buffer.empty())
+  if (!JobTimer.isPaused() && !queue.ring_buffer.empty())
     return;
 
   char axiscode;
@@ -1186,7 +1186,7 @@ void DGUSScreenHandler::MKS_FilamentLoadUnload(DGUS_VP_Variable &var, void *val_
     uint8_t hotend_too_cold = 0;
   #endif
 
-  if (!print_job_timer.isPaused() && !queue.ring_buffer.empty())
+  if (!JobTimer.isPaused() && !queue.ring_buffer.empty())
     return;
 
   const uint16_t val_t = swap16(*(uint16_t*)val_ptr);

@@ -35,18 +35,18 @@
 void GcodeSuite::M24() {
 
   #if ENABLED(DGUS_LCD_UI_MKS)
-    if ((print_job_timer.isPaused() || print_job_timer.isRunning()) && !parser.seen("ST"))
+    if ((JobTimer.isPaused() || JobTimer.isRunning()) && !parser.seen("ST"))
       MKS_resume_print_move();
   #endif
 
   #if ENABLED(POWER_LOSS_RECOVERY)
     if (parser.seenval('S')) card.setIndex(parser.value_long());
-    if (parser.seenval('T')) print_job_timer.resume(parser.value_long());
+    if (parser.seenval('T')) JobTimer.resume(parser.value_long());
   #endif
 
   #if ENABLED(PARK_HEAD_ON_PAUSE)
     if (did_pause_print) {
-      resume_print(); // will call print_job_timer.start()
+      resume_print(); // will call JobTimer.start()
       return;
     }
   #endif
@@ -91,7 +91,7 @@ void GcodeSuite::M25() {
       if (recovery.enabled) recovery.save(true);
     #endif
 
-    print_job_timer.pause();
+    JobTimer.pause();
 
     TERN_(DGUS_LCD_UI_MKS, MKS_pause_print_move());
 

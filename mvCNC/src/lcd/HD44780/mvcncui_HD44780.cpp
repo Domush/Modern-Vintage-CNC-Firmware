@@ -755,7 +755,7 @@ inline uint8_t draw_elapsed_or_remaining_time(uint8_t timepos, const bool blink)
     duration_t remaining = ui.get_remaining_time();
     #else
     uint8_t progress     = ui.get_progress_percent();
-    uint32_t elapsed     = print_job_timer.duration();
+    uint32_t elapsed     = JobTimer.duration();
     duration_t remaining = (progress > 0) ? ((elapsed * 25600 / progress) >> 8) - elapsed : 0;
     #endif
     timepos -= remaining.toDigital(buffer);
@@ -766,7 +766,7 @@ inline uint8_t draw_elapsed_or_remaining_time(uint8_t timepos, const bool blink)
   #endif
 
   if (!show_remain) {
-    duration_t elapsed = print_job_timer.duration();
+    duration_t elapsed = JobTimer.duration();
     timepos -= elapsed.toDigital(buffer);
     lcd_put_wchar(timepos, 2, LCD_STR_CLOCK[0]);
   }

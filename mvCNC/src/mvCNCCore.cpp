@@ -269,7 +269,7 @@ bool pin_is_protected(const pin_t pin) {
 /**
  * A CNC Job exists when the timer is running or SD is printing
  */
-bool jobIsOngoing() { return print_job_timer.isRunning() || IS_SD_PRINTING(); }
+bool jobIsOngoing() { return JobTimer.isRunning() || IS_SD_PRINTING(); }
 
 /**
  * CNCing is active when a job is underway but not paused
@@ -280,7 +280,7 @@ bool jobIsActive() { return !did_pause_print && jobIsOngoing(); }
  * CNCing is paused according to SD or host indicators
  */
 bool jobIsPaused() {
-  return did_pause_print || print_job_timer.isPaused() || IS_SD_PAUSED();
+  return did_pause_print || JobTimer.isPaused() || IS_SD_PAUSED();
 }
 
 void startOrResumeJob() {
@@ -292,7 +292,7 @@ void startOrResumeJob() {
       ui.reset_remaining_time();
     #endif
   }
-  print_job_timer.start();
+  JobTimer.start();
 }
 
 #if ENABLED(SDSUPPORT)
@@ -304,9 +304,7 @@ void startOrResumeJob() {
     queue.clear();
     quickstop_stepper();
 
-    print_job_timer.abort();
-
-    IF_DISABLED(SD_ABORT_NO_COOLDOWN, fanManager.disable_all_heaters());
+    JobTimer.abort();
 
     TERN(HAS_CUTTER, cutter.kill(), fanManager.zero_fan_speeds()); // Full cutter shutdown including ISR control
 
@@ -607,7 +605,7 @@ void idle(bool no_stepper_sleep/*=false*/) {
   TERN_(HOST_KEEPALIVE_FEATURE, gcode.host_keepalive());
 
   // Update the CNC Job Timer state
-  TERN_(JOBCOUNTER, print_job_timer.tick());
+  TERN_(JOBCOUNTER, JobTimer.tick());
 
   // Update the Beeper queue
   TERN_(USE_BEEPER, buzzer.tick());
@@ -641,8 +639,6 @@ void idle(bool no_stepper_sleep/*=false*/) {
 
   // Handle Joystick jogging
   TERN_(JOYSTICK, joystick.injectJogMoves());
-    joystick.injectJogMoves();
-  #endif
 
   // Handle Wii Nunchuck jogging
   TERN_(WII_NUNCHUCK_JOGGING, wii.injectJogMoves());
@@ -663,7 +659,6 @@ void idle(bool no_stepper_sleep/*=false*/) {
  * After this the machine will need to be reset.
  */
 void kill(FSTR_P const lcd_error/*=nullptr*/, FSTR_P const lcd_component/*=nullptr*/, const bool steppers_off/*=false*/) {
-  fanManager.disable_all_heaters();
 
   TERN_(HAS_CUTTER, cutter.kill()); // Full cutter shutdown including ISR control
 
@@ -701,7 +696,7 @@ void minkill(const bool steppers_off/*=false*/) {
   TERN_(HAS_CUTTER, cutter.kill());  // Reiterate cutter shutdown
 
   // Power off all steppers (for M112) or just the E steppers
-  steppers_off ? stepper.disable_all_steppers() : stepper.disable_e_steppers();
+  if (steppers_off) stepper.disable_all_steppers();
 
   TERN_(PSU_CONTROL, powerManager.power_off());
 
@@ -732,7 +727,7 @@ void minkill(const bool steppers_off/*=false*/) {
  * After a stop the machine may be resumed with M999
  */
 void stop() {
-  print_job_timer.stop();
+  JobTimer.stop();
 
   #if EITHER(PROBING_FANS_OFF, ADVANCED_PAUSE_FANS_PAUSE)
     fanManager.fanPause(false); // Un-pause fans for safety
@@ -1079,7 +1074,7 @@ void setup() {
 
   sync_plan_position();               // Vital to init stepper/planner equivalent for current_position
 
-  SETUP_RUN(print_job_timer.init());  // Initial setup of CNC job timer
+  SETUP_RUN(JobTimer.init());  // Initial setup of CNC job timer
 
   SETUP_RUN(endstops.init());         // Init endstops and pullups
 

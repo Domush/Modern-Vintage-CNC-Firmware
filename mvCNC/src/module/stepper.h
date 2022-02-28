@@ -215,7 +215,7 @@
 // Perhaps DISABLE_MULTI_STEPPING should be required with ADAPTIVE_STEP_SMOOTHING.
 #define MIN_STEP_ISR_FREQUENCY (MAX_STEP_ISR_FREQUENCY_1X / 2)
 
-#define ENABLE_COUNT (LINEAR_AXES + E_STEPPERS)
+#define ENABLE_COUNT (LINEAR_AXES)
 typedef IF<(ENABLE_COUNT > 8), uint16_t, uint8_t>::type ena_mask_t;
 
 // Axis flags type, for enabled state or other simple state
@@ -233,7 +233,6 @@ typedef struct {
 // All the stepper enable pins
 constexpr pin_t ena_pins[] = {
   LINEAR_AXIS_LIST(X_ENABLE_PIN, Y_ENABLE_PIN, Z_ENABLE_PIN, I_ENABLE_PIN, J_ENABLE_PIN, K_ENABLE_PIN),
-  LIST_N(E_STEPPERS, E0_ENABLE_PIN, E1_ENABLE_PIN, E2_ENABLE_PIN, E3_ENABLE_PIN, E4_ENABLE_PIN, E5_ENABLE_PIN, E6_ENABLE_PIN, E7_ENABLE_PIN)
 };
 
 // Index of the axis or extruder element in a combined array

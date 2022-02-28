@@ -792,7 +792,7 @@ void mvCNCUI::draw_status_screen() {
   #endif
 
   char buffer[10];
-  duration_t elapsed = print_job_timer.duration();
+  duration_t elapsed = JobTimer.duration();
   uint8_t len = elapsed.toDigital(buffer);
 
   lcd.setCursor((LCD_WIDTH - 1) - len, 1);

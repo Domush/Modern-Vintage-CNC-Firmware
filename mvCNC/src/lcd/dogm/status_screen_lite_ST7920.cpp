@@ -718,7 +718,7 @@ bool ST7920_Lite_Status_Screen::indicators_changed() {
 void ST7920_Lite_Status_Screen::update_indicators(const bool forceUpdate) {
   if (forceUpdate || indicators_changed()) {
     const bool       blink              = ui.get_blink();
-    const duration_t elapsed            = print_job_timer.duration();
+    const duration_t elapsed            = JobTimer.duration();
     duration_t       remaining          = TERN0(USE_M73_REMAINING_TIME, ui.get_remaining_time());
     const uint16_t   feedrate_perc      = feedrate_percentage;
     const celsius_t  extruder_1_temp    = fanManager.wholeDegHotend(0),

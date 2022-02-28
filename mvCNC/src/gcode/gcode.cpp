@@ -177,7 +177,7 @@ void GcodeSuite::get_destination_from_command() {
 
   #if ENABLED(JOBCOUNTER)
     if (!DEBUGGING(DRYRUN) && !skip_move)
-      print_job_timer.incFilamentUsed(destination.e - current_position.e);
+      JobTimer.incFilamentUsed(destination.e - current_position.e);
   #endif
 
   #if ENABLED(LASER_MOVE_POWER)

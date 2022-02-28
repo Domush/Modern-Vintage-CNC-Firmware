@@ -171,7 +171,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
     #endif
 
     // Elapsed CNC job time
-    info.print_job_elapsed = print_job_timer.duration();
+    info.print_job_elapsed = JobTimer.duration();
 
     // Relative axis modes
     info.axis_relative = gcode.axis_relative;

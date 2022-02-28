@@ -5,6 +5,7 @@
  * Based on Marlin and grbl.
  */
 #pragma once
+#include "src/inc/mvCNCConfigPre.h"
 
 //#define BOARD_CUSTOM_BUILD_FLAGS -DTONE_CHANNEL=4 -DTONE_TIMER=4 -DTIMER_TONE=4
 

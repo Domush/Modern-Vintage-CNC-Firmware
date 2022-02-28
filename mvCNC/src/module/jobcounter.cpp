@@ -7,7 +7,7 @@
 #if DISABLED(JOBCOUNTER)
 
 #include "../libs/stopwatch.h"
-Stopwatch print_job_timer;      // Global CNC Job Timer instance
+Stopwatch JobTimer;      // Global CNC Job Timer instance
 
 #else // JOBCOUNTER
 
@@ -47,7 +47,7 @@ Stopwatch print_job_timer;      // Global CNC Job Timer instance
   #endif
 #endif
 
-CNCCounter print_job_timer;   // Global CNC Job Timer instance
+CNCCounter JobTimer;   // Global CNC Job Timer instance
 
 printStatistics CNCCounter::data;
 

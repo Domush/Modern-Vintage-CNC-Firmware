@@ -505,7 +505,7 @@ void mvCNCUI::draw_status_screen() {
     // Progress / elapsed / estimation updates and string formatting to avoid float math on each LCD draw
     #if HAS_PRINT_PROGRESS
       const progress_t progress = TERN(HAS_PRINT_PROGRESS_PERMYRIAD, get_progress_permyriad, get_progress_percent)();
-      duration_t elapsed = print_job_timer.duration();
+      duration_t elapsed = JobTimer.duration();
       const uint8_t p = progress & 0xFF, ev = elapsed.value & 0xFF;
       if (p != lastProgress) {
         lastProgress = p;

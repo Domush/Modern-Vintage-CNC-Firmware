@@ -846,7 +846,7 @@ namespace ExtUI {
   #endif
 
   uint32_t getProgress_seconds_elapsed() {
-    const duration_t elapsed = print_job_timer.duration();
+    const duration_t elapsed = JobTimer.duration();
     return elapsed.value;
   }
 
@@ -902,13 +902,13 @@ namespace ExtUI {
   #endif
 
   #if ENABLED(JOBCOUNTER)
-    char* getFailedPrints_str(char buffer[21])   { strcpy(buffer,i16tostr3left(print_job_timer.getStats().totalPrints - print_job_timer.getStats().finishedPrints)); return buffer; }
-    char* getTotalPrints_str(char buffer[21])    { strcpy(buffer,i16tostr3left(print_job_timer.getStats().totalPrints));    return buffer; }
-    char* getFinishedPrints_str(char buffer[21]) { strcpy(buffer,i16tostr3left(print_job_timer.getStats().finishedPrints)); return buffer; }
-    char* getTotalPrintTime_str(char buffer[21]) { return duration_t(print_job_timer.getStats().printTime).toString(buffer); }
-    char* getLongestPrint_str(char buffer[21])   { return duration_t(print_job_timer.getStats().longestPrint).toString(buffer); }
+    char* getFailedPrints_str(char buffer[21])   { strcpy(buffer,i16tostr3left(JobTimer.getStats().totalPrints - JobTimer.getStats().finishedPrints)); return buffer; }
+    char* getTotalPrints_str(char buffer[21])    { strcpy(buffer,i16tostr3left(JobTimer.getStats().totalPrints));    return buffer; }
+    char* getFinishedPrints_str(char buffer[21]) { strcpy(buffer,i16tostr3left(JobTimer.getStats().finishedPrints)); return buffer; }
+    char* getTotalPrintTime_str(char buffer[21]) { return duration_t(JobTimer.getStats().printTime).toString(buffer); }
+    char* getLongestPrint_str(char buffer[21])   { return duration_t(JobTimer.getStats().longestPrint).toString(buffer); }
     char* getFilamentUsed_str(char buffer[21])   {
-      printStatistics stats = print_job_timer.getStats();
+      printStatistics stats = JobTimer.getStats();
       sprintf_P(buffer, PSTR("%ld.%im"), long(stats.filamentUsed / 1000), int16_t(stats.filamentUsed / 100) % 10);
       return buffer;
     }
@@ -1040,7 +1040,7 @@ namespace ExtUI {
   bool jobRunning() { return commandsInQueue() || jobRunningFromMedia() || jobIsOngoing() || jobIsPaused(); }
 
   bool jobRunningPaused() {
-    return jobRunning() && (jobRunningFromMediaPaused() || print_job_timer.isPaused());
+    return jobRunning() && (jobRunningFromMediaPaused() || JobTimer.isPaused());
   }
 
   bool isMediaInserted() { return TERN0(SDSUPPORT, IS_SD_INSERTED()); }

@@ -2,7 +2,6 @@
  * Modern Vintage CNC Firmware
 */
 #pragma once
-
 //
 // Prepare a list of protected pins for M42/M43
 //
@@ -276,7 +275,65 @@
 #endif
 
 //
-// Heaters, Fans, Temp Sensors
+// For boards with Extruder driver slots, this will make those pins available to other axes
+//
+#define _E0_CS
+#define _E0_MS1
+#define _E0_MS2
+#define _E0_MS3
+#define _E1_CS
+#define _E1_MS1
+#define _E1_MS2
+#define _E1_MS3
+#define _E2_CS
+#define _E2_MS1
+#define _E2_MS2
+#define _E2_MS3
+#define _E3_CS
+#define _E3_MS1
+#define _E3_MS2
+#define _E3_MS3
+#define _E4_CS
+#define _E4_MS1
+#define _E4_MS2
+#define _E4_MS3
+#define _E5_CS
+#define _E5_MS1
+#define _E5_MS2
+#define _E5_MS3
+#define _E6_CS
+#define _E6_MS1
+#define _E6_MS2
+#define _E6_MS3
+#define _E7_CS
+#define _E7_MS1
+#define _E7_MS2
+#define _E7_MS3
+#define _E0_PINS
+#define _E1_PINS
+#define _E2_PINS
+#define _E3_PINS
+#define _E4_PINS
+#define _E5_PINS
+#define _E6_PINS
+#define _E7_PINS
+
+//
+// Make temp sensor and fan pins available
+//
+
+#define E0_AUTO_FAN_PIN -1
+#define E1_AUTO_FAN_PIN -1
+#define E2_AUTO_FAN_PIN -1
+#define E3_AUTO_FAN_PIN -1
+#define E4_AUTO_FAN_PIN -1
+#define E5_AUTO_FAN_PIN -1
+#define E6_AUTO_FAN_PIN -1
+#define E7_AUTO_FAN_PIN -1
+
+
+//
+// Make heaters PWM pins available
 //
 
 #define _H0_PINS
@@ -289,39 +346,6 @@
 #define _H7_PINS
 
 #define DIO_PIN(P) TERN(TARGET_LPC1768, P, analogInputToDigitalPin(P))
-
-#if HAS_HOTEND
-  #undef _H0_PINS
-  #define _H0_PINS HEATER_0_PIN, E0_AUTO_FAN_PIN, DIO_PIN(TEMP_0_PIN),
-  #if TOOL_CHANGE_SUPPORT
-    #undef _H1_PINS
-    #define _H1_PINS HEATER_1_PIN, E1_AUTO_FAN_PIN, DIO_PIN(TEMP_1_PIN),
-    #if HOTENDS > 2
-      #undef _H2_PINS
-      #define _H2_PINS HEATER_2_PIN, E2_AUTO_FAN_PIN, DIO_PIN(TEMP_2_PIN),
-      #if HOTENDS > 3
-        #undef _H3_PINS
-        #define _H3_PINS HEATER_3_PIN, E3_AUTO_FAN_PIN, DIO_PIN(TEMP_3_PIN),
-        #if HOTENDS > 4
-          #undef _H4_PINS
-          #define _H4_PINS HEATER_4_PIN, E4_AUTO_FAN_PIN, DIO_PIN(TEMP_4_PIN),
-          #if HOTENDS > 5
-            #undef _H5_PINS
-            #define _H5_PINS HEATER_5_PIN, E5_AUTO_FAN_PIN, DIO_PIN(TEMP_5_PIN),
-            #if HOTENDS > 6
-              #undef _H6_PINS
-              #define _H6_PINS HEATER_6_PIN, E6_AUTO_FAN_PIN, DIO_PIN(TEMP_6_PIN),
-              #if HOTENDS > 7
-                #undef _H7_PINS
-                #define _H7_PINS HEATER_7_PIN, E7_AUTO_FAN_PIN, DIO_PIN(TEMP_7_PIN),
-              #endif // HOTENDS > 7
-            #endif // HOTENDS > 6
-          #endif // HOTENDS > 5
-        #endif // HOTENDS > 4
-      #endif // HOTENDS > 3
-    #endif // HOTENDS > 2
-  #endif // TOOL_CHANGE_SUPPORT
-#endif // HOTENDS
 
 //
 // Dual X, Dual Y, Multi-Z

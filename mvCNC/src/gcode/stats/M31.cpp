@@ -13,7 +13,7 @@
  */
 void GcodeSuite::M31() {
   char buffer[22];
-  duration_t(print_job_timer.duration()).toString(buffer);
+  duration_t(JobTimer.duration()).toString(buffer);
 
   ui.set_status(buffer);
 

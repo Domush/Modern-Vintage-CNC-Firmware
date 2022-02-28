@@ -174,7 +174,7 @@ void DGUSTxHandler::PositionZ(DGUS_VP &vp) {
 
 void DGUSTxHandler::Ellapsed(DGUS_VP &vp) {
   char buffer[21];
-  duration_t(print_job_timer.duration()).toString(buffer);
+  duration_t(JobTimer.duration()).toString(buffer);
 
   dgus_display.WriteString((uint16_t)vp.addr, buffer, vp.size);
 }
@@ -485,7 +485,7 @@ void DGUSTxHandler::BuildVolume(DGUS_VP &vp) {
 
 void DGUSTxHandler::TotalPrints(DGUS_VP &vp) {
   #if ENABLED(JOBCOUNTER)
-    dgus_display.Write((uint16_t)vp.addr, dgus_display.SwapBytes(print_job_timer.getStats().totalPrints));
+    dgus_display.Write((uint16_t)vp.addr, dgus_display.SwapBytes(JobTimer.getStats().totalPrints));
   #else
     UNUSED(vp);
   #endif
@@ -493,7 +493,7 @@ void DGUSTxHandler::TotalPrints(DGUS_VP &vp) {
 
 void DGUSTxHandler::FinishedPrints(DGUS_VP &vp) {
   #if ENABLED(JOBCOUNTER)
-    dgus_display.Write((uint16_t)vp.addr, dgus_display.SwapBytes(print_job_timer.getStats().finishedPrints));
+    dgus_display.Write((uint16_t)vp.addr, dgus_display.SwapBytes(JobTimer.getStats().finishedPrints));
   #else
     UNUSED(vp);
   #endif

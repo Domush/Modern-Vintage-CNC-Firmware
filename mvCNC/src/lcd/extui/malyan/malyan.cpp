@@ -118,7 +118,7 @@ void process_lcd_c_command(const char *command) {
     case 'T':
       // Sometimes the LCD will send commands to turn off both extruder and bed, though
       // this should not happen since the printing screen is up. Better safe than sorry.
-      if (!print_job_timer.isRunning() || target_val > 0)
+      if (!JobTimer.isRunning() || target_val > 0)
         ExtUI::setTargetTemp_celsius(target_val, ExtUI::extruder_t::E0);
       break;
 
@@ -143,11 +143,11 @@ void process_lcd_eb_command(const char *command) {
   duration_t elapsed;
   switch (command[0]) {
     case '0': {
-      elapsed = print_job_timer.duration();
+      elapsed = JobTimer.duration();
       sprintf_P(elapsed_buffer, PSTR("%02u%02u%02u"), uint16_t(elapsed.hour()), uint16_t(elapsed.minute()) % 60, uint16_t(elapsed.second()) % 60);
 
       char message_buffer[MAX_CURLY_COMMAND];
-      uint8_t done_pct = print_job_timer.isRunning() ? (iteration * 10) : 100;
+      uint8_t done_pct = JobTimer.isRunning() ? (iteration * 10) : 100;
       iteration = (iteration + 1) % 10; // Provide progress animation
       #if ENABLED(SDSUPPORT)
         if (ExtUI::jobRunningFromMedia() || ExtUI::jobRunningFromMediaPaused())

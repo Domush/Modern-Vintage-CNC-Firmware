@@ -203,30 +203,6 @@
 #if !AXIS_HAS_SPI(K)
   #undef K_CS_PIN
 #endif
-#if E_STEPPERS && !AXIS_HAS_SPI(E0)
-  #undef E0_CS_PIN
-#endif
-#if E_STEPPERS > 1 && !AXIS_HAS_SPI(E1)
-  #undef E1_CS_PIN
-#endif
-#if E_STEPPERS > 2 && !AXIS_HAS_SPI(E2)
-  #undef E2_CS_PIN
-#endif
-#if E_STEPPERS > 3 && !AXIS_HAS_SPI(E3)
-  #undef E3_CS_PIN
-#endif
-#if E_STEPPERS > 4 && !AXIS_HAS_SPI(E4)
-  #undef E4_CS_PIN
-#endif
-#if E_STEPPERS > 5 && !AXIS_HAS_SPI(E5)
-  #undef E5_CS_PIN
-#endif
-#if E_STEPPERS > 6 && !AXIS_HAS_SPI(E6)
-  #undef E6_CS_PIN
-#endif
-#if E_STEPPERS > 7 && !AXIS_HAS_SPI(E7)
-  #undef E7_CS_PIN
-#endif
 
 #ifndef X_CS_PIN
   #define X_CS_PIN -1
@@ -527,18 +503,10 @@
   #undef K_MIN_PIN
   #undef K_MAX_PIN
 #endif
+#undef FIL_RUNOUT_PIN
+#undef FIL_RUNOUT1_PIN
+#undef FIL_RUNOUT2_PIN
 
-// Filament Sensor first pin alias
-#if HAS_FILAMENT_SENSOR
-  #define FIL_RUNOUT1_PIN FIL_RUNOUT_PIN  // Filament Sensor first pin alias
-#else
-  #undef FIL_RUNOUT_PIN
-  #undef FIL_RUNOUT1_PIN
-#endif
-
-#if NUM_RUNOUT_SENSORS < 2
-  #undef FIL_RUNOUT2_PIN
-#endif
 
 #ifndef LCD_PINS_D4
   #define LCD_PINS_D4 -1
@@ -571,15 +539,7 @@
 #define DIAG_REMAPPED(p,q) (PIN_EXISTS(q) && _EPIN(p##_E_INDEX, DIAG) == q##_PIN)
 #define _En_DIAG_(p) _E##p##_DIAG_
 
-// The E0/E1 steppers are always used for Dual E
-#if ENABLED(E_DUAL_STEPPER_DRIVERS)
-  #ifndef E1_STEP_PIN
-    #error "No E1 stepper available for E_DUAL_STEPPER_DRIVERS!"
-  #endif
-  #define X2_E_INDEX INCREMENT(E_STEPPERS)
-#else
-  #define X2_E_INDEX E_STEPPERS
-#endif
+#define X2_E_INDEX E_STEPPERS
 
 #if HAS_X2_STEPPER && !defined(X2_DIAG_PIN) && !defined(X2_STEP_PIN) && !PIN_EXISTS(X2_CS_PIN)
   #define Y2_E_INDEX INCREMENT(X2_E_INDEX)

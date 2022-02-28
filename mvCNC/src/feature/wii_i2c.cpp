@@ -57,6 +57,11 @@ void WiiNunchuck::connect() {
   if (PENDING(millis(), next_run)) return;
   next_run = millis() + _reconnection_delay;
 
+  #if PINS_EXIST(I2C_SCL, I2C_SDA) && DISABLED(SOFT_I2C_EEPROM)
+    Wire.setSDA(pin_t(I2C_SDA_PIN));
+    Wire.setSCL(pin_t(I2C_SCL_PIN));
+  #endif
+
 	Wire.begin();
 
 	Wire.beginTransmission(NUNCHUK_DEVICE_ID);
@@ -99,7 +104,7 @@ void WiiNunchuck::calculate(xyz_float_t &joy_value_normalized) {
         axis_jog = (joy_value - wii_limits[1]) / float(wii_limits[1] - wii_limits[0]);  // negative value
 
       // If C button is not pressed, reduce the speed of the movement
-      if (axis_jog != 0.0f && !wii.state.buttonC()) { axis_jog = axis_jog / WII_SLOW_DIVISER; }
+      if (axis_jog != 0.0f && !wii.cPressed()) { axis_jog = axis_jog / WII_SLOW_DIVISER; }
 
       // Map normal to jog value via quadratic relationship
       axis_jog = SIGN(axis_jog) * sq(axis_jog);
@@ -108,22 +113,21 @@ void WiiNunchuck::calculate(xyz_float_t &joy_value_normalized) {
 
   static constexpr int16_t wii_x_limits[4] = WII_X_LIMITS;
   static constexpr int16_t wii_y_limits[4] = WII_Y_LIMITS;
-  static constexpr int16_t wii_z_limits[4] = WII_Z_LIMITS;
 
-  if (wii.state.buttonZ()) {  // Move Z axis if Z button pressed
+  if (wii.zPressed()) {  // Move Z axis if Z button pressed
 
-    if (wii.state.joyX() < wii_z_limits[1] || wii.state.joyX() > wii_z_limits[2]) {
+    if (wii.joyX() < wii_x_limits[1] || wii.joyX() > wii_x_limits[2]) {
       // joyX moves the Z axis at half adjusted speed.
-      float _half_joy_speed = wii.state.joyX() + (128 - wii.state.joyX()) / 2;
-      _normalizeInputValue(joy_value_normalized.z, WII_Z(_half_joy_speed), wii_z_limits, true);
+      float _half_joy_speed = wii.joyX() + (128 - wii.joyX()) / 2;
+      _normalizeInputValue(joy_value_normalized.z, WII_Z(_half_joy_speed), wii_x_limits, true);
     } else {
       // joyY moves the Z axis at normal adjusted speed.
-      _normalizeInputValue(joy_value_normalized.z, WII_Z(wii.state.joyY()), wii_z_limits, true);
+      _normalizeInputValue(joy_value_normalized.z, WII_Z(wii.joyY()), wii_y_limits, true);
     }
 
   } else {  // Move X/Y axis
-    _normalizeInputValue(joy_value_normalized.x, WII_X(wii.state.joyX()), wii_x_limits);
-    _normalizeInputValue(joy_value_normalized.y, WII_Y(wii.state.joyY()), wii_y_limits);
+    _normalizeInputValue(joy_value_normalized.x, WII_X(wii.joyX()), wii_x_limits);
+    _normalizeInputValue(joy_value_normalized.y, WII_Y(wii.joyY()), wii_y_limits);
   }
 }
 
@@ -137,7 +141,7 @@ void WiiNunchuck::injectJogMoves() {
   static bool injecting_now;  // = false;
   if (injecting_now || jobIsOngoing()) return;
     #if HAS_CUTTER
-  if (cutter.power) return;
+  if (cutter.enabled()) return;
     #endif
 
     #if ENABLED(NO_MOTION_BEFORE_HOMING)
@@ -206,29 +210,16 @@ void WiiNunchuck::report() {
     if (PENDING(millis(), next_run)) return;
     next_run = millis() + _report_delay;
 
-    SERIAL_ECHOPGM("Wii Nunchuck States:");
-    if (wii.state.buttonZ()) {
-      SERIAL_ECHOPGM_P(SP_X_STR, "idle");
-      SERIAL_ECHOPGM_P(SP_Y_STR, "idle");
-      SERIAL_ECHOPGM_P(SP_Z_STR, WII_Z(MAX(wii.state.joyX(), wii.state.joyY())));
-    } else {
-      SERIAL_ECHOPGM_P(SP_X_STR, WII_X(wii.state.joyX()));
-      SERIAL_ECHOPGM_P(SP_Y_STR, WII_Y(wii.state.joyY()));
-      SERIAL_ECHOPGM_P(SP_Z_STR, "idle");
-    }
+    const char cPrint = wii.cPressed() ? 'C' : 'c';
+    const char zPrint = wii.zPressed() ? 'Z' : 'z';
+
+    SERIAL_ECHOPGM("Wii Nunchuck");
     #if HAS_WII_EN
     SERIAL_ECHO_TERNARY(READ(WII_EN_PIN), " EN=", "HIGH (dis", "LOW (en", "abled)");
     #endif
-    SERIAL_EOL();
-    char buffer[80];
-
-    const char cPrint = wii.state.buttonC() ? 'C' : '-';
-    const char zPrint = wii.state.buttonZ() ? 'Z' : '-';
-
-    snprintf(buffer, sizeof(buffer), "Raw Values: Joy:(%3u, %3u) | Accel XYZ:(%4u, %4u, %4u) | Buttons: %c%c",
-             wii.state.joyX(), wii.state.joyY(), wii.state.accelX(), wii.state.accelY(), wii.state.accelZ(), cPrint,
-             zPrint);
-    SERIAL_ECHOLN(buffer);
+    SERIAL_ECHOPGM_P(SP_X_STR, WII_X(wii.joyX()));
+    SERIAL_ECHOPGM_P(SP_Y_STR, WII_Y(wii.joyY()));
+    SERIAL_ECHOLNPGM_P("Buttons: ", cPrint + zPrint);
   }
 }
 

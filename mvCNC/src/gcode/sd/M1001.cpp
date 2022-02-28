@@ -59,7 +59,7 @@ void GcodeSuite::M1001() {
   TERN_(POWER_LOSS_RECOVERY, recovery.purge());
 
   // Report total print time
-  const bool long_print = print_job_timer.duration() > 60;
+  const bool long_print = JobTimer.duration() > 60;
   if (long_print) process_subcommands_now(F("M31"));
 
   // Stop the CNC job timer

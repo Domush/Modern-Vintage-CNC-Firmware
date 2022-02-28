@@ -580,7 +580,7 @@ void mvCNCUI::init() {
         if (expire_status_ms) {
 
           // Expire the message if a job is active and the bar has ticks
-          if (get_progress_percent() > 2 && !print_job_timer.isPaused()) {
+          if (get_progress_percent() > 2 && !JobTimer.isPaused()) {
             if (ELAPSED(ms, expire_status_ms)) {
               status_message[0] = '\0';
               expire_status_ms = 0;
@@ -1386,17 +1386,17 @@ void mvCNCUI::init() {
       else if (IS_SD_PRINTING())
         return set_status(card.longest_filename(), true);
     #endif
-    else if (print_job_timer.isRunning())
+    else if (JobTimer.isRunning())
       msg = GET_TEXT_F(MSG_PRINTING);
 
     #if SERVICE_INTERVAL_1 > 0
-      else if (print_job_timer.needsService(1)) msg = FPSTR(service1);
+      else if (JobTimer.needsService(1)) msg = FPSTR(service1);
     #endif
     #if SERVICE_INTERVAL_2 > 0
-      else if (print_job_timer.needsService(2)) msg = FPSTR(service2);
+      else if (JobTimer.needsService(2)) msg = FPSTR(service2);
     #endif
     #if SERVICE_INTERVAL_3 > 0
-      else if (print_job_timer.needsService(3)) msg = FPSTR(service3);
+      else if (JobTimer.needsService(3)) msg = FPSTR(service3);
     #endif
 
     else if (!no_welcome)
@@ -1521,7 +1521,7 @@ void mvCNCUI::init() {
     #ifdef ACTION_ON_CANCEL
       hostui.cancel();
     #endif
-    IF_DISABLED(SDSUPPORT, print_job_timer.stop());
+    IF_DISABLED(SDSUPPORT, JobTimer.stop());
     TERN_(HOST_PROMPT_SUPPORT, hostui.prompt_open(PROMPT_INFO, F("UI Aborted"), FPSTR(DISMISS_STR)));
     LCD_MESSAGE(MSG_PRINT_ABORTED);
     TERN_(HAS_MVCNCUI_MENU, return_to_status());
@@ -1570,7 +1570,7 @@ void mvCNCUI::init() {
     #ifdef ACTION_ON_RESUME
       hostui.resume();
     #endif
-    print_job_timer.start(); // Also called by M24
+    JobTimer.start(); // Also called by M24
   }
 
   #if HAS_PRINT_PROGRESS
