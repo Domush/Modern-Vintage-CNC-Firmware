@@ -644,7 +644,7 @@ char *creat_title_text() {
           feedrate_percentage = 100;
           planner.flow_percentage[0] = 100;
           planner.e_factor[0]        = planner.flow_percentage[0] * 0.01;
-          #if HAS_MULTI_EXTRUDER
+          #if TOOL_CHANGE_SUPPORT
             planner.flow_percentage[1] = 100;
             planner.e_factor[1]        = planner.flow_percentage[1] * 0.01;
           #endif

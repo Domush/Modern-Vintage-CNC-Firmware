@@ -68,13 +68,13 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       }
       break;
     case ID_FILAMNT_TYPE:
-      #if HAS_MULTI_EXTRUDER
+      #if TOOL_CHANGE_SUPPORT
         uiCfg.extruderIndex = !uiCfg.extruderIndex;
       #endif
       disp_filament_type();
       break;
     case ID_FILAMNT_RETURN:
-      #if HAS_MULTI_EXTRUDER
+      #if TOOL_CHANGE_SUPPORT
         if (uiCfg.print_state != IDLE && uiCfg.print_state != REPRINTED)
           gcode.process_subcommands_now(uiCfg.extruderIndexBak == 1 ? F("T1") : F("T0"));
       #endif

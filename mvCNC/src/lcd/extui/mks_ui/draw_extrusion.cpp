@@ -53,7 +53,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       }
       break;
     case ID_E_TYPE:
-      if (ENABLED(HAS_MULTI_EXTRUDER)) {
+      if (ENABLED(TOOL_CHANGE_SUPPORT)) {
         if (uiCfg.extruderIndex == 0) {
           uiCfg.extruderIndex = 1;
           queue.inject(F("T1"));

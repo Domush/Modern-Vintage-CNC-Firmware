@@ -55,7 +55,7 @@ static FSTR_P const assets[] = {
   F("bmp_in.bin"),
   F("bmp_out.bin"),
   F("bmp_extru1.bin"),
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     F("bmp_extru2.bin"),
   #endif
   F("bmp_speed_high.bin"),
@@ -106,7 +106,7 @@ static FSTR_P const assets[] = {
   F("bmp_resume.bin"),
   F("bmp_stop.bin"),
   F("bmp_ext1_state.bin"),
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     F("bmp_ext2_state.bin"),
   #endif
   F("bmp_bed_state.bin"),

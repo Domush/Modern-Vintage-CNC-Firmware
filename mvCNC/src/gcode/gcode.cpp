@@ -468,15 +468,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 123: M123(); break;                                  // M123: Report fan states or set fans auto-report interval
       #endif
 
-      #if HAS_HEATED_CHAMBER
-        case 141: M141(); break;                                  // M141: Set chamber temperature
-        case 191: M191(); break;                                  // M191: Wait for chamber temperature to reach target
-      #endif
-
-      #if HAS_TEMP_PROBE
-        case 192: M192(); break;                                  // M192: Wait for probe temp
-      #endif
-
       #if HAS_COOLER
         case 143: M143(); break;                                  // M143: Set cooler temperature
         case 193: M193(); break;                                  // M193: Wait for cooler temperature to reach target
@@ -484,10 +475,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
       #if ENABLED(AUTO_REPORT_POSITION)
         case 154: M154(); break;                                  // M154: Set position auto-report interval
-      #endif
-
-      #if BOTH(AUTO_REPORT_TEMPERATURES, HAS_TEMP_SENSOR)
-        case 155: M155(); break;                                  // M155: Set temperature auto-report interval
       #endif
 
       #if ENABLED(PARK_HEAD_ON_PAUSE)
@@ -542,6 +529,10 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 211: M211(); break;                                  // M211: Enable, Disable, and/or Report software endstops
       #endif
 
+      #if TOOL_CHANGE_SUPPORT
+        case 217: M217(); break;                                  // M217: Set filament swap parameters
+      #endif
+
       case 220: M220(); break;                                    // M220: Set Feedrate Percentage: S<percent> ("FR" on your LCD)
 
       #if ENABLED(DIRECT_PIN_CONTROL)
@@ -566,10 +557,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 300: M300(); break;                                  // M300: Play beep tone
       #endif
 
-      #if ENABLED(PIDTEMPCHAMBER)
-        case 309: M309(); break;                                  // M309: Set chamber PID parameters
-      #endif
-
       #if ENABLED(PHOTO_GCODE)
         case 240: M240(); break;                                  // M240: Trigger a camera
       #endif
@@ -585,10 +572,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #if ENABLED(EXPERIMENTAL_I2CBUS)
         case 260: M260(); break;                                  // M260: Send data to an i2c slave
         case 261: M261(); break;                                  // M261: Request data from an i2c slave
-      #endif
-
-      #if HAS_PID_HEATING
-        case 303: M303(); break;                                  // M303: PID autotune
       #endif
 
       #if HAS_USER_THERMISTORS

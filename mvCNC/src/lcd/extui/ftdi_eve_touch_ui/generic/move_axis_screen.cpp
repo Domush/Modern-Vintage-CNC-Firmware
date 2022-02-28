@@ -56,7 +56,7 @@ void MoveAxisScreen::onRedraw(draw_mode_t what) {
   w.color(Theme::e_axis);
   #if EXTRUDERS == 1
     w.adjuster(  8, GET_TEXT_F(MSG_AXIS_E),  mydata.e_rel[0], canMove(E0));
-  #elif HAS_MULTI_EXTRUDER
+  #elif TOOL_CHANGE_SUPPORT
     w.adjuster(  8, GET_TEXT_F(MSG_AXIS_E1), mydata.e_rel[0], canMove(E0));
     w.adjuster( 10, GET_TEXT_F(MSG_AXIS_E2), mydata.e_rel[1], canMove(E1));
     #if EXTRUDERS > 2
@@ -86,7 +86,7 @@ bool BaseMoveAxisScreen::onTouchHeld(uint8_t tag) {
     // For extruders, also update relative distances.
     case  8: UI_DECREMENT_AXIS(E0); mydata.e_rel[0] -= increment; break;
     case  9: UI_INCREMENT_AXIS(E0); mydata.e_rel[0] += increment; break;
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
     case 10: UI_DECREMENT_AXIS(E1); mydata.e_rel[1] -= increment; break;
     case 11: UI_INCREMENT_AXIS(E1); mydata.e_rel[1] += increment; break;
     #endif

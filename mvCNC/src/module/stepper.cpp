@@ -146,7 +146,7 @@ axis_bits_t Stepper::last_direction_bits, // = 0
 
 bool Stepper::abort_current_block;
 
-#if DISABLED(MIXING_EXTRUDER) && HAS_MULTI_EXTRUDER
+#if DISABLED(MIXING_EXTRUDER) && TOOL_CHANGE_SUPPORT
   uint8_t Stepper::last_moved_extruder = 0xFF;
 #endif
 
@@ -186,7 +186,7 @@ uint32_t Stepper::advance_divisor = 0,
          Stepper::decelerate_after,          // The count at which to start decelerating
          Stepper::step_event_count;          // The total event count for the current block
 
-#if EITHER(HAS_MULTI_EXTRUDER, MIXING_EXTRUDER)
+#if EITHER(TOOL_CHANGE_SUPPORT, MIXING_EXTRUDER)
   uint8_t Stepper::stepper_extruder;
 #else
   constexpr uint8_t Stepper::stepper_extruder;

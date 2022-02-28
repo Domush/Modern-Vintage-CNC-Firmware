@@ -48,7 +48,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       lv_draw_move_motor();
       break;
     case ID_O_FILAMENT:
-      #if HAS_MULTI_EXTRUDER
+      #if TOOL_CHANGE_SUPPORT
         uiCfg.extruderIndexBak = active_extruder;
       #endif
       if (uiCfg.print_state == WORKING) {

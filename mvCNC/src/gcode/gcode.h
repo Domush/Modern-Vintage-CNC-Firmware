@@ -314,7 +314,7 @@
   #include "../feature/encoder_i2c.h"
 #endif
 
-#if IS_SCARA || defined(G0_FEEDRATE)
+#if defined(G0_FEEDRATE)
   #define HAS_FAST_MOVES 1
 #endif
 
@@ -663,10 +663,6 @@ private:
   static void M125();
 #endif
 
-#if HAS_TEMP_PROBE
-  static void M192();
-#endif
-
 #if HAS_COOLER
   static void M143();
   static void M193();
@@ -683,10 +679,6 @@ private:
 
 #if ENABLED(AUTO_REPORT_POSITION)
   static void M154();
-#endif
-
-#if BOTH(AUTO_REPORT_TEMPERATURES, HAS_TEMP_SENSOR)
-  static void M155();
 #endif
 
   static void M201();
@@ -710,6 +702,12 @@ private:
 
   static void M211();
   static void M211_report(const bool forReplay = true);
+
+  #if TOOL_CHANGE_SUPPORT
+    static void M217();
+    static void M217_report(const bool forReplay=true);
+  #endif
+
 
   static void M220();
 
@@ -846,11 +844,6 @@ private:
 
 #if HAS_DUPLICATION_MODE
   static void M605();
-#endif
-
-#if IS_KINEMATIC
-  static void M665();
-  static void M665_report(const bool forReplay = true);
 #endif
 
 #if EITHER(DELTA, HAS_EXTRA_ENDSTOPS)

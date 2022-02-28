@@ -79,6 +79,11 @@
   #include "../feature/backlash.h"
 #endif
 
+#if TOOL_CHANGE_SUPPORT
+  #include "tool_change.h"
+  void M217_report(const bool eeprom);
+#endif
+
 #if HAS_TRINAMIC_CONFIG
   #include "stepper/indirection.h"
   #include "../feature/tmc_util.h"
@@ -239,18 +244,6 @@ typedef struct SettingsDataStruct {
   #endif
 
   //
-  // PIDTEMPCHAMBER
-  //
-  PID_t chamberPID;                                     // M309 PID / M303 E-2 U
-
-  //
-  // User-defined Thermistors
-  //
-  #if HAS_USER_THERMISTORS
-    user_thermistor_t user_thermistor[USER_THERMISTORS]; // M305 P0 R4700 T100000 B3950
-  #endif
-
-  //
   // Power monitor
   //
   uint8_t power_monitor_flags;                          // M430 I V W
@@ -307,6 +300,13 @@ typedef struct SettingsDataStruct {
   // SKEW_CORRECTION
   //
   skew_factor_t planner_skew_factor;                    // M852 I J K  planner.skew_factor
+
+  //
+  // Tool-change settings
+  //
+  #if TOOL_CHANGE_SUPPORT
+    toolchange_settings_t toolchange_settings;          // M217 S P R
+  #endif
 
   //
   // BACKLASH_COMPENSATION
@@ -416,15 +416,6 @@ void mvCNCSettings::postprocess() {
   // planner position so the stepper counts will be set correctly.
   TERN_(DELTA, recalc_delta_settings());
 
-  TERN_(PIDTEMP, thermalManager.updatePID());
-
-  #if ENABLED(USE_VOLUMETRICS)
-    planner.calculate_volumetric_multipliers();
-  #elif EXTRUDERS
-    for (uint8_t i = COUNT(planner.e_factor); i--;)
-      planner.refresh_e_factor(i);
-  #endif
-
   // Software endstops depend on home_offset
   LOOP_LINEAR_AXES(i) {
     update_workspace_offset((AxisEnum)i);
@@ -432,8 +423,6 @@ void mvCNCSettings::postprocess() {
   }
 
   TERN_(HAS_MOTOR_CURRENT_PWM, stepper.refresh_motor_power());
-
-  TERN_(HAS_LINEAR_E_JERK, planner.recalculate_max_e_jerk());
 
   TERN_(CASELIGHT_USES_BRIGHTNESS, caselight.update_brightness());
 
@@ -687,25 +676,6 @@ void mvCNCSettings::postprocess() {
     #endif
 
     //
-    // PIDTEMPCHAMBER
-    //
-    {
-      _FIELD_TEST(chamberPID);
-
-      const PID_t chamber_pid = {
-        #if DISABLED(PIDTEMPCHAMBER)
-          NAN, NAN, NAN
-        #else
-          // Store the unscaled PID values
-          thermalManager.temp_chamber.pid.Kp,
-          unscalePID_i(thermalManager.temp_chamber.pid.Ki),
-          unscalePID_d(thermalManager.temp_chamber.pid.Kd)
-        #endif
-      };
-      EEPROM_WRITE(chamber_pid);
-    }
-
-    //
     // User-defined Thermistors
     //
     #if HAS_USER_THERMISTORS
@@ -889,20 +859,6 @@ void mvCNCSettings::postprocess() {
     }
 
     //
-    // Linear Advance
-    //
-    {
-      _FIELD_TEST(planner_extruder_advance_K);
-
-      #if ENABLED(LIN_ADVANCE)
-        EEPROM_WRITE(planner.extruder_advance_K);
-      #else
-        dummyf = 0;
-        for (uint8_t q = _MAX(EXTRUDERS, 1); q--;) EEPROM_WRITE(dummyf);
-      #endif
-    }
-
-    //
     // Motor Current PWM
     //
     {
@@ -932,6 +888,15 @@ void mvCNCSettings::postprocess() {
     //
     _FIELD_TEST(planner_skew_factor);
     EEPROM_WRITE(planner.skew_factor);
+
+    //
+    // Multiple Extruders
+    //
+
+    #if TOOL_CHANGE_SUPPORT
+      _FIELD_TEST(toolchange_settings);
+      EEPROM_WRITE(toolchange_settings);
+    #endif
 
     //
     // Backlash Compensation
@@ -1081,6 +1046,13 @@ void mvCNCSettings::postprocess() {
     }
     EEPROM_FINISH();
 
+    if (!eeprom_error) LCD_MESSAGE(MSG_SETTINGS_STORED);
+
+    TERN_(EXTENSIBLE_UI, ExtUI::onConfigurationStoreWritten(!eeprom_error));
+
+    return !eeprom_error;
+  }
+
   /**
    * M501 - Retrieve Configuration
    */
@@ -1179,6 +1151,19 @@ void mvCNCSettings::postprocess() {
       }
 
       //
+      // Probe Z Offset
+      //
+      {
+        _FIELD_TEST(probe_offset);
+        #if HAS_BED_PROBE
+          const xyz_pos_t &zpo = probe.offset;
+        #else
+          xyz_pos_t zpo;
+        #endif
+        EEPROM_READ(zpo);
+      }
+
+      //
       // SERVO_ANGLES
       //
       {
@@ -1246,34 +1231,6 @@ void mvCNCSettings::postprocess() {
       #if HAS_PREHEAT
         _FIELD_TEST(ui_material_preset);
         EEPROM_READ(ui.material_preset);
-      #endif
-
-      //
-      // Heated Chamber PID
-      //
-      {
-        PID_t pid;
-        EEPROM_READ(pid);
-        #if ENABLED(PIDTEMPCHAMBER)
-          if (!validating && !isnan(pid.Kp)) {
-            // Scale PID values since EEPROM values are unscaled
-            thermalManager.temp_chamber.pid.Kp = pid.Kp;
-            thermalManager.temp_chamber.pid.Ki = scalePID_i(pid.Ki);
-            thermalManager.temp_chamber.pid.Kd = scalePID_d(pid.Kd);
-          }
-        #endif
-      }
-
-      //
-      // User-defined Thermistors
-      //
-      #if HAS_USER_THERMISTORS
-      {
-        user_thermistor_t user_thermistor[USER_THERMISTORS];
-        _FIELD_TEST(user_thermistor);
-        EEPROM_READ(user_thermistor);
-        if (!validating) COPY(thermalManager.user_thermistor, user_thermistor);
-      }
       #endif
 
       //
@@ -1509,6 +1466,14 @@ void mvCNCSettings::postprocess() {
           }
         #endif
       }
+
+      //
+      // Tool-change settings
+      //
+      #if TOOL_CHANGE_SUPPORT
+        _FIELD_TEST(toolchange_settings);
+        EEPROM_READ(toolchange_settings);
+      #endif
 
       //
       // Backlash Compensation
@@ -1917,15 +1882,9 @@ void mvCNCSettings::reset() {
   // Tool-change Settings
   //
 
-  #if HAS_MULTI_EXTRUDER
-    #if ENABLED(TOOLCHANGE_FILAMENT_SWAP)
+  #if TOOL_CHANGE_SUPPORT
       toolchange_settings.fan_speed       = TOOLCHANGE_FS_FAN_SPEED;
       toolchange_settings.fan_time        = TOOLCHANGE_FS_FAN_TIME;
-    #endif
-
-    #if ENABLED(TOOLCHANGE_FS_PRIME_FIRST_USED)
-      enable_first_prime = false;
-    #endif
 
     #if ENABLED(TOOLCHANGE_PARK)
       constexpr xyz_pos_t tpxy = TOOLCHANGE_PARK_XY;
@@ -2001,39 +1960,6 @@ void mvCNCSettings::reset() {
   TERN_(EDITABLE_SERVO_ANGLES, COPY(servo_angles, base_servo_angles)); // When not editable only one copy of servo angles exists
 
   //
-  // Probe Temperature Compensation
-  //
-  TERN_(HAS_PTC, ptc.reset());
-
-  //
-  // BLTouch
-  //
-  #ifdef BLTOUCH_HS_MODE
-    bltouch.high_speed_mode = ENABLED(BLTOUCH_HS_MODE);
-  #endif
-
-  //
-  // Kinematic settings
-  //
-
-  #if IS_KINEMATIC
-    segments_per_second = (
-      TERN_(DELTA, DELTA_SEGMENTS_PER_SECOND)
-      TERN_(IS_SCARA, SCARA_SEGMENTS_PER_SECOND)
-      TERN_(POLARGRAPH, POLAR_SEGMENTS_PER_SECOND)
-    );
-    #if ENABLED(DELTA)
-      const abc_float_t adj = DELTA_ENDSTOP_ADJ, dta = DELTA_TOWER_ANGLE_TRIM, ddr = DELTA_DIAGONAL_ROD_TRIM_TOWER;
-      delta_height = DELTA_HEIGHT;
-      delta_endstop_adj = adj;
-      delta_radius = DELTA_RADIUS;
-      delta_diagonal_rod = DELTA_DIAGONAL_ROD;
-      delta_tower_angle_trim = dta;
-      delta_diagonal_rod_trim = ddr;
-    #endif
-  #endif
-
-  //
   // Endstop Adjustments
   //
 
@@ -2075,106 +2001,12 @@ void mvCNCSettings::reset() {
   //
   #if HAS_PREHEAT
     #define _PITEM(N,T) PREHEAT_##N##_##T,
-    #if HAS_HOTEND
-      constexpr uint16_t hpre[] = { REPEAT2_S(1, INCREMENT(PREHEAT_COUNT), _PITEM, TEMP_HOTEND) };
-    #endif
-    #if HAS_HEATED_BED
-      constexpr uint16_t bpre[] = { REPEAT2_S(1, INCREMENT(PREHEAT_COUNT), _PITEM, TEMP_BED) };
-    #endif
     #if HAS_FAN
       constexpr uint8_t fpre[] = { REPEAT2_S(1, INCREMENT(PREHEAT_COUNT), _PITEM, FAN_SPEED) };
     #endif
     LOOP_L_N(i, PREHEAT_COUNT) {
-      TERN_(HAS_HOTEND,     ui.material_preset[i].hotend_temp = hpre[i]);
-      TERN_(HAS_HEATED_BED, ui.material_preset[i].bed_temp = bpre[i]);
       TERN_(HAS_FAN,        ui.material_preset[i].fan_speed = fpre[i]);
     }
-  #endif
-
-  //
-  // Hotend PID
-  //
-
-  #if ENABLED(PIDTEMP)
-    #if ENABLED(PID_PARAMS_PER_HOTEND)
-      constexpr float defKp[] =
-        #ifdef DEFAULT_Kp_LIST
-          DEFAULT_Kp_LIST
-        #else
-          ARRAY_BY_HOTENDS1(DEFAULT_Kp)
-        #endif
-      , defKi[] =
-        #ifdef DEFAULT_Ki_LIST
-          DEFAULT_Ki_LIST
-        #else
-          ARRAY_BY_HOTENDS1(DEFAULT_Ki)
-        #endif
-      , defKd[] =
-        #ifdef DEFAULT_Kd_LIST
-          DEFAULT_Kd_LIST
-        #else
-          ARRAY_BY_HOTENDS1(DEFAULT_Kd)
-        #endif
-      ;
-      static_assert(WITHIN(COUNT(defKp), 1, HOTENDS), "DEFAULT_Kp_LIST must have between 1 and HOTENDS items.");
-      static_assert(WITHIN(COUNT(defKi), 1, HOTENDS), "DEFAULT_Ki_LIST must have between 1 and HOTENDS items.");
-      static_assert(WITHIN(COUNT(defKd), 1, HOTENDS), "DEFAULT_Kd_LIST must have between 1 and HOTENDS items.");
-      #if ENABLED(PID_EXTRUSION_SCALING)
-        constexpr float defKc[] =
-          #ifdef DEFAULT_Kc_LIST
-            DEFAULT_Kc_LIST
-          #else
-            ARRAY_BY_HOTENDS1(DEFAULT_Kc)
-          #endif
-        ;
-        static_assert(WITHIN(COUNT(defKc), 1, HOTENDS), "DEFAULT_Kc_LIST must have between 1 and HOTENDS items.");
-      #endif
-      #if ENABLED(PID_FAN_SCALING)
-        constexpr float defKf[] =
-          #ifdef DEFAULT_Kf_LIST
-            DEFAULT_Kf_LIST
-          #else
-            ARRAY_BY_HOTENDS1(DEFAULT_Kf)
-          #endif
-        ;
-        static_assert(WITHIN(COUNT(defKf), 1, HOTENDS), "DEFAULT_Kf_LIST must have between 1 and HOTENDS items.");
-      #endif
-      #define PID_DEFAULT(N,E) def##N[E]
-    #else
-      #define PID_DEFAULT(N,E) DEFAULT_##N
-    #endif
-    HOTEND_LOOP() {
-      PID_PARAM(Kp, e) =      float(PID_DEFAULT(Kp, ALIM(e, defKp)));
-      PID_PARAM(Ki, e) = scalePID_i(PID_DEFAULT(Ki, ALIM(e, defKi)));
-      PID_PARAM(Kd, e) = scalePID_d(PID_DEFAULT(Kd, ALIM(e, defKd)));
-      TERN_(PID_EXTRUSION_SCALING, PID_PARAM(Kc, e) = float(PID_DEFAULT(Kc, ALIM(e, defKc))));
-      TERN_(PID_FAN_SCALING, PID_PARAM(Kf, e) = float(PID_DEFAULT(Kf, ALIM(e, defKf))));
-    }
-  #endif
-
-  //
-  // PID Extrusion Scaling
-  //
-  TERN_(PID_EXTRUSION_SCALING, thermalManager.lpq_len = 20); // Default last-position-queue size
-
-  //
-  // Heated Bed PID
-  //
-
-  #if ENABLED(PIDTEMPBED)
-    thermalManager.temp_bed.pid.Kp = DEFAULT_bedKp;
-    thermalManager.temp_bed.pid.Ki = scalePID_i(DEFAULT_bedKi);
-    thermalManager.temp_bed.pid.Kd = scalePID_d(DEFAULT_bedKd);
-  #endif
-
-  //
-  // Heated Chamber PID
-  //
-
-  #if ENABLED(PIDTEMPCHAMBER)
-    thermalManager.temp_chamber.pid.Kp = DEFAULT_chamberKp;
-    thermalManager.temp_chamber.pid.Ki = scalePID_i(DEFAULT_chamberKi);
-    thermalManager.temp_chamber.pid.Kd = scalePID_d(DEFAULT_chamberKd);
   #endif
 
   //
@@ -2207,39 +2039,9 @@ void mvCNCSettings::reset() {
   //
   TERN_(POWER_LOSS_RECOVERY, recovery.enable(ENABLED(PLR_ENABLED_DEFAULT)));
 
-  //
-  // Firmware Retraction
-  //
-  TERN_(FWRETRACT, fwretract.reset());
-
-  //
-  // Volumetric & Filament Size
-  //
-
-  #if ENABLED(USE_VOLUMETRICS)
-    parser.volumetric_enabled = ENABLED(VOLUMETRIC_DEFAULT_ON);
-    LOOP_L_N(q, COUNT(planner.filament_size))
-      planner.filament_size[q] = DEFAULT_NOMINAL_FILAMENT_DIA;
-    #if ENABLED(VOLUMETRIC_EXTRUDER_LIMIT)
-      LOOP_L_N(q, COUNT(planner.volumetric_extruder_limit))
-        planner.volumetric_extruder_limit[q] = DEFAULT_VOLUMETRIC_EXTRUDER_LIMIT;
-    #endif
-  #endif
-
   endstops.enable_globally(ENABLED(ENDSTOPS_ALWAYS_ON_DEFAULT));
 
   reset_stepper_drivers();
-
-  //
-  // Linear Advance
-  //
-
-  #if ENABLED(LIN_ADVANCE)
-    LOOP_L_N(i, EXTRUDERS) {
-      planner.extruder_advance_K[i] = LIN_ADVANCE_K;
-      TERN_(EXTRA_LIN_ADVANCE_K, other_extruder_advance_K[i] = LIN_ADVANCE_K);
-    }
-  #endif
 
   //
   // Motor Current PWM
@@ -2276,16 +2078,6 @@ void mvCNCSettings::reset() {
       planner.skew_factor.xz = XZ_SKEW_FACTOR;
       planner.skew_factor.yz = YZ_SKEW_FACTOR;
     #endif
-  #endif
-
-  //
-  // Advanced Pause filament load & unload lengths
-  //
-  #if ENABLED(ADVANCED_PAUSE_FEATURE)
-    LOOP_L_N(e, EXTRUDERS) {
-      fc_settings[e].unload_length = FILAMENT_CHANGE_UNLOAD_LENGTH;
-      fc_settings[e].load_length = FILAMENT_CHANGE_FAST_LOAD_LENGTH;
-    }
   #endif
 
   #if ENABLED(PASSWORD_FEATURE)
@@ -2350,11 +2142,6 @@ void mvCNCSettings::reset() {
     #endif
 
     //
-    // M200 Volumetric Extrusion
-    //
-    IF_ENABLED(USE_VOLUMETRICS, gcode.M200_report(forReplay));
-
-    //
     // M92 Steps per Unit
     //
     gcode.M92_report(forReplay);
@@ -2385,73 +2172,9 @@ void mvCNCSettings::reset() {
     TERN_(HAS_M206_COMMAND, gcode.M206_report(forReplay));
 
     //
-    // M218 Hotend offsets
-    //
-    TERN_(HAS_HOTEND_OFFSET, gcode.M218_report(forReplay));
-
-    //
-    // Bed Leveling
-    //
-    #if HAS_LEVELING
-
-      gcode.M420_report(forReplay);
-
-      #if ENABLED(MESH_BED_LEVELING)
-
-        if (leveling_is_valid()) {
-          LOOP_L_N(py, GRID_MAX_POINTS_Y) {
-            LOOP_L_N(px, GRID_MAX_POINTS_X) {
-              CONFIG_ECHO_START();
-              SERIAL_ECHOPGM("  G29 S3 I", px, " J", py);
-              SERIAL_ECHOLNPAIR_F_P(SP_Z_STR, LINEAR_UNIT(mbl.z_values[px][py]), 5);
-            }
-          }
-          CONFIG_ECHO_START();
-          SERIAL_ECHOLNPAIR_F("  G29 S4 Z", LINEAR_UNIT(mbl.z_offset), 5);
-        }
-
-      #elif ENABLED(AUTO_BED_LEVELING_UBL)
-
-        if (!forReplay) {
-          SERIAL_EOL();
-          ubl.report_state();
-          SERIAL_ECHO_MSG("Active Mesh Slot ", ubl.storage_slot);
-          SERIAL_ECHO_MSG("EEPROM can hold ", calc_num_meshes(), " meshes.\n");
-        }
-
-       //ubl.report_current_mesh();   // This is too verbose for large meshes. A better (more terse)
-                                                  // solution needs to be found.
-      #elif ENABLED(AUTO_BED_LEVELING_BILINEAR)
-
-        if (leveling_is_valid()) {
-          LOOP_L_N(py, GRID_MAX_POINTS_Y) {
-            LOOP_L_N(px, GRID_MAX_POINTS_X) {
-              CONFIG_ECHO_START();
-              SERIAL_ECHOPGM("  G29 W I", px, " J", py);
-              SERIAL_ECHOLNPAIR_F_P(SP_Z_STR, LINEAR_UNIT(z_values[px][py]), 5);
-            }
-          }
-        }
-
-        // TODO: Create G-code for settings
-        //#if ENABLED(X_AXIS_TWIST_COMPENSATION)
-        //  CONFIG_ECHO_START();
-        //  xatc.print_points();
-        //#endif
-
-      #endif
-
-    #endif // HAS_LEVELING
-
-    //
     // Editable Servo Angles
     //
     TERN_(EDITABLE_SERVO_ANGLES, gcode.M281_report(forReplay));
-
-    //
-    // Kinematic Settings
-    //
-    TERN_(IS_KINEMATIC, gcode.M665_report(forReplay));
 
     //
     // M666 Endstops Adjustment
@@ -2464,20 +2187,6 @@ void mvCNCSettings::reset() {
     // Z Auto-Align
     //
     TERN_(Z_STEPPER_AUTO_ALIGN, gcode.M422_report(forReplay));
-
-    //
-    // LCD Preheat Settings
-    //
-    #if HAS_PREHEAT
-      gcode.M145_report(forReplay);
-    #endif
-
-    //
-    // PID
-    //
-    TERN_(PIDTEMP,        gcode.M301_report(forReplay));
-    TERN_(PIDTEMPBED,     gcode.M304_report(forReplay));
-    TERN_(PIDTEMPCHAMBER, gcode.M309_report(forReplay));
 
     #if HAS_USER_THERMISTORS
       LOOP_L_N(i, USER_THERMISTORS)
@@ -2503,15 +2212,6 @@ void mvCNCSettings::reset() {
     // Power-Loss Recovery
     //
     TERN_(POWER_LOSS_RECOVERY, gcode.M413_report(forReplay));
-
-    //
-    // Firmware Retraction
-    //
-    #if ENABLED(FWRETRACT)
-      gcode.M207_report(forReplay);
-      gcode.M208_report(forReplay);
-      TERN_(FWRETRACT_AUTORETRACT, gcode.M209_report(forReplay));
-    #endif
 
     //
     // Probe Offset
@@ -2546,21 +2246,11 @@ void mvCNCSettings::reset() {
     TERN_(HAS_STEALTHCHOP, gcode.M569_report(forReplay));
 
     //
-    // Linear Advance
-    //
-    TERN_(LIN_ADVANCE, gcode.M900_report(forReplay));
-
-    //
     // Motor Current (SPI or PWM)
     //
     #if HAS_MOTOR_CURRENT_SPI || HAS_MOTOR_CURRENT_PWM
       gcode.M907_report(forReplay);
     #endif
-
-    //
-    // Advanced Pause filament load & unload lengths
-    //
-    TERN_(ADVANCED_PAUSE_FEATURE, gcode.M603_report(forReplay));
 
     //
     // Tool-changing Parameters
@@ -2571,11 +2261,6 @@ void mvCNCSettings::reset() {
     // Backlash Compensation
     //
     TERN_(BACKLASH_GCODE, gcode.M425_report(forReplay));
-
-    //
-    // Filament Runout Sensor
-    //
-    TERN_(HAS_FILAMENT_SENSOR, gcode.M412_report(forReplay));
 
     #if HAS_ETHERNET
       CONFIG_ECHO_HEADING("Ethernet");

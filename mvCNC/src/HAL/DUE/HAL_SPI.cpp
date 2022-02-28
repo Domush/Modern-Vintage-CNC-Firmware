@@ -577,7 +577,7 @@
       SPI_Enable(SPI0);
 
       SET_OUTPUT(DAC0_SYNC_PIN);
-      #if HAS_MULTI_EXTRUDER
+      #if TOOL_CHANGE_SUPPORT
         OUT_WRITE(DAC1_SYNC_PIN, HIGH);
       #endif
       WRITE(DAC0_SYNC_PIN, HIGH);

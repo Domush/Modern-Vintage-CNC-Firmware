@@ -86,7 +86,7 @@ extern float feedrate_percentage_change;
 #define MMS_SCALED(V) ((V) * 0.01f * feedrate_percentage)
 
 // The active extruder (tool). Set with T<extruder> command.
-#if HAS_MULTI_EXTRUDER
+#if TOOL_CHANGE_SUPPORT
   extern uint8_t active_extruder;
 #else
   constexpr uint8_t active_extruder = 0;

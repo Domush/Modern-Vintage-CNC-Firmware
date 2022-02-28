@@ -21,7 +21,7 @@ void dac084s085::begin() {
 
   // All SPI chip-select HIGH
   SET_OUTPUT(DAC0_SYNC_PIN);
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     SET_OUTPUT(DAC1_SYNC_PIN);
   #endif
   cshigh();
@@ -38,7 +38,7 @@ void dac084s085::begin() {
   spiSend(SPI_CHAN_DAC, externalDac_buf, COUNT(externalDac_buf));
   WRITE(DAC0_SYNC_PIN, HIGH);
 
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     //init Piggy DAC
     DELAY_US(2);
     WRITE(DAC1_SYNC_PIN, LOW);
@@ -86,7 +86,7 @@ void dac084s085::setValue(const uint8_t channel, const uint8_t value) {
 
 void dac084s085::cshigh() {
   WRITE(DAC0_SYNC_PIN, HIGH);
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     WRITE(DAC1_SYNC_PIN, HIGH);
   #endif
   WRITE(SPI_EEPROM1_CS_PIN, HIGH);

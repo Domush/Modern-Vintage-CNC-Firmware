@@ -233,9 +233,9 @@ void DGUSTxHandler::Flowrate(DGUS_VP &vp) {
   switch (vp.addr) {
     default: return;
     case DGUS_Addr::ADJUST_Flowrate_CUR:
-      flowrate = ExtUI::getFlow_percent(TERN(HAS_MULTI_EXTRUDER, ExtUI::getActiveTool(), ExtUI::E0));
+      flowrate = ExtUI::getFlow_percent(TERN(TOOL_CHANGE_SUPPORT, ExtUI::getActiveTool(), ExtUI::E0));
       break;
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       case DGUS_Addr::ADJUST_Flowrate_E0:
         flowrate = ExtUI::getFlow_percent(ExtUI::E0);
         break;
@@ -340,7 +340,7 @@ void DGUSTxHandler::FilamentIcons(DGUS_VP &vp) {
   switch (dgus_screen_handler.filament_extruder) {
     default: return;
     case DGUS_Data::Extruder::CURRENT:
-      #if HAS_MULTI_EXTRUDER
+      #if TOOL_CHANGE_SUPPORT
         switch (ExtUI::getActiveTool()) {
           default: break;
           case ExtUI::E0:

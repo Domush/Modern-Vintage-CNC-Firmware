@@ -89,7 +89,7 @@ const uint16_t VPList_Status2[] PROGMEM = {
   // VP_M117, for completeness, but it cannot be auto-uploaded
   #if HAS_HOTEND
     VP_Flowrate_E0,
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       VP_Flowrate_E1,
     #endif
   #endif
@@ -119,7 +119,7 @@ const uint16_t VPList_ManualMove[] PROGMEM = {
 const uint16_t VPList_ManualExtrude[] PROGMEM = {
   #if HAS_HOTEND
     VP_T_E0_Is, VP_T_E0_Set,
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       VP_T_E1_Is, VP_T_E1_Set,
     #endif
   #endif
@@ -141,7 +141,7 @@ const uint16_t VPList_Filament_heating[] PROGMEM = {
   #if HAS_HOTEND
     VP_T_E0_Is, VP_T_E0_Set,
     VP_E0_FILAMENT_LOAD_UNLOAD,
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       VP_T_E1_Is, VP_T_E1_Set,
       VP_E1_FILAMENT_LOAD_UNLOAD,
     #endif
@@ -152,7 +152,7 @@ const uint16_t VPList_Filament_heating[] PROGMEM = {
 const uint16_t VPList_Filament_load_unload[] PROGMEM = {
   #if HAS_HOTEND
     VP_E0_FILAMENT_LOAD_UNLOAD,
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       VP_E1_FILAMENT_LOAD_UNLOAD,
     #endif
   #endif
@@ -188,7 +188,7 @@ const uint16_t VPList_SD_PrintManipulation[] PROGMEM = {
 const uint16_t VPList_SDPrintTune[] PROGMEM = {
   #if HAS_HOTEND
     VP_T_E0_Is, VP_T_E0_Set, VP_Flowrate_E0,
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       VP_T_E1_Is, VP_T_E1_Set, VP_Flowrate_E1,  // ERROR: Flowrate is per-extruder, not per-hotend
     #endif
   #endif

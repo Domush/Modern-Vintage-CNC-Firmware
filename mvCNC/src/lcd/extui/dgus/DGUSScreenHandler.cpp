@@ -417,7 +417,7 @@ void DGUSScreenHandler::HandleManualExtrude(DGUS_VP_Variable &var, void *val_ptr
   switch (var.VP) {
     #if HAS_HOTEND
       case VP_MOVE_E0: target_extruder = ExtUI::extruder_t::E0; break;
-      #if HAS_MULTI_EXTRUDER
+      #if TOOL_CHANGE_SUPPORT
         case VP_MOVE_E1: target_extruder = ExtUI::extruder_t::E1; break;
       #endif
     #endif

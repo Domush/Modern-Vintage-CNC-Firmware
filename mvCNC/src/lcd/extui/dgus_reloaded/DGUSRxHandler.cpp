@@ -214,9 +214,9 @@ void DGUSRxHandler::Flowrate(DGUS_VP &vp, void *data_ptr) {
   switch (vp.addr) {
     default: return;
     case DGUS_Addr::ADJUST_SetFlowrate_CUR:
-      ExtUI::setFlow_percent(flowrate, TERN(HAS_MULTI_EXTRUDER, ExtUI::getActiveTool(), ExtUI::E0));
+      ExtUI::setFlow_percent(flowrate, TERN(TOOL_CHANGE_SUPPORT, ExtUI::getActiveTool(), ExtUI::E0));
       break;
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       case DGUS_Addr::ADJUST_SetFlowrate_E0:
         ExtUI::setFlow_percent(flowrate, ExtUI::E0);
         break;
@@ -569,14 +569,14 @@ void DGUSRxHandler::FilamentMove(DGUS_VP &vp, void *data_ptr) {
   switch (dgus_screen_handler.filament_extruder) {
     default: return;
     case DGUS_Data::Extruder::CURRENT:
-      #if HAS_MULTI_EXTRUDER
+      #if TOOL_CHANGE_SUPPORT
         extruder = ExtUI::getActiveTool();
         break;
       #endif
     case DGUS_Data::Extruder::E0:
       extruder = ExtUI::E0;
       break;
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       case DGUS_Data::Extruder::E1:
         extruder = ExtUI::E1;
         break;

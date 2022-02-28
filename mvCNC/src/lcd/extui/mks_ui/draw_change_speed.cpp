@@ -45,7 +45,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         else
           planner.flow_percentage[0] = MAX_EXT_SPEED_PERCENT;
         planner.refresh_e_factor(0);
-        #if HAS_MULTI_EXTRUDER
+        #if TOOL_CHANGE_SUPPORT
           planner.flow_percentage[1] = planner.flow_percentage[0];
           planner.refresh_e_factor(1);
         #endif
@@ -65,7 +65,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         else
           planner.flow_percentage[0] = MIN_EXT_SPEED_PERCENT;
         planner.refresh_e_factor(0);
-        #if HAS_MULTI_EXTRUDER
+        #if TOOL_CHANGE_SUPPORT
           planner.flow_percentage[1] = planner.flow_percentage[0];
           planner.refresh_e_factor(1);
         #endif

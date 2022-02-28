@@ -447,7 +447,7 @@ void NextionTFT::PanelInfo(uint8_t req) {
     #else
       #define SEND_PID_INFO_0(A, B) SEND_NA(A)
     #endif
-    #if BOTH(PIDTEMP, HAS_MULTI_EXTRUDER)
+    #if BOTH(PIDTEMP, TOOL_CHANGE_SUPPORT)
       #define SEND_PID_INFO_1(A, B) SEND_VALasTXT(A, getPIDValues_K##B(E1))
     #else
       #define SEND_PID_INFO_1(A, B) SEND_NA(A)

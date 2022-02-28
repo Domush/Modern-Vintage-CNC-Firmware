@@ -40,7 +40,7 @@ void MoveEScreen::onRedraw(draw_mode_t what) {
   w.color(Theme::e_axis);
   #if EXTRUDERS == 1
     w.adjuster(  8, GET_TEXT_F(MSG_AXIS_E),  mydata.e_rel[0], canMove(E0));
-  #elif HAS_MULTI_EXTRUDER
+  #elif TOOL_CHANGE_SUPPORT
     w.adjuster(  8, GET_TEXT_F(MSG_AXIS_E1), mydata.e_rel[0], canMove(E0));
     w.adjuster( 10, GET_TEXT_F(MSG_AXIS_E2), mydata.e_rel[1], canMove(E1));
     #if EXTRUDERS > 2

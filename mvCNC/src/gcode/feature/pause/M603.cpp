@@ -11,7 +11,7 @@
 #include "../../../module/motion.h"
 #include "../../../module/jobcounter.h"
 
-#if HAS_MULTI_EXTRUDER
+#if TOOL_CHANGE_SUPPORT
   #include "../../../module/tool_change.h"
 #endif
 

@@ -21,10 +21,6 @@
   #include "jobcounter.h" // for print_job_timer
 #endif
 
-#if ENABLED(BLTOUCH)
-  #include "../feature/bltouch.h"
-#endif
-
 #if ENABLED(JOYSTICK)
   #include "../feature/joystick.h"
 #endif

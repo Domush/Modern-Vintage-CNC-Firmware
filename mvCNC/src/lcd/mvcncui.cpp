@@ -251,10 +251,6 @@ void mvCNCUI::init() {
     #include "../feature/tmc_util.h"
   #endif
 
-  #if HAS_ADC_BUTTONS
-    #include "../module/thermistor/thermistors.h"
-  #endif
-
   #if HAS_POWER_MONITOR
     #include "../feature/power_monitor.h"
   #endif
@@ -753,7 +749,7 @@ void mvCNCUI::init() {
 
         #if IS_KINEMATIC
 
-          #if HAS_MULTI_EXTRUDER
+          #if TOOL_CHANGE_SUPPORT
             REMEMBER(ae, active_extruder);
             #if MULTI_E_MANUAL
               if (axis == E_AXIS) active_extruder = e_index;

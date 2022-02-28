@@ -86,7 +86,7 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
           feedrate_percentage = 100;
           planner.flow_percentage[0] = 100;
           planner.e_factor[0] = planner.flow_percentage[0] * 0.01f;
-          #if HAS_MULTI_EXTRUDER
+          #if TOOL_CHANGE_SUPPORT
             planner.flow_percentage[1] = 100;
             planner.e_factor[1] = planner.flow_percentage[1] * 0.01f;
           #endif

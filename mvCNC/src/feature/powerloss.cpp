@@ -351,7 +351,7 @@ void CNCJobRecovery::resume() {
   #endif
 
   // Restore the previously active tool (with no_move)
-  #if HAS_MULTI_EXTRUDER || TOOL_CHANGE_SUPPORT
+  #if TOOL_CHANGE_SUPPORT || TOOL_CHANGE_SUPPORT
     sprintf_P(cmd, PSTR("T%i S"), info.active_extruder);
     gcode.process_subcommands_now(cmd);
   #endif
@@ -456,7 +456,7 @@ void CNCJobRecovery::resume() {
           DEBUG_EOL();
         #endif
 
-        #if HAS_MULTI_EXTRUDER
+        #if TOOL_CHANGE_SUPPORT
           DEBUG_ECHOLNPGM("active_extruder: ", info.active_extruder);
         #endif
 

@@ -203,7 +203,7 @@ PGMSTR(M112_KILL_STR, "M112 Shutdown");
 mvCNCState mvcnc_state = MF_INITIALIZING;
 
 // For M109 and M190, this flag may be cleared (by M108) to exit the wait loop
-bool wait_for_heatup = true;
+bool wait_for_heatup = false;
 
 // For M0/M1, this flag may be cleared (by M108) to exit the wait-for-user loop
 #if HAS_RESUME_CONTINUE
@@ -507,81 +507,6 @@ inline void manage_inactivity(const bool no_stepper_sleep=false) {
     #elif HAS_CUSTOM_USER_BUTTON(10)
       CHECK_CUSTOM_USER_BUTTON(10);
     #endif
-    #if HAS_BETTER_USER_BUTTON(11)
-      CHECK_BETTER_USER_BUTTON(11);
-    #elif HAS_CUSTOM_USER_BUTTON(11)
-      CHECK_CUSTOM_USER_BUTTON(11);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(12)
-      CHECK_BETTER_USER_BUTTON(12);
-    #elif HAS_CUSTOM_USER_BUTTON(12)
-      CHECK_CUSTOM_USER_BUTTON(12);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(13)
-      CHECK_BETTER_USER_BUTTON(13);
-    #elif HAS_CUSTOM_USER_BUTTON(13)
-      CHECK_CUSTOM_USER_BUTTON(13);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(14)
-      CHECK_BETTER_USER_BUTTON(14);
-    #elif HAS_CUSTOM_USER_BUTTON(14)
-      CHECK_CUSTOM_USER_BUTTON(14);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(15)
-      CHECK_BETTER_USER_BUTTON(15);
-    #elif HAS_CUSTOM_USER_BUTTON(15)
-      CHECK_CUSTOM_USER_BUTTON(15);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(16)
-      CHECK_BETTER_USER_BUTTON(16);
-    #elif HAS_CUSTOM_USER_BUTTON(16)
-      CHECK_CUSTOM_USER_BUTTON(16);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(17)
-      CHECK_BETTER_USER_BUTTON(17);
-    #elif HAS_CUSTOM_USER_BUTTON(17)
-      CHECK_CUSTOM_USER_BUTTON(17);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(18)
-      CHECK_BETTER_USER_BUTTON(18);
-    #elif HAS_CUSTOM_USER_BUTTON(18)
-      CHECK_CUSTOM_USER_BUTTON(18);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(19)
-      CHECK_BETTER_USER_BUTTON(19);
-    #elif HAS_CUSTOM_USER_BUTTON(19)
-      CHECK_CUSTOM_USER_BUTTON(19);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(20)
-      CHECK_BETTER_USER_BUTTON(20);
-    #elif HAS_CUSTOM_USER_BUTTON(20)
-      CHECK_CUSTOM_USER_BUTTON(20);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(21)
-      CHECK_BETTER_USER_BUTTON(21);
-    #elif HAS_CUSTOM_USER_BUTTON(21)
-      CHECK_CUSTOM_USER_BUTTON(21);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(22)
-      CHECK_BETTER_USER_BUTTON(22);
-    #elif HAS_CUSTOM_USER_BUTTON(22)
-      CHECK_CUSTOM_USER_BUTTON(22);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(23)
-      CHECK_BETTER_USER_BUTTON(23);
-    #elif HAS_CUSTOM_USER_BUTTON(23)
-      CHECK_CUSTOM_USER_BUTTON(23);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(24)
-      CHECK_BETTER_USER_BUTTON(24);
-    #elif HAS_CUSTOM_USER_BUTTON(24)
-      CHECK_CUSTOM_USER_BUTTON(24);
-    #endif
-    #if HAS_BETTER_USER_BUTTON(25)
-      CHECK_BETTER_USER_BUTTON(25);
-    #elif HAS_CUSTOM_USER_BUTTON(25)
-      CHECK_CUSTOM_USER_BUTTON(25);
-    #endif
   #endif
 
   TERN_(EASYTHREED_UI, easythreed_ui.run());
@@ -590,18 +515,6 @@ inline void manage_inactivity(const bool no_stepper_sleep=false) {
 
   TERN_(AUTO_POWER_CONTROL, powerManager.check(!ui.on_status_screen() || jobIsOngoing() || jobIsPaused()));
 
-  TERN_(HOTEND_IDLE_TIMEOUT, hotend_idle.check());
-
-  #if ENABLED(DUAL_X_CARRIAGE)
-    // handle delayed move timeout
-    if (delayed_move_time && ELAPSED(ms, delayed_move_time) && IsRunning()) {
-      // travel moves have been received so enact them
-      delayed_move_time = 0xFFFFFFFFUL; // force moves to be done
-      destination = current_position;
-      prepare_line_to_destination();
-      planner.synchronize();
-    }
-  #endif
 
   TERN_(TEMP_STAT_LEDS, handle_status_leds());
 
@@ -657,9 +570,6 @@ void idle(bool no_stepper_sleep/*=false*/) {
 
   // Core mvCNC activities
   manage_inactivity(no_stepper_sleep);
-
-  // Manage Heaters (and Watchdog)
-  thermalManager.manage_heater();
 
   // Max7219 heartbeat, animation, etc
   TERN_(MAX7219_DEBUG, max7219.idle_tasks());
@@ -722,7 +632,6 @@ void idle(bool no_stepper_sleep/*=false*/) {
   // Auto-report Temperatures / SD Status
   #if HAS_AUTO_REPORTING
     if (!gcode.autoreport_paused) {
-      TERN_(AUTO_REPORT_TEMPERATURES, thermalManager.auto_reporter.tick());
       TERN_(AUTO_REPORT_FANS, fan_check.auto_reporter.tick());
       TERN_(AUTO_REPORT_SD_STATUS, card.auto_reporter.tick());
       TERN_(AUTO_REPORT_POSITION, position_auto_reporter.tick());
@@ -789,9 +698,6 @@ void minkill(const bool steppers_off/*=false*/) {
   // Wait to ensure all interrupts stopped
   for (int i = 1000; i--;) DELAY_US(250);
 
-  // Reiterate heaters off
-  thermalManager.disable_all_heaters();
-
   TERN_(HAS_CUTTER, cutter.kill());  // Reiterate cutter shutdown
 
   // Power off all steppers (for M112) or just the E steppers
@@ -826,8 +732,6 @@ void minkill(const bool steppers_off/*=false*/) {
  * After a stop the machine may be resumed with M999
  */
 void stop() {
-  thermalManager.disable_all_heaters(); // 'unpause' taken care of in here
-
   print_job_timer.stop();
 
   #if EITHER(PROBING_FANS_OFF, ADVANCED_PAUSE_FANS_PAUSE)
@@ -993,12 +897,9 @@ void setup() {
 #else
   #define SETUP_LOG(...) NOOP
 #endif
-#define SETUP_RUN(C)         \
-  do {                       \
-    SETUP_LOG(STRINGIFY(C)); \
-    C;                       \
-  } while (0)
-
+// clang-format off
+  #define SETUP_RUN(C) do{ SETUP_LOG(STRINGIFY(C)); C; }while(0)
+// clang-format on
   MYSERIAL1.begin(BAUDRATE);
   millis_t serial_connect_timeout = millis() + 1000UL;
   while (!MYSERIAL1.connected() && PENDING(millis(), serial_connect_timeout)) { /*nada*/ }
@@ -1063,22 +964,6 @@ void setup() {
   TERN_(DYNAMIC_VECTORTABLE, hook_cpu_exceptions()); // If supported, install mvCNC exception handlers at runtime
 
   SETUP_RUN(HAL_init());
-
-  // Init and disable SPI thermocouples; this is still needed
-  #if TEMP_SENSOR_0_IS_MAX_TC || (TEMP_SENSOR_REDUNDANT_IS_MAX_TC && REDUNDANT_TEMP_MATCH(SOURCE, E0))
-    OUT_WRITE(TEMP_0_CS_PIN, HIGH);  // Disable
-  #endif
-  #if TEMP_SENSOR_1_IS_MAX_TC || (TEMP_SENSOR_REDUNDANT_IS_MAX_TC && REDUNDANT_TEMP_MATCH(SOURCE, E1))
-    OUT_WRITE(TEMP_1_CS_PIN, HIGH);
-  #endif
-
-  #if ENABLED(DUET_SMART_EFFECTOR) && PIN_EXISTS(SMART_EFFECTOR_MOD)
-    OUT_WRITE(SMART_EFFECTOR_MOD_PIN, LOW);   // Put Smart Effector into NORMAL mode
-  #endif
-
-  #if HAS_FILAMENT_SENSOR
-    SETUP_RUN(runout.setup());
-  #endif
 
   #if HAS_TMC220x
     SETUP_RUN(tmc_serial_begin());
@@ -1193,8 +1078,6 @@ void setup() {
   TERN_(HAS_M206_COMMAND, current_position += home_offset); // Init current position based on home_offset
 
   sync_plan_position();               // Vital to init stepper/planner equivalent for current_position
-
-  SETUP_RUN(thermalManager.init());   // Initialize temperature loop
 
   SETUP_RUN(print_job_timer.init());  // Initial setup of CNC job timer
 
@@ -1320,21 +1203,6 @@ void setup() {
     i2c.onRequest(i2c_on_request);
   #endif
 
-  #if DO_SWITCH_EXTRUDER
-    SETUP_RUN(move_extruder_servo(0));  // Initialize extruder servo
-  #endif
-
-  #if ENABLED(SWITCHING_NOZZLE)
-    SETUP_LOG("SWITCHING_NOZZLE");
-    // Initialize nozzle servo(s)
-    #if SWITCHING_NOZZLE_TWO_SERVOS
-      lower_nozzle(0);
-      raise_nozzle(1);
-    #else
-      move_nozzle_servo(0);
-    #endif
-  #endif
-
   #if ENABLED(PARKING_EXTRUDER)
     SETUP_RUN(pe_solenoid_init());
   #elif ENABLED(MAGNETIC_PARKING_EXTRUDER)
@@ -1343,10 +1211,6 @@ void setup() {
     SETUP_RUN(swt_init());
   #elif ENABLED(ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
     SETUP_RUN(est_init());
-  #endif
-
-  #if ENABLED(USE_WATCHDOG)
-    SETUP_RUN(watchdog_init());       // Reinit watchdog after HAL_get_reset_source call
   #endif
 
   #if ENABLED(EXTERNAL_CLOSED_LOOP_CONTROLLER)

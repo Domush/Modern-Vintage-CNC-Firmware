@@ -301,7 +301,7 @@ class Stepper {
     #endif
 
     // Last-moved extruder, as set when the last movement was fetched from planner
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       static uint8_t last_moved_extruder;
     #else
       static constexpr uint8_t last_moved_extruder = 0;
@@ -355,7 +355,7 @@ class Stepper {
                     decelerate_after,       // The point from where we need to start decelerating
                     step_event_count;       // The total event count for the current block
 
-    #if EITHER(HAS_MULTI_EXTRUDER, MIXING_EXTRUDER)
+    #if EITHER(TOOL_CHANGE_SUPPORT, MIXING_EXTRUDER)
       static uint8_t stepper_extruder;
     #else
       static constexpr uint8_t stepper_extruder = 0;

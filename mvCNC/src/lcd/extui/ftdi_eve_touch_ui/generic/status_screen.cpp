@@ -182,7 +182,7 @@ void StatusScreen::draw_temperature(draw_mode_t what) {
     else
       format_temp_and_temp(e0_str, getActualTemp_celsius(H0), getTargetTemp_celsius(H0));
 
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       if (isHeaterIdle(H1))
         format_temp_and_idle(e1_str, getActualTemp_celsius(H1));
       else

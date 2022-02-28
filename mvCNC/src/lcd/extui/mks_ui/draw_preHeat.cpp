@@ -92,7 +92,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       break;
     case ID_P_TYPE:
       if (uiCfg.curTempType == 0) {
-        if (ENABLED(HAS_MULTI_EXTRUDER)) {
+        if (ENABLED(TOOL_CHANGE_SUPPORT)) {
           if (uiCfg.extruderIndex == 0) {
             uiCfg.extruderIndex = 1;
           }
@@ -217,7 +217,7 @@ void disp_ext_heart() {
 
 void disp_temp_type() {
   if (uiCfg.curTempType == 0) {
-    if (TERN0(HAS_MULTI_EXTRUDER, uiCfg.extruderIndex == 1)) {
+    if (TERN0(TOOL_CHANGE_SUPPORT, uiCfg.extruderIndex == 1)) {
       lv_imgbtn_set_src_both(buttonType, "F:/bmp_extru2.bin");
       if (gCfgItems.multiple_language) {
         lv_label_set_text(labelType, preheat_menu.ext2);

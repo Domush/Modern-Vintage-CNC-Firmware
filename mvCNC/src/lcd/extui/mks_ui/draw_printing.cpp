@@ -32,7 +32,7 @@ static lv_obj_t *labelPause, *labelStop, *labelOperat;
 static lv_obj_t *bar1, *bar1ValueText;
 static lv_obj_t *buttonPause, *buttonOperat, *buttonStop, *buttonExt1, *buttonFanstate, *buttonZpos;
 
-#if HAS_MULTI_EXTRUDER
+#if TOOL_CHANGE_SUPPORT
   static lv_obj_t *labelExt2;
   static lv_obj_t *buttonExt2;
 #endif
@@ -126,7 +126,7 @@ void lv_draw_printing() {
   // Create image buttons
   buttonExt1 = lv_imgbtn_create(scr, "F:/bmp_ext1_state.bin", 206, 136, event_handler, ID_TEMP_EXT);
 
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     buttonExt2 = lv_imgbtn_create(scr, "F:/bmp_ext2_state.bin", 350, 136, event_handler, ID_TEMP_EXT);
   #endif
 
@@ -159,7 +159,7 @@ void lv_draw_printing() {
 
   labelExt1 = lv_label_create(scr, 250, 146, nullptr);
 
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     labelExt2 = lv_label_create(scr, 395, 146, nullptr);
   #endif
 
@@ -207,7 +207,7 @@ void disp_ext_temp() {
   sprintf(public_buf_l, printing_menu.temp1, thermalManager.wholeDegHotend(0), thermalManager.degTargetHotend(0));
   lv_label_set_text(labelExt1, public_buf_l);
 
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     sprintf(public_buf_l, printing_menu.temp1, thermalManager.wholeDegHotend(1), thermalManager.degTargetHotend(1));
     lv_label_set_text(labelExt2, public_buf_l);
   #endif

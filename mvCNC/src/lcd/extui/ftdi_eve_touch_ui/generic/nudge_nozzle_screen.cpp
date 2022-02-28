@@ -34,7 +34,7 @@ constexpr static NudgeNozzleScreenData &mydata = screen_data.NudgeNozzleScreen;
 
 void NudgeNozzleScreen::onEntry() {
   mydata.show_offsets = false;
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     mydata.link_nozzles = true;
   #endif
   mydata.rel.reset();
@@ -53,11 +53,11 @@ void NudgeNozzleScreen::onRedraw(draw_mode_t what) {
   #endif
   w.color(z_axis).adjuster(6, GET_TEXT_F(MSG_AXIS_Z), mydata.rel.z / getAxisSteps_per_mm(Z));
   w.increments();
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     w.toggle(8, GET_TEXT_F(MSG_ADJUST_BOTH_NOZZLES), mydata.link_nozzles);
   #endif
 
-  #if HAS_MULTI_EXTRUDER || HAS_BED_PROBE
+  #if TOOL_CHANGE_SUPPORT || HAS_BED_PROBE
     w.toggle(9, GET_TEXT_F(MSG_SHOW_OFFSETS), mydata.show_offsets);
 
     if (mydata.show_offsets) {
@@ -83,7 +83,7 @@ void NudgeNozzleScreen::onRedraw(draw_mode_t what) {
 
 bool NudgeNozzleScreen::onTouchHeld(uint8_t tag) {
   const float inc = getIncrement();
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     const bool link = mydata.link_nozzles;
   #else
     constexpr bool link = true;
@@ -96,13 +96,13 @@ bool NudgeNozzleScreen::onTouchHeld(uint8_t tag) {
     case 5: steps = mmToWholeSteps(inc, Y); smartAdjustAxis_steps( steps, Y, link); mydata.rel.y += steps; break;
     case 6: steps = mmToWholeSteps(inc, Z); smartAdjustAxis_steps(-steps, Z, link); mydata.rel.z -= steps; break;
     case 7: steps = mmToWholeSteps(inc, Z); smartAdjustAxis_steps( steps, Z, link); mydata.rel.z += steps; break;
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       case 8: mydata.link_nozzles = !link; break;
     #endif
     case 9: mydata.show_offsets = !mydata.show_offsets; break;
     default: return false;
   }
-  #if HAS_MULTI_EXTRUDER || HAS_BED_PROBE
+  #if TOOL_CHANGE_SUPPORT || HAS_BED_PROBE
     SaveSettingsDialogBox::settingsChanged();
   #endif
   return true;

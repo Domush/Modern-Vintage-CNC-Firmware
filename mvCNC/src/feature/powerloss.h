@@ -52,7 +52,7 @@ typedef struct {
   #if HAS_POSITION_SHIFT
     xyz_pos_t position_shift;
   #endif
-  #if HAS_MULTI_EXTRUDER
+  #if TOOL_CHANGE_SUPPORT
     uint8_t active_extruder;
   #endif
 

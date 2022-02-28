@@ -45,7 +45,7 @@
   #include "../../libs/numtostr.h"
 #endif
 
-#if HAS_MULTI_EXTRUDER
+#if TOOL_CHANGE_SUPPORT
   #include "../../module/tool_change.h"
 #endif
 
@@ -321,7 +321,7 @@ namespace ExtUI {
   }
 
   void setActiveTool(const extruder_t extruder, bool no_move) {
-    #if HAS_MULTI_EXTRUDER
+    #if TOOL_CHANGE_SUPPORT
       const uint8_t e = extruder - E0;
       if (e != active_extruder) tool_change(e, no_move);
       active_extruder = e;
@@ -742,11 +742,11 @@ namespace ExtUI {
 
       #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
         // Make it so babystepping in Z adjusts the Z probe offset.
-        if (axis == Z && TERN1(HAS_MULTI_EXTRUDER, (linked_nozzles || active_extruder == 0)))
+        if (axis == Z && TERN1(TOOL_CHANGE_SUPPORT, (linked_nozzles || active_extruder == 0)))
           probe.offset.z += mm;
       #endif
 
-      #if HAS_MULTI_EXTRUDER && HAS_HOTEND_OFFSET
+      #if TOOL_CHANGE_SUPPORT && HAS_HOTEND_OFFSET
         /**
          * When linked_nozzles is false, as an axis is babystepped
          * adjust the hotend offsets so that the other nozzles are
