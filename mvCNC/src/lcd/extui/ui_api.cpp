@@ -140,12 +140,12 @@ namespace ExtUI {
   }
 
   void yield() {
-    if (!flags.cnc_killed) thermalManager.manage_heater();
+    if (!flags.cnc_killed) fanManager.manage_heater();
   }
 
   void enableHeater(const extruder_t extruder) {
     #if HAS_HOTEND && HEATER_IDLE_HANDLER
-      thermalManager.reset_hotend_idle_timer(extruder - E0);
+      fanManager.reset_hotend_idle_timer(extruder - E0);
     #else
       UNUSED(extruder);
     #endif
@@ -155,7 +155,7 @@ namespace ExtUI {
     #if HEATER_IDLE_HANDLER
       switch (heater) {
         #if HAS_HEATED_BED
-          case BED: thermalManager.reset_bed_idle_timer(); return;
+          case BED: fanManager.reset_bed_idle_timer(); return;
         #endif
         #if HAS_HEATED_CHAMBER
           case CHAMBER: return; // Chamber has no idle timer
@@ -164,7 +164,7 @@ namespace ExtUI {
           case COOLER: return;  // Cooler has no idle timer
         #endif
         default:
-          TERN_(HAS_HOTEND, thermalManager.reset_hotend_idle_timer(heater - H0));
+          TERN_(HAS_HOTEND, fanManager.reset_hotend_idle_timer(heater - H0));
           break;
       }
     #else
@@ -210,7 +210,7 @@ namespace ExtUI {
 
   bool isHeaterIdle(const extruder_t extruder) {
     #if HAS_HOTEND && HEATER_IDLE_HANDLER
-      return thermalManager.heater_idle[extruder - E0].timed_out;
+      return fanManager.heater_idle[extruder - E0].timed_out;
     #else
       UNUSED(extruder);
       return false;
@@ -221,13 +221,13 @@ namespace ExtUI {
     #if HEATER_IDLE_HANDLER
       switch (heater) {
         #if HAS_HEATED_BED
-          case BED: return thermalManager.heater_idle[thermalManager.IDLE_INDEX_BED].timed_out;
+          case BED: return fanManager.heater_idle[fanManager.IDLE_INDEX_BED].timed_out;
         #endif
         #if HAS_HEATED_CHAMBER
           case CHAMBER: return false; // Chamber has no idle timer
         #endif
         default:
-          return TERN0(HAS_HOTEND, thermalManager.heater_idle[heater - H0].timed_out);
+          return TERN0(HAS_HOTEND, fanManager.heater_idle[heater - H0].timed_out);
       }
     #else
       UNUSED(heater);
@@ -244,43 +244,43 @@ namespace ExtUI {
   celsius_float_t getActualTemp_celsius(const heater_t heater) {
     switch (heater) {
       #if HAS_HEATED_BED
-        case BED: return GET_TEMP_ADJUSTMENT(thermalManager.degBed());
+        case BED: return GET_TEMP_ADJUSTMENT(fanManager.degBed());
       #endif
       #if HAS_HEATED_CHAMBER
-        case CHAMBER: return GET_TEMP_ADJUSTMENT(thermalManager.degChamber());
+        case CHAMBER: return GET_TEMP_ADJUSTMENT(fanManager.degChamber());
       #endif
-      default: return GET_TEMP_ADJUSTMENT(thermalManager.degHotend(heater - H0));
+      default: return GET_TEMP_ADJUSTMENT(fanManager.degHotend(heater - H0));
     }
   }
 
   celsius_float_t getActualTemp_celsius(const extruder_t extruder) {
-    return GET_TEMP_ADJUSTMENT(thermalManager.degHotend(extruder - E0));
+    return GET_TEMP_ADJUSTMENT(fanManager.degHotend(extruder - E0));
   }
 
   celsius_float_t getTargetTemp_celsius(const heater_t heater) {
     switch (heater) {
       #if HAS_HEATED_BED
-        case BED: return GET_TEMP_ADJUSTMENT(thermalManager.degTargetBed());
+        case BED: return GET_TEMP_ADJUSTMENT(fanManager.degTargetBed());
       #endif
       #if HAS_HEATED_CHAMBER
-        case CHAMBER: return GET_TEMP_ADJUSTMENT(thermalManager.degTargetChamber());
+        case CHAMBER: return GET_TEMP_ADJUSTMENT(fanManager.degTargetChamber());
       #endif
-      default: return GET_TEMP_ADJUSTMENT(thermalManager.degTargetHotend(heater - H0));
+      default: return GET_TEMP_ADJUSTMENT(fanManager.degTargetHotend(heater - H0));
     }
   }
 
   celsius_float_t getTargetTemp_celsius(const extruder_t extruder) {
-    return GET_TEMP_ADJUSTMENT(thermalManager.degTargetHotend(extruder - E0));
+    return GET_TEMP_ADJUSTMENT(fanManager.degTargetHotend(extruder - E0));
   }
 
   float getTargetFan_percent(const fan_t fan) {
     UNUSED(fan);
-    return TERN0(HAS_FAN, thermalManager.fanSpeedPercent(fan - FAN0));
+    return TERN0(HAS_FAN, fanManager.fanSpeedPercent(fan - FAN0));
   }
 
   float getActualFan_percent(const fan_t fan) {
     UNUSED(fan);
-    return TERN0(HAS_FAN, thermalManager.scaledFanSpeedPercent(fan - FAN0));
+    return TERN0(HAS_FAN, fanManager.scaledFanSpeedPercent(fan - FAN0));
   }
 
   float getAxisPosition_mm(const axis_t axis) {
@@ -357,7 +357,7 @@ namespace ExtUI {
   }
 
   bool canMove(const extruder_t extruder) {
-    return !thermalManager.tooColdToExtrude(extruder - E0);
+    return !fanManager.tooColdToExtrude(extruder - E0);
   }
 
   GcodeSuite::mvCNCBusyState getHostKeepaliveState() { return TERN0(HOST_KEEPALIVE_FEATURE, gcode.busy_state); }
@@ -922,31 +922,31 @@ namespace ExtUI {
     float getPIDValues_Kd(const extruder_t tool) { return unscalePID_d(PID_PARAM(Kd, tool)); }
 
     void setPIDValues(const_float_t p, const_float_t i, const_float_t d, extruder_t tool) {
-      thermalManager.temp_hotend[tool].pid.Kp = p;
-      thermalManager.temp_hotend[tool].pid.Ki = scalePID_i(i);
-      thermalManager.temp_hotend[tool].pid.Kd = scalePID_d(d);
-      thermalManager.updatePID();
+      fanManager.temp_hotend[tool].pid.Kp = p;
+      fanManager.temp_hotend[tool].pid.Ki = scalePID_i(i);
+      fanManager.temp_hotend[tool].pid.Kd = scalePID_d(d);
+      fanManager.updatePID();
     }
 
     void startPIDTune(const celsius_t temp, extruder_t tool) {
-      thermalManager.PID_autotune(temp, (heater_id_t)tool, 8, true);
+      fanManager.PID_autotune(temp, (heater_id_t)tool, 8, true);
     }
   #endif
 
   #if ENABLED(PIDTEMPBED)
-    float getBedPIDValues_Kp() { return thermalManager.temp_bed.pid.Kp; }
-    float getBedPIDValues_Ki() { return unscalePID_i(thermalManager.temp_bed.pid.Ki); }
-    float getBedPIDValues_Kd() { return unscalePID_d(thermalManager.temp_bed.pid.Kd); }
+    float getBedPIDValues_Kp() { return fanManager.temp_bed.pid.Kp; }
+    float getBedPIDValues_Ki() { return unscalePID_i(fanManager.temp_bed.pid.Ki); }
+    float getBedPIDValues_Kd() { return unscalePID_d(fanManager.temp_bed.pid.Kd); }
 
     void setBedPIDValues(const_float_t p, const_float_t i, const_float_t d) {
-      thermalManager.temp_bed.pid.Kp = p;
-      thermalManager.temp_bed.pid.Ki = scalePID_i(i);
-      thermalManager.temp_bed.pid.Kd = scalePID_d(d);
-      thermalManager.updatePID();
+      fanManager.temp_bed.pid.Kp = p;
+      fanManager.temp_bed.pid.Ki = scalePID_i(i);
+      fanManager.temp_bed.pid.Kd = scalePID_d(d);
+      fanManager.updatePID();
     }
 
     void startBedPIDTune(const celsius_t temp) {
-      thermalManager.PID_autotune(temp, H_BED, 4, true);
+      fanManager.PID_autotune(temp, H_BED, 4, true);
     }
   #endif
 
@@ -973,18 +973,18 @@ namespace ExtUI {
     enableHeater(heater);
     switch (heater) {
       #if HAS_HEATED_CHAMBER
-        case CHAMBER: thermalManager.setTargetChamber(LROUND(constrain(value, 0, CHAMBER_MAX_TARGET))); break;
+        case CHAMBER: fanManager.setTargetChamber(LROUND(constrain(value, 0, CHAMBER_MAX_TARGET))); break;
       #endif
       #if HAS_COOLER
-        case COOLER: thermalManager.setTargetCooler(LROUND(constrain(value, 0, COOLER_MAXTEMP))); break;
+        case COOLER: fanManager.setTargetCooler(LROUND(constrain(value, 0, COOLER_MAXTEMP))); break;
       #endif
       #if HAS_HEATED_BED
-        case BED: thermalManager.setTargetBed(LROUND(constrain(value, 0, BED_MAX_TARGET))); break;
+        case BED: fanManager.setTargetBed(LROUND(constrain(value, 0, BED_MAX_TARGET))); break;
       #endif
       default: {
         #if HAS_HOTEND
           const int16_t e = heater - H0;
-          thermalManager.setTargetHotend(LROUND(constrain(value, 0, thermalManager.hotend_max_target(e))), e);
+          fanManager.setTargetHotend(LROUND(constrain(value, 0, fanManager.hotend_max_target(e))), e);
         #endif
       } break;
     }
@@ -998,14 +998,14 @@ namespace ExtUI {
     #if HAS_HOTEND
       const int16_t e = extruder - E0;
       enableHeater(extruder);
-      thermalManager.setTargetHotend(LROUND(constrain(value, 0, thermalManager.hotend_max_target(e))), e);
+      fanManager.setTargetHotend(LROUND(constrain(value, 0, fanManager.hotend_max_target(e))), e);
     #endif
   }
 
   void setTargetFan_percent(const_float_t value, const fan_t fan) {
     #if HAS_FAN
       if (fan < FAN_COUNT)
-        thermalManager.set_fan_speed(fan - FAN0, map(constrain(value, 0, 100), 0, 100, 0, 255));
+        fanManager.fanSpeedSet(fan - FAN0, map(constrain(value, 0, 100), 0, 100, 0, 255));
     #else
       UNUSED(value);
       UNUSED(fan);
@@ -1014,7 +1014,7 @@ namespace ExtUI {
 
   void setFeedrate_percent(const_float_t value) { feedrate_percentage = constrain(value, 10, 500); }
 
-  void coolDown() { thermalManager.cooldown(); }
+  void coolDown() { fanManager.cooldown(); }
 
   bool awaitingUserConfirm() {
     return TERN0(HAS_RESUME_CONTINUE, wait_for_user) || getHostKeepaliveIsPaused();

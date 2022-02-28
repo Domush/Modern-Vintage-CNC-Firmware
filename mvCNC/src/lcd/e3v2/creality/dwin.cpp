@@ -986,15 +986,15 @@ void Draw_Tune_Menu() {
 
   #if HAS_HOTEND
     Draw_Menu_Line(TUNE_CASE_TEMP, ICON_HotendTemp);
-    Draw_Edit_Integer3(TUNE_CASE_TEMP, thermalManager.degTargetHotend(0));
+    Draw_Edit_Integer3(TUNE_CASE_TEMP, fanManager.degTargetHotend(0));
   #endif
   #if HAS_HEATED_BED
     Draw_Menu_Line(TUNE_CASE_BED, ICON_BedTemp);
-    Draw_Edit_Integer3(TUNE_CASE_BED, thermalManager.degTargetBed());
+    Draw_Edit_Integer3(TUNE_CASE_BED, fanManager.degTargetBed());
   #endif
   #if HAS_FAN
     Draw_Menu_Line(TUNE_CASE_FAN, ICON_FanSpeed);
-    Draw_Edit_Integer3(TUNE_CASE_FAN, thermalManager.fan_speed[0]);
+    Draw_Edit_Integer3(TUNE_CASE_FAN, fanManager.fan_speed[0]);
   #endif
   #if HAS_ZOFFSET_ITEM
     Draw_Menu_Line(TUNE_CASE_ZOFF, ICON_Zoffset);
@@ -1451,11 +1451,11 @@ void HMI_Move_Z() {
       else
         checkkey = Tune;
       Draw_Edit_Integer3(temp_line, HMI_ValueStruct.E_Temp);
-      thermalManager.setTargetHotend(HMI_ValueStruct.E_Temp, 0);
+      fanManager.setTargetHotend(HMI_ValueStruct.E_Temp, 0);
       return;
     }
     // E_Temp limit
-    LIMIT(HMI_ValueStruct.E_Temp, HEATER_0_MINTEMP, thermalManager.hotend_max_target(0));
+    LIMIT(HMI_ValueStruct.E_Temp, HEATER_0_MINTEMP, fanManager.hotend_max_target(0));
     // E_Temp value
     Draw_Edit_Integer3(temp_line, HMI_ValueStruct.E_Temp, true);
   }
@@ -1505,7 +1505,7 @@ void HMI_Move_Z() {
     #endif
       checkkey = HMI_ValueStruct.show_mode == -1 ? TemperatureID : Tune;
       Draw_Edit_Integer3(bed_line, HMI_ValueStruct.Bed_Temp);
-      thermalManager.setTargetBed(HMI_ValueStruct.Bed_Temp);
+      fanManager.setTargetBed(HMI_ValueStruct.Bed_Temp);
       return;
     }
     // Bed_Temp limit
@@ -1554,7 +1554,7 @@ void HMI_Move_Z() {
     #endif
       checkkey = HMI_ValueStruct.show_mode == -1 ? TemperatureID : Tune;
       Draw_Edit_Integer3(fan_line, HMI_ValueStruct.Fan_speed);
-      thermalManager.set_fan_speed(0, HMI_ValueStruct.Fan_speed);
+      fanManager.fanSpeedSet(0, HMI_ValueStruct.Fan_speed);
       return;
     }
     // Fan_speed limit
@@ -1701,22 +1701,22 @@ void HMI_Move_Z() {
   void update_variable() {
   #if HAS_HOTEND
     static celsius_t _hotendtemp = 0, _hotendtarget = 0;
-    const celsius_t hc = thermalManager.wholeDegHotend(0), ht = thermalManager.degTargetHotend(0);
+    const celsius_t hc = fanManager.wholeDegHotend(0), ht = fanManager.degTargetHotend(0);
     const bool _new_hotend_temp = _hotendtemp != hc, _new_hotend_target = _hotendtarget != ht;
     if (_new_hotend_temp) _hotendtemp = hc;
     if (_new_hotend_target) _hotendtarget = ht;
   #endif
   #if HAS_HEATED_BED
     static celsius_t _bedtemp = 0, _bedtarget = 0;
-    const celsius_t bc = thermalManager.wholeDegBed(), bt = thermalManager.degTargetBed();
+    const celsius_t bc = fanManager.wholeDegBed(), bt = fanManager.degTargetBed();
     const bool _new_bed_temp = _bedtemp != bc, _new_bed_target = _bedtarget != bt;
     if (_new_bed_temp) _bedtemp = bc;
     if (_new_bed_target) _bedtarget = bt;
   #endif
   #if HAS_FAN
     static uint8_t _fanspeed = 0;
-    const bool _new_fanspeed = _fanspeed != thermalManager.fan_speed[0];
-    if (_new_fanspeed) _fanspeed = thermalManager.fan_speed[0];
+    const bool _new_fanspeed = _fanspeed != fanManager.fan_speed[0];
+    if (_new_fanspeed) _fanspeed = fanManager.fan_speed[0];
   #endif
 
     if (checkkey == Tune) {
@@ -1769,7 +1769,7 @@ void HMI_Move_Z() {
 
   #if HAS_FAN
     if (_new_fanspeed) {
-      _fanspeed = thermalManager.fan_speed[0];
+      _fanspeed = fanManager.fan_speed[0];
       Draw_Stat_Int(195 + 2 * STAT_CHR_W, 384, _fanspeed);
     }
   #endif
@@ -1990,9 +1990,9 @@ void Draw_Status_Area(const bool with_update) {
 
   #if HAS_HOTEND
     DWIN_ICON_Show(ICON, ICON_HotendTemp, 10, 383);
-    Draw_Stat_Int(28, 384, thermalManager.wholeDegHotend(0));
+    Draw_Stat_Int(28, 384, fanManager.wholeDegHotend(0));
     DWIN_Draw_String(false, DWIN_FONT_STAT, Color_White, Color_Bg_Black, 25 + 3 * STAT_CHR_W + 5, 384, F("/"));
-    Draw_Stat_Int(25 + 4 * STAT_CHR_W + 6, 384, thermalManager.degTargetHotend(0));
+    Draw_Stat_Int(25 + 4 * STAT_CHR_W + 6, 384, fanManager.degTargetHotend(0));
 
     DWIN_ICON_Show(ICON, ICON_StepE, 112, 417);
     Draw_Stat_Int(116 + 2 * STAT_CHR_W, 417, planner.flow_percentage[0]);
@@ -2001,9 +2001,9 @@ void Draw_Status_Area(const bool with_update) {
 
   #if HAS_HEATED_BED
     DWIN_ICON_Show(ICON, ICON_BedTemp, 10, 416);
-    Draw_Stat_Int(28, 417, thermalManager.wholeDegBed());
+    Draw_Stat_Int(28, 417, fanManager.wholeDegBed());
     DWIN_Draw_String(false, DWIN_FONT_STAT, Color_White, Color_Bg_Black, 25 + 3 * STAT_CHR_W + 5, 417, F("/"));
-    Draw_Stat_Int(25 + 4 * STAT_CHR_W + 6, 417, thermalManager.degTargetBed());
+    Draw_Stat_Int(25 + 4 * STAT_CHR_W + 6, 417, fanManager.degTargetBed());
   #endif
 
   DWIN_ICON_Show(ICON, ICON_Speed, 113, 383);
@@ -2012,7 +2012,7 @@ void Draw_Status_Area(const bool with_update) {
 
   #if HAS_FAN
     DWIN_ICON_Show(ICON, ICON_FanSpeed, 187, 383);
-    Draw_Stat_Int(195 + 2 * STAT_CHR_W, 384, thermalManager.fan_speed[0]);
+    Draw_Stat_Int(195 + 2 * STAT_CHR_W, 384, fanManager.fan_speed[0]);
   #endif
 
   #if HAS_ZOFFSET_ITEM
@@ -2264,7 +2264,7 @@ void HMI_SelectFile() {
         // All fans on for Ender 3 v2 ?
         // The slicer should manage this for us.
         //for (uint8_t i = 0; i < FAN_COUNT; i++)
-        //  thermalManager.fan_speed[i] = 255;
+        //  fanManager.fan_speed[i] = 255;
       #endif
 
       _card_percent = 0;
@@ -2761,7 +2761,7 @@ void HMI_Prepare() {
 
       #if HAS_HOTEND || HAS_HEATED_BED
         case PREPARE_CASE_COOL:
-          thermalManager.cooldown();
+          fanManager.cooldown();
           ui.reset_status();
           break;
       #endif
@@ -2853,15 +2853,15 @@ void Draw_Temperature_Menu() {
   #define _TMENU_ICON(N) Draw_Menu_Line(++i, ICON_SetEndTemp + (N) - 1)
   #if HAS_HOTEND
     _TMENU_ICON(TEMP_CASE_TEMP);
-    Draw_Edit_Integer3(i, thermalManager.degTargetHotend(0));
+    Draw_Edit_Integer3(i, fanManager.degTargetHotend(0));
   #endif
   #if HAS_HEATED_BED
     _TMENU_ICON(TEMP_CASE_BED);
-    Draw_Edit_Integer3(i, thermalManager.degTargetBed());
+    Draw_Edit_Integer3(i, fanManager.degTargetBed());
   #endif
   #if HAS_FAN
     _TMENU_ICON(TEMP_CASE_FAN);
-    Draw_Edit_Integer3(i, thermalManager.fan_speed[0]);
+    Draw_Edit_Integer3(i, fanManager.fan_speed[0]);
   #endif
   #if HAS_PREHEAT
     // PLA/ABS items have submenus
@@ -3026,7 +3026,7 @@ void HMI_AxisMove() {
         #if HAS_HOTEND
           case 4: // Extruder
             #if ENABLED(PREVENT_COLD_EXTRUSION)
-              if (thermalManager.tooColdToExtrude(0)) {
+              if (fanManager.tooColdToExtrude(0)) {
                 HMI_flag.cold_flag = true;
                 Popup_Window_ETempTooLow();
                 DWIN_UpdateLCD();
@@ -3067,7 +3067,7 @@ void HMI_Temperature() {
       #if HAS_HOTEND
         case TEMP_CASE_TEMP:
           checkkey = ETemp;
-          HMI_ValueStruct.E_Temp = thermalManager.degTargetHotend(0);
+          HMI_ValueStruct.E_Temp = fanManager.degTargetHotend(0);
           Draw_Edit_Integer3(1, HMI_ValueStruct.E_Temp, true);
           EncoderRate.enabled = true;
           break;
@@ -3075,7 +3075,7 @@ void HMI_Temperature() {
       #if HAS_HEATED_BED
         case TEMP_CASE_BED:
           checkkey = BedTemp;
-          HMI_ValueStruct.Bed_Temp = thermalManager.degTargetBed();
+          HMI_ValueStruct.Bed_Temp = fanManager.degTargetBed();
           Draw_Edit_Integer3(2, HMI_ValueStruct.Bed_Temp, true);
           EncoderRate.enabled = true;
           break;
@@ -3083,7 +3083,7 @@ void HMI_Temperature() {
       #if HAS_FAN
         case TEMP_CASE_FAN:
           checkkey = FanSpeed;
-          HMI_ValueStruct.Fan_speed = thermalManager.fan_speed[0];
+          HMI_ValueStruct.Fan_speed = fanManager.fan_speed[0];
           Draw_Edit_Integer3(3, HMI_ValueStruct.Fan_speed, true);
           EncoderRate.enabled = true;
           break;
@@ -3593,13 +3593,13 @@ void HMI_AdvSet() {
 
       #if HAS_HOTEND
         case ADVSET_CASE_HEPID:
-          thermalManager.PID_autotune(ui.material_preset[0].hotend_temp, H_E0, 10, true);
+          fanManager.PID_autotune(ui.material_preset[0].hotend_temp, H_E0, 10, true);
           break;
       #endif
 
       #if HAS_HEATED_BED
         case ADVSET_CASE_BEDPID:
-          thermalManager.PID_autotune(ui.material_preset[0].bed_temp, H_BED, 10, true);
+          fanManager.PID_autotune(ui.material_preset[0].bed_temp, H_BED, 10, true);
           break;
       #endif
 
@@ -3794,7 +3794,7 @@ void HMI_Tune() {
       #if HAS_HOTEND
         case TUNE_CASE_TEMP: // Spindle temp
           checkkey = ETemp;
-          HMI_ValueStruct.E_Temp = thermalManager.degTargetHotend(0);
+          HMI_ValueStruct.E_Temp = fanManager.degTargetHotend(0);
           Draw_Edit_Integer3(TUNE_CASE_TEMP + MROWS - index_tune, HMI_ValueStruct.E_Temp, true);
           EncoderRate.enabled = true;
           break;
@@ -3802,7 +3802,7 @@ void HMI_Tune() {
       #if HAS_HEATED_BED
         case TUNE_CASE_BED: // Bed temp
           checkkey = BedTemp;
-          HMI_ValueStruct.Bed_Temp = thermalManager.degTargetBed();
+          HMI_ValueStruct.Bed_Temp = fanManager.degTargetBed();
           Draw_Edit_Integer3(TUNE_CASE_BED + MROWS - index_tune, HMI_ValueStruct.Bed_Temp, true);
           EncoderRate.enabled = true;
           break;
@@ -3810,7 +3810,7 @@ void HMI_Tune() {
       #if HAS_FAN
         case TUNE_CASE_FAN: // Fan speed
           checkkey = FanSpeed;
-          HMI_ValueStruct.Fan_speed = thermalManager.fan_speed[0];
+          HMI_ValueStruct.Fan_speed = fanManager.fan_speed[0];
           Draw_Edit_Integer3(TUNE_CASE_FAN + MROWS - index_tune, HMI_ValueStruct.Fan_speed, true);
           EncoderRate.enabled = true;
           break;
@@ -4130,9 +4130,9 @@ void EachMomentUpdate() {
   if (HMI_flag.pause_action && jobIsPaused() && !planner.has_blocks_queued()) {
     HMI_flag.pause_action = false;
     #if ENABLED(PAUSE_HEAT)
-      TERN_(HAS_HOTEND, resume_hotend_temp = thermalManager.degTargetHotend(0));
-      TERN_(HAS_HEATED_BED, resume_bed_temp = thermalManager.degTargetBed());
-      thermalManager.disable_all_heaters();
+      TERN_(HAS_HOTEND, resume_hotend_temp = fanManager.degTargetHotend(0));
+      TERN_(HAS_HEATED_BED, resume_bed_temp = fanManager.degTargetBed());
+      fanManager.disable_all_heaters();
     #endif
     queue.inject(F("G1 F1200 X0 Y0"));
   }

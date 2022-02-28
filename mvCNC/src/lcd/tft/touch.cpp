@@ -171,26 +171,26 @@ void Touch::touch(touch_control_t *control) {
       #if HAS_HOTEND
         if (heater >= 0) { // HotEnd
           #if HOTENDS == 1
-            MenuItem_int3::action((const char *)GET_TEXT_F(MSG_NOZZLE), &thermalManager.temp_hotend[0].target, 0, thermalManager.hotend_max_target(0), []{ thermalManager.start_watching_hotend(0); });
+            MenuItem_int3::action((const char *)GET_TEXT_F(MSG_NOZZLE), &fanManager.temp_hotend[0].target, 0, fanManager.hotend_max_target(0), []{ fanManager.start_watching_hotend(0); });
           #else
             MenuItemBase::itemIndex = heater;
-            MenuItem_int3::action((const char *)GET_TEXT_F(MSG_NOZZLE_N), &thermalManager.temp_hotend[heater].target, 0, thermalManager.hotend_max_target(heater), []{ thermalManager.start_watching_hotend(MenuItemBase::itemIndex); });
+            MenuItem_int3::action((const char *)GET_TEXT_F(MSG_NOZZLE_N), &fanManager.temp_hotend[heater].target, 0, fanManager.hotend_max_target(heater), []{ fanManager.start_watching_hotend(MenuItemBase::itemIndex); });
           #endif
         }
       #endif
       #if HAS_HEATED_BED
         else if (heater == H_BED) {
-          MenuItem_int3::action((const char *)GET_TEXT_F(MSG_BED), &thermalManager.temp_bed.target, 0, BED_MAX_TARGET, thermalManager.start_watching_bed);
+          MenuItem_int3::action((const char *)GET_TEXT_F(MSG_BED), &fanManager.temp_bed.target, 0, BED_MAX_TARGET, fanManager.start_watching_bed);
         }
       #endif
       #if HAS_HEATED_CHAMBER
         else if (heater == H_CHAMBER) {
-          MenuItem_int3::action((const char *)GET_TEXT_F(MSG_CHAMBER), &thermalManager.temp_chamber.target, 0, CHAMBER_MAX_TARGET, thermalManager.start_watching_chamber);
+          MenuItem_int3::action((const char *)GET_TEXT_F(MSG_CHAMBER), &fanManager.temp_chamber.target, 0, CHAMBER_MAX_TARGET, fanManager.start_watching_chamber);
         }
       #endif
       #if HAS_COOLER
         else if (heater == H_COOLER) {
-          MenuItem_int3::action((const char *)GET_TEXT_F(MSG_COOLER), &thermalManager.temp_cooler.target, 0, COOLER_MAX_TARGET, thermalManager.start_watching_cooler);
+          MenuItem_int3::action((const char *)GET_TEXT_F(MSG_COOLER), &fanManager.temp_cooler.target, 0, COOLER_MAX_TARGET, fanManager.start_watching_cooler);
         }
       #endif
 
@@ -199,8 +199,8 @@ void Touch::touch(touch_control_t *control) {
       ui.clear_lcd();
       static uint8_t fan, fan_speed;
       fan = 0;
-      fan_speed = thermalManager.fan_speed[fan];
-      MenuItem_percent::action((const char *)GET_TEXT_F(MSG_FIRST_FAN_SPEED), &fan_speed, 0, 255, []{ thermalManager.set_fan_speed(fan, fan_speed); });
+      fan_speed = fanManager.fan_speed[fan];
+      MenuItem_percent::action((const char *)GET_TEXT_F(MSG_FIRST_FAN_SPEED), &fan_speed, 0, 255, []{ fanManager.fanSpeedSet(fan, fan_speed); });
       break;
     case FEEDRATE:
       ui.clear_lcd();

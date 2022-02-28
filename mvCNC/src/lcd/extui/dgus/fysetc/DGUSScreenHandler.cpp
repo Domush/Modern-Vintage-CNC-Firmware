@@ -314,10 +314,10 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
 
     if (filament_data.action == 0) { // Go back to utility screen
       #if HAS_HOTEND
-        thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
+        fanManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
       #endif
       #if TOOL_CHANGE_SUPPORT
-        thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E1);
+        fanManager.setTargetHotend(e_temp, ExtUI::extruder_t::E1);
       #endif
       GotoScreen(DGUSLCD_SCREEN_UTILITY);
     }
@@ -327,13 +327,13 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
           #if HAS_HOTEND
             case VP_E0_FILAMENT_LOAD_UNLOAD:
               filament_data.extruder = ExtUI::extruder_t::E0;
-              thermalManager.setTargetHotend(e_temp, filament_data.extruder);
+              fanManager.setTargetHotend(e_temp, filament_data.extruder);
               break;
           #endif
           #if TOOL_CHANGE_SUPPORT
             case VP_E1_FILAMENT_LOAD_UNLOAD:
               filament_data.extruder = ExtUI::extruder_t::E1;
-              thermalManager.setTargetHotend(e_temp, filament_data.extruder);
+              fanManager.setTargetHotend(e_temp, filament_data.extruder);
               break;
           #endif
       }
@@ -346,8 +346,8 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
     if (filament_data.action <= 0) return;
 
     // If we close to the target temperature, we can start load or unload the filament
-    if (thermalManager.hotEnoughToExtrude(filament_data.extruder) && \
-        thermalManager.targetHotEnoughToExtrude(filament_data.extruder)) {
+    if (fanManager.hotEnoughToExtrude(filament_data.extruder) && \
+        fanManager.targetHotEnoughToExtrude(filament_data.extruder)) {
       float movevalue = DGUS_FILAMENT_LOAD_LENGTH_PER_TIME;
 
       if (filament_data.action == 1) { // load filament

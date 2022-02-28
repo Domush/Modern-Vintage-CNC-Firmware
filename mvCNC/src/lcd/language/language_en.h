@@ -472,7 +472,7 @@ namespace Language_en {
   LSTR MSG_TOOL_MIGRATION_SWAP            = _UxGT("Migrate to *");
   LSTR MSG_FILAMENTCHANGE                 = _UxGT("Change Filament");
   LSTR MSG_FILAMENTCHANGE_E               = _UxGT("Change Filament *");
-  LSTR MSG_FILAMENTLOAD                   = _UxGT("Load Filament");
+  LSTR MSG_FILAMENTLOAD                   = _UxGT("Change Bit");
   LSTR MSG_FILAMENTLOAD_E                 = _UxGT("Load *");
   LSTR MSG_FILAMENTUNLOAD                 = _UxGT("Unload Filament");
   LSTR MSG_FILAMENTUNLOAD_E               = _UxGT("Unload *");

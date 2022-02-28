@@ -662,7 +662,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #endif
 
       #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
-        case 701: M701(); break;                                  // M701: Load Filament
+        case 701: M701(); break;                                  // M701: Change Bit
         case 702: M702(); break;                                  // M702: Unload Filament
       #endif
 

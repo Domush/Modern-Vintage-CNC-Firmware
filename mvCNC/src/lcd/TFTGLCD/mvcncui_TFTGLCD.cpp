@@ -430,10 +430,10 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
     uint8_t pic_hot_bits;
     #if HAS_HEATED_BED
       const bool isBed = heater_id < 0;
-      const celsius_t t1 = (isBed ? thermalManager.wholeDegBed() : thermalManager.wholeDegHotend(heater_id)),
-                      t2 = (isBed ? thermalManager.degTargetBed() : thermalManager.degTargetHotend(heater_id));
+      const celsius_t t1 = (isBed ? fanManager.wholeDegBed() : fanManager.wholeDegHotend(heater_id)),
+                      t2 = (isBed ? fanManager.degTargetBed() : fanManager.degTargetHotend(heater_id));
     #else
-      const celsius_t t1 = thermalManager.wholeDegHotend(heater_id), t2 = thermalManager.degTargetHotend(heater_id);
+      const celsius_t t1 = fanManager.wholeDegHotend(heater_id), t2 = fanManager.degTargetHotend(heater_id);
     #endif
 
     #if HOTENDS < 2
@@ -463,7 +463,7 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
     #if !HEATER_IDLE_HANDLER
       UNUSED(blink);
     #else
-      if (!blink && thermalManager.heater_idle[thermalManager.idle_index_for_id(heater_id)].timed_out) {
+      if (!blink && fanManager.heater_idle[fanManager.idle_index_for_id(heater_id)].timed_out) {
         lcd.write(' ');
         if (t2 >= 10) lcd.write(' ');
         if (t2 >= 100) lcd.write(' ');
@@ -495,16 +495,16 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
 #if HAS_COOLER
 
   FORCE_INLINE void _draw_cooler_status(const bool blink) {
-    const celsius_t t2 = thermalManager.degTargetCooler();
+    const celsius_t t2 = fanManager.degTargetCooler();
 
     lcd.setCursor(0, 5); lcd_put_u8str(F("COOL"));
-    lcd.setCursor(1, 6); lcd_put_u8str(i16tostr3rj(thermalManager.wholeDegCooler()));
+    lcd.setCursor(1, 6); lcd_put_u8str(i16tostr3rj(fanManager.wholeDegCooler()));
     lcd.setCursor(1, 7);
 
     #if !HEATER_IDLE_HANDLER
       UNUSED(blink);
     #else
-      if (!blink && thermalManager.heater_idle[thermalManager.idle_index_for_id(heater_id)].timed_out) {
+      if (!blink && fanManager.heater_idle[fanManager.idle_index_for_id(heater_id)].timed_out) {
         lcd_put_wchar(' ');
         if (t2 >= 10) lcd_put_wchar(' ');
         if (t2 >= 100) lcd_put_wchar(' ');
@@ -866,11 +866,11 @@ void mvCNCUI::draw_status_screen() {
     #endif
 
     #if HAS_FAN
-      uint16_t spd = thermalManager.fan_speed[0];
+      uint16_t spd = fanManager.fan_speed[0];
       #if ENABLED(ADAPTIVE_FAN_SLOWING)
-        if (!blink) spd = thermalManager.scaledFanSpeed(0, spd);
+        if (!blink) spd = fanManager.scaledFanSpeed(0, spd);
       #endif
-      uint16_t per = thermalManager.pwmToPercent(spd);
+      uint16_t per = fanManager.pwmToPercent(spd);
 
       #if HOTENDS < 2
         #define FANX 11
@@ -882,7 +882,7 @@ void mvCNCUI::draw_status_screen() {
       lcd.setCursor(FANX, 7);
       lcd.print(i16tostr3rj(per));
 
-      if (TERN0(HAS_FAN0, thermalManager.fan_speed[0]) || TERN0(HAS_FAN1, thermalManager.fan_speed[1]) || TERN0(HAS_FAN2, thermalManager.fan_speed[2]))
+      if (TERN0(HAS_FAN0, fanManager.fan_speed[0]) || TERN0(HAS_FAN1, fanManager.fan_speed[1]) || TERN0(HAS_FAN2, fanManager.fan_speed[2]))
         picBits |= ICON_FAN;
       else
         picBits &= ~ICON_FAN;
@@ -914,8 +914,8 @@ void mvCNCUI::draw_status_screen() {
       if (!PanelDetected) return;
       lcd.setCursor((LCD_WIDTH - 14) / 2, row + 1);
       lcd.write(LCD_STR_THERMOMETER[0]); lcd_put_u8str(F(" E")); lcd.write('1' + extruder); lcd.write(' ');
-      lcd.print(i16tostr3rj(thermalManager.wholeDegHotend(extruder))); lcd.write(LCD_STR_DEGREE[0]); lcd.write('/');
-      lcd.print(i16tostr3rj(thermalManager.degTargetHotend(extruder))); lcd.write(LCD_STR_DEGREE[0]);
+      lcd.print(i16tostr3rj(fanManager.wholeDegHotend(extruder))); lcd.write(LCD_STR_DEGREE[0]); lcd.write('/');
+      lcd.print(i16tostr3rj(fanManager.degTargetHotend(extruder))); lcd.write(LCD_STR_DEGREE[0]);
       lcd.print_line();
     }
 

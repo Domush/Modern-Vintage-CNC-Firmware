@@ -110,7 +110,7 @@ void _lcd_ubl_custom_mesh() {
   START_MENU();
   BACK_ITEM(MSG_UBL_BUILD_MESH_MENU);
   #if HAS_HOTEND
-    EDIT_ITEM(int3, MSG_UBL_HOTEND_TEMP_CUSTOM, &custom_hotend_temp, EXTRUDE_MINTEMP, thermalManager.hotend_max_target(0));
+    EDIT_ITEM(int3, MSG_UBL_HOTEND_TEMP_CUSTOM, &custom_hotend_temp, EXTRUDE_MINTEMP, fanManager.hotend_max_target(0));
   #endif
   #if HAS_HEATED_BED
     EDIT_ITEM(int3, MSG_UBL_BED_TEMP_CUSTOM, &custom_bed_temp, BED_MINTEMP, BED_MAX_TARGET);
@@ -607,7 +607,7 @@ void _menu_ubl_tools() {
     BACK_ITEM(MSG_UBL_LEVEL_BED);
 
     #if HAS_HOTEND
-      EDIT_ITEM(int3, MSG_UBL_HOTEND_TEMP_CUSTOM, &custom_hotend_temp, HEATER_0_MINTEMP + 20, thermalManager.hotend_max_target(0));
+      EDIT_ITEM(int3, MSG_UBL_HOTEND_TEMP_CUSTOM, &custom_hotend_temp, HEATER_0_MINTEMP + 20, fanManager.hotend_max_target(0));
     #endif
 
     #if HAS_HEATED_BED

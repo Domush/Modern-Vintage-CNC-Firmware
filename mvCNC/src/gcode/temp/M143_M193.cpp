@@ -27,7 +27,7 @@ extern Cooler cooler;
 void GcodeSuite::M143() {
   if (DEBUGGING(DRYRUN)) return;
   if (parser.seenval('S')) {
-    thermalManager.setTargetCooler(parser.value_celsius());
+    fanManager.setTargetCooler(parser.value_celsius());
     parser.value_celsius() ? cooler.enable() : cooler.disable();
   }
 }
@@ -40,10 +40,10 @@ void GcodeSuite::M193() {
 
   if (parser.seenval('S')) {
     cooler.enable();
-    thermalManager.setTargetCooler(parser.value_celsius());
-    if (thermalManager.isLaserCooling()) {
+    fanManager.setTargetCooler(parser.value_celsius());
+    if (fanManager.isLaserCooling()) {
       LCD_MESSAGE(MSG_LASER_COOLING);
-      thermalManager.wait_for_cooler(true);
+      fanManager.wait_for_cooler(true);
     }
   }
 }

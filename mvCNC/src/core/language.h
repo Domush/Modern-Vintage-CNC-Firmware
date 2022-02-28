@@ -175,10 +175,10 @@
 #define STR_ERR_EEPROM_WRITE                "Error writing to EEPROM!"
 
 #define STR_FILAMENT_CHANGE_HEAT_LCD        "Press button to heat nozzle"
-#define STR_FILAMENT_CHANGE_INSERT_LCD      "Insert filament and press button"
+#define STR_FILAMENT_CHANGE_INSERT_LCD      "Change bit and press button"
 #define STR_FILAMENT_CHANGE_WAIT_LCD        "Press button to resume"
 #define STR_FILAMENT_CHANGE_HEAT_M108       "Send M108 to heat nozzle"
-#define STR_FILAMENT_CHANGE_INSERT_M108     "Insert filament and send M108"
+#define STR_FILAMENT_CHANGE_INSERT_M108     "Change bit and send M108"
 #define STR_FILAMENT_CHANGE_WAIT_M108       "Send M108 to resume"
 
 #define STR_STOP_BLTOUCH                    "!! STOP called because of BLTouch error - restart with M999"
@@ -209,7 +209,7 @@
 #define STR_PID_DEBUG_ITERM                 " iTerm "
 #define STR_PID_DEBUG_DTERM                 " dTerm "
 #define STR_PID_DEBUG_CTERM                 " cTerm "
-#define STR_INVALID_EXTRUDER_NUM            " - Invalid extruder number !"
+#define STR_INVALID_EXTRUDER_NUM            " - Invalid tool number !"
 
 #define STR_HEATER_BED                      "bed"
 #define STR_HEATER_CHAMBER                  "chamber"

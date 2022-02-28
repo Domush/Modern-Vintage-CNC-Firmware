@@ -23,102 +23,14 @@
   #define SOFT_PWM_SCALE 0
 #endif
 
-#define HOTEND_INDEX TERN(TOOL_CHANGE_SUPPORT, e, 0)
-#define E_NAME TERN_(TOOL_CHANGE_SUPPORT, e)
-
-// Element identifiers. Positive values are hotends. Negative values are other heaters or coolers.
-typedef enum : int8_t {
-  H_REDUNDANT = HID_REDUNDANT,
-  H_COOLER = HID_COOLER,
-  H_PROBE = HID_PROBE,
-  H_BOARD = HID_BOARD,
-  H_CHAMBER = HID_CHAMBER,
-  H_BED = HID_BED,
-  H_E0 = HID_E0, H_E1, H_E2, H_E3, H_E4, H_E5, H_E6, H_E7,
-  H_NONE = -128
-} heater_id_t;
-
-// PID storage
-typedef struct { float Kp, Ki, Kd;     } PID_t;
-typedef struct { float Kp, Ki, Kd, Kc; } PIDC_t;
-typedef struct { float Kp, Ki, Kd, Kf; } PIDF_t;
-typedef struct { float Kp, Ki, Kd, Kc, Kf; } PIDCF_t;
-
-typedef
-  #if BOTH(PID_EXTRUSION_SCALING, PID_FAN_SCALING)
-    PIDCF_t
-  #elif ENABLED(PID_EXTRUSION_SCALING)
-    PIDC_t
-  #elif ENABLED(PID_FAN_SCALING)
-    PIDF_t
-  #else
-    PID_t
-  #endif
-hotend_pid_t;
-
-#if ENABLED(PID_EXTRUSION_SCALING)
-  typedef IF<(LPQ_MAX_LEN > 255), uint16_t, uint8_t>::type lpq_ptr_t;
-#endif
-
-#define PID_PARAM(F,H) _PID_##F(TERN(PID_PARAMS_PER_HOTEND, H, 0 & H)) // Always use 'H' to suppress warning
-#define _PID_Kp(H) TERN(PIDTEMP, FanControl::temp_hotend[H].pid.Kp, NAN)
-#define _PID_Ki(H) TERN(PIDTEMP, FanControl::temp_hotend[H].pid.Ki, NAN)
-#define _PID_Kd(H) TERN(PIDTEMP, FanControl::temp_hotend[H].pid.Kd, NAN)
-#if ENABLED(PIDTEMP)
-  #define _PID_Kc(H) TERN(PID_EXTRUSION_SCALING, FanControl::temp_hotend[H].pid.Kc, 1)
-  #define _PID_Kf(H) TERN(PID_FAN_SCALING,       FanControl::temp_hotend[H].pid.Kf, 0)
-#else
-  #define _PID_Kc(H) 1
-  #define _PID_Kf(H) 0
-#endif
+#define TOOL_INDEX TERN(TOOL_CHANGE_SUPPORT, e, 0)
+#define TOOL_NAME TERN_(TOOL_CHANGE_SUPPORT, e)
 
 /**
  * States for ADC reading in the ISR
  */
 enum ADCSensorState : char {
   StartSampling,
-  #if HAS_TEMP_ADC_0
-    PrepareTemp_0, MeasureTemp_0,
-  #endif
-  #if HAS_TEMP_ADC_BED
-    PrepareTemp_BED, MeasureTemp_BED,
-  #endif
-  #if HAS_TEMP_ADC_CHAMBER
-    PrepareTemp_CHAMBER, MeasureTemp_CHAMBER,
-  #endif
-  #if HAS_TEMP_ADC_COOLER
-    PrepareTemp_COOLER, MeasureTemp_COOLER,
-  #endif
-  #if HAS_TEMP_ADC_PROBE
-    PrepareTemp_PROBE, MeasureTemp_PROBE,
-  #endif
-  #if HAS_TEMP_ADC_BOARD
-    PrepareTemp_BOARD, MeasureTemp_BOARD,
-  #endif
-  #if HAS_TEMP_ADC_REDUNDANT
-    PrepareTemp_REDUNDANT, MeasureTemp_REDUNDANT,
-  #endif
-  #if HAS_TEMP_ADC_1
-    PrepareTemp_1, MeasureTemp_1,
-  #endif
-  #if HAS_TEMP_ADC_2
-    PrepareTemp_2, MeasureTemp_2,
-  #endif
-  #if HAS_TEMP_ADC_3
-    PrepareTemp_3, MeasureTemp_3,
-  #endif
-  #if HAS_TEMP_ADC_4
-    PrepareTemp_4, MeasureTemp_4,
-  #endif
-  #if HAS_TEMP_ADC_5
-    PrepareTemp_5, MeasureTemp_5,
-  #endif
-  #if HAS_TEMP_ADC_6
-    PrepareTemp_6, MeasureTemp_6,
-  #endif
-  #if HAS_TEMP_ADC_7
-    PrepareTemp_7, MeasureTemp_7,
-  #endif
   #if HAS_JOY_ADC_X
     PrepareJoy_X, MeasureJoy_X,
   #endif
@@ -127,9 +39,6 @@ enum ADCSensorState : char {
   #endif
   #if HAS_JOY_ADC_Z
     PrepareJoy_Z, MeasureJoy_Z,
-  #endif
-  #if ENABLED(FILAMENT_WIDTH_SENSOR)
-    Prepare_FILWIDTH, Measure_FILWIDTH,
   #endif
   #if ENABLED(POWER_MONITOR_CURRENT)
     Prepare_POWER_MONITOR_CURRENT,
@@ -152,52 +61,6 @@ enum ADCSensorState : char {
 #define MIN_ADC_ISR_LOOPS 10
 
 #define ACTUAL_ADC_SAMPLES _MAX(int(MIN_ADC_ISR_LOOPS), int(SensorsReady))
-
-#if HAS_PID_HEATING
-  #define PID_K2 (1-float(PID_K1))
-  #define PID_dT ((OVERSAMPLENR * float(ACTUAL_ADC_SAMPLES)) / TEMP_TIMER_FREQUENCY)
-
-  // Apply the scale factors to the PID values
-  #define scalePID_i(i)   ( float(i) * PID_dT )
-  #define unscalePID_i(i) ( float(i) / PID_dT )
-  #define scalePID_d(d)   ( float(d) / PID_dT )
-  #define unscalePID_d(d) ( float(d) * PID_dT )
-#endif
-
-#if ENABLED(G26_MESH_VALIDATION) && EITHER(HAS_MVCNCUI_MENU, EXTENSIBLE_UI)
-  #define G26_CLICK_CAN_CANCEL 1
-#endif
-
-// A temperature sensor
-typedef struct TempInfo {
-  uint16_t acc;
-  int16_t raw;
-  celsius_float_t celsius;
-  inline void reset() { acc = 0; }
-  inline void sample(const uint16_t s) { acc += s; }
-  inline void update() { raw = acc; }
-} temp_info_t;
-
-#if HAS_TEMP_REDUNDANT
-  // A redundant temperature sensor
-  typedef struct RedundantTempInfo : public TempInfo {
-    temp_info_t* target;
-  } redundant_info_t;
-#endif
-
-// A PWM heater with temperature sensor
-typedef struct HeaterInfo : public TempInfo {
-  celsius_t target;
-  uint8_t soft_pwm_amount;
-} heater_info_t;
-
-// A heater with PID stabilization
-template<typename T>
-struct PIDHeaterInfo : public HeaterInfo {
-  T pid;  // Initialized by settings.load()
-};
-
-// Temperature sensor read value ranges
 
 #if HAS_AUTO_FAN || HAS_FANCHECK
   #define HAS_FAN_LOGIC 1
@@ -272,10 +135,10 @@ class FanControl {
       static uint8_t fan_speed[FAN_COUNT];
       #define FANS_LOOP(I) LOOP_L_N(I, FAN_COUNT)
 
-      static void set_fan_speed(const uint8_t fan, const uint16_t speed);
+      static void fanSpeedSet(const uint8_t fan, const uint16_t speed);
 
       #if ENABLED(REPORT_FAN_CHANGE)
-        static void report_fan_speed(const uint8_t fan);
+        static void fanSpeedReport(const uint8_t fan);
       #endif
 
       #if EITHER(PROBING_FANS_OFF, ADVANCED_PAUSE_FANS_PAUSE)
@@ -303,18 +166,18 @@ class FanControl {
       #if ENABLED(EXTRA_FAN_SPEED)
         typedef struct { uint8_t saved, speed; } extra_fan_t;
         static extra_fan_t extra_fan_speed[FAN_COUNT];
-        static void set_temp_fan_speed(const uint8_t fan, const uint16_t command_or_speed);
+        static void fanSpeedOverride(const uint8_t fan, const uint16_t command_or_speed);
       #endif
 
       #if EITHER(PROBING_FANS_OFF, ADVANCED_PAUSE_FANS_PAUSE)
-        void set_fans_paused(const bool p);
+        void fanPause(const bool p);
       #endif
 
     #endif // HAS_FAN
 
     static void zero_fan_speeds() {
       #if HAS_FAN
-        FANS_LOOP(i) set_fan_speed(i, 0);
+        FANS_LOOP(i) fanSpeedSet(i, 0);
       #endif
     }
 
@@ -322,4 +185,4 @@ class FanControl {
   private:
 };
 
-extern FanControl thermalManager;
+extern FanControl fanManager;

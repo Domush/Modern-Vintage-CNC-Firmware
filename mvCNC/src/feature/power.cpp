@@ -105,15 +105,15 @@ void Power::power_off() {
 
   bool Power::is_cooling_needed() {
     #if HAS_HOTEND && AUTO_POWER_E_TEMP
-      HOTEND_LOOP() if (thermalManager.degHotend(e) >= (AUTO_POWER_E_TEMP)) return true;
+      HOTEND_LOOP() if (fanManager.degHotend(e) >= (AUTO_POWER_E_TEMP)) return true;
     #endif
 
     #if HAS_HEATED_CHAMBER && AUTO_POWER_CHAMBER_TEMP
-      if (thermalManager.degChamber() >= (AUTO_POWER_CHAMBER_TEMP)) return true;
+      if (fanManager.degChamber() >= (AUTO_POWER_CHAMBER_TEMP)) return true;
     #endif
 
     #if HAS_COOLER && AUTO_POWER_COOLER_TEMP
-      if (thermalManager.degCooler() >= (AUTO_POWER_COOLER_TEMP)) return true;
+      if (fanManager.degCooler() >= (AUTO_POWER_COOLER_TEMP)) return true;
     #endif
 
     return false;
@@ -166,28 +166,28 @@ void Power::power_off() {
     if (jobIsOngoing() || jobIsPaused()) return true;
 
     #if ENABLED(AUTO_POWER_FANS)
-      FANS_LOOP(i) if (thermalManager.fan_speed[i]) return true;
+      FANS_LOOP(i) if (fanManager.fan_speed[i]) return true;
     #endif
 
     #if ENABLED(AUTO_POWER_E_FANS)
-      HOTEND_LOOP() if (thermalManager.autofan_speed[e]) return true;
+      HOTEND_LOOP() if (fanManager.autofan_speed[e]) return true;
     #endif
 
     #if BOTH(USE_CONTROLLER_FAN, AUTO_POWER_CONTROLLERFAN)
       if (controllerFan.state()) return true;
     #endif
 
-    if (TERN0(AUTO_POWER_CHAMBER_FAN, thermalManager.chamberfan_speed))
+    if (TERN0(AUTO_POWER_CHAMBER_FAN, fanManager.chamberfan_speed))
       return true;
 
-    if (TERN0(AUTO_POWER_COOLER_FAN, thermalManager.coolerfan_speed))
+    if (TERN0(AUTO_POWER_COOLER_FAN, fanManager.coolerfan_speed))
       return true;
 
     #if HAS_HOTEND
-      HOTEND_LOOP() if (thermalManager.degTargetHotend(e) > 0 || thermalManager.temp_hotend[e].soft_pwm_amount > 0) return true;
+      HOTEND_LOOP() if (fanManager.degTargetHotend(e) > 0 || fanManager.temp_hotend[e].soft_pwm_amount > 0) return true;
     #endif
 
-    if (TERN0(HAS_HEATED_BED, thermalManager.degTargetBed() > 0 || thermalManager.temp_bed.soft_pwm_amount > 0)) return true;
+    if (TERN0(HAS_HEATED_BED, fanManager.degTargetBed() > 0 || fanManager.temp_bed.soft_pwm_amount > 0)) return true;
 
     return is_cooling_needed();
   }

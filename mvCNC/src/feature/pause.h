@@ -49,11 +49,6 @@ enum PauseMessage : char {
 
 extern uint8_t did_pause_print;
 
-#define DXC_PARAMS OPTARG(DUAL_X_CARRIAGE, const int8_t DXC_ext=-1)
-#define DXC_ARGS   OPTARG(DUAL_X_CARRIAGE, const int8_t DXC_ext)
-#define DXC_PASS   OPTARG(DUAL_X_CARRIAGE, DXC_ext)
-#define DXC_SAY    OPTARG(DUAL_X_CARRIAGE, " dxc:", int(DXC_ext))
-
 // Pause the print. If unload_length is set, do a Filament Unload
 bool pause_print(
   const_float_t   retract,                                    // (mm) Retraction length

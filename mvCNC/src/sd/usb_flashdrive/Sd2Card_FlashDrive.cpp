@@ -45,7 +45,7 @@
 
   // Workarounds for keeping mvCNC's watchdog timer from barking...
   void mvcnc_yield() {
-    thermalManager.manage_heater();
+    fanManager.manage_heater();
   }
   #define SYSTEM_OR_SPECIAL_YIELD(...) mvcnc_yield();
   #define delay(x) safe_delay(x)

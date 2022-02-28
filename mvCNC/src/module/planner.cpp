@@ -1184,7 +1184,7 @@ void Planner::modify_nominal_speeds(float nominal_speed_modifier/* = 1.0f*/) {
     #endif
 
     #if ENABLED(FAN_SOFT_PWM)
-      #define _FAN_SET(F) thermalManager.soft_pwm_amount_fan[F] = CALC_FAN_SPEED(F);
+      #define _FAN_SET(F) fanManager.soft_pwm_amount_fan[F] = CALC_FAN_SPEED(F);
     #else
       #define _FAN_SET(F) set_pwm_duty(pin_t(FAN##F##_PIN), CALC_FAN_SPEED(F));
     #endif
@@ -1244,7 +1244,7 @@ void Planner::check_axes_activity() {
 
     #if HAS_TAIL_FAN_SPEED
       FANS_LOOP(i) {
-        const uint8_t spd = thermalManager.scaledFanSpeed(i, block->fan_speed[i]);
+        const uint8_t spd = fanManager.scaledFanSpeed(i, block->fan_speed[i]);
         if (tail_fan_speed[i] != spd) {
           fans_need_update = true;
           tail_fan_speed[i] = spd;
@@ -1273,7 +1273,7 @@ void Planner::check_axes_activity() {
 
     #if HAS_TAIL_FAN_SPEED
       FANS_LOOP(i) {
-        const uint8_t spd = thermalManager.scaledFanSpeed(i);
+        const uint8_t spd = fanManager.scaledFanSpeed(i);
         if (tail_fan_speed[i] != spd) {
           fans_need_update = true;
           tail_fan_speed[i] = spd;
@@ -1768,7 +1768,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
   TERN_(HAS_CUTTER, block->cutter_power = cutter.power);
 
   #if HAS_FAN
-    FANS_LOOP(i) block->fan_speed[i] = thermalManager.fan_speed[i];
+    FANS_LOOP(i) block->fan_speed[i] = fanManager.fan_speed[i];
   #endif
 
   #if ENABLED(AUTO_POWER_CONTROL)
@@ -2330,7 +2330,7 @@ void Planner::buffer_sync_block(TERN_(LASER_SYNCHRONOUS_M106_M107, uint8_t sync_
   block->position = position;
 
   #if BOTH(HAS_FAN, LASER_SYNCHRONOUS_M106_M107)
-    FANS_LOOP(i) block->fan_speed[i] = thermalManager.fan_speed[i];
+    FANS_LOOP(i) block->fan_speed[i] = fanManager.fan_speed[i];
   #endif
 
   // If this is the first added movement, reload the delay, otherwise, cancel it.
@@ -2500,7 +2500,7 @@ bool Planner::buffer_line(const xyze_pos_t &cart, const_feedRate_t fr_mm_s, cons
     block->flag = BLOCK_FLAG_IS_PAGE;
 
     #if HAS_FAN
-      FANS_LOOP(i) block->fan_speed[i] = thermalManager.fan_speed[i];
+      FANS_LOOP(i) block->fan_speed[i] = fanManager.fan_speed[i];
     #endif
 
     E_TERN_(block->extruder = extruder);

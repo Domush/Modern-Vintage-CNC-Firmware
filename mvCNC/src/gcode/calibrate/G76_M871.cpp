@@ -77,14 +77,14 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
       const millis_t ms = millis();
       if (ELAPSED(ms, ntr)) {
         ntr = ms + 1000;
-        thermalManager.print_heater_states(active_extruder);
+        fanManager.print_heater_states(active_extruder);
       }
       return (timeout && ELAPSED(ms, timeout));
     };
 
     auto wait_for_temps = [&](const celsius_t tb, const celsius_t tp, millis_t &ntr, const millis_t timeout=0) {
       say_waiting_for(); SERIAL_ECHOLNPGM("bed and probe temperature.");
-      while (thermalManager.wholeDegBed() != tb || thermalManager.wholeDegProbe() > tp)
+      while (fanManager.wholeDegBed() != tb || fanManager.wholeDegProbe() > tp)
         if (report_temps(ntr, timeout)) return true;
       return false;
     };
@@ -156,14 +156,14 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
                 target_probe = PTC_PROBE_TEMP;
 
       say_waiting_for(); SERIAL_ECHOLNPGM(" cooling.");
-      while (thermalManager.wholeDegBed() > target_bed || thermalManager.wholeDegProbe() > target_probe)
+      while (fanManager.wholeDegBed() > target_bed || fanManager.wholeDegProbe() > target_probe)
         report_temps(next_temp_report);
 
       // Disable leveling so it won't mess with us
       TERN_(HAS_LEVELING, set_bed_leveling_enabled(false));
 
       for (uint8_t idx = 0; idx <= PTC_BED_COUNT; idx++) {
-        thermalManager.setTargetBed(target_bed);
+        fanManager.setTargetBed(target_bed);
 
         report_targets(target_bed, target_probe);
 
@@ -180,7 +180,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
         do_blocking_move_to(noz_pos_xyz);
         say_waiting_for_probe_heating();
         SERIAL_EOL();
-        while (thermalManager.wholeDegProbe() < target_probe)
+        while (fanManager.wholeDegProbe() < target_probe)
           report_temps(next_temp_report);
 
         const float measured_z = g76_probe(TSI_BED, target_bed, noz_pos_xyz);
@@ -198,7 +198,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
       }
 
       // Cleanup
-      thermalManager.setTargetBed(0);
+      fanManager.setTargetBed(0);
       TERN_(HAS_LEVELING, set_bed_leveling_enabled(true));
     } // do_bed_cal
 
@@ -213,7 +213,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
 
       // Initialize temperatures
       const celsius_t target_bed = BED_MAX_TARGET;
-      thermalManager.setTargetBed(target_bed);
+      fanManager.setTargetBed(target_bed);
 
       celsius_t target_probe = PTC_PROBE_START;
 
@@ -233,7 +233,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
         say_waiting_for_probe_heating();
         SERIAL_ECHOLNPGM(" Bed:", target_bed, " Probe:", target_probe);
         const millis_t probe_timeout_ms = millis() + SEC_TO_MS(900UL);
-        while (thermalManager.degProbe() < target_probe) {
+        while (fanManager.degProbe() < target_probe) {
           if (report_temps(next_temp_report, probe_timeout_ms)) {
             SERIAL_ECHOLNPGM("!Probe heating timed out.");
             timeout = true;
@@ -254,7 +254,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
       SERIAL_ECHOLNPGM(" probe.");
 
       // Cleanup
-      thermalManager.setTargetBed(0);
+      fanManager.setTargetBed(0);
       TERN_(HAS_LEVELING, set_bed_leveling_enabled(true));
 
       SERIAL_ECHOLNPGM("Final compensation values:");

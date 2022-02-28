@@ -25,7 +25,7 @@ void ControllerFan::setup() {
   init();
 }
 
-void ControllerFan::set_fan_speed(const uint8_t s) {
+void ControllerFan::fanSpeedSet(const uint8_t s) {
   speed = s < (CONTROLLERFAN_SPEED_MIN) ? 0 : s; // Fan OFF below minimum
 }
 
@@ -42,20 +42,20 @@ void ControllerFan::update() {
     //   - TEMP_SENSOR_BOARD is reporting >= CONTROLLER_FAN_MIN_BOARD_TEMP
     const ena_mask_t axis_mask = TERN(CONTROLLER_FAN_USE_Z_ONLY, _BV(Z_AXIS), (ena_mask_t)~TERN0(CONTROLLER_FAN_IGNORE_Z, _BV(Z_AXIS)));
     if ( (stepper.axis_enabled.bits & axis_mask)
-      || TERN0(HAS_HEATED_BED, thermalManager.temp_bed.soft_pwm_amount > 0)
-      || TERN0(HAS_CONTROLLER_FAN_MIN_BOARD_TEMP, thermalManager.wholeDegBoard() >= CONTROLLER_FAN_MIN_BOARD_TEMP)
+      || TERN0(HAS_HEATED_BED, fanManager.temp_bed.soft_pwm_amount > 0)
+      || TERN0(HAS_CONTROLLER_FAN_MIN_BOARD_TEMP, fanManager.wholeDegBoard() >= CONTROLLER_FAN_MIN_BOARD_TEMP)
     ) lastMotorOn = ms; //... set time to NOW so the fan will turn on
 
     // Fan Settings. Set fan > 0:
     //  - If AutoMode is on and steppers have been enabled for CONTROLLERFAN_IDLE_TIME seconds.
     //  - If System is on idle and idle fan speed settings is activated.
-    set_fan_speed(
+    fanSpeedSet(
       settings.auto_mode && lastMotorOn && PENDING(ms, lastMotorOn + SEC_TO_MS(settings.duration))
       ? settings.active_speed : settings.idle_speed
     );
 
     #if ENABLED(FAN_SOFT_PWM)
-      thermalManager.soft_pwm_controller_speed = speed;
+      fanManager.soft_pwm_controller_speed = speed;
     #else
       if (PWM_PIN(CONTROLLER_FAN_PIN))
         set_pwm_duty(pin_t(CONTROLLER_FAN_PIN), speed);

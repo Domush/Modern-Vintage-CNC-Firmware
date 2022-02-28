@@ -365,7 +365,7 @@ void DGUSScreenHandler::ScreenChangeHookIfIdle(DGUS_VP_Variable &var, void *val_
 }
 
 void DGUSScreenHandler::HandleAllHeatersOff(DGUS_VP_Variable &var, void *val_ptr) {
-  thermalManager.disable_all_heaters();
+  fanManager.disable_all_heaters();
   ForceCompleteUpdate(); // hint to send all data.
 }
 
@@ -378,22 +378,22 @@ void DGUSScreenHandler::HandleTemperatureChanged(DGUS_VP_Variable &var, void *va
     #if HAS_HOTEND
       case VP_T_E0_Set:
         NOMORE(newvalue, HEATER_0_MAXTEMP);
-        thermalManager.setTargetHotend(newvalue, 0);
-        acceptedvalue = thermalManager.degTargetHotend(0);
+        fanManager.setTargetHotend(newvalue, 0);
+        acceptedvalue = fanManager.degTargetHotend(0);
         break;
     #endif
     #if TOOL_CHANGE_SUPPORT
       case VP_T_E1_Set:
         NOMORE(newvalue, HEATER_1_MAXTEMP);
-        thermalManager.setTargetHotend(newvalue, 1);
-        acceptedvalue = thermalManager.degTargetHotend(1);
+        fanManager.setTargetHotend(newvalue, 1);
+        acceptedvalue = fanManager.degTargetHotend(1);
         break;
     #endif
     #if HAS_HEATED_BED
       case VP_T_Bed_Set:
         NOMORE(newvalue, BED_MAXTEMP);
-        thermalManager.setTargetBed(newvalue);
-        acceptedvalue = thermalManager.degTargetBed();
+        fanManager.setTargetBed(newvalue);
+        acceptedvalue = fanManager.degTargetBed();
         break;
     #endif
   }
@@ -591,7 +591,7 @@ void DGUSScreenHandler::HandleHeaterControl(DGUS_VP_Variable &var, void *val_ptr
         case VP_E1_BED_PREHEAT: TERN_(TOOL_CHANGE_SUPPORT, ui.preheat_all(1)); break;
       }
       case 7: break; // Custom preheat
-      case 9: thermalManager.cooldown(); break; // Cool down
+      case 9: fanManager.cooldown(); break; // Cool down
     }
 
     // Go to the preheat screen to show the heating progress

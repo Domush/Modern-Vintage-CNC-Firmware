@@ -171,7 +171,7 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
     TERN_(ADVANCED_PAUSE_FEATURE, pause_menu_response = PAUSE_RESPONSE_RESUME_PRINT);
   }
   else if (DIALOG_IS(TYPE_FILAMENT_LOAD_HEAT, TYPE_FILAMENT_UNLOAD_HEAT, TYPE_FILAMENT_HEAT_LOAD_COMPLETED, TYPE_FILAMENT_HEAT_UNLOAD_COMPLETED)) {
-    thermalManager.setTargetHotend(uiCfg.hotendTargetTempBak, uiCfg.extruderIndex);
+    fanManager.setTargetHotend(uiCfg.hotendTargetTempBak, uiCfg.extruderIndex);
     goto_previous_ui();
   }
   else if (DIALOG_IS(TYPE_FILAMENT_LOADING, TYPE_FILAMENT_UNLOADING)) {
@@ -183,7 +183,7 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
     uiCfg.filament_loading_time_cnt    = 0;
     uiCfg.filament_unloading_time_flg  = false;
     uiCfg.filament_unloading_time_cnt  = 0;
-    thermalManager.setTargetHotend(uiCfg.hotendTargetTempBak, uiCfg.extruderIndex);
+    fanManager.setTargetHotend(uiCfg.hotendTargetTempBak, uiCfg.extruderIndex);
     goto_previous_ui();
   }
   else {
@@ -452,7 +452,7 @@ void lv_draw_dialog(uint8_t type) {
 
 void filament_sprayer_temp() {
   char buf[20] = {0};
-  sprintf(buf, preheat_menu.value_state, thermalManager.wholeDegHotend(uiCfg.extruderIndex), thermalManager.degTargetHotend(uiCfg.extruderIndex));
+  sprintf(buf, preheat_menu.value_state, fanManager.wholeDegHotend(uiCfg.extruderIndex), fanManager.degTargetHotend(uiCfg.extruderIndex));
 
   strcpy(public_buf_l, uiCfg.extruderIndex < 1 ? extrude_menu.ext1 : extrude_menu.ext2);
   strcat_P(public_buf_l, PSTR(": "));
@@ -488,7 +488,7 @@ void filament_dialog_handle() {
   }
 
   if (uiCfg.filament_load_heat_flg) {
-    const celsius_t diff = thermalManager.wholeDegHotend(uiCfg.extruderIndex) - gCfgItems.filament_limit_temp;
+    const celsius_t diff = fanManager.wholeDegHotend(uiCfg.extruderIndex) - gCfgItems.filament_limit_temp;
     if (ABS(diff) < 2 || diff > 0) {
       uiCfg.filament_load_heat_flg = false;
       lv_clear_dialog();
@@ -504,7 +504,7 @@ void filament_dialog_handle() {
   }
 
   if (uiCfg.filament_unload_heat_flg) {
-    const celsius_t diff = thermalManager.wholeDegHotend(uiCfg.extruderIndex) - gCfgItems.filament_limit_temp;
+    const celsius_t diff = fanManager.wholeDegHotend(uiCfg.extruderIndex) - gCfgItems.filament_limit_temp;
     if (ABS(diff) < 2 || diff > 0) {
       uiCfg.filament_unload_heat_flg = false;
       lv_clear_dialog();

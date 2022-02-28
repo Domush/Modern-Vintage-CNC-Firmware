@@ -172,7 +172,7 @@ void AnycubicTFTClass::OnUserConfirmRequired(const char * const msg) {
     /**
      * Need to handle the process of following states
      * "Spindle Parked"
-     * "Load Filament"
+     * "Change Bit"
      * "Filament Purging..."
      * "HeaterTimeout"
      * "Reheat finished."
@@ -185,7 +185,7 @@ void AnycubicTFTClass::OnUserConfirmRequired(const char * const msg) {
       // enable continue button
       SENDLINE_DBG_PGM("J18", "TFT Serial Debug: UserConfirm SD print paused done... J18");
     }
-    else if (strcmp_P(msg, PSTR("Load Filament")) == 0) {
+    else if (strcmp_P(msg, PSTR("Change Bit")) == 0) {
       mediaPrintingState = AMPRINTSTATE_PAUSED;
       mediaPauseState    = AMPAUSESTATE_FILAMENT_OUT;
       // enable continue button

@@ -713,8 +713,8 @@ void _draw_xyz_position(const bool force) {
 void update_variable() {
   #if HAS_HOTEND
     static celsius_t _hotendtemp = 0, _hotendtarget = 0;
-    const celsius_t hc = thermalManager.wholeDegHotend(0),
-                    ht = thermalManager.degTargetHotend(0);
+    const celsius_t hc = fanManager.wholeDegHotend(0),
+                    ht = fanManager.degTargetHotend(0);
     const bool _new_hotend_temp = _hotendtemp != hc,
                _new_hotend_target = _hotendtarget != ht;
     if (_new_hotend_temp) _hotendtemp = hc;
@@ -722,8 +722,8 @@ void update_variable() {
   #endif
   #if HAS_HEATED_BED
     static celsius_t _bedtemp = 0, _bedtarget = 0;
-    const celsius_t bc = thermalManager.wholeDegBed(),
-                    bt = thermalManager.degTargetBed();
+    const celsius_t bc = fanManager.wholeDegBed(),
+                    bt = fanManager.degTargetBed();
     const bool _new_bed_temp = _bedtemp != bc,
                _new_bed_target = _bedtarget != bt;
     if (_new_bed_temp) _bedtemp = bc;
@@ -731,8 +731,8 @@ void update_variable() {
   #endif
   #if HAS_FAN
     static uint8_t _fanspeed = 0;
-    const bool _new_fanspeed = _fanspeed != thermalManager.fan_speed[0];
-    if (_new_fanspeed) _fanspeed = thermalManager.fan_speed[0];
+    const bool _new_fanspeed = _fanspeed != fanManager.fan_speed[0];
+    if (_new_fanspeed) _fanspeed = fanManager.fan_speed[0];
   #endif
 
   if (checkkey == Menu && (CurrentMenu == TuneMenu || CurrentMenu == TemperatureMenu)) {
@@ -781,7 +781,7 @@ void update_variable() {
 
   #if HAS_FAN
     if (_new_fanspeed) {
-      _fanspeed = thermalManager.fan_speed[0];
+      _fanspeed = fanManager.fan_speed[0];
       DWINUI::Draw_Int(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 195 + 2 * STAT_CHR_W, 384, _fanspeed);
     }
   #endif
@@ -1002,9 +1002,9 @@ void Draw_Status_Area(const bool with_update) {
 
   #if HAS_HOTEND
     DWINUI::Draw_Icon(ICON_HotendTemp, 10, 383);
-    DWINUI::Draw_Int(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 28, 384, thermalManager.wholeDegHotend(0));
+    DWINUI::Draw_Int(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 28, 384, fanManager.wholeDegHotend(0));
     DWINUI::Draw_String(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 25 + 3 * STAT_CHR_W + 5, 384, F("/"));
-    DWINUI::Draw_Int(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 25 + 4 * STAT_CHR_W + 6, 384, thermalManager.degTargetHotend(0));
+    DWINUI::Draw_Int(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 25 + 4 * STAT_CHR_W + 6, 384, fanManager.degTargetHotend(0));
 
     DWINUI::Draw_Icon(ICON_StepE, 112, 417);
     DWINUI::Draw_Int(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 116 + 2 * STAT_CHR_W, 417, planner.flow_percentage[0]);
@@ -1013,9 +1013,9 @@ void Draw_Status_Area(const bool with_update) {
 
   #if HAS_HEATED_BED
     DWINUI::Draw_Icon(ICON_BedTemp, 10, 416);
-    DWINUI::Draw_Int(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 28, 417, thermalManager.wholeDegBed());
+    DWINUI::Draw_Int(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 28, 417, fanManager.wholeDegBed());
     DWINUI::Draw_String(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 25 + 3 * STAT_CHR_W + 5, 417, F("/"));
-    DWINUI::Draw_Int(true, true, 0, DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 25 + 4 * STAT_CHR_W + 6, 417, thermalManager.degTargetBed());
+    DWINUI::Draw_Int(true, true, 0, DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 25 + 4 * STAT_CHR_W + 6, 417, fanManager.degTargetBed());
   #endif
 
   DWINUI::Draw_Icon(ICON_Speed, 113, 383);
@@ -1024,7 +1024,7 @@ void Draw_Status_Area(const bool with_update) {
 
   #if HAS_FAN
     DWINUI::Draw_Icon(ICON_FanSpeed, 187, 383);
-    DWINUI::Draw_Int(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 195 + 2 * STAT_CHR_W, 384, thermalManager.fan_speed[0]);
+    DWINUI::Draw_Int(DWIN_FONT_STAT, HMI_data.Indicator_Color, HMI_data.Background_Color, 3, 195 + 2 * STAT_CHR_W, 384, fanManager.fan_speed[0]);
   #endif
 
   #if HAS_ZOFFSET_ITEM
@@ -1243,7 +1243,7 @@ void HMI_SelectFile() {
         // All fans on for Ender 3 v2 ?
         // The slicer should manage this for us.
         //for (uint8_t i = 0; i < FAN_COUNT; i++)
-        //  thermalManager.fan_speed[i] = 255;
+        //  fanManager.fan_speed[i] = 255;
       #endif
 
       DWIN_Print_Started(true);
@@ -1293,7 +1293,7 @@ void HMI_Printing() {
               if (resume_hotend_temp) sprintf_P(&cmd[strlen(cmd)], PSTR("M109 S%i\n"), resume_hotend_temp);
             #endif
             #if HAS_FAN
-              if (resume_fan) thermalManager.fan_speed[0] = resume_fan;
+              if (resume_fan) fanManager.fan_speed[0] = resume_fan;
             #endif
             strcat_P(cmd, M24_STR);
             queue.inject(cmd);
@@ -1493,11 +1493,11 @@ void EachMomentUpdate() {
   if (HMI_flag.pause_action && jobIsPaused() && !planner.has_blocks_queued()) {
     HMI_flag.pause_action = false;
     #if ENABLED(PAUSE_HEAT)
-      TERN_(HAS_HOTEND, resume_hotend_temp = sdprint ? thermalManager.degTargetHotend(0) : thermalManager.wholeDegHotend(0));
-      TERN_(HAS_HEATED_BED, resume_bed_temp = sdprint ? thermalManager.degTargetBed() : thermalManager.wholeDegBed());
-      TERN_(HAS_FAN, resume_fan = thermalManager.fan_speed[0]);
+      TERN_(HAS_HOTEND, resume_hotend_temp = sdprint ? fanManager.degTargetHotend(0) : fanManager.wholeDegHotend(0));
+      TERN_(HAS_HEATED_BED, resume_bed_temp = sdprint ? fanManager.degTargetBed() : fanManager.wholeDegBed());
+      TERN_(HAS_FAN, resume_fan = fanManager.fan_speed[0]);
     #endif
-    IF_DISABLED(ADVANCED_PAUSE_FEATURE, thermalManager.disable_all_heaters());
+    IF_DISABLED(ADVANCED_PAUSE_FEATURE, fanManager.disable_all_heaters());
     IF_DISABLED(PARK_HEAD_ON_PAUSE, queue.inject(F("G1 F1200 X0 Y0")));
   }
 
@@ -1786,7 +1786,7 @@ void DWIN_Print_Started(const bool sd) {
 // Ended CNC job
 void DWIN_Print_Finished() {
   if (checkkey == CNCProcess || jobIsActive()) {
-    thermalManager.cooldown();
+    fanManager.cooldown();
     HMI_flag.print_finish = true;
   }
 }
@@ -2138,7 +2138,7 @@ void SetPFloatOnClick(const float lo, const float hi, uint8_t dp, void (*Apply)(
 void RebootCNC() {
   dwin_abort_flag = true;
   wait_for_heatup = wait_for_user = false;    // Stop waiting for heating/user
-  thermalManager.disable_all_heaters();
+  fanManager.disable_all_heaters();
   planner.finish_and_disable();
   DWIN_RebootScreen();
   HAL_reboot();
@@ -2200,7 +2200,7 @@ bool cnc_busy() {
   void DoPreheat2() { ui.preheat_all(2); }
 #endif
 
-void DoCoolDown() { thermalManager.cooldown(); }
+void DoCoolDown() { fanManager.cooldown(); }
 
 void SetLanguage() {
   HMI_ToggleLanguage();
@@ -2229,7 +2229,7 @@ void SetMoveZ() { HMI_value.axis = Z_AXIS; SetPFloatOnClick(Z_MIN_POS, Z_MAX_POS
 #if HAS_HOTEND
   void SetMoveE() {
     #if ENABLED(PREVENT_COLD_EXTRUSION)
-      if (thermalManager.tooColdToExtrude(0)) {
+      if (fanManager.tooColdToExtrude(0)) {
         Popup_Window_ETempTooLow();
         return;
       }
@@ -2265,7 +2265,7 @@ void SetPID(celsius_t t, heater_id_t h) {
   );
   gcode.process_subcommands_now(cmd);
   planner.synchronize();
-  thermalManager.PID_autotune(t, h, HMI_data.PidCycles, true);
+  fanManager.PID_autotune(t, h, HMI_data.PidCycles, true);
 }
 #if HAS_HOTEND
   void HotendPID() { SetPID(HMI_data.HotendPidT, H_E0); }
@@ -2383,7 +2383,7 @@ void SetPID(celsius_t t, heater_id_t h) {
 #endif
 
 #if ENABLED(PREVENT_COLD_EXTRUSION)
-  void ApplyExtMinT() { thermalManager.extrude_min_temp = HMI_data.ExtMinT; thermalManager.allow_cold_extrude = (HMI_data.ExtMinT == 0); }
+  void ApplyExtMinT() { fanManager.extrude_min_temp = HMI_data.ExtMinT; fanManager.allow_cold_extrude = (HMI_data.ExtMinT == 0); }
   void SetExtMinT() { SetPIntOnClick(MIN_ETEMP, MAX_ETEMP, ApplyExtMinT); }
 #endif
 
@@ -2422,18 +2422,18 @@ void DWIN_ApplyColor() {
 void SetSpeed() { SetPIntOnClick(MIN_PRINT_SPEED, MAX_PRINT_SPEED); }
 
 #if HAS_HOTEND
-  void ApplyHotendTemp() { thermalManager.setTargetHotend(HMI_value.Value, 0); }
-  void SetHotendTemp() { SetIntOnClick(MIN_ETEMP, MAX_ETEMP, thermalManager.degTargetHotend(0), ApplyHotendTemp); }
+  void ApplyHotendTemp() { fanManager.setTargetHotend(HMI_value.Value, 0); }
+  void SetHotendTemp() { SetIntOnClick(MIN_ETEMP, MAX_ETEMP, fanManager.degTargetHotend(0), ApplyHotendTemp); }
 #endif
 
 #if HAS_HEATED_BED
-  void ApplyBedTemp() { thermalManager.setTargetBed(HMI_value.Value); }
-  void SetBedTemp() { SetIntOnClick(BED_MINTEMP, BED_MAX_TARGET, thermalManager.degTargetBed(), ApplyBedTemp); }
+  void ApplyBedTemp() { fanManager.setTargetBed(HMI_value.Value); }
+  void SetBedTemp() { SetIntOnClick(BED_MINTEMP, BED_MAX_TARGET, fanManager.degTargetBed(), ApplyBedTemp); }
 #endif
 
 #if HAS_FAN
-  void ApplyFanSpeed() { thermalManager.set_fan_speed(0, HMI_value.Value); }
-  void SetFanSpeed() { SetIntOnClick(0, 255, thermalManager.fan_speed[0], ApplyFanSpeed); }
+  void ApplyFanSpeed() { fanManager.fanSpeedSet(0, HMI_value.Value); }
+  void SetFanSpeed() { SetIntOnClick(0, 255, fanManager.fan_speed[0], ApplyFanSpeed); }
 #endif
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
@@ -2619,11 +2619,11 @@ void SetStepsZ() { HMI_value.axis = Z_AXIS, SetPFloatOnClick( MIN_STEP, MAX_STEP
   void SetKp() { SetPFloatOnClick(0, 1000, 2); }
   void ApplyPIDi() {
     *HMI_value.P_Float = scalePID_i(HMI_value.Value / POW(10, 2));
-    thermalManager.updatePID();
+    fanManager.updatePID();
   }
   void ApplyPIDd() {
     *HMI_value.P_Float = scalePID_d(HMI_value.Value / POW(10, 2));
-    thermalManager.updatePID();
+    fanManager.updatePID();
   }
   void SetKi() {
     HMI_value.P_Float = (float*)static_cast<MenuItemPtrClass*>(CurrentMenu->SelectedItem())->value;
@@ -3590,13 +3590,13 @@ void Draw_Tune_Menu() {
     #endif
     EDIT_ITEM(ICON_Speed, GET_TEXT_F(MSG_SPEED), onDrawSpeedItem, SetSpeed, &feedrate_percentage);
     #if HAS_HOTEND
-      HotendTargetItem = EDIT_ITEM(ICON_HotendTemp, GET_TEXT_F(MSG_UBL_SET_TEMP_HOTEND), onDrawHotendTemp, SetHotendTemp, &thermalManager.temp_hotend[0].target);
+      HotendTargetItem = EDIT_ITEM(ICON_HotendTemp, GET_TEXT_F(MSG_UBL_SET_TEMP_HOTEND), onDrawHotendTemp, SetHotendTemp, &fanManager.temp_hotend[0].target);
     #endif
     #if HAS_HEATED_BED
-      BedTargetItem = EDIT_ITEM(ICON_BedTemp, GET_TEXT_F(MSG_UBL_SET_TEMP_BED), onDrawBedTemp, SetBedTemp, &thermalManager.temp_bed.target);
+      BedTargetItem = EDIT_ITEM(ICON_BedTemp, GET_TEXT_F(MSG_UBL_SET_TEMP_BED), onDrawBedTemp, SetBedTemp, &fanManager.temp_bed.target);
     #endif
     #if HAS_FAN
-      FanSpeedItem = EDIT_ITEM(ICON_FanSpeed, GET_TEXT_F(MSG_FAN_SPEED), onDrawFanSpeed, SetFanSpeed, &thermalManager.fan_speed[0]);
+      FanSpeedItem = EDIT_ITEM(ICON_FanSpeed, GET_TEXT_F(MSG_FAN_SPEED), onDrawFanSpeed, SetFanSpeed, &fanManager.fan_speed[0]);
     #endif
     #if HAS_ZOFFSET_ITEM && EITHER(HAS_BED_PROBE, BABYSTEPPING)
       EDIT_ITEM(ICON_Zoffset, GET_TEXT_F(MSG_ZPROBE_ZOFFSET), onDrawZOffset, SetZOffset, &BABY_Z_VAR);
@@ -3734,13 +3734,13 @@ void Draw_Temperature_Menu() {
     DWINUI::MenuItemsPrepare(7);
     MENU_ITEM(ICON_Back, GET_TEXT_F(MSG_BUTTON_BACK), onDrawBack, Draw_Control_Menu);
     #if HAS_HOTEND
-      HotendTargetItem = EDIT_ITEM(ICON_SetEndTemp, GET_TEXT_F(MSG_UBL_SET_TEMP_HOTEND), onDrawHotendTemp, SetHotendTemp, &thermalManager.temp_hotend[0].target);
+      HotendTargetItem = EDIT_ITEM(ICON_SetEndTemp, GET_TEXT_F(MSG_UBL_SET_TEMP_HOTEND), onDrawHotendTemp, SetHotendTemp, &fanManager.temp_hotend[0].target);
     #endif
     #if HAS_HEATED_BED
-      BedTargetItem = EDIT_ITEM(ICON_SetBedTemp, GET_TEXT_F(MSG_UBL_SET_TEMP_BED), onDrawBedTemp, SetBedTemp, &thermalManager.temp_bed.target);
+      BedTargetItem = EDIT_ITEM(ICON_SetBedTemp, GET_TEXT_F(MSG_UBL_SET_TEMP_BED), onDrawBedTemp, SetBedTemp, &fanManager.temp_bed.target);
     #endif
     #if HAS_FAN
-      FanSpeedItem = EDIT_ITEM(ICON_FanSpeed, GET_TEXT_F(MSG_FAN_SPEED), onDrawFanSpeed, SetFanSpeed, &thermalManager.fan_speed[0]);
+      FanSpeedItem = EDIT_ITEM(ICON_FanSpeed, GET_TEXT_F(MSG_FAN_SPEED), onDrawFanSpeed, SetFanSpeed, &fanManager.fan_speed[0]);
     #endif
     #if HAS_HOTEND
       MENU_ITEM(ICON_SetPLAPreheat, F(PREHEAT_1_LABEL " Preheat Settings"), onDrawPLAPreheatSubMenu, Draw_Preheat1_Menu);
@@ -3837,9 +3837,9 @@ void Draw_Steps_Menu() {
       DWINUI::MenuItemsPrepare(8);
       MENU_ITEM(ICON_Back, GET_TEXT_F(MSG_BUTTON_BACK), onDrawMenuItem, Draw_AdvancedSettings_Menu);
       MENU_ITEM(ICON_PIDSpindle, F("Hotend PID"), onDrawMenuItem, HotendPID);
-      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KP), onDrawPFloat2Menu, SetKp, &thermalManager.temp_hotend[0].pid.Kp);
-      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KI), onDrawPIDi, SetKi, &thermalManager.temp_hotend[0].pid.Ki);
-      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KD), onDrawPIDd, SetKd, &thermalManager.temp_hotend[0].pid.Kd);
+      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KP), onDrawPFloat2Menu, SetKp, &fanManager.temp_hotend[0].pid.Kp);
+      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KI), onDrawPIDi, SetKi, &fanManager.temp_hotend[0].pid.Ki);
+      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KD), onDrawPIDd, SetKd, &fanManager.temp_hotend[0].pid.Kd);
       EDIT_ITEM(ICON_Temperature, GET_TEXT_F(MSG_TEMPERATURE), onDrawPIntMenu, SetHotendPidT, &HMI_data.HotendPidT);
       EDIT_ITEM(ICON_PIDcycles, GET_TEXT_F(MSG_PID_CYCLE), onDrawPIntMenu, SetPidCycles, &HMI_data.PidCycles);
       #if ENABLED(EEPROM_SETTINGS)
@@ -3860,9 +3860,9 @@ void Draw_Steps_Menu() {
       DWINUI::MenuItemsPrepare(8);
       MENU_ITEM(ICON_Back, GET_TEXT_F(MSG_BUTTON_BACK), onDrawMenuItem, Draw_AdvancedSettings_Menu);
       MENU_ITEM(ICON_PIDSpindle, F("Bed PID"), onDrawMenuItem,BedPID);
-      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KP), onDrawPFloat2Menu, SetKp, &thermalManager.temp_bed.pid.Kp);
-      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KI), onDrawPIDi, SetKi, &thermalManager.temp_bed.pid.Ki);
-      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KD), onDrawPIDd, SetKd, &thermalManager.temp_bed.pid.Kd);
+      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KP), onDrawPFloat2Menu, SetKp, &fanManager.temp_bed.pid.Kp);
+      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KI), onDrawPIDi, SetKi, &fanManager.temp_bed.pid.Ki);
+      EDIT_ITEM(ICON_PIDValue, F("Set" STR_KD), onDrawPIDd, SetKd, &fanManager.temp_bed.pid.Kd);
       EDIT_ITEM(ICON_Temperature, GET_TEXT_F(MSG_TEMPERATURE), onDrawPIntMenu, SetBedPidT, &HMI_data.BedPidT);
       EDIT_ITEM(ICON_PIDcycles, GET_TEXT_F(MSG_PID_CYCLE), onDrawPIntMenu, SetPidCycles, &HMI_data.PidCycles);
       #if ENABLED(EEPROM_SETTINGS)

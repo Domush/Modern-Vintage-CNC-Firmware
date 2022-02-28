@@ -204,24 +204,24 @@ void lv_draw_printing() {
 }
 
 void disp_ext_temp() {
-  sprintf(public_buf_l, printing_menu.temp1, thermalManager.wholeDegHotend(0), thermalManager.degTargetHotend(0));
+  sprintf(public_buf_l, printing_menu.temp1, fanManager.wholeDegHotend(0), fanManager.degTargetHotend(0));
   lv_label_set_text(labelExt1, public_buf_l);
 
   #if TOOL_CHANGE_SUPPORT
-    sprintf(public_buf_l, printing_menu.temp1, thermalManager.wholeDegHotend(1), thermalManager.degTargetHotend(1));
+    sprintf(public_buf_l, printing_menu.temp1, fanManager.wholeDegHotend(1), fanManager.degTargetHotend(1));
     lv_label_set_text(labelExt2, public_buf_l);
   #endif
 }
 
 void disp_bed_temp() {
   #if HAS_HEATED_BED
-    sprintf(public_buf_l, printing_menu.bed_temp, thermalManager.wholeDegBed(), thermalManager.degTargetBed());
+    sprintf(public_buf_l, printing_menu.bed_temp, fanManager.wholeDegBed(), fanManager.degTargetBed());
     lv_label_set_text(labelBed, public_buf_l);
   #endif
 }
 
 void disp_fan_speed() {
-  sprintf_P(public_buf_l, PSTR("%d%%"), (int)thermalManager.fanSpeedPercent(0));
+  sprintf_P(public_buf_l, PSTR("%d%%"), (int)fanManager.fanSpeedPercent(0));
   lv_label_set_text(labelFan, public_buf_l);
 }
 

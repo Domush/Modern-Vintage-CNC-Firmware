@@ -167,7 +167,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
     E_TERN_(info.active_extruder = active_extruder);
 
     #if HAS_FAN
-      COPY(info.fan_speed, thermalManager.fan_speed);
+      COPY(info.fan_speed, fanManager.fan_speed);
     #endif
 
     // Elapsed CNC job time
@@ -178,7 +178,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
 
     // Misc. mvCNC flags
     info.flag.dryrun               = !!(mvcnc_debug_flags & MVCNC_DEBUG_DRYRUN);
-    info.flag.allow_cold_extrusion = TERN0(PREVENT_COLD_EXTRUSION, thermalManager.allow_cold_extrude);
+    info.flag.allow_cold_extrusion = TERN0(PREVENT_COLD_EXTRUSION, fanManager.allow_cold_extrude);
 
     write();
   }
@@ -243,7 +243,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
     if (IS_SD_PRINTING()) save(true, zraise, ENABLED(BACKUP_POWER_SUPPLY));
 
     // Disable all heaters to reduce power loss
-    thermalManager.disable_all_heaters();
+    fanManager.disable_all_heaters();
 
     #if ENABLED(BACKUP_POWER_SUPPLY)
       // Do a hard-stop of the steppers (with possibly a loud thud)

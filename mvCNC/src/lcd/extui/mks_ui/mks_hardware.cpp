@@ -218,7 +218,7 @@
 
     void mks_hardware_test() {
       if (millis() % 2000 < 1000) {
-        thermalManager.fan_speed[0] = 255;
+        fanManager.fan_speed[0] = 255;
         WRITE(X_DIR_PIN, LOW);
         #if HAS_Y_AXIS
           WRITE(Y_DIR_PIN, LOW);
@@ -228,7 +228,7 @@
         #endif
       }
       else {
-        thermalManager.fan_speed[0] = 0;
+        fanManager.fan_speed[0] = 0;
         WRITE(X_DIR_PIN, HIGH);
         #if HAS_Y_AXIS
           WRITE(Y_DIR_PIN, HIGH);

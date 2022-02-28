@@ -17,7 +17,7 @@ void GcodeSuite::M105() {
 
   #if HAS_TEMP_SENSOR
 
-    thermalManager.print_heater_states(target_extruder OPTARG(HAS_TEMP_REDUNDANT, parser.boolval('R')));
+    fanManager.print_heater_states(target_extruder OPTARG(HAS_TEMP_REDUNDANT, parser.boolval('R')));
 
     SERIAL_EOL();
 

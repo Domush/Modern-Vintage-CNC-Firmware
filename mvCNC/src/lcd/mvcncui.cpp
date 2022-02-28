@@ -130,10 +130,10 @@ constexpr uint8_t epps = ENCODER_PULSES_PER_STEP;
 
   void mvCNCUI::apply_preheat(const uint8_t m, const uint8_t pmask, const uint8_t e/*=active_extruder*/) {
     const preheat_t &pre = material_preset[m];
-    TERN_(HAS_HOTEND,           if (TEST(pmask, PT_HOTEND))  thermalManager.setTargetHotend(pre.hotend_temp, e));
-    TERN_(HAS_HEATED_BED,       if (TEST(pmask, PT_BED))     thermalManager.setTargetBed(pre.bed_temp));
-    //TERN_(HAS_HEATED_CHAMBER, if (TEST(pmask, PT_CHAMBER)) thermalManager.setTargetBed(pre.chamber_temp));
-    TERN_(HAS_FAN,              if (TEST(pmask, PT_FAN))     thermalManager.set_fan_speed(0, pre.fan_speed));
+    TERN_(HAS_HOTEND,           if (TEST(pmask, PT_HOTEND))  fanManager.setTargetHotend(pre.hotend_temp, e));
+    TERN_(HAS_HEATED_BED,       if (TEST(pmask, PT_BED))     fanManager.setTargetBed(pre.bed_temp));
+    //TERN_(HAS_HEATED_CHAMBER, if (TEST(pmask, PT_CHAMBER)) fanManager.setTargetBed(pre.chamber_temp));
+    TERN_(HAS_FAN,              if (TEST(pmask, PT_FAN))     fanManager.fanSpeedSet(0, pre.fan_speed));
   }
 #endif
 
@@ -1184,10 +1184,10 @@ void mvCNCUI::init() {
     };
 
     uint8_t get_ADC_keyValue() {
-      if (thermalManager.ADCKey_count >= 16) {
-        const uint16_t currentkpADCValue = thermalManager.current_ADCKey_raw;
-        thermalManager.current_ADCKey_raw = HAL_ADC_RANGE;
-        thermalManager.ADCKey_count = 0;
+      if (fanManager.ADCKey_count >= 16) {
+        const uint16_t currentkpADCValue = fanManager.current_ADCKey_raw;
+        fanManager.current_ADCKey_raw = HAL_ADC_RANGE;
+        fanManager.ADCKey_count = 0;
         if (currentkpADCValue < adc_other_button)
           LOOP_L_N(i, ADC_KEY_NUM) {
             const uint16_t lo = pgm_read_word(&stADCKeyTable[i].ADCKeyValueMin),

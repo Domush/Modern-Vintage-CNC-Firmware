@@ -33,8 +33,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
   switch (obj->mks_obj_id) {
     case ID_FILAMNT_IN:
       uiCfg.filament_load_heat_flg = true;
-      if (ABS(thermalManager.degTargetHotend(uiCfg.extruderIndex) - thermalManager.wholeDegHotend(uiCfg.extruderIndex)) <= 1
-        || gCfgItems.filament_limit_temp <= thermalManager.wholeDegHotend(uiCfg.extruderIndex)
+      if (ABS(fanManager.degTargetHotend(uiCfg.extruderIndex) - fanManager.wholeDegHotend(uiCfg.extruderIndex)) <= 1
+        || gCfgItems.filament_limit_temp <= fanManager.wholeDegHotend(uiCfg.extruderIndex)
       ) {
         lv_clear_filament_change();
         lv_draw_dialog(DIALOG_TYPE_FILAMENT_HEAT_LOAD_COMPLETED);
@@ -42,17 +42,17 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       else {
         lv_clear_filament_change();
         lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
-        if (thermalManager.degTargetHotend(uiCfg.extruderIndex) < gCfgItems.filament_limit_temp) {
-          thermalManager.setTargetHotend(gCfgItems.filament_limit_temp, uiCfg.extruderIndex);
-          thermalManager.start_watching_hotend(uiCfg.extruderIndex);
+        if (fanManager.degTargetHotend(uiCfg.extruderIndex) < gCfgItems.filament_limit_temp) {
+          fanManager.setTargetHotend(gCfgItems.filament_limit_temp, uiCfg.extruderIndex);
+          fanManager.start_watching_hotend(uiCfg.extruderIndex);
         }
       }
       break;
     case ID_FILAMNT_OUT:
       uiCfg.filament_unload_heat_flg = true;
-      if (thermalManager.degTargetHotend(uiCfg.extruderIndex)
-          && (ABS(thermalManager.degTargetHotend(uiCfg.extruderIndex) - thermalManager.wholeDegHotend(uiCfg.extruderIndex)) <= 1
-              || thermalManager.wholeDegHotend(uiCfg.extruderIndex) >= gCfgItems.filament_limit_temp)
+      if (fanManager.degTargetHotend(uiCfg.extruderIndex)
+          && (ABS(fanManager.degTargetHotend(uiCfg.extruderIndex) - fanManager.wholeDegHotend(uiCfg.extruderIndex)) <= 1
+              || fanManager.wholeDegHotend(uiCfg.extruderIndex) >= gCfgItems.filament_limit_temp)
       ) {
         lv_clear_filament_change();
         lv_draw_dialog(DIALOG_TYPE_FILAMENT_HEAT_UNLOAD_COMPLETED);
@@ -60,9 +60,9 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       else {
         lv_clear_filament_change();
         lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
-        if (thermalManager.degTargetHotend(uiCfg.extruderIndex) < gCfgItems.filament_limit_temp) {
-          thermalManager.setTargetHotend(gCfgItems.filament_limit_temp, uiCfg.extruderIndex);
-          thermalManager.start_watching_hotend(uiCfg.extruderIndex);
+        if (fanManager.degTargetHotend(uiCfg.extruderIndex) < gCfgItems.filament_limit_temp) {
+          fanManager.setTargetHotend(gCfgItems.filament_limit_temp, uiCfg.extruderIndex);
+          fanManager.start_watching_hotend(uiCfg.extruderIndex);
         }
         filament_sprayer_temp();
       }
@@ -81,7 +81,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       feedrate_mm_s = (float)uiCfg.moveSpeed_bak;
       if (uiCfg.print_state == PAUSED)
         planner.set_e_position_mm((destination.e = current_position.e = uiCfg.current_e_position_bak));
-      thermalManager.setTargetHotend(uiCfg.hotendTargetTempBak, uiCfg.extruderIndex);
+      fanManager.setTargetHotend(uiCfg.hotendTargetTempBak, uiCfg.extruderIndex);
 
       goto_previous_ui();
       break;
@@ -136,7 +136,7 @@ void disp_filament_temp() {
   public_buf_l[0] = '\0';
 
   strcat(public_buf_l, uiCfg.extruderIndex < 1 ? preheat_menu.ext1 : preheat_menu.ext2);
-  sprintf(buf, preheat_menu.value_state, thermalManager.wholeDegHotend(uiCfg.extruderIndex), thermalManager.degTargetHotend(uiCfg.extruderIndex));
+  sprintf(buf, preheat_menu.value_state, fanManager.wholeDegHotend(uiCfg.extruderIndex), fanManager.degTargetHotend(uiCfg.extruderIndex));
 
   strcat_P(public_buf_l, PSTR(": "));
   strcat(public_buf_l, buf);

@@ -582,9 +582,9 @@
 
 // filament model PLA
 #define FILAMENT_MODEL_PLA_TITLE_EN       "Model-PLA"
-#define FILAMENT_PLA_LOAD_TITLE_EN        "Load Filament"
+#define FILAMENT_PLA_LOAD_TITLE_EN        "Change Bit"
 #define FILAMENT_PLA_UNLOAD_TITLE_EN      "Unload Filament"
-#define FILAMENT_MODEL_PLA_LOAD_EN        "Load Filament"
+#define FILAMENT_MODEL_PLA_LOAD_EN        "Change Bit"
 #define FILAMENT_MODEL_PLA_UNLOAD_EN      "Unload Filament"
 // filament support enter
 #define FILAMENT_SUPPORT_ENTER_TITLE_EN   "Support-PVA"
@@ -592,14 +592,14 @@
 #define FILAMENT_SUPPORT_ENTER_BEGIN_EN   "Begin >"
 #define FILAMENT_SUPPORT_ENTER_TIPS_EN    "The Support Filament spool\ncompartment is located on\nthe left side of the machine."
 // filament heating
-#define FILAMENT_HEATING_LOAD_TITLE_EN    "Load Filament"
+#define FILAMENT_HEATING_LOAD_TITLE_EN    "Change Bit"
 #define FILAMENT_HEATING_UNLOAD_TITLE_EN  "Unload Filament"
 #define FILAMENT_HEATING_CANCEL_EN        "< Cancel"
 #define FILAMENT_HEATING_MATERIAL_EN      "Material:"
 #define FILAMENT_HEATING_PLA_EN           "Model-PLA"
 #define FILAMENT_HEATING_TIPS_EN          "CNC head is heating..."
 // rotate left
-#define ROTATE_LEFT_LOAD_TITLE_EN         "Load Filament"
+#define ROTATE_LEFT_LOAD_TITLE_EN         "Change Bit"
 #define ROTATE_LEFT_UNLOAD_TITLE_EN       "Unload Filament"
 #define ROTATE_LEFT_CANCEL_EN             "< Cancel"
 #define ROTATE_LEFT_MATERIAL_EN           "Material:"
@@ -608,7 +608,7 @@
 #define ROTATE_LEFT_TIPS_EN               "Rotate extruder selection\ndial to the left."
 
 // hang spool
-#define HANG_SPOOL_TITLE_EN         "Load Filament"
+#define HANG_SPOOL_TITLE_EN         "Change Bit"
 #define HANG_SPOOL_PREVIOUS_EN      "< Previous"
 #define HANG_SPOOL_MATERIAL_EN      "Material:"
 #define HANG_SPOOL_PLA_EN           "Model-PLA"
@@ -616,7 +616,7 @@
 #define HANG_SPOOL_TIPS_EN          "Hang the spool in the spool\ncompartment as shown."
 
 // feed filament
-#define FEED_FILAMENT_TITLE_EN      "Load Filament"
+#define FEED_FILAMENT_TITLE_EN      "Change Bit"
 #define FEED_FILAMENT_PREVIOUS_EN   "< Previous"
 #define FEED_FILAMENT_MATERIAL_EN   "Material:"
 #define FEED_FILAMENT_PLA_EN        "Model-PLA"
@@ -624,7 +624,7 @@
 #define FEED_FILAMENT_TIPS_EN       "Feed filament into extruder\nup beyond the gears."
 
 // feed filament
-#define ROTATE_UP_TITLE_EN          "Load Filament"
+#define ROTATE_UP_TITLE_EN          "Change Bit"
 #define ROTATE_UP_PREVIOUS_EN        "< Previous"
 #define ROTATE_UP_MATERIAL_EN       "Material:"
 #define ROTATE_UP_PLA_EN            "Model-PLA"
@@ -632,14 +632,14 @@
 #define ROTATE_UP_TIPS_EN           "Rotate extruder selection\ndial up."
 
 // filament begin
-#define FEED_BEGIN_TITLE_EN         "Load Filament"
+#define FEED_BEGIN_TITLE_EN         "Change Bit"
 #define FEED_BEGIN_MATERIAL_EN      "Material:"
 #define FEED_BEGIN_PLA_EN           "Model-PLA"
 #define FEED_BEGIN_NEXT_EN          "Next >"
 #define FEED_BEGIN_TIPS_EN          "Press Next when filament\nbegins to extrude."
 
 // filament finish
-#define FEED_FINISH_TITLE_EN        "Load Filament"
+#define FEED_FINISH_TITLE_EN        "Change Bit"
 #define FEED_FINISH_MATERIAL_EN     "Material:"
 #define FEED_FINISH_PLA_EN          "Model-PLA"
 #define FEED_FINISH_NEXT_EN         "Finish >"

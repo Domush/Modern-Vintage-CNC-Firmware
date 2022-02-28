@@ -457,7 +457,7 @@ class MenuItem_bool : public MenuEditItemBase {
   #include "../../module/fan_control.h"
 
   inline void on_fan_update() {
-    thermalManager.set_fan_speed(MenuItemBase::itemIndex, editable.uint8);
+    fanManager.fanSpeedSet(MenuItemBase::itemIndex, editable.uint8);
   }
 
   #if ENABLED(EXTRA_FAN_SPEED)
@@ -467,9 +467,9 @@ class MenuItem_bool : public MenuEditItemBase {
   #endif
 
   #define _FAN_EDIT_ITEMS(F,L) do{ \
-    editable.uint8 = thermalManager.fan_speed[F]; \
+    editable.uint8 = fanManager.fan_speed[F]; \
     EDIT_ITEM_FAST_N(percent, F, MSG_##L, &editable.uint8, 0, 255, on_fan_update); \
-    EDIT_EXTRA_FAN_SPEED(percent, F, MSG_EXTRA_##L, &thermalManager.extra_fan_speed[F].speed, 3, 255); \
+    EDIT_EXTRA_FAN_SPEED(percent, F, MSG_EXTRA_##L, &fanManager.extra_fan_speed[F].speed, 3, 255); \
   }while(0)
 
   #if FAN_COUNT > 1
@@ -481,7 +481,7 @@ class MenuItem_bool : public MenuEditItemBase {
   #if SNFAN(1) || SNFAN(2) || SNFAN(3) || SNFAN(4) || SNFAN(5) || SNFAN(6) || SNFAN(7)
     #define DEFINE_SINGLENOZZLE_ITEM() \
       auto singlenozzle_item = [&](const uint8_t f) { \
-        editable.uint8 = thermalManager.singlenozzle_fan_speed[f]; \
+        editable.uint8 = fanManager.singlenozzle_fan_speed[f]; \
         EDIT_ITEM_FAST_N(percent, f, MSG_STORED_FAN_N, &editable.uint8, 0, 255, on_fan_update); \
       }
   #else

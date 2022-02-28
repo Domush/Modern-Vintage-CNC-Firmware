@@ -15,7 +15,7 @@
 void GcodeSuite::M155() {
 
   if (parser.seenval('S'))
-    thermalManager.auto_reporter.set_interval(parser.value_byte());
+    fanManager.auto_reporter.set_interval(parser.value_byte());
 
 }
 

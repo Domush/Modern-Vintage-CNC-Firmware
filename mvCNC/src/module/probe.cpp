@@ -242,8 +242,8 @@ xyz_pos_t Probe::offset; // Initialized by settings.load()
   #endif
 
   void Probe::set_probing_paused(const bool dopause) {
-    TERN_(PROBING_HEATERS_OFF, thermalManager.pause_heaters(dopause));
-    TERN_(PROBING_FANS_OFF, thermalManager.set_fans_paused(dopause));
+    TERN_(PROBING_HEATERS_OFF, fanManager.pause_heaters(dopause));
+    TERN_(PROBING_FANS_OFF, fanManager.fanPause(dopause));
     TERN_(PROBING_ESTEPPERS_OFF, if (dopause) stepper.disable_e_steppers());
     #if ENABLED(PROBING_STEPPERS_OFF) && DISABLED(DELTA)
       static uint8_t old_trusted;
@@ -364,28 +364,28 @@ FORCE_INLINE void probe_specific_action(const bool deploy) {
     DEBUG_ECHOPGM("Preheating ");
 
     #if ENABLED(WAIT_FOR_NOZZLE_HEAT)
-      const celsius_t hotendPreheat = hotend_temp > thermalManager.degTargetHotend(0) ? hotend_temp : 0;
+      const celsius_t hotendPreheat = hotend_temp > fanManager.degTargetHotend(0) ? hotend_temp : 0;
       if (hotendPreheat) {
         DEBUG_ECHOPGM("hotend (", hotendPreheat, ")");
-        thermalManager.setTargetHotend(hotendPreheat, 0);
+        fanManager.setTargetHotend(hotendPreheat, 0);
       }
     #elif ENABLED(WAIT_FOR_BED_HEAT)
       constexpr celsius_t hotendPreheat = 0;
     #endif
 
     #if ENABLED(WAIT_FOR_BED_HEAT)
-      const celsius_t bedPreheat = bed_temp > thermalManager.degTargetBed() ? bed_temp : 0;
+      const celsius_t bedPreheat = bed_temp > fanManager.degTargetBed() ? bed_temp : 0;
       if (bedPreheat) {
         if (hotendPreheat) DEBUG_ECHOPGM(" and ");
         DEBUG_ECHOPGM("bed (", bedPreheat, ")");
-        thermalManager.setTargetBed(bedPreheat);
+        fanManager.setTargetBed(bedPreheat);
       }
     #endif
 
     DEBUG_EOL();
 
-    TERN_(WAIT_FOR_NOZZLE_HEAT, if (hotend_temp > thermalManager.wholeDegHotend(0) + (TEMP_WINDOW)) thermalManager.wait_for_hotend(0));
-    TERN_(WAIT_FOR_BED_HEAT,    if (bed_temp    > thermalManager.wholeDegBed() + (TEMP_BED_WINDOW)) thermalManager.wait_for_bed_heating());
+    TERN_(WAIT_FOR_NOZZLE_HEAT, if (hotend_temp > fanManager.wholeDegHotend(0) + (TEMP_WINDOW)) fanManager.wait_for_hotend(0));
+    TERN_(WAIT_FOR_BED_HEAT,    if (bed_temp    > fanManager.wholeDegBed() + (TEMP_BED_WINDOW)) fanManager.wait_for_bed_heating());
   }
 
 #endif
@@ -480,11 +480,11 @@ bool Probe::probe_down_to_z(const_float_t z, const_feedRate_t fr_mm_s) {
   DEBUG_SECTION(log_probe, "Probe::probe_down_to_z", DEBUGGING(LEVELING));
 
   #if BOTH(HAS_HEATED_BED, WAIT_FOR_BED_HEATER)
-    thermalManager.wait_for_bed_heating();
+    fanManager.wait_for_bed_heating();
   #endif
 
   #if BOTH(HAS_TEMP_HOTEND, WAIT_FOR_HOTEND)
-    thermalManager.wait_for_hotend_heating(active_extruder);
+    fanManager.wait_for_hotend_heating(active_extruder);
   #endif
   #if ENABLED(BLTOUCH)
     if (!bltouch.high_speed_mode && bltouch.deploy())

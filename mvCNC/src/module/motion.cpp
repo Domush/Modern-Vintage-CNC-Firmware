@@ -926,7 +926,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     next_idle_ms = ms + 200UL;
     return idle();
   }
-  thermalManager.manage_heater();  // Returns immediately on most calls
+  fanManager.manage_heater();  // Returns immediately on most calls
 }
 
 #if IS_KINEMATIC
@@ -1270,7 +1270,7 @@ void prepare_line_to_destination() {
       bool ignore_e = false;
 
       #if ENABLED(PREVENT_COLD_EXTRUSION)
-        ignore_e = thermalManager.tooColdToExtrude(active_extruder);
+        ignore_e = fanManager.tooColdToExtrude(active_extruder);
         if (ignore_e) SERIAL_ECHO_MSG(STR_ERR_COLD_EXTRUDE_STOP);
       #endif
 
@@ -1583,12 +1583,12 @@ void prepare_line_to_destination() {
       if (TERN0(HOMING_Z_WITH_PROBE, axis == Z_AXIS)) {
         #if BOTH(HAS_HEATED_BED, WAIT_FOR_BED_HEATER)
           // Wait for bed to heat back up between probing points
-          thermalManager.wait_for_bed_heating();
+          fanManager.wait_for_bed_heating();
         #endif
 
         #if BOTH(HAS_HOTEND, WAIT_FOR_HOTEND)
           // Wait for the hotend to heat back up between probing points
-          thermalManager.wait_for_hotend_heating(active_extruder);
+          fanManager.wait_for_hotend_heating(active_extruder);
         #endif
 
         TERN_(HAS_QUIET_PROBING, if (final_approach) probe.set_probing_paused(true));

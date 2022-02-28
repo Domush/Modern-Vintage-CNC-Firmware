@@ -250,10 +250,10 @@ void mvCNCUI::draw_status_message(const bool blink) {
       dwin_string.set("E");
       dwin_string.add('1' + extruder);
       dwin_string.add(' ');
-      dwin_string.add(i16tostr3rj(thermalManager.degHotend(extruder)));
+      dwin_string.add(i16tostr3rj(fanManager.degHotend(extruder)));
       dwin_string.add('/');
-      if (get_blink() || !thermalManager.heater_idle[thermalManager.idle_index_for_id(extruder)].timed_out)
-        dwin_string.add(i16tostr3rj(thermalManager.degTargetHotend(extruder)));
+      if (get_blink() || !fanManager.heater_idle[fanManager.idle_index_for_id(extruder)].timed_out)
+        dwin_string.add(i16tostr3rj(fanManager.degTargetHotend(extruder)));
       else
         dwin_string.add(PSTR("    "));
 

@@ -22,7 +22,7 @@
 void GcodeSuite::M141() {
   if (DEBUGGING(DRYRUN)) return;
   if (parser.seenval('S')) {
-    thermalManager.setTargetChamber(parser.value_celsius());
+    fanManager.setTargetChamber(parser.value_celsius());
 
     #if ENABLED(JOB_TIMER_AUTOSTART)
       /**
@@ -30,7 +30,7 @@ void GcodeSuite::M141() {
        * temperatures need to be set below mintemp. Order of M140, M104, and M141
        * at the end of the print does not matter.
        */
-      thermalManager.auto_job_check_timer(false, true);
+      fanManager.auto_job_check_timer(false, true);
     #endif
   }
 }
@@ -44,15 +44,15 @@ void GcodeSuite::M191() {
 
   const bool no_wait_for_cooling = parser.seenval('S');
   if (no_wait_for_cooling || parser.seenval('R')) {
-    thermalManager.setTargetChamber(parser.value_celsius());
-    TERN_(JOB_TIMER_AUTOSTART, thermalManager.auto_job_check_timer(true, false));
+    fanManager.setTargetChamber(parser.value_celsius());
+    TERN_(JOB_TIMER_AUTOSTART, fanManager.auto_job_check_timer(true, false));
   }
   else return;
 
-  const bool is_heating = thermalManager.isHeatingChamber();
+  const bool is_heating = fanManager.isHeatingChamber();
   if (is_heating || !no_wait_for_cooling) {
     ui.set_status(is_heating ? GET_TEXT_F(MSG_CHAMBER_HEATING) : GET_TEXT_F(MSG_CHAMBER_COOLING));
-    thermalManager.wait_for_chamber(false);
+    fanManager.wait_for_chamber(false);
   }
 }
 

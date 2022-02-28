@@ -147,7 +147,7 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
 //
 FORCE_INLINE void _draw_fan_status(const uint16_t x, const uint16_t y) {
   const uint16_t fanx = (4 * STATUS_CHR_WIDTH - STATUS_FAN_WIDTH) / 2;
-  const uint8_t fan_pct = thermalManager.scaledFanSpeedPercent(0);
+  const uint8_t fan_pct = fanManager.scaledFanSpeedPercent(0);
   const bool fan_on = !!fan_pct;
   if (fan_on) {
     DWIN_ICON_Animation(0, fan_on, ICON, ICON_Fan0, ICON_Fan3, x + fanx, y, 25);
@@ -191,9 +191,9 @@ FORCE_INLINE void _draw_heater_status(const heater_id_t heater, const uint16_t x
 
   #if HAS_HOTEND && HAS_HEATED_BED
     const bool isBed = heater < 0;
-    const float tc = isBed ? thermalManager.degBed() : thermalManager.degHotend(heater),
-                tt = isBed ? thermalManager.degTargetBed() : thermalManager.degTargetHotend(heater);
-    const bool ta = isBed ? thermalManager.isHeatingBed() : thermalManager.isHeatingHotend(heater);
+    const float tc = isBed ? fanManager.degBed() : fanManager.degHotend(heater),
+                tt = isBed ? fanManager.degTargetBed() : fanManager.degTargetHotend(heater);
+    const bool ta = isBed ? fanManager.isHeatingBed() : fanManager.isHeatingHotend(heater);
 
     bool c_draw = tc != (isBed ? old_bed_temp : old_temp[heater]),
          t_draw = tt != (isBed ? old_bed_target : old_target[heater]),
@@ -215,14 +215,14 @@ FORCE_INLINE void _draw_heater_status(const heater_id_t heater, const uint16_t x
     }
   #elif HAS_HOTEND
     constexpr bool isBed = false;
-    const float tc = thermalManager.degHotend(heater), tt = thermalManager.degTargetHotend(heater);
-    const uint8_t ta = thermalManager.isHeatingHotend(heater);
+    const float tc = fanManager.degHotend(heater), tt = fanManager.degTargetHotend(heater);
+    const uint8_t ta = fanManager.isHeatingHotend(heater);
     const bool c_draw = tc != old_bed_temp, t_draw = tt != old_bed_target, i_draw = ta != old_bed_on;
     old_temp[heater] = tc; old_target[heater] = tt; old_on[heater] = ta;
   #elif HAS_HEATED_BED
     constexpr bool isBed = true;
-    const float tc = thermalManager.degBed(), tt = thermalManager.degTargetBed();
-    const uint8_t ta = thermalManager.isHeatingBed();
+    const float tc = fanManager.degBed(), tt = fanManager.degTargetBed();
+    const uint8_t ta = fanManager.isHeatingBed();
     bool c_draw = tc != old_temp[heater], t_draw = tt != old_target[heater], i_draw = ta != old_on[heater];
     #if HAS_LEVELING
       if (!idraw && planner.leveling_active != old_leveling_on) i_draw = true;

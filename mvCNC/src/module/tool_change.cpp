@@ -877,7 +877,7 @@ void fast_line_to_current(const AxisEnum fr_axis) { _line_to_current(fr_axis, 0.
 
   void tool_change_prime() {
     if (toolchange_settings.extra_prime > 0
-      && TERN(PREVENT_COLD_EXTRUSION, !thermalManager.targetTooColdToExtrude(active_extruder), 1)
+      && TERN(PREVENT_COLD_EXTRUSION, !fanManager.targetTooColdToExtrude(active_extruder), 1)
     ) {
       destination = current_position; // Remember the old position
 
@@ -885,7 +885,7 @@ void fast_line_to_current(const AxisEnum fr_axis) { _line_to_current(fr_axis, 0.
 
       #if HAS_FAN && TOOLCHANGE_FS_FAN >= 0
         // Store and stop fan. Restored on any exit.
-        REMEMBER(fan, thermalManager.fan_speed[TOOLCHANGE_FS_FAN], 0);
+        REMEMBER(fan, fanManager.fan_speed[TOOLCHANGE_FS_FAN], 0);
       #endif
 
       // Z raise
@@ -917,9 +917,9 @@ void fast_line_to_current(const AxisEnum fr_axis) { _line_to_current(fr_axis, 0.
 
       // Cool down with fan
       #if HAS_FAN && TOOLCHANGE_FS_FAN >= 0
-        thermalManager.fan_speed[TOOLCHANGE_FS_FAN] = toolchange_settings.fan_speed;
+        fanManager.fan_speed[TOOLCHANGE_FS_FAN] = toolchange_settings.fan_speed;
         gcode.dwell(SEC_TO_MS(toolchange_settings.fan_time));
-        thermalManager.fan_speed[TOOLCHANGE_FS_FAN] = 0;
+        fanManager.fan_speed[TOOLCHANGE_FS_FAN] = 0;
       #endif
 
       // Move back
@@ -1032,7 +1032,7 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
 
       #if BOTH(TOOLCHANGE_FILAMENT_SWAP, HAS_FAN) && TOOLCHANGE_FS_FAN >= 0
         // Store and stop fan. Restored on any exit.
-        REMEMBER(fan, thermalManager.fan_speed[TOOLCHANGE_FS_FAN], 0);
+        REMEMBER(fan, fanManager.fan_speed[TOOLCHANGE_FS_FAN], 0);
       #endif
 
       // Z raise before retraction
@@ -1050,7 +1050,7 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
       #if ENABLED(TOOLCHANGE_FILAMENT_SWAP)
         const bool should_swap = can_move_away && toolchange_settings.swap_length,
                    too_cold = TERN0(PREVENT_COLD_EXTRUSION,
-                     !DEBUGGING(DRYRUN) && (thermalManager.targetTooColdToExtrude(old_tool) || thermalManager.targetTooColdToExtrude(new_tool))
+                     !DEBUGGING(DRYRUN) && (fanManager.targetTooColdToExtrude(old_tool) || fanManager.targetTooColdToExtrude(new_tool))
                    );
         if (should_swap) {
           if (too_cold) {
@@ -1162,7 +1162,7 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
       if (should_move) {
 
         #if EITHER(SINGLENOZZLE_STANDBY_TEMP, SINGLENOZZLE_STANDBY_FAN)
-          thermalManager.singlenozzle_change(old_tool, new_tool);
+          fanManager.singlenozzle_change(old_tool, new_tool);
         #endif
 
         #if ENABLED(TOOLCHANGE_FILAMENT_SWAP)
@@ -1191,9 +1191,9 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
 
             // Cool down with fan
             #if HAS_FAN && TOOLCHANGE_FS_FAN >= 0
-              thermalManager.fan_speed[TOOLCHANGE_FS_FAN] = toolchange_settings.fan_speed;
+              fanManager.fan_speed[TOOLCHANGE_FS_FAN] = toolchange_settings.fan_speed;
               gcode.dwell(SEC_TO_MS(toolchange_settings.fan_time));
-              thermalManager.fan_speed[TOOLCHANGE_FS_FAN] = 0;
+              fanManager.fan_speed[TOOLCHANGE_FS_FAN] = 0;
             #endif
           }
         #endif
@@ -1311,7 +1311,7 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
   bool extruder_migration() {
 
     #if ENABLED(PREVENT_COLD_EXTRUSION)
-      if (thermalManager.targetTooColdToExtrude(active_extruder)) {
+      if (fanManager.targetTooColdToExtrude(active_extruder)) {
         DEBUG_ECHOLNPGM("Migration Source Too Cold");
         return false;
       }
@@ -1362,10 +1362,10 @@ void tool_change(const uint8_t new_tool, bool no_move/*=false*/) {
 
     // Migrate the temperature to the new hotend
     #if TOOL_CHANGE_SUPPORT
-      thermalManager.setTargetHotend(thermalManager.degTargetHotend(active_extruder), migration_extruder);
+      fanManager.setTargetHotend(fanManager.degTargetHotend(active_extruder), migration_extruder);
       TERN_(AUTOTEMP, planner.autotemp_update());
-      thermalManager.set_heating_message(0);
-      thermalManager.wait_for_hotend(active_extruder);
+      fanManager.set_heating_message(0);
+      fanManager.wait_for_hotend(active_extruder);
     #endif
 
     // Migrate Linear Advance K factor to the new extruder

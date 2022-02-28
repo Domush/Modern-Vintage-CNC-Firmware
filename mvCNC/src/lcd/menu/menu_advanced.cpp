@@ -190,12 +190,12 @@ void menu_backlash();
   void copy_and_scalePID_i(int16_t e) {
     UNUSED(e);
     PID_PARAM(Ki, e) = scalePID_i(raw_Ki);
-    thermalManager.updatePID();
+    fanManager.updatePID();
   }
   void copy_and_scalePID_d(int16_t e) {
     UNUSED(e);
     PID_PARAM(Kd, e) = scalePID_d(raw_Kd);
-    thermalManager.updatePID();
+    fanManager.updatePID();
   }
 
   #define _DEFINE_PIDTEMP_BASE_FUNCS(N) \
@@ -240,8 +240,8 @@ void menu_backlash();
     //
     #if BOTH(AUTOTEMP, HAS_TEMP_HOTEND)
       EDIT_ITEM(bool, MSG_AUTOTEMP, &planner.autotemp_enabled);
-      EDIT_ITEM(int3, MSG_MIN, &planner.autotemp_min, 0, thermalManager.hotend_max_target(0));
-      EDIT_ITEM(int3, MSG_MAX, &planner.autotemp_max, 0, thermalManager.hotend_max_target(0));
+      EDIT_ITEM(int3, MSG_MIN, &planner.autotemp_min, 0, fanManager.hotend_max_target(0));
+      EDIT_ITEM(int3, MSG_MAX, &planner.autotemp_max, 0, fanManager.hotend_max_target(0));
       EDIT_ITEM(float42_52, MSG_FACTOR, &planner.autotemp_factor, 0, 10);
     #endif
 
@@ -294,7 +294,7 @@ void menu_backlash();
     #if ENABLED(PID_AUTOTUNE_MENU)
       #define HOTEND_PID_EDIT_MENU_ITEMS(N) \
         _HOTEND_PID_EDIT_MENU_ITEMS(N); \
-        EDIT_ITEM_FAST_N(int3, N, MSG_PID_AUTOTUNE_E, &autotune_temp[N], 150, thermalManager.hotend_max_target(N), []{ _lcd_autotune(heater_id_t(MenuItemBase::itemIndex)); });
+        EDIT_ITEM_FAST_N(int3, N, MSG_PID_AUTOTUNE_E, &autotune_temp[N], 150, fanManager.hotend_max_target(N), []{ _lcd_autotune(heater_id_t(MenuItemBase::itemIndex)); });
     #else
       #define HOTEND_PID_EDIT_MENU_ITEMS(N) _HOTEND_PID_EDIT_MENU_ITEMS(N);
     #endif
@@ -306,7 +306,7 @@ void menu_backlash();
 
     #if ENABLED(PIDTEMPBED)
       #if ENABLED(PID_EDIT_MENU)
-        _PID_EDIT_ITEMS_TMPL(H_BED, thermalManager.temp_bed);
+        _PID_EDIT_ITEMS_TMPL(H_BED, fanManager.temp_bed);
       #endif
       #if ENABLED(PID_AUTOTUNE_MENU)
         EDIT_ITEM_FAST_N(int3, H_BED, MSG_PID_AUTOTUNE_E, &autotune_temp_bed, PREHEAT_1_TEMP_BED, BED_MAX_TARGET, []{ _lcd_autotune(H_BED); });
@@ -315,7 +315,7 @@ void menu_backlash();
 
     #if ENABLED(PIDTEMPCHAMBER)
       #if ENABLED(PID_EDIT_MENU)
-        _PID_EDIT_ITEMS_TMPL(H_CHAMBER, thermalManager.temp_chamber);
+        _PID_EDIT_ITEMS_TMPL(H_CHAMBER, fanManager.temp_chamber);
       #endif
       #if ENABLED(PID_AUTOTUNE_MENU)
         EDIT_ITEM_FAST_N(int3, H_CHAMBER, MSG_PID_AUTOTUNE_E, &autotune_temp_chamber, PREHEAT_1_TEMP_CHAMBER, CHAMBER_MAX_TARGET, []{ _lcd_autotune(H_CHAMBER); });

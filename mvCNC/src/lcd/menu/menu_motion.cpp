@@ -196,7 +196,7 @@ void _menu_move_distance(const AxisEnum axis, const screenFunc_t func, const int
 
   inline void _menu_move_distance_e_maybe() {
     #if ENABLED(PREVENT_COLD_EXTRUSION)
-      const bool too_cold = thermalManager.tooColdToExtrude(active_extruder);
+      const bool too_cold = fanManager.tooColdToExtrude(active_extruder);
       if (too_cold) {
         ui.goto_screen([]{
           MenuItem_confirm::select_screen(

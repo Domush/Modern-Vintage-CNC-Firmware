@@ -30,7 +30,7 @@ void Buzzer::tone(const uint16_t duration, const uint16_t frequency/*=0*/) {
   if (!ui.buzzer_enabled) return;
   while (buffer.isFull()) {
     tick();
-    thermalManager.manage_heater();
+    fanManager.manage_heater();
   }
   tone_t tone = { duration, frequency };
   buffer.enqueue(tone);

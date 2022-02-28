@@ -784,14 +784,14 @@ void CrealityDWINClass::Draw_Status_Area(bool icons/*=false*/) {
       DWIN_ICON_Show(ICON, ICON_HotendTemp, 10, 383);
       DWIN_Draw_String(false, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 25 + 3 * STAT_CHR_W + 5, 384, F("/"));
     }
-    if (thermalManager.temp_hotend[0].celsius != hotend) {
-      hotend = thermalManager.temp_hotend[0].celsius;
-      DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 3, 28, 384, thermalManager.temp_hotend[0].celsius);
+    if (fanManager.temp_hotend[0].celsius != hotend) {
+      hotend = fanManager.temp_hotend[0].celsius;
+      DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 3, 28, 384, fanManager.temp_hotend[0].celsius);
       DWIN_Draw_DegreeSymbol(GetColor(eeprom_settings.status_area_text, Color_White), 25 + 3 * STAT_CHR_W + 5, 386);
     }
-    if (thermalManager.temp_hotend[0].target != hotendtarget) {
-      hotendtarget = thermalManager.temp_hotend[0].target;
-      DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 3, 25 + 4 * STAT_CHR_W + 6, 384, thermalManager.temp_hotend[0].target);
+    if (fanManager.temp_hotend[0].target != hotendtarget) {
+      hotendtarget = fanManager.temp_hotend[0].target;
+      DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 3, 25 + 4 * STAT_CHR_W + 6, 384, fanManager.temp_hotend[0].target);
       DWIN_Draw_DegreeSymbol(GetColor(eeprom_settings.status_area_text, Color_White), 25 + 4 * STAT_CHR_W + 39, 386);
     }
     if (icons) {
@@ -814,14 +814,14 @@ void CrealityDWINClass::Draw_Status_Area(bool icons/*=false*/) {
       DWIN_ICON_Show(ICON, ICON_BedTemp, 10, 416);
       DWIN_Draw_String(false, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 25 + 3 * STAT_CHR_W + 5, 417, F("/"));
     }
-    if (thermalManager.temp_bed.celsius != bed) {
-      bed = thermalManager.temp_bed.celsius;
-      DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 3, 28, 417, thermalManager.temp_bed.celsius);
+    if (fanManager.temp_bed.celsius != bed) {
+      bed = fanManager.temp_bed.celsius;
+      DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 3, 28, 417, fanManager.temp_bed.celsius);
       DWIN_Draw_DegreeSymbol(GetColor(eeprom_settings.status_area_text, Color_White), 25 + 3 * STAT_CHR_W + 5, 419);
     }
-    if (thermalManager.temp_bed.target != bedtarget) {
-      bedtarget = thermalManager.temp_bed.target;
-      DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 3, 25 + 4 * STAT_CHR_W + 6, 417, thermalManager.temp_bed.target);
+    if (fanManager.temp_bed.target != bedtarget) {
+      bedtarget = fanManager.temp_bed.target;
+      DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 3, 25 + 4 * STAT_CHR_W + 6, 417, fanManager.temp_bed.target);
       DWIN_Draw_DegreeSymbol(GetColor(eeprom_settings.status_area_text, Color_White), 25 + 4 * STAT_CHR_W + 39, 419);
     }
   #endif
@@ -832,9 +832,9 @@ void CrealityDWINClass::Draw_Status_Area(bool icons/*=false*/) {
       fan = -1;
       DWIN_ICON_Show(ICON, ICON_FanSpeed, 187, 383);
     }
-    if (thermalManager.fan_speed[0] != fan) {
-      fan = thermalManager.fan_speed[0];
-      DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 3, 195 + 2 * STAT_CHR_W, 384, thermalManager.fan_speed[0]);
+    if (fanManager.fan_speed[0] != fan) {
+      fan = fanManager.fan_speed[0];
+      DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_STAT, GetColor(eeprom_settings.status_area_text, Color_White), Color_Bg_Black, 3, 195 + 2 * STAT_CHR_W, 384, fanManager.fan_speed[0]);
     }
   #endif
 
@@ -1083,7 +1083,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             if (draw)
               Draw_Menu_Item(row, ICON_Cool, F("Cooldown"));
             else
-              thermalManager.cooldown();
+              fanManager.cooldown();
             break;
         #endif
 
@@ -1100,15 +1100,15 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
               #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
                 Draw_Menu(ChangeFilament);
               #else
-                if (thermalManager.temp_hotend[0].target < thermalManager.extrude_min_temp)
+                if (fanManager.temp_hotend[0].target < fanManager.extrude_min_temp)
                   Popup_Handler(ETemp);
                 else {
-                  if (thermalManager.temp_hotend[0].celsius < thermalManager.temp_hotend[0].target - 2) {
+                  if (fanManager.temp_hotend[0].celsius < fanManager.temp_hotend[0].target - 2) {
                     Popup_Handler(Heating);
-                    thermalManager.wait_for_hotend(0);
+                    fanManager.wait_for_hotend(0);
                   }
                   Popup_Handler(FilChange);
-                  sprintf_P(cmd, PSTR("M600 B1 R%i"), thermalManager.temp_hotend[0].target);
+                  sprintf_P(cmd, PSTR("M600 B1 R%i"), fanManager.temp_hotend[0].target);
                   gcode.process_subcommands_now(cmd);
                 }
               #endif
@@ -1242,13 +1242,13 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
               Draw_Float(current_position.e, row);
             }
             else {
-              if (thermalManager.temp_hotend[0].target < thermalManager.extrude_min_temp) {
+              if (fanManager.temp_hotend[0].target < fanManager.extrude_min_temp) {
                 Popup_Handler(ETemp);
               }
               else {
-                if (thermalManager.temp_hotend[0].celsius < thermalManager.temp_hotend[0].target - 2) {
+                if (fanManager.temp_hotend[0].celsius < fanManager.temp_hotend[0].target - 2) {
                   Popup_Handler(Heating);
-                  thermalManager.wait_for_hotend(0);
+                  fanManager.wait_for_hotend(0);
                   Redraw_Menu();
                 }
                 current_position.e = 0;
@@ -1578,7 +1578,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
         #define PREHEAT_TOTAL PREHEAT_5
 
         auto do_preheat = [](const uint8_t m) {
-          thermalManager.cooldown();
+          fanManager.cooldown();
           if (preheatmode == 0 || preheatmode == 1) { ui.preheat_hotend_and_fan(m); }
           if (preheatmode == 0 || preheatmode == 2) ui.preheat_bed(m);
         };
@@ -1665,14 +1665,14 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             break;
           case CHANGEFIL_LOAD:
             if (draw)
-              Draw_Menu_Item(row, ICON_WriteEEPROM, F("Load Filament"));
+              Draw_Menu_Item(row, ICON_WriteEEPROM, F("Change Bit"));
             else {
-              if (thermalManager.temp_hotend[0].target < thermalManager.extrude_min_temp)
+              if (fanManager.temp_hotend[0].target < fanManager.extrude_min_temp)
                 Popup_Handler(ETemp);
               else {
-                if (thermalManager.temp_hotend[0].celsius < thermalManager.temp_hotend[0].target - 2) {
+                if (fanManager.temp_hotend[0].celsius < fanManager.temp_hotend[0].target - 2) {
                   Popup_Handler(Heating);
-                  thermalManager.wait_for_hotend(0);
+                  fanManager.wait_for_hotend(0);
                 }
                 Popup_Handler(FilLoad);
                 gcode.process_subcommands_now(F("M701"));
@@ -1685,13 +1685,13 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             if (draw)
               Draw_Menu_Item(row, ICON_ReadEEPROM, F("Unload Filament"));
             else {
-              if (thermalManager.temp_hotend[0].target < thermalManager.extrude_min_temp) {
+              if (fanManager.temp_hotend[0].target < fanManager.extrude_min_temp) {
                 Popup_Handler(ETemp);
               }
               else {
-                if (thermalManager.temp_hotend[0].celsius < thermalManager.temp_hotend[0].target - 2) {
+                if (fanManager.temp_hotend[0].celsius < fanManager.temp_hotend[0].target - 2) {
                   Popup_Handler(Heating);
-                  thermalManager.wait_for_hotend(0);
+                  fanManager.wait_for_hotend(0);
                 }
                 Popup_Handler(FilLoad, true);
                 gcode.process_subcommands_now(F("M702"));
@@ -1704,15 +1704,15 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             if (draw)
               Draw_Menu_Item(row, ICON_ResumeEEPROM, F("Change Filament"));
             else {
-              if (thermalManager.temp_hotend[0].target < thermalManager.extrude_min_temp)
+              if (fanManager.temp_hotend[0].target < fanManager.extrude_min_temp)
                 Popup_Handler(ETemp);
               else {
-                if (thermalManager.temp_hotend[0].celsius < thermalManager.temp_hotend[0].target - 2) {
+                if (fanManager.temp_hotend[0].celsius < fanManager.temp_hotend[0].target - 2) {
                   Popup_Handler(Heating);
-                  thermalManager.wait_for_hotend(0);
+                  fanManager.wait_for_hotend(0);
                 }
                 Popup_Handler(FilChange);
-                sprintf_P(cmd, PSTR("M600 B1 R%i"), thermalManager.temp_hotend[0].target);
+                sprintf_P(cmd, PSTR("M600 B1 R%i"), fanManager.temp_hotend[0].target);
                 gcode.process_subcommands_now(cmd);
               }
             }
@@ -1821,30 +1821,30 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           case TEMP_HOTEND:
             if (draw) {
               Draw_Menu_Item(row, ICON_SetEndTemp, F("Hotend"));
-              Draw_Float(thermalManager.temp_hotend[0].target, row, false, 1);
+              Draw_Float(fanManager.temp_hotend[0].target, row, false, 1);
             }
             else
-              Modify_Value(thermalManager.temp_hotend[0].target, MIN_E_TEMP, MAX_E_TEMP, 1);
+              Modify_Value(fanManager.temp_hotend[0].target, MIN_E_TEMP, MAX_E_TEMP, 1);
             break;
         #endif
         #if HAS_HEATED_BED
           case TEMP_BED:
             if (draw) {
               Draw_Menu_Item(row, ICON_SetBedTemp, F("Bed"));
-              Draw_Float(thermalManager.temp_bed.target, row, false, 1);
+              Draw_Float(fanManager.temp_bed.target, row, false, 1);
             }
             else
-              Modify_Value(thermalManager.temp_bed.target, MIN_BED_TEMP, MAX_BED_TEMP, 1);
+              Modify_Value(fanManager.temp_bed.target, MIN_BED_TEMP, MAX_BED_TEMP, 1);
             break;
         #endif
         #if HAS_FAN
           case TEMP_FAN:
             if (draw) {
               Draw_Menu_Item(row, ICON_FanSpeed, F("Fan"));
-              Draw_Float(thermalManager.fan_speed[0], row, false, 1);
+              Draw_Float(fanManager.fan_speed[0], row, false, 1);
             }
             else
-              Modify_Value(thermalManager.fan_speed[0], MIN_FAN_SPEED, MAX_FAN_SPEED, 1);
+              Modify_Value(fanManager.fan_speed[0], MIN_FAN_SPEED, MAX_FAN_SPEED, 1);
             break;
         #endif
         #if HAS_HOTEND || HAS_HEATED_BED
@@ -1986,26 +1986,26 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           case HOTENDPID_KP:
             if (draw) {
               Draw_Menu_Item(row, ICON_Version, F("Kp Value"));
-              Draw_Float(thermalManager.temp_hotend[0].pid.Kp, row, false, 100);
+              Draw_Float(fanManager.temp_hotend[0].pid.Kp, row, false, 100);
             }
             else
-              Modify_Value(thermalManager.temp_hotend[0].pid.Kp, 0, 5000, 100, thermalManager.updatePID);
+              Modify_Value(fanManager.temp_hotend[0].pid.Kp, 0, 5000, 100, fanManager.updatePID);
             break;
           case HOTENDPID_KI:
             if (draw) {
               Draw_Menu_Item(row, ICON_Version, F("Ki Value"));
-              Draw_Float(unscalePID_i(thermalManager.temp_hotend[0].pid.Ki), row, false, 100);
+              Draw_Float(unscalePID_i(fanManager.temp_hotend[0].pid.Ki), row, false, 100);
             }
             else
-              Modify_Value(thermalManager.temp_hotend[0].pid.Ki, 0, 5000, 100, thermalManager.updatePID);
+              Modify_Value(fanManager.temp_hotend[0].pid.Ki, 0, 5000, 100, fanManager.updatePID);
             break;
           case HOTENDPID_KD:
             if (draw) {
               Draw_Menu_Item(row, ICON_Version, F("Kd Value"));
-              Draw_Float(unscalePID_d(thermalManager.temp_hotend[0].pid.Kd), row, false, 100);
+              Draw_Float(unscalePID_d(fanManager.temp_hotend[0].pid.Kd), row, false, 100);
             }
             else
-              Modify_Value(thermalManager.temp_hotend[0].pid.Kd, 0, 5000, 100, thermalManager.updatePID);
+              Modify_Value(fanManager.temp_hotend[0].pid.Kd, 0, 5000, 100, fanManager.updatePID);
             break;
         }
         break;
@@ -2053,27 +2053,27 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           case BEDPID_KP:
             if (draw) {
               Draw_Menu_Item(row, ICON_Version, F("Kp Value"));
-              Draw_Float(thermalManager.temp_bed.pid.Kp, row, false, 100);
+              Draw_Float(fanManager.temp_bed.pid.Kp, row, false, 100);
             }
             else {
-              Modify_Value(thermalManager.temp_bed.pid.Kp, 0, 5000, 100, thermalManager.updatePID);
+              Modify_Value(fanManager.temp_bed.pid.Kp, 0, 5000, 100, fanManager.updatePID);
             }
             break;
           case BEDPID_KI:
             if (draw) {
               Draw_Menu_Item(row, ICON_Version, F("Ki Value"));
-              Draw_Float(unscalePID_i(thermalManager.temp_bed.pid.Ki), row, false, 100);
+              Draw_Float(unscalePID_i(fanManager.temp_bed.pid.Ki), row, false, 100);
             }
             else
-              Modify_Value(thermalManager.temp_bed.pid.Ki, 0, 5000, 100, thermalManager.updatePID);
+              Modify_Value(fanManager.temp_bed.pid.Ki, 0, 5000, 100, fanManager.updatePID);
             break;
           case BEDPID_KD:
             if (draw) {
               Draw_Menu_Item(row, ICON_Version, F("Kd Value"));
-              Draw_Float(unscalePID_d(thermalManager.temp_bed.pid.Kd), row, false, 100);
+              Draw_Float(unscalePID_d(fanManager.temp_bed.pid.Kd), row, false, 100);
             }
             else
-              Modify_Value(thermalManager.temp_bed.pid.Kd, 0, 5000, 100, thermalManager.updatePID);
+              Modify_Value(fanManager.temp_bed.pid.Kd, 0, 5000, 100, fanManager.updatePID);
             break;
         }
         break;
@@ -2894,11 +2894,11 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           case ADVANCED_COLD_EXTRUDE:
             if (draw) {
               Draw_Menu_Item(row, ICON_Cool, F("Min Extrusion T"));
-              Draw_Float(thermalManager.extrude_min_temp, row, false, 1);
+              Draw_Float(fanManager.extrude_min_temp, row, false, 1);
             }
             else {
-              Modify_Value(thermalManager.extrude_min_temp, 0, MAX_E_TEMP, 1);
-              thermalManager.allow_cold_extrude = (thermalManager.extrude_min_temp == 0);
+              Modify_Value(fanManager.extrude_min_temp, 0, MAX_E_TEMP, 1);
+              fanManager.allow_cold_extrude = (fanManager.extrude_min_temp == 0);
             }
             break;
         #endif
@@ -3116,15 +3116,15 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
                 #if ENABLED(PREHEAT_BEFORE_LEVELING)
                   Popup_Handler(Heating);
                   #if HAS_HOTEND
-                    if (thermalManager.degTargetHotend(0) < LEVELING_NOZZLE_TEMP)
-                      thermalManager.setTargetHotend(LEVELING_NOZZLE_TEMP, 0);
+                    if (fanManager.degTargetHotend(0) < LEVELING_NOZZLE_TEMP)
+                      fanManager.setTargetHotend(LEVELING_NOZZLE_TEMP, 0);
                   #endif
                   #if HAS_HEATED_BED
-                    if (thermalManager.degTargetBed() < LEVELING_BED_TEMP)
-                      thermalManager.setTargetBed(LEVELING_BED_TEMP);
+                    if (fanManager.degTargetBed() < LEVELING_BED_TEMP)
+                      fanManager.setTargetBed(LEVELING_BED_TEMP);
                   #endif
-                  thermalManager.wait_for_hotend(0);
-                  TERN_(HAS_HEATED_BED, thermalManager.wait_for_bed_heating());
+                  fanManager.wait_for_hotend(0);
+                  TERN_(HAS_HEATED_BED, fanManager.wait_for_bed_heating());
                 #endif
                 #if HAS_BED_PROBE
                   Popup_Handler(Level);
@@ -3184,15 +3184,15 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
               #if ENABLED(PREHEAT_BEFORE_LEVELING)
                 Popup_Handler(Heating);
                 #if HAS_HOTEND
-                  if (thermalManager.degTargetHotend(0) < LEVELING_NOZZLE_TEMP)
-                    thermalManager.setTargetHotend(LEVELING_NOZZLE_TEMP, 0);
+                  if (fanManager.degTargetHotend(0) < LEVELING_NOZZLE_TEMP)
+                    fanManager.setTargetHotend(LEVELING_NOZZLE_TEMP, 0);
                 #endif
                 #if HAS_HEATED_BED
-                  if (thermalManager.degTargetBed() < LEVELING_BED_TEMP)
-                    thermalManager.setTargetBed(LEVELING_BED_TEMP);
+                  if (fanManager.degTargetBed() < LEVELING_BED_TEMP)
+                    fanManager.setTargetBed(LEVELING_BED_TEMP);
                 #endif
-                TERN_(HAS_HOTEND, thermalManager.wait_for_hotend(0));
-                TERN_(HAS_HEATED_BED, thermalManager.wait_for_bed_heating());
+                TERN_(HAS_HOTEND, fanManager.wait_for_hotend(0));
+                TERN_(HAS_HEATED_BED, fanManager.wait_for_bed_heating());
               #endif
               Popup_Handler(MoveWait);
               mesh_conf.manual_move();
@@ -3742,10 +3742,10 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           case TUNE_HOTEND:
             if (draw) {
               Draw_Menu_Item(row, ICON_SetEndTemp, F("Hotend"));
-              Draw_Float(thermalManager.temp_hotend[0].target, row, false, 1);
+              Draw_Float(fanManager.temp_hotend[0].target, row, false, 1);
             }
             else
-              Modify_Value(thermalManager.temp_hotend[0].target, MIN_E_TEMP, MAX_E_TEMP, 1);
+              Modify_Value(fanManager.temp_hotend[0].target, MIN_E_TEMP, MAX_E_TEMP, 1);
             break;
         #endif
 
@@ -3753,10 +3753,10 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           case TUNE_BED:
             if (draw) {
               Draw_Menu_Item(row, ICON_SetBedTemp, F("Bed"));
-              Draw_Float(thermalManager.temp_bed.target, row, false, 1);
+              Draw_Float(fanManager.temp_bed.target, row, false, 1);
             }
             else
-              Modify_Value(thermalManager.temp_bed.target, MIN_BED_TEMP, MAX_BED_TEMP, 1);
+              Modify_Value(fanManager.temp_bed.target, MIN_BED_TEMP, MAX_BED_TEMP, 1);
             break;
         #endif
 
@@ -3764,10 +3764,10 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           case TUNE_FAN:
             if (draw) {
               Draw_Menu_Item(row, ICON_FanSpeed, F("Fan"));
-              Draw_Float(thermalManager.fan_speed[0], row, false, 1);
+              Draw_Float(fanManager.fan_speed[0], row, false, 1);
             }
             else
-              Modify_Value(thermalManager.fan_speed[0], MIN_FAN_SPEED, MAX_FAN_SPEED, 1);
+              Modify_Value(fanManager.fan_speed[0], MIN_FAN_SPEED, MAX_FAN_SPEED, 1);
             break;
         #endif
 
@@ -3856,8 +3856,8 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             if (draw)
               Draw_Menu_Item(row, ICON_Back, F("Cancel"));
             else {
-              thermalManager.setTargetHotend(0, 0);
-              thermalManager.set_fan_speed(0, 0);
+              fanManager.setTargetHotend(0, 0);
+              fanManager.fanSpeedSet(0, 0);
               Redraw_Menu(false, true, true);
             }
             break;
@@ -3866,11 +3866,11 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
               Draw_Menu_Item(row, ICON_SetEndTemp, F("Continue"));
             else {
               Popup_Handler(Heating);
-              thermalManager.wait_for_hotend(0);
+              fanManager.wait_for_hotend(0);
               switch (last_menu) {
                 case Prepare:
                   Popup_Handler(FilChange);
-                  sprintf_P(cmd, PSTR("M600 B1 R%i"), thermalManager.temp_hotend[0].target);
+                  sprintf_P(cmd, PSTR("M600 B1 R%i"), fanManager.temp_hotend[0].target);
                   gcode.process_subcommands_now(cmd);
                   break;
                 #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
@@ -3890,7 +3890,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
                         break;
                       case CHANGEFIL_CHANGE:
                         Popup_Handler(FilChange);
-                        sprintf_P(cmd, PSTR("M600 B1 R%i"), thermalManager.temp_hotend[0].target);
+                        sprintf_P(cmd, PSTR("M600 B1 R%i"), fanManager.temp_hotend[0].target);
                         gcode.process_subcommands_now(cmd);
                         break;
                     }
@@ -3945,10 +3945,10 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           case PREHEATHOTEND_CUSTOM:
             if (draw) {
               Draw_Menu_Item(row, ICON_Temperature, F("Custom"));
-              Draw_Float(thermalManager.temp_hotend[0].target, row, false, 1);
+              Draw_Float(fanManager.temp_hotend[0].target, row, false, 1);
             }
             else
-              Modify_Value(thermalManager.temp_hotend[0].target, EXTRUDE_MINTEMP, MAX_E_TEMP, 1);
+              Modify_Value(fanManager.temp_hotend[0].target, EXTRUDE_MINTEMP, MAX_E_TEMP, 1);
             break;
         }
         break;
@@ -4222,9 +4222,9 @@ void CrealityDWINClass::Value_Control() {
       sprintf_P(cmd, PSTR("M290 Z%s"), dtostrf((tempvalue / valueunit - zoffsetvalue), 1, 3, str_1));
       gcode.process_subcommands_now(cmd);
     }
-    if (TERN0(HAS_HOTEND, valuepointer == &thermalManager.temp_hotend[0].pid.Ki) || TERN0(HAS_HEATED_BED, valuepointer == &thermalManager.temp_bed.pid.Ki))
+    if (TERN0(HAS_HOTEND, valuepointer == &fanManager.temp_hotend[0].pid.Ki) || TERN0(HAS_HEATED_BED, valuepointer == &fanManager.temp_bed.pid.Ki))
       tempvalue = scalePID_i(tempvalue);
-    if (TERN0(HAS_HOTEND, valuepointer == &thermalManager.temp_hotend[0].pid.Kd) || TERN0(HAS_HEATED_BED, valuepointer == &thermalManager.temp_bed.pid.Kd))
+    if (TERN0(HAS_HOTEND, valuepointer == &fanManager.temp_hotend[0].pid.Kd) || TERN0(HAS_HEATED_BED, valuepointer == &fanManager.temp_bed.pid.Kd))
       tempvalue = scalePID_d(tempvalue);
     switch (valuetype) {
       case 0: *(float*)valuepointer = tempvalue / valueunit; break;
@@ -4421,7 +4421,7 @@ void CrealityDWINClass::CNC_Screen_Control() {
                 cmnd[sprintf_P(cmnd, PSTR("M140 S%i"), pausebed)] = '\0';
                 gcode.process_subcommands_now(cmnd);
               #endif
-              TERN_(HAS_FAN, thermalManager.fan_speed[0] = pausefan);
+              TERN_(HAS_FAN, fanManager.fan_speed[0] = pausefan);
               planner.synchronize();
               TERN_(SDSUPPORT, queue.inject(F("M24")));
             #endif
@@ -4469,10 +4469,10 @@ void CrealityDWINClass::Popup_Control() {
               planner.synchronize();
             #else
               queue.inject(F("M25"));
-              TERN_(HAS_HOTEND, pausetemp = thermalManager.temp_hotend[0].target);
-              TERN_(HAS_HEATED_BED, pausebed = thermalManager.temp_bed.target);
-              TERN_(HAS_FAN, pausefan = thermalManager.fan_speed[0]);
-              thermalManager.cooldown();
+              TERN_(HAS_HOTEND, pausetemp = fanManager.temp_hotend[0].target);
+              TERN_(HAS_HEATED_BED, pausebed = fanManager.temp_bed.target);
+              TERN_(HAS_FAN, pausefan = fanManager.fan_speed[0]);
+              fanManager.cooldown();
             #endif
           }
           else {
@@ -4485,7 +4485,7 @@ void CrealityDWINClass::Popup_Control() {
         if (selection == 0) {
           if (sdprint) {
             ui.abort_print();
-            thermalManager.cooldown();
+            fanManager.cooldown();
           }
           else {
             TERN_(HOST_ACTION_COMMANDS, hostui.cancel());
@@ -4506,8 +4506,8 @@ void CrealityDWINClass::Popup_Control() {
       #if HAS_HOTEND
         case ETemp:
           if (selection == 0) {
-            thermalManager.setTargetHotend(EXTRUDE_MINTEMP, 0);
-            thermalManager.set_fan_speed(0, MAX_FAN_SPEED);
+            fanManager.setTargetHotend(EXTRUDE_MINTEMP, 0);
+            fanManager.fanSpeedSet(0, MAX_FAN_SPEED);
             Draw_Menu(PreheatHotend);
           }
           else
@@ -4533,15 +4533,15 @@ void CrealityDWINClass::Popup_Control() {
       #if ENABLED(ADVANCED_PAUSE_FEATURE)
         case ConfFilChange:
           if (selection == 0) {
-            if (thermalManager.temp_hotend[0].target < thermalManager.extrude_min_temp)
+            if (fanManager.temp_hotend[0].target < fanManager.extrude_min_temp)
               Popup_Handler(ETemp);
             else {
-              if (thermalManager.temp_hotend[0].celsius < thermalManager.temp_hotend[0].target - 2) {
+              if (fanManager.temp_hotend[0].celsius < fanManager.temp_hotend[0].target - 2) {
                 Popup_Handler(Heating);
-                thermalManager.wait_for_hotend(0);
+                fanManager.wait_for_hotend(0);
               }
               Popup_Handler(FilChange);
-              sprintf_P(cmd, PSTR("M600 B1 R%i"), thermalManager.temp_hotend[0].target);
+              sprintf_P(cmd, PSTR("M600 B1 R%i"), fanManager.temp_hotend[0].target);
               gcode.process_subcommands_now(cmd);
             }
           }
@@ -4616,9 +4616,9 @@ void CrealityDWINClass::Confirm_Control() {
 /* In-Menu Value Modification */
 
 void CrealityDWINClass::Setup_Value(float value, float min, float max, float unit, uint8_t type) {
-  if (TERN0(HAS_HOTEND, valuepointer == &thermalManager.temp_hotend[0].pid.Ki) || TERN0(HAS_HEATED_BED, valuepointer == &thermalManager.temp_bed.pid.Ki))
+  if (TERN0(HAS_HOTEND, valuepointer == &fanManager.temp_hotend[0].pid.Ki) || TERN0(HAS_HEATED_BED, valuepointer == &fanManager.temp_bed.pid.Ki))
     tempvalue = unscalePID_i(value) * unit;
-  else if (TERN0(HAS_HOTEND, valuepointer == &thermalManager.temp_hotend[0].pid.Kd) || TERN0(HAS_HEATED_BED, valuepointer == &thermalManager.temp_bed.pid.Kd))
+  else if (TERN0(HAS_HOTEND, valuepointer == &fanManager.temp_hotend[0].pid.Kd) || TERN0(HAS_HEATED_BED, valuepointer == &fanManager.temp_bed.pid.Kd))
     tempvalue = unscalePID_d(value) * unit;
   else
     tempvalue = value * unit;
@@ -4715,7 +4715,7 @@ void CrealityDWINClass::Start_Print(bool sd) {
 void CrealityDWINClass::Stop_Print() {
   printing = false;
   sdprint = false;
-  thermalManager.cooldown();
+  fanManager.cooldown();
   TERN_(LCD_SET_PROGRESS_MANUALLY, ui.set_progress(100 * (PROGRESS_SCALE)));
   TERN_(USE_M73_REMAINING_TIME, ui.set_remaining_time(0));
   Draw_Print_confirm();
@@ -4839,58 +4839,58 @@ void CrealityDWINClass::Screen_Update() {
     switch (active_menu) {
       case TempMenu:
         #if HAS_HOTEND
-          if (thermalManager.temp_hotend[0].target != hotendtarget) {
-            hotendtarget = thermalManager.temp_hotend[0].target;
+          if (fanManager.temp_hotend[0].target != hotendtarget) {
+            hotendtarget = fanManager.temp_hotend[0].target;
             if (scrollpos <= TEMP_HOTEND && TEMP_HOTEND <= scrollpos + MROWS) {
               if (process != Value || selection != TEMP_HOTEND - scrollpos)
-                Draw_Float(thermalManager.temp_hotend[0].target, TEMP_HOTEND - scrollpos, false, 1);
+                Draw_Float(fanManager.temp_hotend[0].target, TEMP_HOTEND - scrollpos, false, 1);
             }
           }
         #endif
         #if HAS_HEATED_BED
-          if (thermalManager.temp_bed.target != bedtarget) {
-            bedtarget = thermalManager.temp_bed.target;
+          if (fanManager.temp_bed.target != bedtarget) {
+            bedtarget = fanManager.temp_bed.target;
             if (scrollpos <= TEMP_BED && TEMP_BED <= scrollpos + MROWS) {
               if (process != Value || selection != TEMP_HOTEND - scrollpos)
-                Draw_Float(thermalManager.temp_bed.target, TEMP_BED - scrollpos, false, 1);
+                Draw_Float(fanManager.temp_bed.target, TEMP_BED - scrollpos, false, 1);
             }
           }
         #endif
         #if HAS_FAN
-          if (thermalManager.fan_speed[0] != fanspeed) {
-            fanspeed = thermalManager.fan_speed[0];
+          if (fanManager.fan_speed[0] != fanspeed) {
+            fanspeed = fanManager.fan_speed[0];
             if (scrollpos <= TEMP_FAN && TEMP_FAN <= scrollpos + MROWS) {
               if (process != Value || selection != TEMP_HOTEND - scrollpos)
-                Draw_Float(thermalManager.fan_speed[0], TEMP_FAN - scrollpos, false, 1);
+                Draw_Float(fanManager.fan_speed[0], TEMP_FAN - scrollpos, false, 1);
             }
           }
         #endif
         break;
       case Tune:
         #if HAS_HOTEND
-          if (thermalManager.temp_hotend[0].target != hotendtarget) {
-            hotendtarget = thermalManager.temp_hotend[0].target;
+          if (fanManager.temp_hotend[0].target != hotendtarget) {
+            hotendtarget = fanManager.temp_hotend[0].target;
             if (scrollpos <= TUNE_HOTEND && TUNE_HOTEND <= scrollpos + MROWS) {
               if (process != Value || selection != TEMP_HOTEND - scrollpos)
-                Draw_Float(thermalManager.temp_hotend[0].target, TUNE_HOTEND - scrollpos, false, 1);
+                Draw_Float(fanManager.temp_hotend[0].target, TUNE_HOTEND - scrollpos, false, 1);
             }
           }
         #endif
         #if HAS_HEATED_BED
-          if (thermalManager.temp_bed.target != bedtarget) {
-            bedtarget = thermalManager.temp_bed.target;
+          if (fanManager.temp_bed.target != bedtarget) {
+            bedtarget = fanManager.temp_bed.target;
             if (scrollpos <= TUNE_BED && TUNE_BED <= scrollpos + MROWS) {
               if (process != Value || selection != TEMP_HOTEND - scrollpos)
-                Draw_Float(thermalManager.temp_bed.target, TUNE_BED - scrollpos, false, 1);
+                Draw_Float(fanManager.temp_bed.target, TUNE_BED - scrollpos, false, 1);
             }
           }
         #endif
         #if HAS_FAN
-          if (thermalManager.fan_speed[0] != fanspeed) {
-            fanspeed = thermalManager.fan_speed[0];
+          if (fanManager.fan_speed[0] != fanspeed) {
+            fanspeed = fanManager.fan_speed[0];
             if (scrollpos <= TUNE_FAN && TUNE_FAN <= scrollpos + MROWS) {
               if (process != Value || selection != TEMP_HOTEND - scrollpos)
-                Draw_Float(thermalManager.fan_speed[0], TUNE_FAN - scrollpos, false, 1);
+                Draw_Float(fanManager.fan_speed[0], TUNE_FAN - scrollpos, false, 1);
             }
           }
         #endif

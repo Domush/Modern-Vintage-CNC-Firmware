@@ -105,20 +105,20 @@ void draw_heater_status(uint16_t x, uint16_t y, const int8_t Heater) {
   celsius_t currentTemperature, targetTemperature;
 
   if (Heater >= 0) { // HotEnd
-    currentTemperature = thermalManager.wholeDegHotend(Heater);
-    targetTemperature = thermalManager.degTargetHotend(Heater);
+    currentTemperature = fanManager.wholeDegHotend(Heater);
+    targetTemperature = fanManager.degTargetHotend(Heater);
   }
   #if HAS_HEATED_BED
     else if (Heater == H_BED) {
-      currentTemperature = thermalManager.wholeDegBed();
-      targetTemperature = thermalManager.degTargetBed();
+      currentTemperature = fanManager.wholeDegBed();
+      targetTemperature = fanManager.degTargetBed();
     }
   #endif
   #if HAS_TEMP_CHAMBER
     else if (Heater == H_CHAMBER) {
-      currentTemperature = thermalManager.wholeDegChamber();
+      currentTemperature = fanManager.wholeDegChamber();
       #if HAS_HEATED_CHAMBER
-        targetTemperature = thermalManager.degTargetChamber();
+        targetTemperature = fanManager.degTargetChamber();
       #else
         targetTemperature = ABSOLUTE_ZERO;
       #endif
@@ -126,8 +126,8 @@ void draw_heater_status(uint16_t x, uint16_t y, const int8_t Heater) {
   #endif
   #if HAS_TEMP_COOLER
     else if (Heater == H_COOLER) {
-      currentTemperature = thermalManager.wholeDegCooler();
-      targetTemperature = TERN(HAS_COOLER, thermalManager.degTargetCooler(), ABSOLUTE_ZERO);
+      currentTemperature = fanManager.wholeDegCooler();
+      targetTemperature = TERN(HAS_COOLER, fanManager.degTargetCooler(), ABSOLUTE_ZERO);
     }
   #endif
   else return;
@@ -181,7 +181,7 @@ void draw_fan_status(uint16_t x, uint16_t y, const bool blink) {
   tft.canvas(x, y, 80, 120);
   tft.set_background(COLOR_BACKGROUND);
 
-  uint8_t fanSpeed = thermalManager.fan_speed[0];
+  uint8_t fanSpeed = fanManager.fan_speed[0];
   mvCNCImage image;
 
   if (fanSpeed >= 127)
@@ -193,7 +193,7 @@ void draw_fan_status(uint16_t x, uint16_t y, const bool blink) {
 
   tft.add_image(8, 20, image, COLOR_FAN);
 
-  tft_string.set((uint8_t *)ui8tostr4pctrj(thermalManager.fan_speed[0]));
+  tft_string.set((uint8_t *)ui8tostr4pctrj(fanManager.fan_speed[0]));
   tft_string.trim();
   tft.add_text(tft_string.center(80) + 6, 82, COLOR_FAN, tft_string);
 }
@@ -459,10 +459,10 @@ void MenuItem_confirm::draw_select_screen(PGM_P const yes, PGM_P const no, const
     tft_string.add('E');
     tft_string.add((char)('1' + extruder));
     tft_string.add(' ');
-    tft_string.add(i16tostr3rj(thermalManager.wholeDegHotend(extruder)));
+    tft_string.add(i16tostr3rj(fanManager.wholeDegHotend(extruder)));
     tft_string.add(LCD_STR_DEGREE);
     tft_string.add(" / ");
-    tft_string.add(i16tostr3rj(thermalManager.degTargetHotend(extruder)));
+    tft_string.add(i16tostr3rj(fanManager.degTargetHotend(extruder)));
     tft_string.add(LCD_STR_DEGREE);
     tft_string.trim();
     tft.add_text(tft_string.center(TFT_WIDTH), 0, COLOR_MENU_TEXT, tft_string);
@@ -647,7 +647,7 @@ static void moveAxis(const AxisEnum axis, const int8_t direction) {
   quick_feedback();
 
   #if ENABLED(PREVENT_COLD_EXTRUSION)
-    if (axis == E_AXIS && thermalManager.tooColdToExtrude(motionAxisState.e_selection)) {
+    if (axis == E_AXIS && fanManager.tooColdToExtrude(motionAxisState.e_selection)) {
       drawMessage("Too cold");
       return;
     }

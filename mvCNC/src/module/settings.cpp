@@ -681,7 +681,7 @@ void mvCNCSettings::postprocess() {
     #if HAS_USER_THERMISTORS
     {
       _FIELD_TEST(user_thermistor);
-      EEPROM_WRITE(thermalManager.user_thermistor);
+      EEPROM_WRITE(fanManager.user_thermistor);
     }
     #endif
 
@@ -2012,7 +2012,7 @@ void mvCNCSettings::reset() {
   //
   // User-Defined Thermistors
   //
-  TERN_(HAS_USER_THERMISTORS, thermalManager.reset_user_thermistors());
+  TERN_(HAS_USER_THERMISTORS, fanManager.reset_user_thermistors());
 
   //
   // Power Monitor
@@ -2190,7 +2190,7 @@ void mvCNCSettings::reset() {
 
     #if HAS_USER_THERMISTORS
       LOOP_L_N(i, USER_THERMISTORS)
-        thermalManager.M305_report(i, forReplay);
+        fanManager.M305_report(i, forReplay);
     #endif
 
     //

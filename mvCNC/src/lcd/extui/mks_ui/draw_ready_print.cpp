@@ -91,15 +91,15 @@ lv_obj_t *e1, *e2, *e3, *bed;
 void mks_disp_test() {
   char buf[30] = {0};
   #if HAS_HOTEND
-    sprintf_P(buf, PSTR("e1:%d"), thermalManager.wholeDegHotend(0));
+    sprintf_P(buf, PSTR("e1:%d"), fanManager.wholeDegHotend(0));
     lv_label_set_text(e1, buf);
   #endif
   #if TOOL_CHANGE_SUPPORT
-    sprintf_P(buf, PSTR("e2:%d"), thermalManager.wholeDegHotend(1));
+    sprintf_P(buf, PSTR("e2:%d"), fanManager.wholeDegHotend(1));
     lv_label_set_text(e2, buf);
   #endif
   #if HAS_HEATED_BED
-    sprintf_P(buf, PSTR("bed:%d"), thermalManager.wholeDegBed());
+    sprintf_P(buf, PSTR("bed:%d"), fanManager.wholeDegBed());
     lv_label_set_text(bed, buf);
   #endif
 }
@@ -127,19 +127,19 @@ void lv_draw_ready_print() {
     #if HAS_HOTEND
       e1 = lv_label_create_empty(scr);
       lv_obj_set_pos(e1, 20, 20);
-      sprintf_P(buf, PSTR("e1:  %d"), thermalManager.wholeDegHotend(0));
+      sprintf_P(buf, PSTR("e1:  %d"), fanManager.wholeDegHotend(0));
       lv_label_set_text(e1, buf);
     #endif
     #if TOOL_CHANGE_SUPPORT
       e2 = lv_label_create_empty(scr);
       lv_obj_set_pos(e2, 20, 45);
-      sprintf_P(buf, PSTR("e2:  %d"), thermalManager.wholeDegHotend(1));
+      sprintf_P(buf, PSTR("e2:  %d"), fanManager.wholeDegHotend(1));
       lv_label_set_text(e2, buf);
     #endif
     #if HAS_HEATED_BED
       bed = lv_label_create_empty(scr);
       lv_obj_set_pos(bed, 20, 95);
-      sprintf_P(buf, PSTR("bed:  %d"), thermalManager.wholeDegBed());
+      sprintf_P(buf, PSTR("bed:  %d"), fanManager.wholeDegBed());
       lv_label_set_text(bed, buf);
     #endif
 
@@ -200,22 +200,22 @@ void lv_draw_ready_print() {
 
 void lv_temp_refr() {
   #if HAS_HOTEND
-    sprintf(public_buf_l, printing_menu.temp1, thermalManager.wholeDegHotend(0), thermalManager.degTargetHotend(0));
+    sprintf(public_buf_l, printing_menu.temp1, fanManager.wholeDegHotend(0), fanManager.degTargetHotend(0));
     lv_label_set_text(labelExt1, public_buf_l);
     lv_obj_align(labelExt1, buttonExt1, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
   #endif
   #if TOOL_CHANGE_SUPPORT
-    sprintf(public_buf_l, printing_menu.temp1, thermalManager.wholeDegHotend(1), thermalManager.degTargetHotend(1));
+    sprintf(public_buf_l, printing_menu.temp1, fanManager.wholeDegHotend(1), fanManager.degTargetHotend(1));
     lv_label_set_text(labelExt2, public_buf_l);
     lv_obj_align(labelExt2, buttonExt2, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
   #endif
   #if HAS_HEATED_BED
-    sprintf(public_buf_l, printing_menu.bed_temp, thermalManager.wholeDegBed(), thermalManager.degTargetBed());
+    sprintf(public_buf_l, printing_menu.bed_temp, fanManager.wholeDegBed(), fanManager.degTargetBed());
     lv_label_set_text(labelBed, public_buf_l);
     lv_obj_align(labelBed, buttonBedstate, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
   #endif
   #if HAS_FAN
-    sprintf_P(public_buf_l, PSTR("%d%%"), (int)thermalManager.fanSpeedPercent(0));
+    sprintf_P(public_buf_l, PSTR("%d%%"), (int)fanManager.fanSpeedPercent(0));
     lv_label_set_text(labelFan, public_buf_l);
     lv_obj_align(labelFan, buttonFanstate, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
   #endif

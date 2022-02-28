@@ -306,9 +306,9 @@ void startOrResumeJob() {
 
     print_job_timer.abort();
 
-    IF_DISABLED(SD_ABORT_NO_COOLDOWN, thermalManager.disable_all_heaters());
+    IF_DISABLED(SD_ABORT_NO_COOLDOWN, fanManager.disable_all_heaters());
 
-    TERN(HAS_CUTTER, cutter.kill(), thermalManager.zero_fan_speeds()); // Full cutter shutdown including ISR control
+    TERN(HAS_CUTTER, cutter.kill(), fanManager.zero_fan_speeds()); // Full cutter shutdown including ISR control
 
     wait_for_heatup = false;
 
@@ -663,7 +663,7 @@ void idle(bool no_stepper_sleep/*=false*/) {
  * After this the machine will need to be reset.
  */
 void kill(FSTR_P const lcd_error/*=nullptr*/, FSTR_P const lcd_component/*=nullptr*/, const bool steppers_off/*=false*/) {
-  thermalManager.disable_all_heaters();
+  fanManager.disable_all_heaters();
 
   TERN_(HAS_CUTTER, cutter.kill()); // Full cutter shutdown including ISR control
 
@@ -735,7 +735,7 @@ void stop() {
   print_job_timer.stop();
 
   #if EITHER(PROBING_FANS_OFF, ADVANCED_PAUSE_FANS_PAUSE)
-    thermalManager.set_fans_paused(false); // Un-pause fans for safety
+    fanManager.fanPause(false); // Un-pause fans for safety
   #endif
 
   if (!IsStopped()) {

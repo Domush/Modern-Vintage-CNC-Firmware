@@ -93,7 +93,7 @@ void EasythreedUI::loadButton() {
     case FS_PRESS:
       if (ELAPSED(millis(), filament_time + BTN_DEBOUNCE_MS)) {     // After a short debounce delay...
         if (!READ(BTN_RETRACT) || !READ(BTN_FEED)) {                // ...if switch still toggled...
-          thermalManager.setTargetHotend(EXTRUDE_MINTEMP + 10, 0);  // Start heating up
+          fanManager.setTargetHotend(EXTRUDE_MINTEMP + 10, 0);  // Start heating up
           blink_interval_ms = LED_BLINK_7;                          // Set the LED to blink fast
           filament_status++;
         }
@@ -106,9 +106,9 @@ void EasythreedUI::loadButton() {
       if (READ(BTN_RETRACT) && READ(BTN_FEED)) {                    // Switch in center position (stop)
         blink_interval_ms = LED_ON;                                 // LED on steady
         filament_status = FS_IDLE;
-        thermalManager.disable_all_heaters();
+        fanManager.disable_all_heaters();
       }
-      else if (thermalManager.hotEnoughToExtrude(0)) {              // Is the hotend hot enough to move material?
+      else if (fanManager.hotEnoughToExtrude(0)) {              // Is the hotend hot enough to move material?
         filament_status++;                                          // Proceed to feed / retract.
         blink_interval_ms = LED_BLINK_5;                            // Blink ~3 times per second
       }
@@ -121,7 +121,7 @@ void EasythreedUI::loadButton() {
         flag = false;                                               // Restore flag to false
         filament_status = FS_IDLE;                                  // Go back to idle state
         quickstop_stepper();                                        // Hard-stop all the steppers ... now!
-        thermalManager.disable_all_heaters();                       // And disable all the heaters
+        fanManager.disable_all_heaters();                       // And disable all the heaters
         blink_interval_ms = LED_ON;
       }
       else if (!flag) {

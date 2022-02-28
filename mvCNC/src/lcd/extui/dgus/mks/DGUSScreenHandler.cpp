@@ -324,7 +324,7 @@ void DGUSScreenHandler::GetTurnOffCtrl(DGUS_VP_Variable &var, void *val_ptr) {
 void DGUSScreenHandler::GetMinExtrudeTemp(DGUS_VP_Variable &var, void *val_ptr) {
   DEBUG_ECHOLNPGM("GetMinExtrudeTemp");
   const uint16_t value = swap16(*(uint16_t *)val_ptr);
-  TERN_(PREVENT_COLD_EXTRUSION, thermalManager.extrude_min_temp = value);
+  TERN_(PREVENT_COLD_EXTRUSION, fanManager.extrude_min_temp = value);
   mks_min_extrusion_temp = value;
   settings.save();
 }
@@ -1065,7 +1065,7 @@ void DGUSScreenHandler::HandleAccChange_MKS(DGUS_VP_Variable &var, void *val_ptr
 #if ENABLED(PREVENT_COLD_EXTRUSION)
   void DGUSScreenHandler::HandleGetExMinTemp_MKS(DGUS_VP_Variable &var, void *val_ptr) {
     const uint16_t value_ex_min_temp = swap16(*(uint16_t*)val_ptr);
-    thermalManager.extrude_min_temp = value_ex_min_temp;
+    fanManager.extrude_min_temp = value_ex_min_temp;
     skipVP = var.VP; // don't overwrite value the next update time as the display might autoincrement in parallel
   }
 #endif
@@ -1194,7 +1194,7 @@ void DGUSScreenHandler::MKS_FilamentLoadUnload(DGUS_VP_Variable &var, void *val_
     default: break;
     case 0:
       #if HAS_HOTEND
-        if (thermalManager.tooColdToExtrude(0))
+        if (fanManager.tooColdToExtrude(0))
           hotend_too_cold = 1;
         else {
           #if EITHER(TOOL_CHANGE_SUPPORT, SINGLENOZZLE)
@@ -1205,16 +1205,16 @@ void DGUSScreenHandler::MKS_FilamentLoadUnload(DGUS_VP_Variable &var, void *val_
       break;
     case 1:
       #if TOOL_CHANGE_SUPPORT
-        if (thermalManager.tooColdToExtrude(1)) hotend_too_cold = 2; else swap_tool = 2;
+        if (fanManager.tooColdToExtrude(1)) hotend_too_cold = 2; else swap_tool = 2;
       #elif ENABLED(SINGLENOZZLE)
-        if (thermalManager.tooColdToExtrude(0)) hotend_too_cold = 1; else swap_tool = 2;
+        if (fanManager.tooColdToExtrude(0)) hotend_too_cold = 1; else swap_tool = 2;
       #endif
       break;
   }
 
   #if BOTH(HAS_HOTEND, PREVENT_COLD_EXTRUSION)
     if (hotend_too_cold) {
-      if (thermalManager.targetTooColdToExtrude(hotend_too_cold - 1)) thermalManager.setTargetHotend(thermalManager.extrude_min_temp, hotend_too_cold - 1);
+      if (fanManager.targetTooColdToExtrude(hotend_too_cold - 1)) fanManager.setTargetHotend(fanManager.extrude_min_temp, hotend_too_cold - 1);
       sendinfoscreen(F("NOTICE"), nullptr, F("Please wait."), F("Spindle heating!"), true, true, true, true);
       SetupConfirmAction(nullptr);
       GotoScreen(DGUSLCD_SCREEN_POPUP);
@@ -1313,10 +1313,10 @@ void DGUSScreenHandler::MKS_FilamentUnLoad(DGUS_VP_Variable &var, void *val_ptr)
 
     if (filament_data.action == 0) { // Go back to utility screen
       #if HAS_HOTEND
-        thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
+        fanManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
       #endif
       #if TOOL_CHANGE_SUPPORT
-        thermalManager.setTargetHotend(e_temp, ExtUI::extruder_t::E1);
+        fanManager.setTargetHotend(e_temp, ExtUI::extruder_t::E1);
       #endif
       GotoScreen(DGUSLCD_SCREEN_UTILITY);
     }
@@ -1326,13 +1326,13 @@ void DGUSScreenHandler::MKS_FilamentUnLoad(DGUS_VP_Variable &var, void *val_ptr)
           #if HAS_HOTEND
             case VP_E0_FILAMENT_LOAD_UNLOAD:
               filament_data.extruder = ExtUI::extruder_t::E0;
-              thermalManager.setTargetHotend(e_temp, filament_data.extruder);
+              fanManager.setTargetHotend(e_temp, filament_data.extruder);
               break;
           #endif
           #if TOOL_CHANGE_SUPPORT
             case VP_E1_FILAMENT_LOAD_UNLOAD:
               filament_data.extruder = ExtUI::extruder_t::E1;
-              thermalManager.setTargetHotend(e_temp, filament_data.extruder);
+              fanManager.setTargetHotend(e_temp, filament_data.extruder);
               break;
           #endif
       }
@@ -1344,8 +1344,8 @@ void DGUSScreenHandler::MKS_FilamentUnLoad(DGUS_VP_Variable &var, void *val_ptr)
     if (filament_data.action <= 0) return;
 
     // If we close to the target temperature, we can start load or unload the filament
-    if (thermalManager.hotEnoughToExtrude(filament_data.extruder) && \
-        thermalManager.targetHotEnoughToExtrude(filament_data.extruder)) {
+    if (fanManager.hotEnoughToExtrude(filament_data.extruder) && \
+        fanManager.targetHotEnoughToExtrude(filament_data.extruder)) {
       float movevalue = DGUS_FILAMENT_LOAD_LENGTH_PER_TIME;
 
       if (filament_data.action == 1) { // load filament
@@ -1405,7 +1405,7 @@ bool DGUSScreenHandler::loop() {
 
       #if ENABLED(PREVENT_COLD_EXTRUSION)
         if (mks_min_extrusion_temp != 0)
-          thermalManager.extrude_min_temp = mks_min_extrusion_temp;
+          fanManager.extrude_min_temp = mks_min_extrusion_temp;
       #endif
 
       DGUS_ExtrudeLoadInit();
