@@ -10,7 +10,7 @@
 #include "stepper.h"
 
 #include "../sd/cardreader.h"
-#include "temperature.h"
+#include "fan_control.h"
 #include "../lcd/mvcncui.h"
 
 #if ENABLED(ENDSTOP_INTERRUPTS_FEATURE)

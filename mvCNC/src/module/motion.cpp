@@ -10,7 +10,7 @@
 #include "endstops.h"
 #include "stepper.h"
 #include "planner.h"
-#include "temperature.h"
+#include "fan_control.h"
 
 #include "../gcode/gcode.h"
 

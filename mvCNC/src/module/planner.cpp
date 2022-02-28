@@ -47,7 +47,7 @@
 #include "planner.h"
 #include "stepper.h"
 #include "motion.h"
-#include "temperature.h"
+#include "fan_control.h"
 #include "../lcd/mvcncui.h"
 #include "../gcode/parser.h"
 

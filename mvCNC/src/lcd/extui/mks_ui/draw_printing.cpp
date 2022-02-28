@@ -10,7 +10,7 @@
 #include <lv_conf.h>
 
 #include "../../../mvCNCCore.h" // for mvcnc_state
-#include "../../../module/temperature.h"
+#include "../../../module/fan_control.h"
 #include "../../../module/motion.h"
 #include "../../../sd/cardreader.h"
 #include "../../../gcode/queue.h"

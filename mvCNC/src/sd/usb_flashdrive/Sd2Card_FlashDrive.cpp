@@ -24,7 +24,7 @@
 
 #include "../../mvCNCCore.h"
 #include "../../core/serial.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 
 #if DISABLED(USE_OTG_USB_HOST) && !PINS_EXIST(USB_CS, USB_INTR)
   #error "USB_FLASH_DRIVE_SUPPORT requires USB_CS_PIN and USB_INTR_PIN to be defined."

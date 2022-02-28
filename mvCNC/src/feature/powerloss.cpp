@@ -33,7 +33,7 @@ uint32_t CNCJobRecovery::cmd_sdpos, // = 0
 #include "../module/motion.h"
 #include "../module/planner.h"
 #include "../module/jobcounter.h"
-#include "../module/temperature.h"
+#include "../module/fan_control.h"
 #include "../core/serial.h"
 
 #define DEBUG_OUT ENABLED(DEBUG_POWER_LOSS_RECOVERY)

@@ -14,7 +14,7 @@ Nozzle nozzle;
 #include "../module/motion.h"
 
 #if NOZZLE_CLEAN_MIN_TEMP > 20
-  #include "../module/temperature.h"
+  #include "../module/fan_control.h"
 #endif
 
 #if ENABLED(NOZZLE_CLEAN_FEATURE)

@@ -13,7 +13,7 @@
 #if HAS_HEATED_CHAMBER
 
 #include "../gcode.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 #include "../../lcd/mvcncui.h"
 
 /**

@@ -18,7 +18,7 @@
 #include "../../../mvCNCCore.h"
 
 #include "../../../gcode/gcode.h"
-#include "../../../module/temperature.h"
+#include "../../../module/fan_control.h"
 #include "../../../module/planner.h"
 #include "../../../module/settings.h"
 #include "../../../libs/buzzer.h"

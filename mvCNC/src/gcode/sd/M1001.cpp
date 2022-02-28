@@ -9,7 +9,7 @@
 #include "../gcode.h"
 #include "../../module/planner.h"
 #include "../../module/jobcounter.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 #include "../../sd/cardreader.h"
 
 #ifdef SD_FINISHED_RELEASECOMMAND

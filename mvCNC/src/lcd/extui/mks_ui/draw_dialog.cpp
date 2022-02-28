@@ -15,7 +15,7 @@
 
 #include "../../../sd/cardreader.h"
 #include "../../../gcode/queue.h"
-#include "../../../module/temperature.h"
+#include "../../../module/fan_control.h"
 #include "../../../module/planner.h"
 #include "../../../gcode/gcode.h"
 #include "../../../inc/mvCNCConfig.h"

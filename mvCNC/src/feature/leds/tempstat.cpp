@@ -11,7 +11,7 @@
 #if ENABLED(TEMP_STAT_LEDS)
 
 #include "tempstat.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 
 void handle_status_leds() {
   static int8_t old_red = -1;  // Invalid value to force LED initialization

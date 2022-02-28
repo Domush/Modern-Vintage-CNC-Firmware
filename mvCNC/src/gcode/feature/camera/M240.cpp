@@ -22,7 +22,7 @@
   #define _PHOTO_RETRACT_MM (PHOTO_RETRACT_MM + 0)
 
   #include "../../../module/planner.h"
-  #include "../../../module/temperature.h"
+  #include "../../../module/fan_control.h"
 
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
     #include "../../../feature/pause.h"

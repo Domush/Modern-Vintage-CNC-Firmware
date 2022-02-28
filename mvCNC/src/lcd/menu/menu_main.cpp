@@ -11,7 +11,7 @@
 #if HAS_MVCNCUI_MENU
 
 #include "menu_item.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 #include "../../gcode/queue.h"
 #include "../../module/jobcounter.h"
 #include "../../module/stepper.h"

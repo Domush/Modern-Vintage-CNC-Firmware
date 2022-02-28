@@ -116,7 +116,7 @@ constexpr uint8_t epps = ENCODER_PULSES_PER_STEP;
 #endif
 
 #if HAS_PREHEAT
-  #include "../module/temperature.h"
+  #include "../module/fan_control.h"
 
   preheat_t mvCNCUI::material_preset[PREHEAT_COUNT];  // Initialized by settings.load()
 
@@ -235,7 +235,7 @@ void mvCNCUI::init() {
 
   #include "lcdprint.h"
 
-  #include "../module/temperature.h"
+  #include "../module/fan_control.h"
   #include "../module/planner.h"
   #include "../module/motion.h"
 

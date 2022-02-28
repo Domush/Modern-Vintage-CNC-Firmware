@@ -19,7 +19,7 @@
 #include "../module/planner.h"
 #include "../module/stepper.h"
 #include "../module/jobcounter.h"
-#include "../module/temperature.h"
+#include "../module/fan_control.h"
 
 #if ENABLED(AUTO_BED_LEVELING_UBL)
   #include "bedlevel/bedlevel.h"

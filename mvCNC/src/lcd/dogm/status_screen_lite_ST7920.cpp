@@ -52,7 +52,7 @@
 #include "../../libs/duration_t.h"
 #include "../../module/motion.h"
 #include "../../module/jobcounter.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 
 #if ENABLED(SDSUPPORT)
   #include "../../sd/cardreader.h"

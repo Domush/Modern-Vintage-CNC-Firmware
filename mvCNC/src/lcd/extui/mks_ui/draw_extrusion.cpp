@@ -9,7 +9,7 @@
 #include "draw_ui.h"
 #include <lv_conf.h>
 
-#include "../../../module/temperature.h"
+#include "../../../module/fan_control.h"
 #include "../../../gcode/queue.h"
 #include "../../../inc/mvCNCConfig.h"
 

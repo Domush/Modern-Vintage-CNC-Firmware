@@ -5,7 +5,7 @@
 #include "utility.h"
 
 #include "../mvCNCCore.h"
-#include "../module/temperature.h"
+#include "../module/fan_control.h"
 
 void safe_delay(millis_t ms) {
   while (ms > 50) {

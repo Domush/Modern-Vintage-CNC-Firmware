@@ -9,7 +9,7 @@
 #include "probe.h"
 #include "motion.h"
 #include "planner.h"
-#include "temperature.h"
+#include "fan_control.h"
 
 #include "../mvCNCCore.h"
 

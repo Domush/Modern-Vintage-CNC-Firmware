@@ -10,7 +10,7 @@
 #include <lv_conf.h>
 
 #include "../../../gcode/queue.h"
-#include "../../../module/temperature.h"
+#include "../../../module/fan_control.h"
 #include "../../../inc/mvCNCConfig.h"
 
 extern lv_group_t *g;

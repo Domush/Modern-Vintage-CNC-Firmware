@@ -4,7 +4,7 @@
 
 #include "../gcode.h"
 
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 #include "../../module/planner.h"       // for planner.finish_and_disable
 #include "../../module/jobcounter.h"  // for print_job_timer.stop
 #include "../../lcd/mvcncui.h"         // for LCD_MESSAGE_F

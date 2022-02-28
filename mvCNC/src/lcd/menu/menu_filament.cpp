@@ -11,7 +11,7 @@
 #if BOTH(HAS_MVCNCUI_MENU, ADVANCED_PAUSE_FEATURE)
 
 #include "menu_item.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 #include "../../feature/pause.h"
 #include "../../gcode/queue.h"
 #if HAS_FILAMENT_SENSOR

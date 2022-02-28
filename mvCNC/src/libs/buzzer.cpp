@@ -7,7 +7,7 @@
 #if USE_BEEPER
 
 #include "buzzer.h"
-#include "../module/temperature.h"
+#include "../module/fan_control.h"
 #include "../lcd/mvcncui.h"
 
 #if ENABLED(EXTENSIBLE_UI)

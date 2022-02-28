@@ -15,7 +15,7 @@
 #include "../../module/planner.h"
 #include "../../module/probe.h"
 #include "../../feature/bedlevel/bedlevel.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 #include "../../module/probe.h"
 #include "../../feature/probe_temp_comp.h"
 #include "../../lcd/mvcncui.h"

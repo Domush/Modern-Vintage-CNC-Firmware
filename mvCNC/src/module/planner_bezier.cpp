@@ -14,7 +14,7 @@
 
 #include "planner.h"
 #include "motion.h"
-#include "temperature.h"
+#include "fan_control.h"
 
 #include "../mvCNCCore.h"
 #include "../gcode/queue.h"

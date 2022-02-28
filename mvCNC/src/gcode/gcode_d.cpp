@@ -13,7 +13,7 @@
   #endif
 
   #include "../module/settings.h"
-  #include "../module/temperature.h"
+  #include "../module/fan_control.h"
   #include "../libs/hex_print.h"
   #include "../HAL/shared/eeprom_if.h"
   #include "../HAL/shared/Delay.h"

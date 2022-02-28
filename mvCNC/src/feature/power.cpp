@@ -13,7 +13,7 @@
 #include "power.h"
 #include "../module/planner.h"
 #include "../module/stepper.h"
-#include "../module/temperature.h"
+#include "../module/fan_control.h"
 #include "../mvCNCCore.h"
 
 #if ENABLED(PS_OFF_SOUND)
@@ -28,7 +28,7 @@ Power powerManager;
 bool Power::psu_on;
 
 #if ENABLED(AUTO_POWER_CONTROL)
-  #include "../module/temperature.h"
+  #include "../module/fan_control.h"
 
   #if BOTH(USE_CONTROLLER_FAN, AUTO_POWER_CONTROLLERFAN)
     #include "controllerfan.h"

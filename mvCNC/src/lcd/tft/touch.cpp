@@ -11,7 +11,7 @@
 #include "../mvcncui.h"  // for ui methods
 #include "../menu/menu_item.h" // for touch_screen_calibration
 
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 #include "../../module/planner.h"
 
 #if ENABLED(AUTO_BED_LEVELING_UBL)

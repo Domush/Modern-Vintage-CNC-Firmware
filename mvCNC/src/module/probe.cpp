@@ -14,7 +14,7 @@
 
 #include "../libs/buzzer.h"
 #include "motion.h"
-#include "temperature.h"
+#include "fan_control.h"
 #include "endstops.h"
 
 #include "../gcode/gcode.h"

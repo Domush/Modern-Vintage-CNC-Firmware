@@ -12,7 +12,7 @@
 #include "../DGUSDisplay.h"
 #include "../DGUSScreenHandler.h"
 
-#include "../../../../module/temperature.h"
+#include "../../../../module/fan_control.h"
 #include "../../../../module/motion.h"
 #include "../../../../module/planner.h"
 

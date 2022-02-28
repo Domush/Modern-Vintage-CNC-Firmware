@@ -14,7 +14,7 @@
 
 #include <lvgl.h>
 
-#include "../../../module/temperature.h"
+#include "../../../module/fan_control.h"
 #include "../../../inc/mvCNCConfig.h"
 
 #if ENABLED(TOUCH_SCREEN_CALIBRATION)

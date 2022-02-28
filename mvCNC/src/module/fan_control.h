@@ -4,7 +4,7 @@
 #pragma once
 
 /**
- * temperature.h - temperature controller
+ * fan_control.h - temperature controller
  */
 
 // #include "thermistor/thermistors.h"
@@ -61,12 +61,12 @@ hotend_pid_t;
 #endif
 
 #define PID_PARAM(F,H) _PID_##F(TERN(PID_PARAMS_PER_HOTEND, H, 0 & H)) // Always use 'H' to suppress warning
-#define _PID_Kp(H) TERN(PIDTEMP, Temperature::temp_hotend[H].pid.Kp, NAN)
-#define _PID_Ki(H) TERN(PIDTEMP, Temperature::temp_hotend[H].pid.Ki, NAN)
-#define _PID_Kd(H) TERN(PIDTEMP, Temperature::temp_hotend[H].pid.Kd, NAN)
+#define _PID_Kp(H) TERN(PIDTEMP, FanControl::temp_hotend[H].pid.Kp, NAN)
+#define _PID_Ki(H) TERN(PIDTEMP, FanControl::temp_hotend[H].pid.Ki, NAN)
+#define _PID_Kd(H) TERN(PIDTEMP, FanControl::temp_hotend[H].pid.Kd, NAN)
 #if ENABLED(PIDTEMP)
-  #define _PID_Kc(H) TERN(PID_EXTRUSION_SCALING, Temperature::temp_hotend[H].pid.Kc, 1)
-  #define _PID_Kf(H) TERN(PID_FAN_SCALING,       Temperature::temp_hotend[H].pid.Kf, 0)
+  #define _PID_Kc(H) TERN(PID_EXTRUSION_SCALING, FanControl::temp_hotend[H].pid.Kc, 1)
+  #define _PID_Kf(H) TERN(PID_FAN_SCALING,       FanControl::temp_hotend[H].pid.Kf, 0)
 #else
   #define _PID_Kc(H) 1
   #define _PID_Kf(H) 0
@@ -146,7 +146,7 @@ enum ADCSensorState : char {
   StartupDelay  // Startup, delay initial temp reading a tiny bit so the hardware can settle
 };
 
-// Minimum number of Temperature::ISR loops between sensor readings.
+// Minimum number of FanControl::ISR loops between sensor readings.
 // Multiplied by 16 (OVERSAMPLENR) to obtain the total time to
 // get all oversampled sensor readings
 #define MIN_ADC_ISR_LOOPS 10
@@ -197,141 +197,13 @@ struct PIDHeaterInfo : public HeaterInfo {
   T pid;  // Initialized by settings.load()
 };
 
-#if ENABLED(PIDTEMP)
-  typedef struct PIDHeaterInfo<hotend_pid_t> hotend_info_t;
-#else
-  typedef heater_info_t hotend_info_t;
-#endif
-#if HAS_HEATED_BED
-  #if ENABLED(PIDTEMPBED)
-    typedef struct PIDHeaterInfo<PID_t> bed_info_t;
-  #else
-    typedef heater_info_t bed_info_t;
-  #endif
-#endif
-#if HAS_HEATED_CHAMBER
-  #if ENABLED(PIDTEMPCHAMBER)
-    typedef struct PIDHeaterInfo<PID_t> chamber_info_t;
-  #else
-    typedef heater_info_t chamber_info_t;
-  #endif
-#elif HAS_TEMP_CHAMBER
-  typedef temp_info_t chamber_info_t;
-#endif
-#if HAS_TEMP_PROBE
-  typedef temp_info_t probe_info_t;
-#endif
-#if EITHER(HAS_COOLER, HAS_TEMP_COOLER)
-  typedef heater_info_t cooler_info_t;
-#endif
-#if HAS_TEMP_BOARD
-  typedef temp_info_t board_info_t;
-#endif
-
-// Heater watch handling
-template <int INCREASE, int HYSTERESIS, millis_t PERIOD>
-struct HeaterWatch {
-  celsius_t target;
-  millis_t next_ms;
-  inline bool elapsed(const millis_t &ms) { return next_ms && ELAPSED(ms, next_ms); }
-  inline bool elapsed() { return elapsed(millis()); }
-
-  inline bool check(const celsius_t curr) { return curr >= target; }
-
-  inline void restart(const celsius_t curr, const celsius_t tgt) {
-    if (tgt) {
-      const celsius_t newtarget = curr + INCREASE;
-      if (newtarget < tgt - HYSTERESIS - 1) {
-        target = newtarget;
-        next_ms = millis() + SEC_TO_MS(PERIOD);
-        return;
-      }
-    }
-    next_ms = 0;
-  }
-};
-
-#if WATCH_HOTENDS
-  typedef struct HeaterWatch<WATCH_TEMP_INCREASE, TEMP_HYSTERESIS, WATCH_TEMP_PERIOD> hotend_watch_t;
-#endif
-#if WATCH_BED
-  typedef struct HeaterWatch<WATCH_BED_TEMP_INCREASE, TEMP_BED_HYSTERESIS, WATCH_BED_TEMP_PERIOD> bed_watch_t;
-#endif
-#if WATCH_CHAMBER
-  typedef struct HeaterWatch<WATCH_CHAMBER_TEMP_INCREASE, TEMP_CHAMBER_HYSTERESIS, WATCH_CHAMBER_TEMP_PERIOD> chamber_watch_t;
-#endif
-#if WATCH_COOLER
-  typedef struct HeaterWatch<WATCH_COOLER_TEMP_INCREASE, TEMP_COOLER_HYSTERESIS, WATCH_COOLER_TEMP_PERIOD> cooler_watch_t;
-#endif
-
 // Temperature sensor read value ranges
-typedef struct { int16_t raw_min, raw_max; } raw_range_t;
-typedef struct { celsius_t mintemp, maxtemp; } celsius_range_t;
-typedef struct { int16_t raw_min, raw_max; celsius_t mintemp, maxtemp; } temp_range_t;
-
-#define THERMISTOR_ABS_ZERO_C           -273.15f  // bbbbrrrrr cold !
-#define THERMISTOR_RESISTANCE_NOMINAL_C 25.0f     // mmmmm comfortable
-
-#if HAS_USER_THERMISTORS
-
-  enum CustomThermistorIndex : uint8_t {
-    #if TEMP_SENSOR_0_IS_CUSTOM
-      CTI_HOTEND_0,
-    #endif
-    #if TEMP_SENSOR_1_IS_CUSTOM
-      CTI_HOTEND_1,
-    #endif
-    #if TEMP_SENSOR_2_IS_CUSTOM
-      CTI_HOTEND_2,
-    #endif
-    #if TEMP_SENSOR_3_IS_CUSTOM
-      CTI_HOTEND_3,
-    #endif
-    #if TEMP_SENSOR_4_IS_CUSTOM
-      CTI_HOTEND_4,
-    #endif
-    #if TEMP_SENSOR_5_IS_CUSTOM
-      CTI_HOTEND_5,
-    #endif
-    #if TEMP_SENSOR_BED_IS_CUSTOM
-      CTI_BED,
-    #endif
-    #if TEMP_SENSOR_CHAMBER_IS_CUSTOM
-      CTI_CHAMBER,
-    #endif
-    #if TEMP_SENSOR_PROBE_IS_CUSTOM
-      CTI_PROBE,
-    #endif
-    #if TEMP_SENSOR_COOLER_IS_CUSTOM
-      CTI_COOLER,
-    #endif
-    #if TEMP_SENSOR_BOARD_IS_CUSTOM
-      CTI_BOARD,
-    #endif
-    #if TEMP_SENSOR_REDUNDANT_IS_CUSTOM
-      CTI_REDUNDANT,
-    #endif
-    USER_THERMISTORS
-  };
-
-  // User-defined thermistor
-  typedef struct {
-    bool pre_calc;     // true if pre-calculations update needed
-    float sh_c_coeff,  // Steinhart-Hart C coefficient .. defaults to '0.0'
-          sh_alpha,
-          series_res,
-          res_25, res_25_recip,
-          res_25_log,
-          beta, beta_recip;
-  } user_thermistor_t;
-
-#endif
 
 #if HAS_AUTO_FAN || HAS_FANCHECK
   #define HAS_FAN_LOGIC 1
 #endif
 
-class Temperature {
+class FanControl {
 
   public:
 
@@ -447,40 +319,7 @@ class Temperature {
     }
 
 
-    //high level conversion routines, for use outside of temperature.cpp
-    //inline so that there is no performance decrease.
-    //deg=degreeCelsius
-
-    static celsius_float_t degHotend(const uint8_t E_NAME) {
-      return TERN0(HAS_HOTEND, temp_hotend[HOTEND_INDEX].celsius);
-    }
-
-    static celsius_t wholeDegHotend(const uint8_t E_NAME) {
-      return TERN0(HAS_HOTEND, static_cast<celsius_t>(temp_hotend[HOTEND_INDEX].celsius + 0.5f));
-    }
-
-    static celsius_t degTargetHotend(const uint8_t E_NAME) {
-      return TERN0(HAS_HOTEND, temp_hotend[HOTEND_INDEX].target);
-    }
-
-    #if HAS_COOLER
-      static void setTargetCooler(const celsius_t celsius) {
-        temp_cooler.target = constrain(celsius, COOLER_MIN_TARGET, COOLER_MAX_TARGET);
-        start_watching_cooler();
-      }
-      // Start watching the Cooler to make sure it's really cooling down
-      static void start_watching_cooler() { TERN_(WATCH_COOLER, watch_cooler.restart(degCooler(), degTargetCooler())); }
-    #endif
-
-    #if ENABLED(JOB_TIMER_AUTOSTART)
-      /**
-       * Methods to check if heaters are enabled, indicating an active job
-       */
-      static bool auto_job_over_threshold();
-      static void auto_job_check_timer(const bool can_start, const bool can_stop);
-    #endif
-
   private:
 };
 
-extern Temperature thermalManager;
+extern FanControl thermalManager;

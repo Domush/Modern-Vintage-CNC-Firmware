@@ -18,7 +18,7 @@
 #include "../../ui_api.h"
 #include "../../../../module/probe.h"
 #include "../../../../module/motion.h"
-#include "../../../../module/temperature.h"
+#include "../../../../module/fan_control.h"
 
 const char DGUS_MACHINENAME[] PROGMEM = MACHINE_NAME;
 const char DGUS_mvCNCVERSION[] PROGMEM = SHORT_BUILD_VERSION;

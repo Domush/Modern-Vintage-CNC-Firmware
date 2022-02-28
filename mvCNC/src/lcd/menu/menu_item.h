@@ -454,7 +454,7 @@ class MenuItem_bool : public MenuEditItemBase {
 
 #if HAS_FAN
 
-  #include "../../module/temperature.h"
+  #include "../../module/fan_control.h"
 
   inline void on_fan_update() {
     thermalManager.set_fan_speed(MenuItemBase::itemIndex, editable.uint8);

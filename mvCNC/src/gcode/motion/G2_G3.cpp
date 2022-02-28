@@ -9,7 +9,7 @@
 #include "../gcode.h"
 #include "../../module/motion.h"
 #include "../../module/planner.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 
 #if ENABLED(DELTA)
   #include "../../module/delta.h"

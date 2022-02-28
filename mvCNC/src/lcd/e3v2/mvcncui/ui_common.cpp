@@ -20,7 +20,7 @@
 
 #include "../../../sd/cardreader.h"
 #include "../../../module/motion.h"
-#include "../../../module/temperature.h"
+#include "../../../module/fan_control.h"
 #include "../../../module/jobcounter.h"
 
 #if ENABLED(SDSUPPORT)

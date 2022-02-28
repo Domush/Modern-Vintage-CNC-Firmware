@@ -30,7 +30,7 @@
 #include "endstops.h"
 #include "planner.h"
 #include "stepper.h"
-#include "temperature.h"
+#include "fan_control.h"
 
 #include "../lcd/mvcncui.h"
 #include "../libs/vector_3.h"   // for matrix_3x3

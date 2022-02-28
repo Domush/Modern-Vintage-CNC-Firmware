@@ -15,7 +15,7 @@ GCodeQueue queue;
 #include "../sd/cardreader.h"
 #include "../module/motion.h"
 #include "../module/planner.h"
-#include "../module/temperature.h"
+#include "../module/fan_control.h"
 #include "../mvCNCCore.h"
 #include "../core/bug_on.h"
 

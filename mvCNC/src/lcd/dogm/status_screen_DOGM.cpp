@@ -18,7 +18,7 @@
 #include "../../libs/numtostr.h"
 
 #include "../../module/motion.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 
 #include "../../gcode/parser.h" // for units (and volumetric)
 

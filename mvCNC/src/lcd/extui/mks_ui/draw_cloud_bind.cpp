@@ -10,7 +10,7 @@
 #include "draw_ui.h"
 
 #include "../../../mvCNCCore.h"
-#include "../../../module/temperature.h"
+#include "../../../module/fan_control.h"
 
 #include "QR_Encode.h"
 

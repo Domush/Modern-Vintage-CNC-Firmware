@@ -22,7 +22,7 @@
 #endif
 
 #if ENABLED(PIDTEMP)
-  #include "../../module/temperature.h"
+  #include "../../module/fan_control.h"
 #endif
 
 #if HAS_FILAMENT_RUNOUT_DISTANCE

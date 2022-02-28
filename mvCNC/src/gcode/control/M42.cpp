@@ -10,7 +10,7 @@
 #include "../../mvCNCCore.h" // for pin_is_protected
 
 #if HAS_FAN
-  #include "../../module/temperature.h"
+  #include "../../module/fan_control.h"
 #endif
 
 #ifdef MAPLE_STM32F1

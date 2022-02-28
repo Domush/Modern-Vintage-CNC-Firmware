@@ -9,7 +9,7 @@
 
 #include "../inc/mvCNCConfigPre.h"
 #include "../core/types.h"
-#include "../module/temperature.h"
+#include "../module/fan_control.h"
 
 class Joystick {
   friend class Temperature;

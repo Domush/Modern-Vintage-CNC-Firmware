@@ -23,7 +23,7 @@
 #endif
 
 #if ENABLED(PREVENT_COLD_EXTRUSION)
-  #include "../../module/temperature.h"
+  #include "../../module/fan_control.h"
 #endif
 
 #if HAS_LEVELING

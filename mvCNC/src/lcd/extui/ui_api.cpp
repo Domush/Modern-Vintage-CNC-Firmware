@@ -33,7 +33,7 @@
 #include "../../module/motion.h"
 #include "../../module/planner.h"
 #include "../../module/probe.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 #include "../../module/jobcounter.h"
 #include "../../libs/duration_t.h"
 #include "../../HAL/shared/Delay.h"

@@ -3,7 +3,7 @@
 */
 
 #include "../gcode.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 
 /**
  * M105: Read hot end and bed temperature

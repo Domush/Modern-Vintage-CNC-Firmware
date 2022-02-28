@@ -8,7 +8,7 @@
 
 #include "../gcode.h"
 #include "../../module/motion.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 
 #if ENABLED(LASER_SYNCHRONOUS_M106_M107)
   #include "../../module/planner.h"

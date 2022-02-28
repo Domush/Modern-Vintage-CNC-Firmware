@@ -10,7 +10,7 @@
 
 #include "easythreed_ui.h"
 #include "pause.h"
-#include "../module/temperature.h"
+#include "../module/fan_control.h"
 #include "../module/jobcounter.h"
 #include "../sd/cardreader.h"
 #include "../gcode/queue.h"

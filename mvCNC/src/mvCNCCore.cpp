@@ -26,7 +26,7 @@
 #include "module/motion.h"
 #include "module/planner.h"
 #include "module/endstops.h"
-#include "module/temperature.h"
+#include "module/fan_control.h"
 #include "module/settings.h"
 #include "module/jobcounter.h" // CNCCounter or Stopwatch
 

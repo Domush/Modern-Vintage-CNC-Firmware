@@ -8,7 +8,7 @@
 
 #include "controllerfan.h"
 #include "../module/stepper.h"
-#include "../module/temperature.h"
+#include "../module/fan_control.h"
 
 ControllerFan controllerFan;
 

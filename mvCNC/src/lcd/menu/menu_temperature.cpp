@@ -11,7 +11,7 @@
 #if HAS_MVCNCUI_MENU && HAS_TEMPERATURE
 
 #include "menu_item.h"
-#include "../../module/temperature.h"
+#include "../../module/fan_control.h"
 
 #if HAS_FAN || ENABLED(SINGLENOZZLE)
   #include "../../module/motion.h"
@@ -29,7 +29,7 @@
 // "Temperature" submenu items
 //
 
-void Temperature::lcd_preheat(const uint8_t e, const int8_t indh, const int8_t indb) {
+void FanControl::lcd_preheat(const uint8_t e, const int8_t indh, const int8_t indb) {
   UNUSED(e); UNUSED(indh); UNUSED(indb);
   #if HAS_HOTEND
     if (indh >= 0 && ui.material_preset[indh].hotend_temp > 0)
