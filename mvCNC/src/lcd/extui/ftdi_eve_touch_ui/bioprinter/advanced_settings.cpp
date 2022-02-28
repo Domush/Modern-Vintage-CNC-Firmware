@@ -105,7 +105,7 @@ bool AdvancedSettingsMenu::onTouchEnd(uint8_t tag) {
     #endif
     case 5: GOTO_SCREEN(EndstopStatesScreen);              break;
     #if TOOL_CHANGE_SUPPORT
-    case 6: GOTO_SCREEN(NozzleOffsetScreen);               break;
+    case 6: GOTO_SCREEN(SpindleOffsetScreen);               break;
     #endif
 
     case 7: GOTO_SCREEN(StepsScreen);                      break;

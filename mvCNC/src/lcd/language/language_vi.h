@@ -190,7 +190,7 @@ namespace Language_vi {
   LSTR MSG_MOVE_100MM                     = _UxGT("Di chuyển 100mm");                      // Move 100mm
   LSTR MSG_SPEED                          = _UxGT("Tốc độ");                               // Speed
   LSTR MSG_BED_Z                          = _UxGT("Z Bàn");
-  LSTR MSG_NOZZLE                         = _UxGT("Đầu phun");                             // Nozzle
+  LSTR MSG_NOZZLE                         = _UxGT("Đầu phun");                             // Spindle
   LSTR MSG_NOZZLE_N                       = _UxGT("Đầu phun ~");
   LSTR MSG_BED                            = _UxGT("Bàn");                                  // bed
   LSTR MSG_FAN_SPEED                      = _UxGT("Tốc độ quạt");                          // fan speed
@@ -396,7 +396,7 @@ namespace Language_vi {
   LSTR MSG_FILAMENT_CHANGE_OPTION_HEADER  = _UxGT("Tùy chọn hồi phục:");                   // RESUME OPTIONS
   LSTR MSG_FILAMENT_CHANGE_OPTION_PURGE   = _UxGT("Xả thêm");                              // Purge more
   LSTR MSG_FILAMENT_CHANGE_OPTION_RESUME  = _UxGT("Tiếp tục");                             // continue
-  LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT("  Đầu Phun: ");                         // Nozzle
+  LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT("  Đầu Phun: ");                         // Spindle
   LSTR MSG_RUNOUT_SENSOR_ENABLE           = _UxGT("Cảm Biến Hết");                         // Runout Sensor
   LSTR MSG_KILL_HOMING_FAILED             = _UxGT("Sự nhà không thành công");              // Homing failed
   LSTR MSG_LCD_PROBING_FAILED             = _UxGT(" không thành công");                    // Probing failed
@@ -410,7 +410,7 @@ namespace Language_vi {
     LSTR MSG_FILAMENT_CHANGE_INIT         = _UxGT(MSG_3_LINE("Chờ cho sự", "thay đổi dây nhựa", "bắt đầu")); // wait for filament change to start
     LSTR MSG_FILAMENT_CHANGE_INSERT       = _UxGT(MSG_3_LINE("Đút dây nhựa vào", "và nhấn nút", "để tiếp tục")); // insert filament and press button to continue                       //
     LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Nhấn nút", "để làm nóng đầu phun")); // Press button to heat nozzle
-    LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("Đầu phun đang nóng lên", "Xin chờ...")); // Nozzle heating Please wait
+    LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("Đầu phun đang nóng lên", "Xin chờ...")); // Spindle heating Please wait
     LSTR MSG_FILAMENT_CHANGE_UNLOAD       = _UxGT(MSG_2_LINE("Chờ tro", "dây nhựa ra"));   // Wait for filament unload
     LSTR MSG_FILAMENT_CHANGE_LOAD         = _UxGT(MSG_2_LINE("Chờ tro", "dây nhựa vào"));  // Wait for filament load
     LSTR MSG_FILAMENT_CHANGE_PURGE        = _UxGT(MSG_2_LINE("Chờ tro", "xả dây nhựa"));   // wait for filament purge

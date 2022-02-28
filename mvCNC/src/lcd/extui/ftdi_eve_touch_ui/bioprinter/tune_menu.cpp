@@ -65,7 +65,7 @@ bool TuneMenu::onTouchEnd(uint8_t tag) {
     case 1: GOTO_PREVIOUS();                                     break;
     case 2: GOTO_SCREEN(FeedratePercentScreen);                  break;
     case 3: GOTO_SCREEN(TemperatureScreen);                      break;
-    case 4: GOTO_SCREEN(NudgeNozzleScreen);                      break;
+    case 4: GOTO_SCREEN(NudgeSpindleScreen);                      break;
     case 5: GOTO_SCREEN(BioConfirmHomeXYZ);                      break;
     case 6: SpinnerDialogBox::enqueueAndWait(F("G0 E0 F120")); break;
     case 7: StatusScreen::unlockMotors();                        break;

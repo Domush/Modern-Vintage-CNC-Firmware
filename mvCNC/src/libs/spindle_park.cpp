@@ -6,9 +6,9 @@
 
 #if EITHER(NOZZLE_CLEAN_FEATURE, SPINDLE_PARK_FEATURE)
 
-#include "nozzle.h"
+#include "spindle_park.h"
 
-Nozzle nozzle;
+Spindle nozzle;
 
 #include "../mvCNCCore.h"
 #include "../module/motion.h"
@@ -27,7 +27,7 @@ Nozzle nozzle;
    * @param end xyz_pos_t defining the ending point
    * @param strokes number of strokes to execute
    */
-  void Nozzle::stroke(const xyz_pos_t &start, const xyz_pos_t &end, const uint8_t &strokes) {
+  void Spindle::stroke(const xyz_pos_t &start, const xyz_pos_t &end, const uint8_t &strokes) {
     #if ENABLED(NOZZLE_CLEAN_GOBACK)
       const xyz_pos_t oldpos = current_position;
     #endif
@@ -66,7 +66,7 @@ Nozzle nozzle;
    * @param strokes number of strokes to execute
    * @param objects number of triangles to do
    */
-  void Nozzle::zigzag(const xyz_pos_t &start, const xyz_pos_t &end, const uint8_t &strokes, const uint8_t &objects) {
+  void Spindle::zigzag(const xyz_pos_t &start, const xyz_pos_t &end, const uint8_t &strokes, const uint8_t &objects) {
     const xy_pos_t diff = end - start;
     if (!diff.x || !diff.y) return;
 
@@ -112,7 +112,7 @@ Nozzle nozzle;
    * @param strokes number of strokes to execute
    * @param radius radius of circle
    */
-  void Nozzle::circle(const xyz_pos_t &start, const xyz_pos_t &middle, const uint8_t &strokes, const_float_t radius) {
+  void Spindle::circle(const xyz_pos_t &start, const xyz_pos_t &middle, const uint8_t &strokes, const_float_t radius) {
     if (strokes == 0) return;
 
     #if ENABLED(NOZZLE_CLEAN_GOBACK)
@@ -140,7 +140,7 @@ Nozzle nozzle;
    * @param pattern one of the available patterns
    * @param argument depends on the cleaning pattern
    */
-  void Nozzle::clean(const uint8_t &pattern, const uint8_t &strokes, const_float_t radius, const uint8_t &objects, const uint8_t cleans) {
+  void Spindle::clean(const uint8_t &pattern, const uint8_t &strokes, const_float_t radius, const uint8_t &objects, const uint8_t cleans) {
     xyz_pos_t start[HOTENDS] = NOZZLE_CLEAN_START_POINT, end[HOTENDS] = NOZZLE_CLEAN_END_POINT, middle[HOTENDS] = NOZZLE_CLEAN_CIRCLE_MIDDLE;
 
     const uint8_t arrPos = ANY(SINGLENOZZLE, MIXING_EXTRUDER) ? 0 : active_extruder;
@@ -148,11 +148,11 @@ Nozzle nozzle;
     #if NOZZLE_CLEAN_MIN_TEMP > 20
       if (thermalManager.degTargetHotend(arrPos) < NOZZLE_CLEAN_MIN_TEMP) {
         #if ENABLED(NOZZLE_CLEAN_HEATUP)
-          SERIAL_ECHOLNPGM("Nozzle too Cold - Heating");
+          SERIAL_ECHOLNPGM("Spindle too Cold - Heating");
           thermalManager.setTargetHotend(NOZZLE_CLEAN_MIN_TEMP, arrPos);
           thermalManager.wait_for_hotend(arrPos);
         #else
-          SERIAL_ECHOLNPGM("Nozzle too cold - Skipping wipe");
+          SERIAL_ECHOLNPGM("Spindle too cold - Skipping wipe");
           return;
         #endif
       }
@@ -207,7 +207,7 @@ Nozzle nozzle;
 
 #if ENABLED(SPINDLE_PARK_FEATURE)
 
-  float Nozzle::park_mode_0_height(const_float_t park_z) {
+  float Spindle::park_mode_0_height(const_float_t park_z) {
     // Apply a minimum raise, if specified. Use park.z as a minimum height instead.
     return _MAX(park_z,                       // Minimum height over 0 based on input
       _MIN(Z_MAX_POS,                         // Maximum height is fixed
@@ -219,7 +219,7 @@ Nozzle nozzle;
     );
   }
 
-  void Nozzle::park(const uint8_t z_action, const xyz_pos_t &park/*=SPINDLE_PARK_POINT*/) {
+  void Spindle::park(const uint8_t z_action, const xyz_pos_t &park/*=SPINDLE_PARK_POINT*/) {
     constexpr feedRate_t fr_xy = SPINDLE_PARK_XY_FEEDRATE, fr_z = SPINDLE_PARK_Z_FEEDRATE;
 
     switch (z_action) {

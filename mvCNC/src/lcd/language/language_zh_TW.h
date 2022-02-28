@@ -98,8 +98,8 @@ namespace Language_zh_TW {
   LSTR MSG_IDEX_MODE_DUPLICATE            = _UxGT("Duplication");
   LSTR MSG_IDEX_MODE_MIRRORED_COPY        = _UxGT("Mirrored Copy");
   LSTR MSG_IDEX_MODE_FULL_CTRL            = _UxGT("Full Control");
-  LSTR MSG_HOTEND_OFFSET_Z                = _UxGT("2nd Nozzle Z");
-  LSTR MSG_HOTEND_OFFSET_A                = _UxGT("2nd Nozzle @");
+  LSTR MSG_HOTEND_OFFSET_Z                = _UxGT("2nd Spindle Z");
+  LSTR MSG_HOTEND_OFFSET_A                = _UxGT("2nd Spindle @");
   LSTR MSG_UBL_DOING_G29                  = _UxGT("執行G29");     // "Doing G29"
   LSTR MSG_UBL_TOOLS                      = _UxGT("UBL工具");     // "UBL Tools"
   LSTR MSG_UBL_LEVEL_BED                  = _UxGT("統一熱床調平(UBL)");     // "Unified Bed Leveling"
@@ -131,7 +131,7 @@ namespace Language_zh_TW {
   LSTR MSG_UBL_VALIDATE_MESH_MENU         = _UxGT("批准網格");     // "Validate Mesh"
   LSTR MSG_UBL_VALIDATE_CUSTOM_MESH       = _UxGT("批准客戶網格");     // "Validate Custom Mesh"
   LSTR MSG_G26_HEATING_BED                = _UxGT("G26 加熱熱床");    // "G26 Heating Bed"
-  LSTR MSG_G26_HEATING_NOZZLE             = _UxGT("G26 加熱噴嘴"); //"G26 Heating Nozzle"
+  LSTR MSG_G26_HEATING_NOZZLE             = _UxGT("G26 加熱噴嘴"); //"G26 Heating Spindle"
   LSTR MSG_G26_MANUAL_PRIME               = _UxGT("手動填裝");  // "Manual priming..."
   LSTR MSG_G26_FIXED_LENGTH               = _UxGT("固定距離填裝");   // "Fixed Length Prime"
   LSTR MSG_G26_PRIME_DONE                 = _UxGT("完成填裝");   // "Done Priming"
@@ -211,7 +211,7 @@ namespace Language_zh_TW {
   LSTR MSG_MOVE_100MM                     = _UxGT("移動 100 mm");    // "Move 100mm"
   LSTR MSG_SPEED                          = _UxGT("速率");     // "Speed"
   LSTR MSG_BED_Z                          = _UxGT("熱床Z");     // "Bed Z"
-  LSTR MSG_NOZZLE                         = " " LCD_STR_THERMOMETER _UxGT(" 噴嘴");     // "Nozzle" 噴嘴
+  LSTR MSG_NOZZLE                         = " " LCD_STR_THERMOMETER _UxGT(" 噴嘴");     // "Spindle" 噴嘴
   LSTR MSG_NOZZLE_N                       = " " LCD_STR_THERMOMETER _UxGT(" 噴嘴 ~");
   LSTR MSG_BED                            = " " LCD_STR_THERMOMETER _UxGT(" 熱床");     // "Bed"
   LSTR MSG_CHAMBER                        = _UxGT("Enclosure");
@@ -339,7 +339,7 @@ namespace Language_zh_TW {
   LSTR MSG_TOOL_CHANGE_ZLIFT              = _UxGT("Z軸提昇");    // "Z Raise"
   LSTR MSG_SINGLENOZZLE_PRIME_SPEED       = _UxGT("最高速度");    // "Prime Speed"
   LSTR MSG_SINGLENOZZLE_RETRACT_SPEED     = _UxGT("收回速度");  // "Retract Speed"
-  LSTR MSG_NOZZLE_STANDBY                 = _UxGT("噴嘴待機"); //"Nozzle Standby"
+  LSTR MSG_NOZZLE_STANDBY                 = _UxGT("噴嘴待機"); //"Spindle Standby"
   LSTR MSG_FILAMENTCHANGE                 = _UxGT("更換絲料");     // "Change filament"
   LSTR MSG_FILAMENTCHANGE_E               = _UxGT("更換絲料 *");
   LSTR MSG_FILAMENTLOAD                   = _UxGT("裝載絲料");     // "Load filament"
@@ -453,7 +453,7 @@ namespace Language_zh_TW {
   LSTR MSG_FILAMENT_CHANGE_OPTION_HEADER  = _UxGT("恢複選項:");     // "RESUME OPTIONS:"
   LSTR MSG_FILAMENT_CHANGE_OPTION_PURGE   = _UxGT("清除更多");     // "Purge more"
   LSTR MSG_FILAMENT_CHANGE_OPTION_RESUME  = _UxGT("恢復列印");     // "Resume print"
-  LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT("  噴嘴: ");     // "  Nozzle: "
+  LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT("  噴嘴: ");     // "  Spindle: "
   LSTR MSG_RUNOUT_SENSOR                  = _UxGT("斷絲偵測");    // "Runout Sensor"
   LSTR MSG_RUNOUT_DISTANCE_MM             = _UxGT("絲距離mm");   // "Runout Dist mm"
   LSTR MSG_KILL_HOMING_FAILED             = _UxGT("歸原位失敗");     // "Homing failed"

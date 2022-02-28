@@ -1,5 +1,5 @@
 /******************
- * nudge_nozzle.h *
+ * nudge_spindle_park.h *
  ******************/
 
 /****************************************************************************
@@ -23,9 +23,9 @@
 #pragma once
 
 #define FTDI_NUDGE_NOZZLE_SCREEN
-#define FTDI_NUDGE_NOZZLE_SCREEN_CLASS NudgeNozzleScreen
+#define FTDI_NUDGE_NOZZLE_SCREEN_CLASS NudgeSpindleScreen
 
-struct NudgeNozzleScreenData {
+struct NudgeSpindleScreenData {
   struct BaseNumericAdjustmentScreenData placeholder;
   xyz_int_t rel;
   #if TOOL_CHANGE_SUPPORT
@@ -34,7 +34,7 @@ struct NudgeNozzleScreenData {
   bool show_offsets;
 };
 
-class NudgeNozzleScreen : public BaseNumericAdjustmentScreen, public CachedScreen<ADJUST_OFFSETS_SCREEN_CACHE> {
+class NudgeSpindleScreen : public BaseNumericAdjustmentScreen, public CachedScreen<ADJUST_OFFSETS_SCREEN_CACHE> {
   public:
     static void onEntry();
     static void onRedraw(draw_mode_t);

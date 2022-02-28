@@ -116,7 +116,7 @@ void AnycubicTFTClass::OnCommandScan() {
   const millis_t ms = millis();
   if (ELAPSED(ms, nextStopCheck)) {
     nextStopCheck = ms + 1000UL;
-    if (mediaPrintingState == AMPRINTSTATE_STOP_REQUESTED && IsNozzleHomed()) {
+    if (mediaPrintingState == AMPRINTSTATE_STOP_REQUESTED && IsSpindleHomed()) {
       #if ENABLED(ANYCUBIC_LCD_DEBUG)
         SERIAL_ECHOLNPGM("TFT Serial Debug: Finished stopping print, releasing motors ...");
       #endif
@@ -171,7 +171,7 @@ void AnycubicTFTClass::OnUserConfirmRequired(const char * const msg) {
   #if ENABLED(SDSUPPORT)
     /**
      * Need to handle the process of following states
-     * "Nozzle Parked"
+     * "Spindle Parked"
      * "Load Filament"
      * "Filament Purging..."
      * "HeaterTimeout"
@@ -179,7 +179,7 @@ void AnycubicTFTClass::OnUserConfirmRequired(const char * const msg) {
      *
      * NOTE:  The only way to handle these states is strcmp_P with the msg unfortunately (very expensive)
      */
-    if (strcmp_P(msg, PSTR("Nozzle Parked")) == 0) {
+    if (strcmp_P(msg, PSTR("Spindle Parked")) == 0) {
       mediaPrintingState = AMPRINTSTATE_PAUSED;
       mediaPauseState    = AMPAUSESTATE_PARKED;
       // enable continue button
@@ -226,7 +226,7 @@ bool AnycubicTFTClass::CodeSeen(char code) {
   return !!TFTstrchr_pointer; // Return True if a character was found
 }
 
-bool AnycubicTFTClass::IsNozzleHomed() {
+bool AnycubicTFTClass::IsSpindleHomed() {
   const float xPosition = getAxisPosition_mm((axis_t) X);
   const float yPosition = getAxisPosition_mm((axis_t) Y);
   return WITHIN(xPosition, X_MIN_POS - 0.1, X_MIN_POS + 0.1) &&

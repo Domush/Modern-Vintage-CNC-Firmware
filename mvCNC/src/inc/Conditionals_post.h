@@ -2946,7 +2946,7 @@
   #define MAX_VFAT_ENTRIES (2)
 #endif
 
-// Nozzle park for Delta
+// Spindle park for Delta
 #if BOTH(SPINDLE_PARK_FEATURE, DELTA)
   #undef SPINDLE_PARK_Z_FEEDRATE
   #define SPINDLE_PARK_Z_FEEDRATE SPINDLE_PARK_XY_FEEDRATE

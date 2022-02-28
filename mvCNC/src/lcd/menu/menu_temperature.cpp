@@ -147,8 +147,8 @@ void menu_temperature() {
   BACK_ITEM(MSG_MAIN);
 
   //
-  // Nozzle:
-  // Nozzle [1-5]:
+  // Spindle:
+  // Spindle [1-5]:
   //
   #if HOTENDS == 1
     editable.celsius = thermalManager.temp_hotend[0].target;

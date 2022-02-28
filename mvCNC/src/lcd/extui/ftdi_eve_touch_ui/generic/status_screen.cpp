@@ -440,7 +440,7 @@ bool StatusScreen::onTouchEnd(uint8_t tag) {
     case 6:
       if (jobRunning()) {
         #if ENABLED(BABYSTEPPING)
-          GOTO_SCREEN(NudgeNozzleScreen);
+          GOTO_SCREEN(NudgeSpindleScreen);
         #elif HAS_BED_PROBE
           GOTO_SCREEN(ZOffsetScreen);
         #else

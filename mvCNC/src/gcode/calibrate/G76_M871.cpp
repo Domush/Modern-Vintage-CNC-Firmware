@@ -116,7 +116,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
     #endif
     const xyz_pos_t parkpos = PTC_PARK_POS,
               probe_pos_xyz = xyz_pos_t(PTC_PROBE_POS) + xyz_pos_t({ 0.0f, 0.0f, PTC_PROBE_HEATING_OFFSET }),
-                noz_pos_xyz = probe_pos_xyz - probe.offset_xy;  // Nozzle position based on probe position
+                noz_pos_xyz = probe_pos_xyz - probe.offset_xy;  // Spindle position based on probe position
 
     if (do_bed_cal || do_probe_cal) {
       // Ensure park position is reachable

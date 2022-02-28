@@ -83,7 +83,7 @@
 #define LEVELING_PARA_CONF_EN           "Leveling settings"
 #define TRAMMING_POS_EN                 "Manual leveling coordinate settings"
 #define LEVELING_AUTO_COMMAND_EN        "AutoLeveling command settings"
-#define LEVELING_AUTO_ZOFFSET_EN        "Nozzle-to-probe offsets settings"
+#define LEVELING_AUTO_ZOFFSET_EN        "Spindle-to-probe offsets settings"
 
 #define LEVELING_ZOFFSET_TITLE_EN       "Machine Settings>Z Offset Wizard"
 
@@ -119,11 +119,11 @@
 #define PROBE_REACH_MAX_BACK_EN         "Probe reaches final position"
 
 #define TEMPERATURE_CONF_TITLE_EN       "Machine Settings>Temperature settings"
-#define NOZZLE_CONF_EN                  "Nozzle settings"
+#define NOZZLE_CONF_EN                  "Spindle settings"
 #define HOTBED_CONF_EN                  "Hotbed settings"
 #define PREHEAT_TEMPER_EN               "Preset temperature"
 
-#define NOZZLE_CONF_TITLE_EN            "Machine Settings>Nozzle settings"
+#define NOZZLE_CONF_TITLE_EN            "Machine Settings>Spindle settings"
 #define NOZZLECNT_EN                    "Number of nozzles"
 #define NOZZLE_TYPE_EN                  "E0 Temperature type"
 #define NOZZLE_ADJUST_TYPE_EN           "PID thermostat"
@@ -552,7 +552,7 @@
 
 // build settings
 #define SETTINGS_TITLE_EN                 "Build Settings"
-#define SETTINGS_NOZZLE_TEMPER_EN         "Nozzle Temp:"
+#define SETTINGS_NOZZLE_TEMPER_EN         "Spindle Temp:"
 #define SETTINGS_NOZZLE_VALUE_EN          "%d"
 #define SETTINGS_BED_TEMPER_EN            "Bed Temp:"
 #define SETTINGS_BED_VALUE_EN             "%d"
@@ -701,7 +701,7 @@
 #define MESSAGE_PURGE_EN          "Wait for filament purge"
 #define MESSAGE_RESUME_EN         "Wait for print to resume..."
 #define MESSAGE_HEAT_EN           "Press button to heat nozzle"
-#define MESSAGE_HEATING_EN        "Nozzle heating Please wait..."
+#define MESSAGE_HEATING_EN        "Spindle heating Please wait..."
 #define MESSAGE_OPTION_EN         "Purge more or continue print?"
 #define MESSAGE_PURGE_MORE_EN     "Purge"
 #define MESSAGE_CONTINUE_PRINT_EN "Print"

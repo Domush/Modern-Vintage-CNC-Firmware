@@ -6,11 +6,11 @@
 #include "../inc/mvCNCConfig.h"
 
 /**
- * @brief Nozzle class
+ * @brief Spindle class
  *
  * @todo: Do not ignore the end.z value and allow XYZ movements
  */
-class Nozzle {
+class Spindle {
   private:
 
   #if ENABLED(NOZZLE_CLEAN_FEATURE)
@@ -71,4 +71,4 @@ class Nozzle {
   #endif
 };
 
-extern Nozzle nozzle;
+extern Spindle nozzle;

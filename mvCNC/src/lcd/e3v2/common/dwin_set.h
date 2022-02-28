@@ -128,5 +128,5 @@
 #define ICON_ProbeOffsetX ICON_StepX
 #define ICON_ProbeOffsetY ICON_StepY
 #define ICON_ProbeOffsetZ ICON_StepZ
-#define ICON_PIDNozzle    ICON_SetEndTemp
+#define ICON_PIDSpindle    ICON_SetEndTemp
 #define ICON_PIDbed       ICON_SetBedTemp

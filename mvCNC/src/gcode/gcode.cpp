@@ -269,7 +269,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #endif
 
       #if ENABLED(SPINDLE_PARK_FEATURE)
-        case 27: G27(); break;                                    // G27: Nozzle Park
+        case 27: G27(); break;                                    // G27: Spindle Park
       #endif
 
       case 28: G28(); break;                                      // G28: Home one or more axes

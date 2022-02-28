@@ -53,7 +53,7 @@
   #include "powerloss.h"
 #endif
 
-#include "../libs/nozzle.h"
+#include "../libs/spindle_park.h"
 #include "pause.h"
 
 #define DEBUG_OUT ENABLED(DEBUG_PAUSE_RESUME)
@@ -117,32 +117,6 @@ fil_change_settings_t fc_settings[EXTRUDERS];
  * Returns 'true' if heating was completed, 'false' for abort
  */
 static bool ensure_safe_temperature(const bool wait=true, const PauseMode mode=PAUSE_MODE_SAME) {
-  DEBUG_SECTION(est, "ensure_safe_temperature", true);
-  DEBUG_ECHOLNPGM("... wait:", wait, " mode:", mode);
-
-  #if ENABLED(PREVENT_COLD_EXTRUSION)
-    if (!DEBUGGING(DRYRUN) && thermalManager.targetTooColdToExtrude(active_extruder))
-      thermalManager.setTargetHotend(thermalManager.extrude_min_temp, active_extruder);
-  #endif
-
-  ui.pause_show_message(PAUSE_MESSAGE_HEATING, mode); UNUSED(mode);
-
-  if (wait) return thermalManager.wait_for_hotend(active_extruder);
-
-  // Allow interruption by Emergency Parser M108
-  wait_for_heatup = TERN1(PREVENT_COLD_EXTRUSION, !thermalManager.allow_cold_extrude);
-  while (wait_for_heatup && ABS(thermalManager.wholeDegHotend(active_extruder) - thermalManager.degTargetHotend(active_extruder)) > (TEMP_WINDOW))
-    idle();
-  wait_for_heatup = false;
-
-  #if ENABLED(PREVENT_COLD_EXTRUSION)
-    // A user can cancel wait-for-heating with M108
-    if (!DEBUGGING(DRYRUN) && thermalManager.targetTooColdToExtrude(active_extruder)) {
-      SERIAL_ECHO_MSG(STR_ERR_HOTEND_TOO_COLD);
-      return false;
-    }
-  #endif
-
   return true;
 }
 

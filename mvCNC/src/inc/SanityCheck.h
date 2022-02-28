@@ -1128,7 +1128,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 #endif
 
 /**
- * A Dual Nozzle carriage with switching servo
+ * A Dual Spindle carriage with switching servo
  */
 #if ENABLED(SWITCHING_NOZZLE)
   #if ENABLED(DUAL_X_CARRIAGE)

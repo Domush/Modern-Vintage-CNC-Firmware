@@ -61,13 +61,13 @@
 //
 // Temperature Sensors
 //
-#define TEMP_0_PIN                          PA0   // pin 23 (Nozzle 100K/3950 thermistor)
+#define TEMP_0_PIN                          PA0   // pin 23 (Spindle 100K/3950 thermistor)
 #define TEMP_BED_PIN                        PA1   // pin 24 (Hot Bed 100K/3950 thermistor)
 
 //
 // Heaters / Fans
 //
-#define HEATER_0_PIN                        PD3   // pin 84 (Nozzle Heat Mosfet)
+#define HEATER_0_PIN                        PD3   // pin 84 (Spindle Heat Mosfet)
 #define HEATER_BED_PIN                      PA8   // pin 67 (Hot Bed Mosfet)
 
 #define FAN_PIN                             PA15  // pin 77 (4cm Fan)

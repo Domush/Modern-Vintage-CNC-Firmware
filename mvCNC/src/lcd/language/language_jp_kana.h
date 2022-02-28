@@ -47,16 +47,16 @@ namespace Language_jp_kana {
   #if HAS_PREHEAT
     LSTR MSG_PREHEAT_1                    = PREHEAT_1_LABEL _UxGT(" ヨネツ");       // "Preheat " PREHEAT_1_LABEL
     LSTR MSG_PREHEAT_1_H                  = PREHEAT_1_LABEL _UxGT(" ヨネツ ~");       // "Preheat " PREHEAT_1_LABEL
-    LSTR MSG_PREHEAT_1_END                = PREHEAT_1_LABEL _UxGT(" ヨネツノズル");  // " Nozzle"
-    LSTR MSG_PREHEAT_1_END_E              = PREHEAT_1_LABEL _UxGT(" ヨネツノズル ~");  // " Nozzle"
+    LSTR MSG_PREHEAT_1_END                = PREHEAT_1_LABEL _UxGT(" ヨネツノズル");  // " Spindle"
+    LSTR MSG_PREHEAT_1_END_E              = PREHEAT_1_LABEL _UxGT(" ヨネツノズル ~");  // " Spindle"
     LSTR MSG_PREHEAT_1_ALL                = PREHEAT_1_LABEL _UxGT(" スベテヨネツ");  // " All"
     LSTR MSG_PREHEAT_1_BEDONLY            = PREHEAT_1_LABEL _UxGT(" ベッドヨネツ");  // " Bed"
     LSTR MSG_PREHEAT_1_SETTINGS           = PREHEAT_1_LABEL _UxGT(" ヨネツセッテイ");  // " conf"
 
     LSTR MSG_PREHEAT_M                    = _UxGT("$ ヨネツ");       // "Preheat " PREHEAT_1_LABEL
     LSTR MSG_PREHEAT_M_H                  = _UxGT("$ ヨネツ ~");       // "Preheat " PREHEAT_1_LABEL
-    LSTR MSG_PREHEAT_M_END                = _UxGT("$ ヨネツノズル");  // " Nozzle"
-    LSTR MSG_PREHEAT_M_END_E              = _UxGT("$ ヨネツノズル ~");  // " Nozzle"
+    LSTR MSG_PREHEAT_M_END                = _UxGT("$ ヨネツノズル");  // " Spindle"
+    LSTR MSG_PREHEAT_M_END_E              = _UxGT("$ ヨネツノズル ~");  // " Spindle"
     LSTR MSG_PREHEAT_M_ALL                = _UxGT("$ スベテヨネツ");  // " All"
     LSTR MSG_PREHEAT_M_BEDONLY            = _UxGT("$ ベッドヨネツ");  // " Bed"
     LSTR MSG_PREHEAT_M_SETTINGS           = _UxGT("$ ヨネツセッテイ");  // " conf"
@@ -83,7 +83,7 @@ namespace Language_jp_kana {
   LSTR MSG_MOVE_100MM                     = _UxGT(" 100mm イドウ");                 // "Move 100mm"
   LSTR MSG_SPEED                          = _UxGT("ソクド");                       // "Speed"
   LSTR MSG_BED_Z                          = _UxGT("Zオフセット");                   // "Bed Z"
-  LSTR MSG_NOZZLE                         = _UxGT("ノズル");                       // "Nozzle"
+  LSTR MSG_NOZZLE                         = _UxGT("ノズル");                       // "Spindle"
   LSTR MSG_BED                            = _UxGT("ベッド");                       // "Bed"
   LSTR MSG_FAN_SPEED                      = _UxGT("ファンソクド");                    // "Fan speed"
   LSTR MSG_FLOW                           = _UxGT("トシュツリョウ");                   // "Flow"

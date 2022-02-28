@@ -1073,7 +1073,7 @@ void Draw_Motion_Menu() {
         DWIN_Frame_AreaCopy(1, 189, 389, 271, 402,  95, 310);
       }
       else {
-        DWIN_Draw_String(true, font8x16, Popup_Text_Color, Color_Bg_Window, 36, 300, F("Nozzle or Bed temperature"));
+        DWIN_Draw_String(true, font8x16, Popup_Text_Color, Color_Bg_Window, 36, 300, F("Spindle or Bed temperature"));
         DWIN_Draw_String(true, font8x16, Popup_Text_Color, Color_Bg_Window, 92, 300, F("is too high"));
       }
     }
@@ -1084,7 +1084,7 @@ void Draw_Motion_Menu() {
         DWIN_Frame_AreaCopy(1, 189, 389, 271, 402, 95, 310);
       }
       else {
-        DWIN_Draw_String(true, font8x16, Popup_Text_Color, Color_Bg_Window, 36, 300, F("Nozzle or Bed temperature"));
+        DWIN_Draw_String(true, font8x16, Popup_Text_Color, Color_Bg_Window, 36, 300, F("Spindle or Bed temperature"));
         DWIN_Draw_String(true, font8x16, Popup_Text_Color, Color_Bg_Window, 92, 300, F("is too low"));
       }
     }
@@ -1103,12 +1103,12 @@ void Draw_Popup_Bkgd_60() {
     Draw_Popup_Bkgd_60();
     DWIN_ICON_Show(ICON, ICON_TempTooLow, 102, 105);
     if (HMI_IsChinese()) {
-      DWIN_Frame_AreaCopy(1, 103, 371, 136, 386, 69, 240);      // Nozzle Too Cold
+      DWIN_Frame_AreaCopy(1, 103, 371, 136, 386, 69, 240);      // Spindle Too Cold
       DWIN_Frame_AreaCopy(1, 170, 371, 270, 386, 69 + 33, 240);
       DWIN_ICON_Show(ICON, ICON_Confirm_C, 86, 280);
     }
     else {
-      DWIN_Draw_String(true, font8x16, Popup_Text_Color, Color_Bg_Window, 20, 235, F("Nozzle is too cold"));
+      DWIN_Draw_String(true, font8x16, Popup_Text_Color, Color_Bg_Window, 20, 235, F("Spindle is too cold"));
       DWIN_ICON_Show(ICON, ICON_Confirm_E, 86, 280);
     }
   }
@@ -2473,7 +2473,7 @@ void Item_Adv_HotendPID(const uint8_t row) {
       Item_AreaCopy(96, 104, 167, 114, row); // "Hotend PID"
     #endif
   }
-  Draw_Menu_Line(row, ICON_PIDNozzle);
+  Draw_Menu_Line(row, ICON_PIDSpindle);
 }
 
 void Item_Adv_BedPID(const uint8_t row) {
@@ -2537,7 +2537,7 @@ void Draw_AdvancedSettings_Menu() {
   #if HAS_ONESTEP_LEVELING
     if (AVISI(ADVSET_CASE_PROBEOFF)) Item_Adv_ProbeOffsets(ASCROL(ADVSET_CASE_PROBEOFF)); // Probe Offsets >
   #endif
-  if (AVISI(ADVSET_CASE_HEPID)) Item_Adv_HotendPID(ASCROL(ADVSET_CASE_HEPID));            // Nozzle PID
+  if (AVISI(ADVSET_CASE_HEPID)) Item_Adv_HotendPID(ASCROL(ADVSET_CASE_HEPID));            // Spindle PID
   if (AVISI(ADVSET_CASE_BEDPID)) Item_Adv_BedPID(ASCROL(ADVSET_CASE_BEDPID));             // Bed PID
   #if ENABLED(POWER_LOSS_RECOVERY)
     if (AVISI(ADVSET_CASE_PWRLOSSR)) Item_Adv_PLR(ASCROL(ADVSET_CASE_PWRLOSSR));          // Power-loss recovery
@@ -2822,7 +2822,7 @@ void Draw_Temperature_Menu() {
       #endif
     #else
       #if HAS_HOTEND
-        Item_AreaCopy(197, 104, 238, 114, TEMP_CASE_TEMP);      // "Nozzle"
+        Item_AreaCopy(197, 104, 238, 114, TEMP_CASE_TEMP);      // "Spindle"
         Item_AreaCopy(1,  89,  83, 101, TEMP_CASE_TEMP, 44);    // "Temperature"
       #endif
       #if HAS_HEATED_BED
@@ -3120,7 +3120,7 @@ void HMI_Temperature() {
               DWIN_Frame_TitleCopy(56, 15, 85, 14);                       // "Temperature"  TODO: "PLA Settings"
             #endif
             #ifdef USE_STRING_TITLES
-              DWIN_Draw_Label(PREHEAT_CASE_TEMP, F("Nozzle Temp"));
+              DWIN_Draw_Label(PREHEAT_CASE_TEMP, F("Spindle Temp"));
               #if HAS_HEATED_BED
                 DWIN_Draw_Label(PREHEAT_CASE_BED, F("Bed Temp"));
               #endif
@@ -3132,7 +3132,7 @@ void HMI_Temperature() {
               #endif
             #else
               say_pla_en(0, PREHEAT_CASE_TEMP);                           // "PLA"
-              Item_AreaCopy(198, 104, 237, 114, PREHEAT_CASE_TEMP, 27);   // "Nozzle"
+              Item_AreaCopy(198, 104, 237, 114, PREHEAT_CASE_TEMP, 27);   // "Spindle"
               Item_AreaCopy(1,  89,  81, 102, PREHEAT_CASE_TEMP, 71);     // "Temperature"
               #if HAS_HEATED_BED
                 say_pla_en(0, PREHEAT_CASE_BED);                          // "PLA"
@@ -3201,7 +3201,7 @@ void HMI_Temperature() {
               DWIN_Frame_TitleCopy(56, 15, 85, 14);                       // "Temperature"  TODO: "ABS Settings"
             #endif
             #ifdef USE_STRING_TITLES
-              DWIN_Draw_Label(PREHEAT_CASE_TEMP, F("Nozzle Temp"));
+              DWIN_Draw_Label(PREHEAT_CASE_TEMP, F("Spindle Temp"));
               #if HAS_HEATED_BED
                 DWIN_Draw_Label(PREHEAT_CASE_BED, F("Bed Temp"));
               #endif
@@ -3213,7 +3213,7 @@ void HMI_Temperature() {
               #endif
             #else
               say_abs_en(0, PREHEAT_CASE_TEMP);                           // "ABS"
-              Item_AreaCopy(197, 104, 238, 114, PREHEAT_CASE_TEMP, 29);   // "Nozzle"
+              Item_AreaCopy(197, 104, 238, 114, PREHEAT_CASE_TEMP, 29);   // "Spindle"
               Item_AreaCopy(1,  89,  34, 102, PREHEAT_CASE_TEMP, 73);     // "Temp"
               #if HAS_HEATED_BED
                 say_abs_en(0, PREHEAT_CASE_BED);                          // "ABS"
@@ -3792,7 +3792,7 @@ void HMI_Tune() {
         EncoderRate.enabled = true;
         break;
       #if HAS_HOTEND
-        case TUNE_CASE_TEMP: // Nozzle temp
+        case TUNE_CASE_TEMP: // Spindle temp
           checkkey = ETemp;
           HMI_ValueStruct.E_Temp = thermalManager.degTargetHotend(0);
           Draw_Edit_Integer3(TUNE_CASE_TEMP + MROWS - index_tune, HMI_ValueStruct.E_Temp, true);

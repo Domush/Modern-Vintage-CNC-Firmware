@@ -111,7 +111,7 @@ void prepare_for_probe_offset_wizard() {
     if (ui.wait_for_move) return;
   #endif
 
-  // Move Nozzle to Probing/Homing Position
+  // Move Spindle to Probing/Homing Position
   ui.wait_for_move = true;
   current_position += probe.offset_xy;
   line_to_current_position(MMM_TO_MMS(XY_PROBE_FEEDRATE));

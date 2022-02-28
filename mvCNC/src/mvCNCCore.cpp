@@ -849,7 +849,7 @@ inline void tmc_standby_setup() {
  *    • Custom I2C Bus handlers
  *    • Enhanced tools or extruders:
  *      • Switching Extruder
- *      • Switching Nozzle
+ *      • Switching Spindle
  *      • Parking Extruder
  *      • Magnetic Parking Extruder
  *      • Switching Toolhead

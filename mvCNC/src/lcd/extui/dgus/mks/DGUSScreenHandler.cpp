@@ -1215,7 +1215,7 @@ void DGUSScreenHandler::MKS_FilamentLoadUnload(DGUS_VP_Variable &var, void *val_
   #if BOTH(HAS_HOTEND, PREVENT_COLD_EXTRUSION)
     if (hotend_too_cold) {
       if (thermalManager.targetTooColdToExtrude(hotend_too_cold - 1)) thermalManager.setTargetHotend(thermalManager.extrude_min_temp, hotend_too_cold - 1);
-      sendinfoscreen(F("NOTICE"), nullptr, F("Please wait."), F("Nozzle heating!"), true, true, true, true);
+      sendinfoscreen(F("NOTICE"), nullptr, F("Please wait."), F("Spindle heating!"), true, true, true, true);
       SetupConfirmAction(nullptr);
       GotoScreen(DGUSLCD_SCREEN_POPUP);
     }

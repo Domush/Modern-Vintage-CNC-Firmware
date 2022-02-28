@@ -35,7 +35,7 @@
  * G20  - Set input units to inches (Requires INCH_MODE_SUPPORT)
  * G21  - Set input units to millimeters (Requires INCH_MODE_SUPPORT)
  * G26  - Mesh Validation Pattern (Requires G26_MESH_VALIDATION)
- * G27  - Park Nozzle (Requires SPINDLE_PARK_FEATURE)
+ * G27  - Park Spindle (Requires SPINDLE_PARK_FEATURE)
  * G28  - Home one or more axes
  * G29  - Start or continue the bed leveling probe procedure (Requires bed leveling)
  * G30  - Single Z probe, probes bed at X Y location (defaults to current XY location)

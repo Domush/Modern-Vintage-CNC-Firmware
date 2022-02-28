@@ -71,7 +71,7 @@ private:
 
   static float CodeValue();
   static bool CodeSeen(char);
-  static bool IsNozzleHomed();
+  static bool IsSpindleHomed();
   static void RenderCurrentFileList();
   static void RenderSpecialMenu(uint16_t);
   static void RenderCurrentFolder(uint16_t);

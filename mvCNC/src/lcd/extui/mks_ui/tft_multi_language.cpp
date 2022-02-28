@@ -136,16 +136,16 @@ void machine_setting_disp() {
     machine_menu.LevelingSubXYZConfTitle = XYZ_LEVEL_CONF_TITLE_CN;
 
     machine_menu.TemperatureConfTitle = TEMPERATURE_CONF_TITLE_CN;
-    machine_menu.NozzleConf           = NOZZLE_CONF_CN;
+    machine_menu.SpindleConf           = NOZZLE_CONF_CN;
     machine_menu.HotBedConf           = HOTBED_CONF_CN;
     machine_menu.PreheatTemperConf    = PREHEAT_TEMPER_CN;
 
-    machine_menu.NozzleConfTitle      = NOZZLE_CONF_TITLE_CN;
-    machine_menu.NozzleCnt            = NOZZLECNT_CN;
-    machine_menu.NozzleType           = NOZZLE_TYPE_CN;
-    machine_menu.NozzleAdjustType     = NOZZLE_ADJUST_TYPE_CN;
-    machine_menu.NozzleMinTemperature = NOZZLE_MIN_TEMPERATURE_CN;
-    machine_menu.NozzleMaxTemperature = NOZZLE_MAX_TEMPERATURE_CN;
+    machine_menu.SpindleConfTitle      = NOZZLE_CONF_TITLE_CN;
+    machine_menu.SpindleCnt            = NOZZLECNT_CN;
+    machine_menu.SpindleType           = NOZZLE_TYPE_CN;
+    machine_menu.SpindleAdjustType     = NOZZLE_ADJUST_TYPE_CN;
+    machine_menu.SpindleMinTemperature = NOZZLE_MIN_TEMPERATURE_CN;
+    machine_menu.SpindleMaxTemperature = NOZZLE_MAX_TEMPERATURE_CN;
     machine_menu.Extrude_Min_Temper   = EXTRUD_MIN_TEMPER_CN;
 
     machine_menu.HotbedConfTitle      = HOTBED_CONF_TITLE_CN;
@@ -364,16 +364,16 @@ void machine_setting_disp() {
     machine_menu.LevelingSubXYZConfTitle = XYZ_LEVEL_CONF_TITLE_T_CN;
 
     machine_menu.TemperatureConfTitle = TEMPERATURE_CONF_TITLE_T_CN;
-    machine_menu.NozzleConf           = NOZZLE_CONF_T_CN;
+    machine_menu.SpindleConf           = NOZZLE_CONF_T_CN;
     machine_menu.HotBedConf           = HOTBED_CONF_T_CN;
     machine_menu.PreheatTemperConf    = PREHEAT_TEMPER_T_CN;
 
-    machine_menu.NozzleConfTitle      = NOZZLE_CONF_TITLE_T_CN;
-    machine_menu.NozzleCnt            = NOZZLECNT_T_CN;
-    machine_menu.NozzleType           = NOZZLE_TYPE_T_CN;
-    machine_menu.NozzleAdjustType     = NOZZLE_ADJUST_TYPE_T_CN;
-    machine_menu.NozzleMinTemperature = NOZZLE_MIN_TEMPERATURE_T_CN;
-    machine_menu.NozzleMaxTemperature = NOZZLE_MAX_TEMPERATURE_T_CN;
+    machine_menu.SpindleConfTitle      = NOZZLE_CONF_TITLE_T_CN;
+    machine_menu.SpindleCnt            = NOZZLECNT_T_CN;
+    machine_menu.SpindleType           = NOZZLE_TYPE_T_CN;
+    machine_menu.SpindleAdjustType     = NOZZLE_ADJUST_TYPE_T_CN;
+    machine_menu.SpindleMinTemperature = NOZZLE_MIN_TEMPERATURE_T_CN;
+    machine_menu.SpindleMaxTemperature = NOZZLE_MAX_TEMPERATURE_T_CN;
     machine_menu.Extrude_Min_Temper   = EXTRUD_MIN_TEMPER_T_CN;
 
     machine_menu.HotbedConfTitle      = HOTBED_CONF_TITLE_T_CN;
@@ -595,16 +595,16 @@ void machine_setting_disp() {
     machine_menu.LevelingSubXYZConfTitle = XYZ_LEVEL_CONF_TITLE_EN;
 
     machine_menu.TemperatureConfTitle = TEMPERATURE_CONF_TITLE_EN;
-    machine_menu.NozzleConf           = NOZZLE_CONF_EN;
+    machine_menu.SpindleConf           = NOZZLE_CONF_EN;
     machine_menu.HotBedConf           = HOTBED_CONF_EN;
     machine_menu.PreheatTemperConf    = PREHEAT_TEMPER_EN;
 
-    machine_menu.NozzleConfTitle      = NOZZLE_CONF_TITLE_EN;
-    machine_menu.NozzleCnt            = NOZZLECNT_EN;
-    machine_menu.NozzleType           = NOZZLE_TYPE_EN;
-    machine_menu.NozzleAdjustType     = NOZZLE_ADJUST_TYPE_EN;
-    machine_menu.NozzleMinTemperature = NOZZLE_MIN_TEMPERATURE_EN;
-    machine_menu.NozzleMaxTemperature = NOZZLE_MAX_TEMPERATURE_EN;
+    machine_menu.SpindleConfTitle      = NOZZLE_CONF_TITLE_EN;
+    machine_menu.SpindleCnt            = NOZZLECNT_EN;
+    machine_menu.SpindleType           = NOZZLE_TYPE_EN;
+    machine_menu.SpindleAdjustType     = NOZZLE_ADJUST_TYPE_EN;
+    machine_menu.SpindleMinTemperature = NOZZLE_MIN_TEMPERATURE_EN;
+    machine_menu.SpindleMaxTemperature = NOZZLE_MAX_TEMPERATURE_EN;
     machine_menu.Extrude_Min_Temper   = EXTRUD_MIN_TEMPER_EN;
 
     machine_menu.HotbedEnable         = HOTBED_ENABLE_EN;

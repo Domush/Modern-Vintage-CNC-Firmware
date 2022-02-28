@@ -7,7 +7,7 @@
 #if ENABLED(SPINDLE_PARK_FEATURE)
 
 #include "../../gcode.h"
-#include "../../../libs/nozzle.h"
+#include "../../../libs/spindle_park.h"
 #include "../../../module/motion.h"
 
 /**

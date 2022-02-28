@@ -76,8 +76,8 @@ namespace Language_nl {
   LSTR MSG_MOVE_100MM                     = _UxGT("Verplaats 100mm");
   LSTR MSG_SPEED                          = _UxGT("Snelheid");
   LSTR MSG_BED_Z                          = _UxGT("Bed Z");
-  LSTR MSG_NOZZLE                         = _UxGT("Nozzle");
-  LSTR MSG_NOZZLE_N                       = _UxGT("Nozzle ~");
+  LSTR MSG_NOZZLE                         = _UxGT("Spindle");
+  LSTR MSG_NOZZLE_N                       = _UxGT("Spindle ~");
   LSTR MSG_BED                            = _UxGT("Bed");
   LSTR MSG_FAN_SPEED                      = _UxGT("Fan snelheid");
   LSTR MSG_FAN_SPEED_N                    = _UxGT("Fan snelheid ~");
@@ -184,7 +184,7 @@ namespace Language_nl {
 
   LSTR MSG_DAC_EEPROM_WRITE               = _UxGT("DAC Opslaan");
   LSTR MSG_FILAMENT_CHANGE_OPTION_RESUME  = _UxGT("Hervat print");
-  LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT(" Nozzle: "); // accepted English term
+  LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT(" Spindle: "); // accepted English term
   //
   // Filament Change screens show up to 3 lines on a 4-line display
   //                        ...or up to 2 lines on a 3-line display
@@ -194,7 +194,7 @@ namespace Language_nl {
     LSTR MSG_FILAMENT_CHANGE_INIT         = _UxGT(MSG_3_LINE("Wacht voor start", "filament te", "verwisselen"));
     LSTR MSG_FILAMENT_CHANGE_UNLOAD       = _UxGT(MSG_3_LINE("Wacht voor", "filament uit", "te laden"));
     LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Klik knop om...", "verw. nozzle.")); //nozzle accepted English term
-    LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("Nozzle verw.", "Wacht a.u.b."));
+    LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("Spindle verw.", "Wacht a.u.b."));
     LSTR MSG_FILAMENT_CHANGE_INSERT       = _UxGT(MSG_3_LINE("Laad filament", "en druk knop", "om verder..."));
     LSTR MSG_FILAMENT_CHANGE_LOAD         = _UxGT(MSG_3_LINE("Wacht voor", "filament te", "laden"));
     LSTR MSG_FILAMENT_CHANGE_RESUME       = _UxGT(MSG_3_LINE("Wacht voor print", "om verder", "te gaan"));

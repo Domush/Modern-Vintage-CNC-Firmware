@@ -75,8 +75,8 @@ namespace Language_ca {
   LSTR MSG_MOVE_100MM                     = _UxGT("Mou 100mm");
   LSTR MSG_SPEED                          = _UxGT("Velocitat");
   LSTR MSG_BED_Z                          = _UxGT("Llit Z");
-  LSTR MSG_NOZZLE                         = _UxGT("Nozzle");
-  LSTR MSG_NOZZLE_N                       = _UxGT("Nozzle ~");
+  LSTR MSG_NOZZLE                         = _UxGT("Spindle");
+  LSTR MSG_NOZZLE_N                       = _UxGT("Spindle ~");
   LSTR MSG_BED                            = _UxGT("Llit");
   LSTR MSG_FAN_SPEED                      = _UxGT("Vel. Ventilador");
   LSTR MSG_FAN_SPEED_N                    = _UxGT("Vel. Ventilador ~");

@@ -730,7 +730,7 @@ namespace ExtUI {
      *
      * When linked_nozzles is false, each nozzle in a multi-nozzle
      * cnc can be babystepped independently of the others. This
-     * lets the user to fine tune the Z-offset and Nozzle Offsets
+     * lets the user to fine tune the Z-offset and Spindle Offsets
      * while observing the first layer of a print, regardless of
      * what nozzle is printing.
      */
@@ -757,9 +757,9 @@ namespace ExtUI {
             if (e != active_extruder)
               hotend_offset[e][axis] += mm;
 
-          normalizeNozzleOffset(X);
-          TERN_(HAS_Y_AXIS, normalizeNozzleOffset(Y));
-          TERN_(HAS_Z_AXIS, normalizeNozzleOffset(Z));
+          normalizeSpindleOffset(X);
+          TERN_(HAS_Y_AXIS, normalizeSpindleOffset(Y));
+          TERN_(HAS_Z_AXIS, normalizeSpindleOffset(Z));
         }
       #else
         UNUSED(linked_nozzles);
@@ -804,12 +804,12 @@ namespace ExtUI {
 
   #if HAS_HOTEND_OFFSET
 
-    float getNozzleOffset_mm(const axis_t axis, const extruder_t extruder) {
+    float getSpindleOffset_mm(const axis_t axis, const extruder_t extruder) {
       if (extruder - E0 >= HOTENDS) return 0;
       return hotend_offset[extruder - E0][axis];
     }
 
-    void setNozzleOffset_mm(const_float_t value, const axis_t axis, const extruder_t extruder) {
+    void setSpindleOffset_mm(const_float_t value, const axis_t axis, const extruder_t extruder) {
       if (extruder - E0 >= HOTENDS) return;
       hotend_offset[extruder - E0][axis] = value;
     }
@@ -819,7 +819,7 @@ namespace ExtUI {
      * nozzle offset is zero (such as when it doesn't allow the
      * user to edit the offset the first nozzle).
      */
-    void normalizeNozzleOffset(const axis_t axis) {
+    void normalizeSpindleOffset(const axis_t axis) {
       const float offs = hotend_offset[0][axis];
       HOTEND_LOOP() hotend_offset[e][axis] -= offs;
     }

@@ -40,7 +40,7 @@ namespace Language_en {
   PROGMEM Language_Str MSG_BUTTON_MENU              = u8"Menu";
   PROGMEM Language_Str MSG_BUTTON_MEDIA             = u8"Media";
   PROGMEM Language_Str MSG_BUTTON_OPEN              = u8"Open";
-  PROGMEM Language_Str MSG_CLEAN_NOZZLE             = u8"Clean Nozzle";
+  PROGMEM Language_Str MSG_CLEAN_NOZZLE             = u8"Clean Spindle";
   PROGMEM Language_Str MSG_VMAX_X                   = u8"Vmax X";
   PROGMEM Language_Str MSG_VMAX_Y                   = u8"Vmax Y";
   PROGMEM Language_Str MSG_VMAX_Z                   = u8"Vmax Z";
@@ -97,8 +97,8 @@ namespace Language_en {
   PROGMEM Language_Str MSG_LINEAR_ADVANCE_K2        = u8"K E2";
   PROGMEM Language_Str MSG_LINEAR_ADVANCE_K3        = u8"K E3";
   PROGMEM Language_Str MSG_LINEAR_ADVANCE_K4        = u8"K E4";
-  PROGMEM Language_Str MSG_NUDGE_NOZZLE             = u8"Nudge Nozzle";
-  PROGMEM Language_Str MSG_ADJUST_BOTH_NOZZLES      = u8"Adjust Both Nozzles";
+  PROGMEM Language_Str MSG_NUDGE_NOZZLE             = u8"Nudge Spindle";
+  PROGMEM Language_Str MSG_ADJUST_BOTH_NOZZLES      = u8"Adjust Both Spindles";
   PROGMEM Language_Str MSG_SHOW_OFFSETS             = u8"Show Offsets";
   PROGMEM Language_Str MSG_INCREMENT                = u8"Increment";
   PROGMEM Language_Str MSG_ERASE_FLASH_WARNING      = u8"Are you sure? SPI flash will be erased.";

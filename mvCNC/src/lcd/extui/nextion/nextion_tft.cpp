@@ -393,7 +393,7 @@ void NextionTFT::PanelInfo(uint8_t req) {
 
   case 34: // Dual X carriage offset
     #if ENABLED(DUAL_X_CARRIAGE)
-      #define SEND_IDEX_INFO(A, B) SEND_VALasTXT(A, getNozzleOffset_mm(B, getActiveTool()))
+      #define SEND_IDEX_INFO(A, B) SEND_VALasTXT(A, getSpindleOffset_mm(B, getActiveTool()))
     #else
       #define SEND_IDEX_INFO(A, B) SEND_NA(A)
     #endif

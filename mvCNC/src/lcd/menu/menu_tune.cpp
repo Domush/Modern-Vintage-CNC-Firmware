@@ -104,8 +104,8 @@ void menu_tune() {
   #endif
 
   //
-  // Nozzle:
-  // Nozzle [1-4]:
+  // Spindle:
+  // Spindle [1-4]:
   //
   #if HOTENDS == 1
     EDIT_ITEM_FAST(int3, MSG_NOZZLE, &thermalManager.temp_hotend[0].target, 0, thermalManager.hotend_max_target(0), []{ thermalManager.start_watching_hotend(0); });

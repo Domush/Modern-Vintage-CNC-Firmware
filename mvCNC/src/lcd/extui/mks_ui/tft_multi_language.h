@@ -118,16 +118,16 @@ typedef struct machine_common_disp {
   const char *LevelingSubXYZConfTitle;
 
   const char *TemperatureConfTitle;
-  const char *NozzleConf;
+  const char *SpindleConf;
   const char *HotBedConf;
   const char *PreheatTemperConf;
 
-  const char *NozzleCnt;
-  const char *NozzleConfTitle;
-  const char *NozzleType;
-  const char *NozzleAdjustType;
-  const char *NozzleMinTemperature;
-  const char *NozzleMaxTemperature;
+  const char *SpindleCnt;
+  const char *SpindleConfTitle;
+  const char *SpindleType;
+  const char *SpindleAdjustType;
+  const char *SpindleMinTemperature;
+  const char *SpindleMaxTemperature;
   const char *Extrude_Min_Temper;
 
   const char *HotbedEnable;

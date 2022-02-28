@@ -538,11 +538,11 @@
 //
 
 /**
- * Nozzle-to-Probe offsets { X, Y, Z }
+ * Spindle-to-Probe offsets { X, Y, Z }
  *
  * X and Y offset
  *   Use a caliper or ruler to measure the distance from the tip of
- *   the Nozzle to the center-point of the Probe in the X and Y axes.
+ *   the Spindle to the center-point of the Probe in the X and Y axes.
  *
  * Z offset
  * - For the Z offset use your best known value and adjust at runtime.
@@ -556,10 +556,10 @@
  * -  PROBE_OFFSET_WIZARD (configuration_adv.h) can be used for setting the Z offset.
  *
  * Assuming the typical work area orientation:
- *  - Probe to RIGHT of the Nozzle has a Positive X offset
- *  - Probe to LEFT  of the Nozzle has a Negative X offset
- *  - Probe in BACK  of the Nozzle has a Positive Y offset
- *  - Probe in FRONT of the Nozzle has a Negative Y offset
+ *  - Probe to RIGHT of the Spindle has a Positive X offset
+ *  - Probe to LEFT  of the Spindle has a Negative X offset
+ *  - Probe in BACK  of the Spindle has a Positive Y offset
+ *  - Probe in FRONT of the Spindle has a Negative Y offset
  *
  * Some examples:
  *   #define NOZZLE_TO_PROBE_OFFSET { 10, 10, -1 }   // Example "1"
@@ -571,7 +571,7 @@
  *     |    [+]    |
  *   L |        1  | R <-- Example "1" (right+,  back+)
  *   E |  2        | I <-- Example "2" ( left-,  back+)
- *   F |[-]  N  [+]| G <-- Nozzle
+ *   F |[-]  N  [+]| G <-- Spindle
  *   T |       3   | H <-- Example "3" (right+, front-)
  *     | 4         | T <-- Example "4" ( left-, front-)
  *     |    [-]    |
@@ -660,16 +660,7 @@
 
 /**
  * Enable one or more of the following if probing seems unreliable.
- * Heaters and/or fans can be disabled during probing to minimize electrical
- * noise. A delay can also be added to allow noise and vibration to settle.
- * These options are most useful for the BLTouch probe, but may also improve
- * readings with inductive probes and piezo sensors.
  */
-//#define PROBING_HEATERS_OFF       // Turn heaters off when probing
-#if ENABLED(PROBING_HEATERS_OFF)
-  //#define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
-  //#define WAIT_FOR_HOTEND         // Wait for hotend to heat back up between probes (to improve accuracy & prevent cold extrude)
-#endif
 //#define PROBING_FANS_OFF          // Turn fans off when probing
 //#define PROBING_STEPPERS_OFF      // Turn all steppers off (unless needed to hold position) when probing (including extruders)
 //#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
@@ -921,7 +912,7 @@
 //#define TEMPERATURE_UNITS_SUPPORT
 
 /**
- * Nozzle Park
+ * Spindle Park
  *
  * Park the nozzle at the given XYZ position on idle or G27.
  *

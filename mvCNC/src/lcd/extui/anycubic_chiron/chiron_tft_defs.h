@@ -88,7 +88,7 @@
 #define mvCNC_msg_extruder_heating    PSTR("E Heating...")
 #define mvCNC_msg_bed_heating         PSTR("Bed Heating...")
 #define mvCNC_msg_EEPROM_version      PSTR("EEPROM Version Error")
-#define mvCNC_msg_nozzle_parked       PSTR("Nozzle Parked")
+#define mvCNC_msg_nozzle_parked       PSTR("Spindle Parked")
 #define mvCNC_msg_heater_timeout      PSTR("Heater Timeout")
 #define mvCNC_msg_reheating           PSTR("Reheating...")
 #define mvCNC_msg_reheat_done         PSTR("Reheat finished.")

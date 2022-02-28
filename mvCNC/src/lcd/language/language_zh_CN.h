@@ -214,8 +214,8 @@ namespace Language_zh_CN {
   LSTR MSG_MOVE_100MM                     = _UxGT("移动 100 mm");     // "Move 100mm"
   LSTR MSG_SPEED                          = _UxGT("速率");     // "Speed"
   LSTR MSG_BED_Z                          = _UxGT("热床Z");     // "Bed Z"
-  LSTR MSG_NOZZLE                         = _UxGT("喷嘴");     // "Nozzle" 噴嘴
-  LSTR MSG_NOZZLE_N                       = _UxGT("喷嘴 ~");     // "Nozzle" 噴嘴
+  LSTR MSG_NOZZLE                         = _UxGT("喷嘴");     // "Spindle" 噴嘴
+  LSTR MSG_NOZZLE_N                       = _UxGT("喷嘴 ~");     // "Spindle" 噴嘴
   LSTR MSG_NOZZLE_PARKED                  = _UxGT("喷嘴已停靠");
   LSTR MSG_NOZZLE_STANDBY                 = _UxGT("喷嘴待命中");
   LSTR MSG_BED                            = _UxGT("热床");     // "Bed"
@@ -505,7 +505,7 @@ namespace Language_zh_CN {
   LSTR MSG_FILAMENT_CHANGE_OPTION_HEADER  = _UxGT("恢复选项:");     // "RESUME OPTIONS:"
   LSTR MSG_FILAMENT_CHANGE_OPTION_PURGE   = _UxGT("清除更多");     // "Purge more"
   LSTR MSG_FILAMENT_CHANGE_OPTION_RESUME  = _UxGT("恢复打印");     // "Resume print"
-  LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT("  喷嘴: ");     // "  Nozzle: "
+  LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT("  喷嘴: ");     // "  Spindle: "
   LSTR MSG_RUNOUT_SENSOR                  = _UxGT("断料传感器");
   LSTR MSG_RUNOUT_DISTANCE_MM             = _UxGT("断料距离mm");
   LSTR MSG_KILL_HOMING_FAILED             = _UxGT("归原位失败");     // "Homing failed"

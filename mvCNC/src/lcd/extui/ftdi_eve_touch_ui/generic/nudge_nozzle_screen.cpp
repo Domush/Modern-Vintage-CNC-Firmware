@@ -30,9 +30,9 @@ using namespace FTDI;
 using namespace Theme;
 using namespace ExtUI;
 
-constexpr static NudgeNozzleScreenData &mydata = screen_data.NudgeNozzleScreen;
+constexpr static NudgeSpindleScreenData &mydata = screen_data.NudgeSpindleScreen;
 
-void NudgeNozzleScreen::onEntry() {
+void NudgeSpindleScreen::onEntry() {
   mydata.show_offsets = false;
   #if TOOL_CHANGE_SUPPORT
     mydata.link_nozzles = true;
@@ -42,7 +42,7 @@ void NudgeNozzleScreen::onEntry() {
   BaseNumericAdjustmentScreen::onEntry();
 }
 
-void NudgeNozzleScreen::onRedraw(draw_mode_t what) {
+void NudgeSpindleScreen::onRedraw(draw_mode_t what) {
   widgets_t w(what);
   w.precision(2, BaseNumericAdjustmentScreen::DEFAULT_MIDRANGE).units(GET_TEXT_F(MSG_UNITS_MM));
 
@@ -74,14 +74,14 @@ void NudgeNozzleScreen::onRedraw(draw_mode_t what) {
       #endif
 
       #if TOOL_CHANGE_SUPPORT
-        format_position(str, getNozzleOffset_mm(X, E1), getNozzleOffset_mm(Y, E1), getNozzleOffset_mm(Z, E1));
+        format_position(str, getSpindleOffset_mm(X, E1), getSpindleOffset_mm(Y, E1), getSpindleOffset_mm(Z, E1));
         w.text_field(0, GET_TEXT_F(MSG_OFFSETS_MENU), str);
       #endif
     }
   #endif
 }
 
-bool NudgeNozzleScreen::onTouchHeld(uint8_t tag) {
+bool NudgeSpindleScreen::onTouchHeld(uint8_t tag) {
   const float inc = getIncrement();
   #if TOOL_CHANGE_SUPPORT
     const bool link = mydata.link_nozzles;
@@ -108,7 +108,7 @@ bool NudgeNozzleScreen::onTouchHeld(uint8_t tag) {
   return true;
 }
 
-bool NudgeNozzleScreen::onTouchEnd(uint8_t tag) {
+bool NudgeSpindleScreen::onTouchEnd(uint8_t tag) {
   if (tag == 1) {
     SaveSettingsDialogBox::promptToSaveSettings();
     return true;
@@ -117,7 +117,7 @@ bool NudgeNozzleScreen::onTouchEnd(uint8_t tag) {
     return BaseNumericAdjustmentScreen::onTouchEnd(tag);
 }
 
-void NudgeNozzleScreen::onIdle() {
+void NudgeSpindleScreen::onIdle() {
   reset_menu_timeout();
 }
 

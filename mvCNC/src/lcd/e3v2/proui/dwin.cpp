@@ -483,7 +483,7 @@ void Popup_window_PauseOrStop() {
       }
     }
     else {
-      DWIN_Draw_Popup(toohigh ? ICON_TempTooHigh : ICON_TempTooLow, F("Nozzle or Bed temperature"), toohigh ? F("is too high") : F("is too low"));
+      DWIN_Draw_Popup(toohigh ? ICON_TempTooHigh : ICON_TempTooLow, F("Spindle or Bed temperature"), toohigh ? F("is too high") : F("is too low"));
     }
   }
 #endif
@@ -1711,7 +1711,7 @@ void DWIN_PidTuning(pidresult_t result) {
       break;
     case PID_EXTR_START:
       HMI_SaveProcessID(NothingToDo);
-      DWIN_Draw_Popup(ICON_TempTooHigh, GET_TEXT_F(MSG_PID_AUTOTUNE), F("for Nozzle is running."));
+      DWIN_Draw_Popup(ICON_TempTooHigh, GET_TEXT_F(MSG_PID_AUTOTUNE), F("for Spindle is running."));
       break;
     case PID_BAD_EXTRUDER_NUM:
       checkkey = last_checkkey;
@@ -3361,7 +3361,7 @@ void Draw_AdvancedSettings_Menu() {
       MENU_ITEM(ICON_ProbeSet, GET_TEXT_F(MSG_ZPROBE_SETTINGS), onDrawSubMenu, Draw_ProbeSet_Menu);
     #endif
     #if HAS_HOTEND
-      MENU_ITEM(ICON_PIDNozzle, F("Hotend PID Settings"), onDrawSubMenu, Draw_HotendPID_Menu);
+      MENU_ITEM(ICON_PIDSpindle, F("Hotend PID Settings"), onDrawSubMenu, Draw_HotendPID_Menu);
     #endif
     #if HAS_HEATED_BED
       MENU_ITEM(ICON_PIDbed, F("Bed PID Settings"), onDrawSubMenu, Draw_BedPID_Menu);
@@ -3836,7 +3836,7 @@ void Draw_Steps_Menu() {
       CurrentMenu->MenuTitle.SetCaption(F("Hotend PID Settings"));
       DWINUI::MenuItemsPrepare(8);
       MENU_ITEM(ICON_Back, GET_TEXT_F(MSG_BUTTON_BACK), onDrawMenuItem, Draw_AdvancedSettings_Menu);
-      MENU_ITEM(ICON_PIDNozzle, F("Hotend PID"), onDrawMenuItem, HotendPID);
+      MENU_ITEM(ICON_PIDSpindle, F("Hotend PID"), onDrawMenuItem, HotendPID);
       EDIT_ITEM(ICON_PIDValue, F("Set" STR_KP), onDrawPFloat2Menu, SetKp, &thermalManager.temp_hotend[0].pid.Kp);
       EDIT_ITEM(ICON_PIDValue, F("Set" STR_KI), onDrawPIDi, SetKi, &thermalManager.temp_hotend[0].pid.Ki);
       EDIT_ITEM(ICON_PIDValue, F("Set" STR_KD), onDrawPIDd, SetKd, &thermalManager.temp_hotend[0].pid.Kd);
@@ -3859,7 +3859,7 @@ void Draw_Steps_Menu() {
       CurrentMenu->MenuTitle.SetCaption(F("Bed PID Settings"));
       DWINUI::MenuItemsPrepare(8);
       MENU_ITEM(ICON_Back, GET_TEXT_F(MSG_BUTTON_BACK), onDrawMenuItem, Draw_AdvancedSettings_Menu);
-      MENU_ITEM(ICON_PIDNozzle, F("Bed PID"), onDrawMenuItem,BedPID);
+      MENU_ITEM(ICON_PIDSpindle, F("Bed PID"), onDrawMenuItem,BedPID);
       EDIT_ITEM(ICON_PIDValue, F("Set" STR_KP), onDrawPFloat2Menu, SetKp, &thermalManager.temp_bed.pid.Kp);
       EDIT_ITEM(ICON_PIDValue, F("Set" STR_KI), onDrawPIDi, SetKi, &thermalManager.temp_bed.pid.Ki);
       EDIT_ITEM(ICON_PIDValue, F("Set" STR_KD), onDrawPIDd, SetKd, &thermalManager.temp_bed.pid.Kd);

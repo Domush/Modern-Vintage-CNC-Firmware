@@ -472,7 +472,7 @@ inline void probe_sides(measurements_t &m, const float uncertainty) {
   }
 
   inline void report_measured_nozzle_dimensions(const measurements_t &m) {
-    SERIAL_ECHOLNPGM("Nozzle Tip Outer Dimensions:");
+    SERIAL_ECHOLNPGM("Spindle Tip Outer Dimensions:");
     #if HAS_X_CENTER
       SERIAL_ECHOLNPGM_P(SP_X_STR, m.nozzle_outer_dimension.x);
     #endif

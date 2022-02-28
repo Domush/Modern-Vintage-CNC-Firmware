@@ -107,7 +107,7 @@ bool TuneMenu::onTouchEnd(uint8_t tag) {
     case  3: GOTO_SCREEN(ChangeFilamentScreen);  break;
     case  4:
       #if ENABLED(BABYSTEPPING) && TOOL_CHANGE_SUPPORT
-        GOTO_SCREEN(NudgeNozzleScreen);
+        GOTO_SCREEN(NudgeSpindleScreen);
       #elif BOTH(HAS_LEVELING, HAS_BED_PROBE)
         GOTO_SCREEN(ZOffsetScreen);
       #endif

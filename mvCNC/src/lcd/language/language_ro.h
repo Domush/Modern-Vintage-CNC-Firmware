@@ -102,8 +102,8 @@ namespace Language_ro {
   LSTR MSG_IDEX_MODE_DUPLICATE            = _UxGT("Duplication");
   LSTR MSG_IDEX_MODE_MIRRORED_COPY        = _UxGT("Mirrored Copy");
   LSTR MSG_IDEX_MODE_FULL_CTRL            = _UxGT("Full Control");
-  LSTR MSG_HOTEND_OFFSET_Z                = _UxGT("2nd Nozzle Z");
-  LSTR MSG_HOTEND_OFFSET_A                = _UxGT("2nd Nozzle @");
+  LSTR MSG_HOTEND_OFFSET_Z                = _UxGT("2nd Spindle Z");
+  LSTR MSG_HOTEND_OFFSET_A                = _UxGT("2nd Spindle @");
   LSTR MSG_UBL_DOING_G29                  = _UxGT("Doing G29");
   LSTR MSG_UBL_TOOLS                      = _UxGT("UBL Tools");
   LSTR MSG_UBL_LEVEL_BED                  = _UxGT("Unified Bed Leveling");
@@ -135,7 +135,7 @@ namespace Language_ro {
   LSTR MSG_UBL_VALIDATE_MESH_MENU         = _UxGT("Validate Mesh");
   LSTR MSG_UBL_VALIDATE_CUSTOM_MESH       = _UxGT("Validate Custom Mesh");
   LSTR MSG_G26_HEATING_BED                = _UxGT("G26 Heating Bed");
-  LSTR MSG_G26_HEATING_NOZZLE             = _UxGT("G26 Heating Nozzle");
+  LSTR MSG_G26_HEATING_NOZZLE             = _UxGT("G26 Heating Spindle");
   LSTR MSG_G26_MANUAL_PRIME               = _UxGT("Manual priming...");
   LSTR MSG_G26_FIXED_LENGTH               = _UxGT("Fixed Length Prime");
   LSTR MSG_G26_PRIME_DONE                 = _UxGT("Done Priming");
@@ -215,10 +215,10 @@ namespace Language_ro {
   LSTR MSG_MOVE_100MM                     = _UxGT("Move 100mm");
   LSTR MSG_SPEED                          = _UxGT("Speed");
   LSTR MSG_BED_Z                          = _UxGT("Bed Z");
-  LSTR MSG_NOZZLE                         = _UxGT("Nozzle");
-  LSTR MSG_NOZZLE_N                       = _UxGT("Nozzle ~");
-  LSTR MSG_NOZZLE_PARKED                  = _UxGT("Nozzle Parked");
-  LSTR MSG_NOZZLE_STANDBY                 = _UxGT("Nozzle Standby");
+  LSTR MSG_NOZZLE                         = _UxGT("Spindle");
+  LSTR MSG_NOZZLE_N                       = _UxGT("Spindle ~");
+  LSTR MSG_NOZZLE_PARKED                  = _UxGT("Spindle Parked");
+  LSTR MSG_NOZZLE_STANDBY                 = _UxGT("Spindle Standby");
   LSTR MSG_BED                            = _UxGT("Bed");
   LSTR MSG_CHAMBER                        = _UxGT("Enclosure");
   LSTR MSG_FAN_SPEED                      = _UxGT("Fan Speed");
@@ -502,7 +502,7 @@ namespace Language_ro {
   LSTR MSG_FILAMENT_CHANGE_OPTION_HEADER  = _UxGT("RESUME OPTIONS:");
   LSTR MSG_FILAMENT_CHANGE_OPTION_PURGE   = _UxGT("Purge more");
   LSTR MSG_FILAMENT_CHANGE_OPTION_RESUME  = _UxGT("Continue");
-  LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT("  Nozzle: ");
+  LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT("  Spindle: ");
   LSTR MSG_RUNOUT_SENSOR                  = _UxGT("Runout Sensor");
   LSTR MSG_RUNOUT_DISTANCE_MM             = _UxGT("Runout Dist mm");
   LSTR MSG_KILL_HOMING_FAILED             = _UxGT("Homing Failed");
@@ -516,7 +516,7 @@ namespace Language_ro {
   LSTR MSG_MMU2_RESUMING                  = _UxGT("MMU Resuming...");
   LSTR MSG_MMU2_LOAD_FILAMENT             = _UxGT("MMU Load");
   LSTR MSG_MMU2_LOAD_ALL                  = _UxGT("MMU Load All");
-  LSTR MSG_MMU2_LOAD_TO_NOZZLE            = _UxGT("MMU Load to Nozzle");
+  LSTR MSG_MMU2_LOAD_TO_NOZZLE            = _UxGT("MMU Load to Spindle");
   LSTR MSG_MMU2_EJECT_FILAMENT            = _UxGT("MMU Eject");
   LSTR MSG_MMU2_EJECT_FILAMENT_N          = _UxGT("MMU Eject ~");
   LSTR MSG_MMU2_UNLOAD_FILAMENT           = _UxGT("MMU Unload");
@@ -567,7 +567,7 @@ namespace Language_ro {
   LSTR MSG_FILAMENT_CHANGE_INIT           = _UxGT(MSG_3_LINE("Astept ca", "inlocuirea filamentului", "sa inceapa"));
   LSTR MSG_FILAMENT_CHANGE_INSERT         = _UxGT(MSG_3_LINE("Insert filament", "and press button", "to continue"));
   LSTR MSG_FILAMENT_CHANGE_HEAT           = _UxGT(MSG_2_LINE("Press button", "to heat nozzle"));
-  LSTR MSG_FILAMENT_CHANGE_HEATING        = _UxGT(MSG_2_LINE("Nozzle heating", "Please wait..."));
+  LSTR MSG_FILAMENT_CHANGE_HEATING        = _UxGT(MSG_2_LINE("Spindle heating", "Please wait..."));
   LSTR MSG_FILAMENT_CHANGE_UNLOAD         = _UxGT(MSG_2_LINE("Wait for", "filament unload"));
   LSTR MSG_FILAMENT_CHANGE_LOAD           = _UxGT(MSG_2_LINE("Wait for", "filament load"));
   LSTR MSG_FILAMENT_CHANGE_PURGE          = _UxGT(MSG_2_LINE("Wait for", "filament purge"));

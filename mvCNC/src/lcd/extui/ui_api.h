@@ -249,9 +249,9 @@ namespace ExtUI {
   #endif
 
   #if HAS_HOTEND_OFFSET
-    float getNozzleOffset_mm(const axis_t, const extruder_t);
-    void setNozzleOffset_mm(const_float_t, const axis_t, const extruder_t);
-    void normalizeNozzleOffset(const axis_t axis);
+    float getSpindleOffset_mm(const axis_t, const extruder_t);
+    void setSpindleOffset_mm(const_float_t, const axis_t, const extruder_t);
+    void normalizeSpindleOffset(const axis_t axis);
   #endif
 
   float getZOffset_mm();

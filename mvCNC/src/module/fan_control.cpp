@@ -50,7 +50,7 @@
 #endif
 
 #if ENABLED(SPINDLE_PARK_FEATURE)
-  #include "../libs/nozzle.h"
+  #include "../libs/spindle_park.h"
 #endif
 
 // LIB_MAX6675 can be added to the build_flags in platformio.ini to use a user-defined library

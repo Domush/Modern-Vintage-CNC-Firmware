@@ -12,7 +12,7 @@
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
 
-#include "../libs/nozzle.h"
+#include "../libs/spindle_park.h"
 
 enum PauseMode : char {
   PAUSE_MODE_SAME,
