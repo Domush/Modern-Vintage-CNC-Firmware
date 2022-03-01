@@ -7,7 +7,7 @@
  * Release version. Leave the mvCNC version or apply a custom scheme.
  */
 #ifndef SHORT_BUILD_VERSION
-  #define SHORT_BUILD_VERSION "mvCNC v0.0.1"
+  #define SHORT_BUILD_VERSION "mvCNC v0.1.0"
 #endif
 
 /**
@@ -24,7 +24,7 @@
  * version was tagged.
  */
 #ifndef STRING_DISTRIBUTION_DATE
-  #define STRING_DISTRIBUTION_DATE "2022-02-08"
+  #define STRING_DISTRIBUTION_DATE "2022-03-01"
 #endif
 
 /**
@@ -34,7 +34,7 @@
  * to alert users to major changes.
  */
 
-#define MVCNC_HEX_VERSION 00000001
+#define MVCNC_HEX_VERSION 00000100
 #ifndef REQUIRED_CONFIGURATION_H_VERSION
   #define REQUIRED_CONFIGURATION_H_VERSION MVCNC_HEX_VERSION
 #endif
