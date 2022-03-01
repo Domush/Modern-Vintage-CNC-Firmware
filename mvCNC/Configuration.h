@@ -17,7 +17,7 @@
  *
  * Advanced settings can be found in Configuration_adv.h
  */
-#define CONFIGURATION_H_VERSION 00000001
+#define CONFIGURATION_H_VERSION 00000100
 
 // @section info
 

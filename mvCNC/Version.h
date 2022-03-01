@@ -10,7 +10,7 @@
 /**
  * mvCNC release version identifier
  */
-#define SHORT_BUILD_VERSION "mvCNC v0.0.1"
+#define SHORT_BUILD_VERSION "mvCNC v0.1.0"
 
 /**
  * Verbose version identifier which should contain a reference to the location
