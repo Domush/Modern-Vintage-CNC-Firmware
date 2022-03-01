@@ -470,10 +470,6 @@ private:
   static void M300();
 #endif
 
-#if HAS_USER_THERMISTORS
-  static void M305();
-#endif
-
 #if HAS_MICROSTEPS
   static void M350();
   static void M351();
@@ -559,10 +555,6 @@ private:
   static void M575();
 #endif
 
-#if HAS_DUPLICATION_MODE
-  static void M605();
-#endif
-
 #if EITHER(DELTA, HAS_EXTRA_ENDSTOPS)
   static void M666();
   static void M666_report(const bool forReplay = true);
@@ -597,10 +589,6 @@ private:
   FORCE_INLINE static void M867() { I2CPEM.M867(); }
   FORCE_INLINE static void M868() { I2CPEM.M868(); }
   FORCE_INLINE static void M869() { I2CPEM.M869(); }
-#endif
-
-#if HAS_PTC
-  static void M871();
 #endif
 
 #if HAS_TRINAMIC_CONFIG

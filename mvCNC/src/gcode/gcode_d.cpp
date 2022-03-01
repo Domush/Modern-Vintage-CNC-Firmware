@@ -166,20 +166,6 @@ void GcodeSuite::D(const int16_t dcode) {
       SERIAL_ECHOLN(gtn(&SERIAL_IMPL));
       break;
 
-    case 100: { // D100 Disable heaters and attempt a hard hang (Watchdog Test)
-      SERIAL_ECHOLNPGM("Disabling heaters and attempting to trigger Watchdog");
-      SERIAL_ECHOLNPGM("(USE_WATCHDOG " TERN(USE_WATCHDOG, "ENABLED", "DISABLED") ")");
-      fanManager.disable_all_heaters();
-      delay(1000); // Allow time to print
-      DISABLE_ISRS();
-      // Use a low-level delay that does not rely on interrupts to function
-      // Do not spin forever, to avoid thermal risks if heaters are enabled and
-      // watchdog does not work.
-      for (int i = 10000; i--;) DELAY_US(1000UL);
-      ENABLE_ISRS();
-      SERIAL_ECHOLNPGM("FAILURE: Watchdog did not trigger board reset.");
-    } break;
-
     #if ENABLED(SDSUPPORT)
 
       case 101: { // D101 Test SD Write

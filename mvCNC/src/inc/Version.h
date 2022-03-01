@@ -64,7 +64,7 @@
  * providing the source code to your customers.)
  */
 #ifndef SOURCE_CODE_URL
-  #define SOURCE_CODE_URL "github.com/Domush/Modern-Vintage-CNC-Firmware"
+  #define SOURCE_CODE_URL "github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware.git"
 #endif
 
 /**
@@ -79,7 +79,7 @@
    * documentation about a specific mvCNC release. Displayed in the Info Menu.
    */
 #ifndef WEBSITE_URL
-  #define WEBSITE_URL "https://github.com/Domush/Modern-Vintage-CNC-Firmware"
+  #define WEBSITE_URL "github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware"
 #endif
 
 /**

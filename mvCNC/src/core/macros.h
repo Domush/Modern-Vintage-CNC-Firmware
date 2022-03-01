@@ -3,8 +3,8 @@
 */
 #pragma once
 
-#if !defined(__has_include)
-  #define __has_include(...) 1
+#if !defined(__HAS_INCLUDE)
+  #define __HAS_INCLUDE(...) 1
 #endif
 
 #define ABCE 4

@@ -2752,10 +2752,10 @@
 //
 // M43 - display pin status, toggle pins, watch pins, watch endstops & toggle LED, test servo probe
 //
-// #define PINS_DEBUGGING
+#define PINS_DEBUGGING
 
 // Enable mvCNC dev mode which adds some special commands
-// #define MVCNC_DEV_MODE
+#define MVCNC_DEV_MODE
 
 #if ENABLED(MVCNC_DEV_MODE)
 /**

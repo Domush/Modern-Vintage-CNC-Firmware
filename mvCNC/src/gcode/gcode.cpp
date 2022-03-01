@@ -31,10 +31,6 @@ GcodeSuite gcode;
   #include "../feature/powerloss.h"
 #endif
 
-#if ENABLED(CANCEL_OBJECTS)
-  #include "../feature/cancel_object.h"
-#endif
-
 #if ENABLED(LASER_MOVE_POWER)
   #include "../feature/spindle_laser.h"
 #endif
@@ -408,7 +404,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #endif
 
       // Kept for compatibility's sake
-      case 105: M105(); return;                                   // M105: Report Temps (and say "ok") 
+      case 105: M105(); return;                                   // M105: Report Temps (and say "ok")
 
       #if HAS_FAN
         case 106: M106(); break;                                  // M106: Fan On
@@ -539,10 +535,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 261: M261(); break;                                  // M261: Request data from an i2c slave
       #endif
 
-      #if HAS_USER_THERMISTORS
-        case 305: M305(); break;                                  // M305: Set user thermistor parameters
-      #endif
-
       #if EITHER(EXT_SOLENOID, MANUAL_SOLENOID_CONTROL)
         case 380: M380(); break;                                  // M380: Activate solenoid on active (or specified) ATC tool
         case 381: M381(); break;                                  // M381: Disable all solenoids or, if MANUAL_SOLENOID_CONTROL, active (or specified) solenoid
@@ -614,10 +606,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 603: M603(); break;                                  // M603: Configure Filament Change
       #endif
 
-      #if HAS_DUPLICATION_MODE
-        case 605: M605(); break;                                  // M605: Set Dual X Carriage movement mode
-      #endif
-
       #if IS_KINEMATIC
         case 665: M665(); break;                                  // M665: Set Delta/SCARA parameters
       #endif
@@ -647,10 +635,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
       #if ENABLED(SKEW_CORRECTION_GCODE)
         case 852: M852(); break;                                  // M852: Set Skew factors
-      #endif
-
-      #if HAS_PTC
-        case 871: M871(); break;                                  // M871: CNC/reset/clear first layer temperature offset values
       #endif
 
       #if ANY(HAS_MOTOR_CURRENT_SPI, HAS_MOTOR_CURRENT_PWM, HAS_MOTOR_CURRENT_I2C, HAS_MOTOR_CURRENT_DAC)
