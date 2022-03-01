@@ -23,7 +23,7 @@
 #include "draw_tool.h"
 #include "draw_print_file.h"
 #include "draw_dialog.h"
-#include "draw_printing.h"
+#include "draw_cutting.h"
 #include "draw_operation.h"
 #include "draw_preHeat.h"
 #include "draw_extrusion.h"
@@ -193,9 +193,9 @@ typedef struct {
 
 typedef struct UI_Config_Struct {
   uint8_t curTempType:1,
-          extruderIndex:3,
+          atc_toolIndex:3,
           stepHeat:4,
-          extruderIndexBak:4;
+          atc_toolIndexBak:4;
   bool    leveling_first_time:1,
           para_ui_page:1,
           configWifi:1,
@@ -247,7 +247,7 @@ typedef enum {
   MAIN_UI,
   PRINT_READY_UI,
   PRINT_FILE_UI,
-  PRINTING_UI,
+  CUTTING_UI,
   MOVE_MOTOR_UI,
   Z_OFFSET_WIZARD_UI,
   OPERATE_UI,

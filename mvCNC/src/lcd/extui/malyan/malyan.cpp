@@ -53,7 +53,7 @@
 uint16_t inbound_count;
 
 // For sending print completion messages
-bool last_printing_status = false;
+bool last_cutting_status = false;
 
 // Everything written needs the high bit set.
 void write_to_lcd(FSTR_P const fmsg) {
@@ -116,10 +116,10 @@ void process_lcd_c_command(const char *command) {
       break;
 
     case 'T':
-      // Sometimes the LCD will send commands to turn off both extruder and bed, though
-      // this should not happen since the printing screen is up. Better safe than sorry.
+      // Sometimes the LCD will send commands to turn off both atc_tool and bed, though
+      // this should not happen since the cutting screen is up. Better safe than sorry.
       if (!JobTimer.isRunning() || target_val > 0)
-        ExtUI::setTargetTemp_celsius(target_val, ExtUI::extruder_t::E0);
+        ExtUI::setTargetTemp_celsius(target_val, ExtUI::atc_tool_t::E0);
       break;
 
     #if HAS_HEATED_BED
@@ -180,7 +180,7 @@ void process_lcd_eb_command(const char *command) {
  *
  * {J:E}{J:X-200}{J:E}
  * {J:E}{J:X+200}{J:E}
- * X, Y, Z, A (extruder)
+ * X, Y, Z, A (ATC tool)
  */
 template<typename T>
 void j_move_axis(const char *command, const T axis) {
@@ -191,7 +191,7 @@ void j_move_axis(const char *command, const T axis) {
 void process_lcd_j_command(const char *command) {
   switch (command[0]) {
     case 'E': break;
-    case 'A': j_move_axis<ExtUI::extruder_t>(command, ExtUI::extruder_t::E0); break;
+    case 'A': j_move_axis<ExtUI::atc_tool_t>(command, ExtUI::atc_tool_t::E0); break;
     case 'Y': j_move_axis<ExtUI::axis_t>(command, ExtUI::axis_t::Y); break;
     case 'Z': j_move_axis<ExtUI::axis_t>(command, ExtUI::axis_t::Z); break;
     case 'X': j_move_axis<ExtUI::axis_t>(command, ExtUI::axis_t::X); break;
@@ -200,7 +200,7 @@ void process_lcd_j_command(const char *command) {
 }
 
 /**
- * Process an LCD 'P' command, related to homing and printing.
+ * Process an LCD 'P' command, related to homing and cutting.
  * Cancel:
  * {P:X}
  *
@@ -305,7 +305,7 @@ void process_lcd_s_command(const char *command) {
         // implement a callback in the ls_SerialPrint code, but
         // that requires changes to the core cardreader class that
         // would not benefit the majority of users. Since one can't
-        // select a file for printing during a print, there's
+        // select a file for cutting during a print, there's
         // little reason not to do it this way.
         char message_buffer[MAX_CURLY_COMMAND];
         uint16_t file_count = card.get_num_Files();

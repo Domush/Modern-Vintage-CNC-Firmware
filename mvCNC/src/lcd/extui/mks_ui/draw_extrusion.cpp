@@ -37,7 +37,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
   if (event != LV_EVENT_RELEASED) return;
   switch (obj->mks_obj_id) {
     case ID_E_ADD:
-      if (fanManager.hotEnoughToExtrude(uiCfg.extruderIndex)) {
+      if (fanManager.hotEnoughToExtrude(uiCfg.atc_toolIndex)) {
         sprintf_P((char *)public_buf_l, PSTR("G91\nG1 E%d F%d\nG90"), uiCfg.extruStep, 60 * uiCfg.extruSpeed);
         queue.inject(public_buf_l);
         extrudeAmount += uiCfg.extruStep;
@@ -45,7 +45,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       }
       break;
     case ID_E_DEC:
-      if (fanManager.hotEnoughToExtrude(uiCfg.extruderIndex)) {
+      if (fanManager.hotEnoughToExtrude(uiCfg.atc_toolIndex)) {
         sprintf_P((char *)public_buf_l, PSTR("G91\nG1 E%d F%d\nG90"), 0 - uiCfg.extruStep, 60 * uiCfg.extruSpeed);
         queue.inject(public_buf_l);
         extrudeAmount -= uiCfg.extruStep;
@@ -54,17 +54,17 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       break;
     case ID_E_TYPE:
       if (ENABLED(TOOL_CHANGE_SUPPORT)) {
-        if (uiCfg.extruderIndex == 0) {
-          uiCfg.extruderIndex = 1;
+        if (uiCfg.atc_toolIndex == 0) {
+          uiCfg.atc_toolIndex = 1;
           queue.inject(F("T1"));
         }
         else {
-          uiCfg.extruderIndex = 0;
+          uiCfg.atc_toolIndex = 0;
           queue.inject(F("T0"));
         }
       }
       else
-        uiCfg.extruderIndex = 0;
+        uiCfg.atc_toolIndex = 0;
 
       extrudeAmount = 0;
       disp_hotend_temp();
@@ -133,7 +133,7 @@ void lv_draw_extrusion() {
 }
 
 void disp_ext_type() {
-  if (uiCfg.extruderIndex == 1) {
+  if (uiCfg.atc_toolIndex == 1) {
     lv_imgbtn_set_src_both(buttonType, "F:/bmp_extru2.bin");
     if (gCfgItems.multiple_language) lv_label_set_text(labelType, extrude_menu.ext2);
   }
@@ -164,7 +164,7 @@ void disp_ext_speed() {
 
 void disp_hotend_temp() {
   char buf[20] = {0};
-  sprintf(buf, extrude_menu.temp_value, fanManager.wholeDegHotend(uiCfg.extruderIndex), fanManager.degTargetHotend(uiCfg.extruderIndex));
+  sprintf(buf, extrude_menu.temp_value, fanManager.wholeDegHotend(uiCfg.atc_toolIndex), fanManager.degTargetHotend(uiCfg.atc_toolIndex));
   strcpy(public_buf_l, extrude_menu.temper_text);
   strcat(public_buf_l, buf);
   lv_label_set_text(tempText, public_buf_l);
@@ -182,7 +182,7 @@ void disp_extru_amount() {
     sprintf(buf1, extrude_menu.count_value_cm, extrudeAmount / 10);
   else
     sprintf(buf1, extrude_menu.count_value_m, extrudeAmount / 1000);
-  strcat(public_buf_l, uiCfg.extruderIndex == 0 ? extrude_menu.ext1 : extrude_menu.ext2);
+  strcat(public_buf_l, uiCfg.atc_toolIndex == 0 ? extrude_menu.ext1 : extrude_menu.ext2);
   strcat(public_buf_l, buf1);
 
   lv_label_set_text(ExtruText, public_buf_l);

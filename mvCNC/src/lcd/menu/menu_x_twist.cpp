@@ -68,7 +68,7 @@ void xatc_wizard_set_offset_and_go_to_next_point() {
 }
 
 //
-// Step 6: Wizard Menu. Move the nozzle down until it touches the bed.
+// Step 6: Wizard Menu. Move the tool down until it touches the bed.
 //
 void xatc_wizard_menu() {
   START_MENU();

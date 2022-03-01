@@ -27,8 +27,8 @@
 #define TFT_MAX_CMD_SIZE 96
 
 enum AnycubicMediaPrintState {
-  AMPRINTSTATE_NOT_PRINTING,
-  AMPRINTSTATE_PRINTING,
+  AMPRINTSTATE_NOT_CUTTING,
+  AMPRINTSTATE_CUTTING,
   AMPRINTSTATE_PAUSE_REQUESTED,
   AMPRINTSTATE_PAUSED,
   AMPRINTSTATE_STOP_REQUESTED
@@ -66,7 +66,7 @@ private:
   static int serial3_count;
   static char *TFTstrchr_pointer;
   static uint8_t SpecialMenu;
-  static AnycubicMediaPrintState mediaPrintingState;
+  static AnycubicMediaPrintState mediaCuttingState;
   static AnycubicMediaPauseState mediaPauseState;
 
   static float CodeValue();

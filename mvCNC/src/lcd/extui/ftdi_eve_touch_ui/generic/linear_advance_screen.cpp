@@ -38,9 +38,9 @@ void LinearAdvanceScreen::onRedraw(draw_mode_t what) {
   #else
     w.adjuster(     2, GET_TEXT_F(MSG_LINEAR_ADVANCE_K1), getLinearAdvance_mm_mm_s(E0) );
     w.adjuster(     4, GET_TEXT_F(MSG_LINEAR_ADVANCE_K2), getLinearAdvance_mm_mm_s(E1) );
-    #if EXTRUDERS > 2
+    #if ATC_TOOLS > 2
       w.adjuster(   6, GET_TEXT_F(MSG_LINEAR_ADVANCE_K3), getLinearAdvance_mm_mm_s(E2) );
-      #if EXTRUDERS > 3
+      #if ATC_TOOLS > 3
         w.adjuster( 8, GET_TEXT_F(MSG_LINEAR_ADVANCE_K4), getLinearAdvance_mm_mm_s(E3) );
       #endif
     #endif
@@ -57,10 +57,10 @@ bool LinearAdvanceScreen::onTouchHeld(uint8_t tag) {
     #if TOOL_CHANGE_SUPPORT
       case  4: UI_DECREMENT(LinearAdvance_mm_mm_s, E1);  break;
       case  5: UI_INCREMENT(LinearAdvance_mm_mm_s, E1); break;
-      #if EXTRUDERS > 2
+      #if ATC_TOOLS > 2
         case  6: UI_DECREMENT(LinearAdvance_mm_mm_s, E2);  break;
         case  7: UI_INCREMENT(LinearAdvance_mm_mm_s, E2);  break;
-        #if EXTRUDERS > 3
+        #if ATC_TOOLS > 3
           case  8: UI_DECREMENT(LinearAdvance_mm_mm_s, E3);  break;
           case  9: UI_INCREMENT(LinearAdvance_mm_mm_s, E3);  break;
         #endif

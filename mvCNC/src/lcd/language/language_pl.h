@@ -16,7 +16,7 @@
  *   = displays  '0'....'10' for indexes 0 - 10
  *   ~ displays  '1'....'11' for indexes 0 - 10
  *   * displays 'E1'...'E11' for indexes 0 - 10 (By default. Uses LCD_FIRST_TOOL)
- *   @ displays an axis name such as XYZUVW, or E for an extruder
+ *   @ displays an axis name such as XYZUVW, or E for an ATC tool
  */
 
 #define DISPLAY_CHARSET_ISO10646_PL
@@ -316,7 +316,7 @@ namespace Language_pl {
   LSTR MSG_PAUSE_PRINT                    = _UxGT("Wstrzymaj druk");
   LSTR MSG_RESUME_PRINT                   = _UxGT("Wznowienie");
   LSTR MSG_STOP_PRINT                     = _UxGT("Stop");
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("Drukowanie obiektu");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("Drukowanie obiektu");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Anunuj obiekt");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Anunuj obiekt =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Odzyskiwanie po awarii");
@@ -325,7 +325,7 @@ namespace Language_pl {
   LSTR MSG_DWELL                          = _UxGT("Uśpij...");
   LSTR MSG_USERWAIT                       = _UxGT("Oczekiwanie...");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Druk wstrzymany");
-  LSTR MSG_PRINTING                       = _UxGT("Drukowanie...");
+  LSTR MSG_CUTTING                       = _UxGT("Drukowanie...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Druk przerwany");
   LSTR MSG_PRINT_DONE                     = _UxGT("Druk zakończony");
   LSTR MSG_NO_MOVE                        = _UxGT("Brak ruchu");
@@ -402,7 +402,7 @@ namespace Language_pl {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Statystyki");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Info płyty");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistory");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Ekstrudery");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Ekstrudery");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Predkość USB");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protokół");
   LSTR MSG_INFO_RUNAWAY_OFF               = _UxGT("Zegar pracy: OFF");

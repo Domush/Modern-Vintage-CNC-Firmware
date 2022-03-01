@@ -24,7 +24,7 @@
  *       object. On resume (M24) the head will be moved back and the
  *       print will resume.
  *
- *       When not actively SD printing, M125 simply moves to the park
+ *       When not actively SD job, M125 simply moves to the park
  *       position and waits, resuming with a button click or M108.
  *       Without PARK_HEAD_ON_PAUSE the M125 command does nothing.
  *
@@ -57,10 +57,10 @@ void GcodeSuite::M125() {
   if (parser.seenval('Z')) park_point.z = parser.linearval('Z');
 
   #if HAS_HOTEND_OFFSET && NONE(DUAL_X_CARRIAGE, DELTA)
-    park_point += hotend_offset[active_extruder];
+    park_point += hotend_offset[active_tool];
   #endif
 
-  const bool sd_printing = TERN0(SDSUPPORT, IS_SD_PRINTING());
+  const bool sd_job_running = TERN0(SDSUPPORT, IS_SD_JOB_RUNNING());
 
   ui.pause_show_message(PAUSE_MESSAGE_PARKING, PAUSE_MODE_PAUSE_PRINT);
 
@@ -68,7 +68,7 @@ void GcodeSuite::M125() {
   const bool show_lcd = TERN0(HAS_MVCNCUI_MENU, parser.boolval('P'));
 
   if (pause_print(retract, park_point, show_lcd, 0)) {
-    if (ENABLED(EXTENSIBLE_UI) || BOTH(EMERGENCY_PARSER, HOST_PROMPT_SUPPORT) || !sd_printing || show_lcd) {
+    if (ENABLED(EXTENSIBLE_UI) || BOTH(EMERGENCY_PARSER, HOST_PROMPT_SUPPORT) || !sd_job_running || show_lcd) {
       wait_for_confirmation(false, 0);
       resume_print(0, 0, 0, 0);
     }

@@ -22,7 +22,7 @@
 
 //#define OPTION_DUALZ_DRIVE
 //#define OPTION_Z2_ENDSTOP
-//#define OPTION_REPEAT_PRINTING
+//#define OPTION_REPEAT_CUTTING
 //#define SWITCH_EXTRUDER_SEQUENCE
 
 //=============================================================================
@@ -177,7 +177,7 @@
   #define Z2_DIR_PIN                        PD0
 #endif
 
-#ifdef OPTION_REPEAT_PRINTING
+#ifdef OPTION_REPEAT_CUTTING
   #define REPRINT_STOP_PIN                  PD8   // X_MAX_PIN
   #define FORWARD_PIN                       PA13
   #define BACK_PIN                          PA14

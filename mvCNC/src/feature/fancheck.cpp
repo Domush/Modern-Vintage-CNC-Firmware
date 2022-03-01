@@ -109,11 +109,11 @@ void FanCheck::compute_speed(uint16_t elapsedTime) {
         edge_counter[f] = 0;
 
         // Check fan speed
-        constexpr int8_t max_extruder_fan_errors = TERN(HAS_PWMFANCHECK, 10000, 5000) / FanControl::fan_update_interval_ms;
+        constexpr int8_t max_atc_tool_fan_errors = TERN(HAS_PWMFANCHECK, 10000, 5000) / FanControl::fan_update_interval_ms;
 
         if (rps[f] >= 20 || TERN0(HAS_AUTO_FAN, fanManager.autofan_speed[f] == 0))
           errors_count[f] = 0;
-        else if (errors_count[f] < max_extruder_fan_errors)
+        else if (errors_count[f] < max_atc_tool_fan_errors)
           ++errors_count[f];
         else if (enabled)
           SBI(fan_error_msk, f);

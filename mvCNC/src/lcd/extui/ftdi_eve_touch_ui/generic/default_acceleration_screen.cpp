@@ -35,7 +35,7 @@ void DefaultAccelerationScreen::onRedraw(draw_mode_t what) {
   w.units(GET_TEXT_F(MSG_UNITS_MM_S2));
   w.heading(      GET_TEXT_F(MSG_ACCELERATION));
   w.color(other);
-  w.adjuster(  2, GET_TEXT_F(MSG_ACCEL_PRINTING), getPrintingAcceleration_mm_s2() );
+  w.adjuster(  2, GET_TEXT_F(MSG_ACCEL_CUTTING), getCuttingAcceleration_mm_s2() );
   w.adjuster(  4, GET_TEXT_F(MSG_ACCEL_TRAVEL),   getTravelAcceleration_mm_s2() );
   w.adjuster(  6, GET_TEXT_F(MSG_ACCEL_RETRACT),  getRetractAcceleration_mm_s2() );
   w.increments();

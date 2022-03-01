@@ -156,7 +156,7 @@ FanControl fanManager;
   #endif
 
   /**
-   * Set the print fan speed for a target extruder
+   * Set the print fan speed for a target ATC tool
    */
   void FanControl::fanSpeedSet(uint8_t fan, uint16_t speed) {
 
@@ -171,7 +171,7 @@ FanControl fanManager;
 
   #if ENABLED(REPORT_FAN_CHANGE)
     /**
-     * Report print fan speed for a target extruder
+     * Report print fan speed for a target ATC tool
      */
     void FanControl::fanSpeedReport(const uint8_t fan) {
       if (fan >= FAN_COUNT) return;
@@ -199,8 +199,6 @@ FanControl fanManager;
 /**
  * private:
  */
-
-volatile bool FanControl::raw_temps_ready = false;
 
 #if HAS_FAN_LOGIC
   constexpr millis_t FanControl::fan_update_interval_ms;
@@ -359,7 +357,6 @@ public:
  */
 void FanControl::isr() {
 
-  static int8_t temp_count = -1;
   static ADCSensorState adc_sensor_state = StartupDelay;
   static uint8_t pwm_count = _BV(SOFT_PWM_SCALE);
 
@@ -383,7 +380,7 @@ void FanControl::isr() {
 
   #if DISABLED(SLOW_PWM_HEATERS)
 
-    #if ANY(HAS_HOTEND, HAS_HEATED_BED, HAS_HEATED_CHAMBER, HAS_COOLER, FAN_SOFT_PWM)
+    #if ANY(HAS_COOLER, FAN_SOFT_PWM)
       constexpr uint8_t pwm_mask = TERN0(SOFT_PWM_DITHER, _BV(SOFT_PWM_SCALE) - 1);
       #define _PWM_MOD(N,S,T) do{                           \
         const bool on = S.add(pwm_mask, T.soft_pwm_amount); \
@@ -616,7 +613,7 @@ void FanControl::isr() {
     case SensorsReady: {
       // All sensors have been read. Stay in this state for a few
       // ISRs to save on calls to temp update/checking code below.
-      constexpr int8_t extra_loops = MIN_ADC_ISR_LOOPS - (int8_t)SensorsReady;
+      constexpr int8_t extra_loops = 10 - (int8_t)SensorsReady;
       static uint8_t delay_count = 0;
       if (extra_loops > 0) {
         if (delay_count == 0) delay_count = extra_loops;  // Init this delay
@@ -629,13 +626,6 @@ void FanControl::isr() {
         next_sensor_state = (ADCSensorState)(int(StartSampling) + 1);
       }
     }
-
-    case StartSampling:                                   // Start of sampling loops. Do updates/checks.
-      if (++temp_count >= OVERSAMPLENR) {                 // 10 * 16 * 1/(16000000/64/256)  = 164ms.
-        temp_count = 0;
-        readings_ready();
-      }
-      break;
 
     #if HAS_TEMP_ADC_COOLER
       case PrepareTemp_COOLER: HAL_START_ADC(TEMP_COOLER_PIN); break;
@@ -703,6 +693,7 @@ void FanControl::isr() {
         break;
     #endif // HAS_ADC_BUTTONS
 
+    case StartSampling: break;
     case StartupDelay: break;
 
   } // switch(adc_sensor_state)

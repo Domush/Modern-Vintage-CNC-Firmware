@@ -28,7 +28,7 @@
 
 #include "../../../libs/numtostr.h"
 #include "../../../module/stepper.h" // for disable_all_steppers
-#include "../../../module/motion.h"  // for quickstop_stepper, A20 read printing speed, feedrate_percentage
+#include "../../../module/motion.h"  // for quickstop_stepper, A20 read cutting speed, feedrate_percentage
 #include "../../../mvCNCCore.h"     // for disable_steppers
 #include "../../../inc/mvCNCConfig.h"
 
@@ -56,7 +56,7 @@ char AnycubicTFTClass::serial3_char;
 int AnycubicTFTClass::serial3_count = 0;
 char* AnycubicTFTClass::TFTstrchr_pointer;
 uint8_t AnycubicTFTClass::SpecialMenu = false;
-AnycubicMediaPrintState AnycubicTFTClass::mediaPrintingState = AMPRINTSTATE_NOT_PRINTING;
+AnycubicMediaPrintState AnycubicTFTClass::mediaCuttingState = AMPRINTSTATE_NOT_CUTTING;
 AnycubicMediaPauseState AnycubicTFTClass::mediaPauseState = AMPAUSESTATE_NOT_PAUSED;
 
 char AnycubicTFTClass::SelectedDirectory[30];
@@ -93,7 +93,7 @@ void AnycubicTFTClass::OnSetup() {
     SET_INPUT_PULLUP(FIL_RUNOUT1_PIN);
   #endif
 
-  mediaPrintingState = AMPRINTSTATE_NOT_PRINTING;
+  mediaCuttingState = AMPRINTSTATE_NOT_CUTTING;
   mediaPauseState = AMPAUSESTATE_NOT_PAUSED;
 
   // DoSDCardStateCheck();
@@ -116,11 +116,11 @@ void AnycubicTFTClass::OnCommandScan() {
   const millis_t ms = millis();
   if (ELAPSED(ms, nextStopCheck)) {
     nextStopCheck = ms + 1000UL;
-    if (mediaPrintingState == AMPRINTSTATE_STOP_REQUESTED && IsSpindleHomed()) {
+    if (mediaCuttingState == AMPRINTSTATE_STOP_REQUESTED && IsSpindleHomed()) {
       #if ENABLED(ANYCUBIC_LCD_DEBUG)
         SERIAL_ECHOLNPGM("TFT Serial Debug: Finished stopping print, releasing motors ...");
       #endif
-      mediaPrintingState = AMPRINTSTATE_NOT_PRINTING;
+      mediaCuttingState = AMPRINTSTATE_NOT_CUTTING;
       mediaPauseState = AMPAUSESTATE_NOT_PAUSED;
       injectCommands(F("M84\nM27")); // disable stepper motors and force report of SD status
       delay_ms(200);
@@ -180,36 +180,36 @@ void AnycubicTFTClass::OnUserConfirmRequired(const char * const msg) {
      * NOTE:  The only way to handle these states is strcmp_P with the msg unfortunately (very expensive)
      */
     if (strcmp_P(msg, PSTR("Spindle Parked")) == 0) {
-      mediaPrintingState = AMPRINTSTATE_PAUSED;
+      mediaCuttingState = AMPRINTSTATE_PAUSED;
       mediaPauseState    = AMPAUSESTATE_PARKED;
       // enable continue button
       SENDLINE_DBG_PGM("J18", "TFT Serial Debug: UserConfirm SD print paused done... J18");
     }
     else if (strcmp_P(msg, PSTR("Change Bit")) == 0) {
-      mediaPrintingState = AMPRINTSTATE_PAUSED;
+      mediaCuttingState = AMPRINTSTATE_PAUSED;
       mediaPauseState    = AMPAUSESTATE_FILAMENT_OUT;
       // enable continue button
       SENDLINE_DBG_PGM("J18", "TFT Serial Debug: UserConfirm Filament is out... J18");
       SENDLINE_DBG_PGM("J23", "TFT Serial Debug: UserConfirm Blocking filament prompt... J23");
     }
     else if (strcmp_P(msg, PSTR("Filament Purging...")) == 0) {
-      mediaPrintingState = AMPRINTSTATE_PAUSED;
+      mediaCuttingState = AMPRINTSTATE_PAUSED;
       mediaPauseState    = AMPAUSESTATE_PARKING;
       // TODO: JBA I don't think J05 just disables the continue button, i think it injects a rogue M25. So taking this out
       // disable continue button
-      // SENDLINE_DBG_PGM("J05", "TFT Serial Debug: UserConfirm SD Filament Purging... J05"); // J05 printing pause
+      // SENDLINE_DBG_PGM("J05", "TFT Serial Debug: UserConfirm SD Filament Purging... J05"); // J05 cutting pause
 
       // enable continue button
       SENDLINE_DBG_PGM("J18", "TFT Serial Debug: UserConfirm Filament is purging... J18");
     }
     else if (strcmp_P(msg, PSTR("HeaterTimeout")) == 0) {
-      mediaPrintingState = AMPRINTSTATE_PAUSED;
+      mediaCuttingState = AMPRINTSTATE_PAUSED;
       mediaPauseState    = AMPAUSESTATE_HEATER_TIMEOUT;
       // enable continue button
       SENDLINE_DBG_PGM("J18", "TFT Serial Debug: UserConfirm SD Heater timeout... J18");
     }
     else if (strcmp_P(msg, PSTR("Reheat finished.")) == 0) {
-      mediaPrintingState = AMPRINTSTATE_PAUSED;
+      mediaCuttingState = AMPRINTSTATE_PAUSED;
       mediaPauseState    = AMPAUSESTATE_REHEAT_FINISHED;
       // enable continue button
       SENDLINE_DBG_PGM("J18", "TFT Serial Debug: UserConfirm SD Reheat done... J18");
@@ -509,7 +509,7 @@ void AnycubicTFTClass::RenderCurrentFolder(uint16_t selectedNumber) {
 
 void AnycubicTFTClass::OnPrintTimerStarted() {
   #if ENABLED(SDSUPPORT)
-    if (mediaPrintingState == AMPRINTSTATE_PRINTING)
+    if (mediaCuttingState == AMPRINTSTATE_CUTTING)
       SENDLINE_DBG_PGM("J04", "TFT Serial Debug: Starting SD CNC... J04"); // J04 Starting Print
 
   #endif
@@ -518,7 +518,7 @@ void AnycubicTFTClass::OnPrintTimerStarted() {
 void AnycubicTFTClass::OnPrintTimerPaused() {
   #if ENABLED(SDSUPPORT)
     if (jobRunningFromMedia()) {
-      mediaPrintingState = AMPRINTSTATE_PAUSED;
+      mediaCuttingState = AMPRINTSTATE_PAUSED;
       mediaPauseState    = AMPAUSESTATE_PARKING;
     }
   #endif
@@ -526,8 +526,8 @@ void AnycubicTFTClass::OnPrintTimerPaused() {
 
 void AnycubicTFTClass::OnPrintTimerStopped() {
   #if ENABLED(SDSUPPORT)
-    if (mediaPrintingState == AMPRINTSTATE_PRINTING) {
-      mediaPrintingState = AMPRINTSTATE_NOT_PRINTING;
+    if (mediaCuttingState == AMPRINTSTATE_CUTTING) {
+      mediaCuttingState = AMPRINTSTATE_NOT_CUTTING;
       mediaPauseState    = AMPAUSESTATE_NOT_PAUSED;
       SENDLINE_DBG_PGM("J14", "TFT Serial Debug: SD CNC Completed... J14");
     }
@@ -599,21 +599,21 @@ void AnycubicTFTClass::GetCommandFromTFT() {
             SENDLINE_PGM("");
           } break;
 
-          case 6: // A6 GET SD CARD PRINTING STATUS
+          case 6: // A6 GET SD CARD CUTTING STATUS
             #if ENABLED(SDSUPPORT)
               if (jobRunningFromMedia()) {
                 SEND_PGM("A6V ");
                 if (isMediaInserted())
                   SENDLINE(ui8tostr3rj(getProgress_percent()));
                 else
-                  SENDLINE_DBG_PGM("J02", "TFT Serial Debug: No SD Card mounted to return printing status... J02");
+                  SENDLINE_DBG_PGM("J02", "TFT Serial Debug: No SD Card mounted to return cutting status... J02");
               }
               else
                 SENDLINE_PGM("A6V ---");
             #endif
             break;
 
-          case 7: { // A7 GET PRINTING TIME
+          case 7: { // A7 GET CUTTING TIME
             const uint32_t elapsedSeconds = getProgress_seconds_elapsed();
             SEND_PGM("A7V ");
             if (elapsedSeconds != 0) {  // print time
@@ -686,7 +686,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
             #endif
             break;
 
-          case 14: // A14 START PRINTING
+          case 14: // A14 START CUTTING
             #if ENABLED(SDSUPPORT)
               if (!jobRunning() && strlen(SelectedFile) > 0)
                 StartPrint();
@@ -701,13 +701,13 @@ void AnycubicTFTClass::GetCommandFromTFT() {
             unsigned int tempvalue;
             if (CodeSeen('S')) {
               tempvalue = constrain(CodeValue(), 0, 275);
-              setTargetTemp_celsius(tempvalue, (extruder_t)E0);
+              setTargetTemp_celsius(tempvalue, (atc_tool_t)E0);
             }
             else if (CodeSeen('C') && !jobRunning()) {
               if (getAxisPosition_mm(Z) < 10)
                 injectCommands(F("G1 Z10")); // RASE Z AXIS
               tempvalue = constrain(CodeValue(), 0, 275);
-              setTargetTemp_celsius(tempvalue, (extruder_t)E0);
+              setTargetTemp_celsius(tempvalue, (atc_tool_t)E0);
             }
           }
           break;
@@ -745,7 +745,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
             SENDLINE_PGM("");
             break;
 
-          case 20: // A20 read printing speed
+          case 20: // A20 read cutting speed
             if (CodeSeen('S'))
               feedrate_percentage = constrain(CodeValue(), 40, 999);
             else
@@ -834,7 +834,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
                 injectCommands(F("G1 Z10")); // RASE Z AXIS
 
               setTargetTemp_celsius(PREHEAT_1_TEMP_BED, (heater_t)BED);
-              setTargetTemp_celsius(PREHEAT_1_TEMP_HOTEND, (extruder_t)E0);
+              setTargetTemp_celsius(PREHEAT_1_TEMP_HOTEND, (atc_tool_t)E0);
               SENDLINE_PGM("OK");
             }
             break;
@@ -845,7 +845,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
                 injectCommands(F("G1 Z10")); // RASE Z AXIS
 
               setTargetTemp_celsius(PREHEAT_2_TEMP_BED, (heater_t)BED);
-              setTargetTemp_celsius(PREHEAT_2_TEMP_HOTEND, (extruder_t)E0);
+              setTargetTemp_celsius(PREHEAT_2_TEMP_HOTEND, (atc_tool_t)E0);
               SENDLINE_PGM("OK");
             }
             break;
@@ -853,7 +853,7 @@ void AnycubicTFTClass::GetCommandFromTFT() {
           case 25: // A25 cool down
             if (!jobRunning()) {
               setTargetTemp_celsius(0, (heater_t) BED);
-              setTargetTemp_celsius(0, (extruder_t) E0);
+              setTargetTemp_celsius(0, (atc_tool_t) E0);
 
               SENDLINE_DBG_PGM("J12", "TFT Serial Debug: Cooling down... J12"); // J12 cool down
             }
@@ -928,10 +928,10 @@ void AnycubicTFTClass::DoSDCardStateCheck() {
 
 void AnycubicTFTClass::DoFilamentRunoutCheck() {
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
-    // NOTE: getFilamentRunoutState() only returns the runout state if the job is printing
+    // NOTE: getFilamentRunoutState() only returns the runout state if the job is cutting
     // we want to actually check the status of the pin here, regardless of printstate
     if (READ(FIL_RUNOUT1_PIN)) {
-      if (mediaPrintingState == AMPRINTSTATE_PRINTING || mediaPrintingState == AMPRINTSTATE_PAUSED || mediaPrintingState == AMPRINTSTATE_PAUSE_REQUESTED) {
+      if (mediaCuttingState == AMPRINTSTATE_CUTTING || mediaCuttingState == AMPRINTSTATE_PAUSED || mediaCuttingState == AMPRINTSTATE_PAUSE_REQUESTED) {
         // play tone to indicate filament is out
         injectCommands(F("\nM300 P200 S1567\nM300 P200 S1174\nM300 P200 S1567\nM300 P200 S1174\nM300 P2000 S1567"));
 
@@ -954,7 +954,7 @@ void AnycubicTFTClass::StartPrint() {
         SERIAL_ECHOPGM(" ");
         SERIAL_ECHOLN(SelectedFile);
       #endif
-      mediaPrintingState = AMPRINTSTATE_PRINTING;
+      mediaCuttingState = AMPRINTSTATE_CUTTING;
       mediaPauseState    = AMPAUSESTATE_NOT_PAUSED;
       printFile(SelectedFile);
     }
@@ -963,12 +963,12 @@ void AnycubicTFTClass::StartPrint() {
 
 void AnycubicTFTClass::PausePrint() {
   #if ENABLED(SDSUPPORT)
-    if (jobRunningFromMedia() && mediaPrintingState != AMPRINTSTATE_STOP_REQUESTED && mediaPauseState == AMPAUSESTATE_NOT_PAUSED) {
-      mediaPrintingState = AMPRINTSTATE_PAUSE_REQUESTED;
+    if (jobRunningFromMedia() && mediaCuttingState != AMPRINTSTATE_STOP_REQUESTED && mediaPauseState == AMPAUSESTATE_NOT_PAUSED) {
+      mediaCuttingState = AMPRINTSTATE_PAUSE_REQUESTED;
       mediaPauseState    = AMPAUSESTATE_NOT_PAUSED; // need the userconfirm method to update pause state
-      SENDLINE_DBG_PGM("J05", "TFT Serial Debug: SD print pause started... J05"); // J05 printing pause
+      SENDLINE_DBG_PGM("J05", "TFT Serial Debug: SD print pause started... J05"); // J05 cutting pause
 
-      // for some reason pausing the print doesn't retract the extruder so force a manual one here
+      // for some reason pausing the print doesn't retract the atc_tool so force a manual one here
       injectCommands(F("G91\nG1 E-2 F1800\nG90"));
       pausePrint();
     }
@@ -996,16 +996,16 @@ void AnycubicTFTClass::ResumePrint() {
       mediaPauseState = AMPAUSESTATE_REHEATING;
       // TODO: JBA I don't think J05 just disables the continue button, i think it injects a rogue M25. So taking this out
       // // disable the continue button
-      // SENDLINE_DBG_PGM("J05", "TFT Serial Debug: Resume called with heater timeout... J05"); // J05 printing pause
+      // SENDLINE_DBG_PGM("J05", "TFT Serial Debug: Resume called with heater timeout... J05"); // J05 cutting pause
 
-      // reheat the nozzle
+      // reheat the tool
       setUserConfirmed();
     }
     else {
-      mediaPrintingState = AMPRINTSTATE_PRINTING;
+      mediaCuttingState = AMPRINTSTATE_CUTTING;
       mediaPauseState    = AMPAUSESTATE_NOT_PAUSED;
 
-      SENDLINE_DBG_PGM("J04", "TFT Serial Debug: SD print resumed... J04"); // J04 printing form sd card now
+      SENDLINE_DBG_PGM("J04", "TFT Serial Debug: SD print resumed... J04"); // J04 cutting form sd card now
       resumePrint();
     }
   #endif
@@ -1013,11 +1013,11 @@ void AnycubicTFTClass::ResumePrint() {
 
 void AnycubicTFTClass::StopPrint() {
   #if ENABLED(SDSUPPORT)
-    mediaPrintingState = AMPRINTSTATE_STOP_REQUESTED;
+    mediaCuttingState = AMPRINTSTATE_STOP_REQUESTED;
     mediaPauseState    = AMPAUSESTATE_NOT_PAUSED;
     SENDLINE_DBG_PGM("J16", "TFT Serial Debug: SD print stop called... J16");
 
-    // for some reason stopping the print doesn't retract the extruder so force a manual one here
+    // for some reason stopping the print doesn't retract the atc_tool so force a manual one here
     injectCommands(F("G91\nG1 E-2 F1800\nG90"));
     stopPrint();
   #endif

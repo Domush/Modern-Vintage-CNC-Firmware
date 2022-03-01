@@ -75,7 +75,7 @@ uint8_t read_byte(uint8_t *byte) { return *byte; }
  *   = displays  '0'....'10' for indexes 0 - 10
  *   ~ displays  '1'....'11' for indexes 0 - 10
  *   * displays 'E1'...'E11' for indexes 0 - 10 (By default. Uses LCD_FIRST_TOOL)
- *   @ displays an axis name such as XYZUVW, or E for an extruder
+ *   @ displays an axis name such as XYZUVW, or E for an ATC tool
  */
 void TFT_String::add(uint8_t *string, int8_t index, uint8_t *itemString/*=nullptr*/) {
   wchar_t wchar;

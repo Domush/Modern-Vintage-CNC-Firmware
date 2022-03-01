@@ -45,8 +45,8 @@ enum class DGUS_Addr : uint16_t {
 
   SCREENCHANGE              = 0x2000, // Screen change request. Data contains target screen in low byte.
   SCREENCHANGE_SD           = 0x2001, // Only change if SD card present.
-  SCREENCHANGE_Idle         = 0x2002, // Only change if not printing.
-  SCREENCHANGE_Printing     = 0x2003, // Only change if printing.
+  SCREENCHANGE_Idle         = 0x2002, // Only change if not cutting.
+  SCREENCHANGE_Cutting     = 0x2003, // Only change if cutting.
   SD_SelectFile             = 0x2004, // Data: file index (0-4)
   SD_Scroll                 = 0x2005, // Data: DGUS_Data::Scroll
   SD_CNC                  = 0x2006,

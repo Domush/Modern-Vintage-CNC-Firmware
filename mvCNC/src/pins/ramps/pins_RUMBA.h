@@ -116,7 +116,7 @@
   #define TEMP_2_PIN                          13  // Analog Input (default connector for thermistor *T2* on rumba board is used)
 #endif
 
-// Optional for extruder 4 or chamber:
+// Optional for atc_tool 4 or chamber:
 //#define TEMP_X_PIN                          12  // Analog Input (default connector for thermistor *T3* on rumba board is used)
 
 #ifndef TEMP_CHAMBER_PIN

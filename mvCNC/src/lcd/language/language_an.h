@@ -172,7 +172,7 @@ namespace Language_an {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Estadisticas Imp.");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Inf. Controlador");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistors");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Extrusors");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Extrusors");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Baudios");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protocolo");
   LSTR MSG_CASE_LIGHT                     = _UxGT("Luz");

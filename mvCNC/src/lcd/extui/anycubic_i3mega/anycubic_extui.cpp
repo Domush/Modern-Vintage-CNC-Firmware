@@ -31,7 +31,7 @@ namespace ExtUI {
   void onPrintTimerStarted()  { AnycubicTFT.OnPrintTimerStarted(); }
   void onPrintTimerPaused()   { AnycubicTFT.OnPrintTimerPaused(); }
   void onPrintTimerStopped()  { AnycubicTFT.OnPrintTimerStopped(); }
-  void onFilamentRunout(const extruder_t extruder)   { AnycubicTFT.OnFilamentRunout(); }
+  void onFilamentRunout(const atc_tool_t atc_tool)   { AnycubicTFT.OnFilamentRunout(); }
   void onUserConfirmRequired(const char * const msg) { AnycubicTFT.OnUserConfirmRequired(msg); }
   void onStatusChanged(const char * const msg) {}
 

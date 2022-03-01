@@ -29,7 +29,7 @@ struct NudgeSpindleScreenData {
   struct BaseNumericAdjustmentScreenData placeholder;
   xyz_int_t rel;
   #if TOOL_CHANGE_SUPPORT
-    bool link_nozzles;
+    bool link_tools;
   #endif
   bool show_offsets;
 };

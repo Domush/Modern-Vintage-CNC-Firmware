@@ -17,7 +17,7 @@ struct printStatistics {    // 16 bytes
   //const uint8_t magic;    // Magic header, it will always be 0x16
   uint16_t totalPrints;     // Number of prints
   uint16_t finishedPrints;  // Number of complete prints
-  uint32_t printTime;       // Accumulated printing time
+  uint32_t printTime;       // Accumulated cutting time
   uint32_t longestPrint;    // Longest successful CNC job
   float    filamentUsed;    // Accumulated filament consumed in mm
   #if SERVICE_INTERVAL_1 > 0

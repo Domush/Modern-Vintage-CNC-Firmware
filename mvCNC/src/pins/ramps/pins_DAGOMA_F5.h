@@ -17,7 +17,7 @@
 #define Z_STOP_PIN                            15
 
 #define FIL_RUNOUT_PIN                        39
-#if EXTRUDERS > 1
+#if ATC_TOOLS > 1
   #define FIL_RUNOUT2_PIN                     14
 #endif
 

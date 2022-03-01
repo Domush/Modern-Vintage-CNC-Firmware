@@ -129,7 +129,7 @@
 // Augmentation for auto-assigning plugs
 //
 // Two thermocouple connectors allows for either
-// 2 extruders or 1 extruder and a heated bed.
+// 2 ATC tools or 1 ATC tool and a heated bed.
 // With no heated bed, an additional 24V fan is possible.
 //
 

@@ -129,7 +129,7 @@ It is a Integer only algorithm - hence efficient (fast). And the Multiplication 
 
 ### Oversampling Bresenham algorithm:
 
-Even if Bresenham does NOT lose steps at all, and also does NOT accumulate error, there is a concept i would call "time resolution" - If the quotient between major axis and minor axis (major axis means, in this context, the axis that must create more step pulses compared with the other ones, including the extruder)
+Even if Bresenham does NOT lose steps at all, and also does NOT accumulate error, there is a concept i would call "time resolution" - If the quotient between major axis and minor axis (major axis means, in this context, the axis that must create more step pulses compared with the other ones, including the ATC tool)
 
 Well, if the quotient result is not an integer, then Bresenham, at some points in the movement of the major axis, must decide that it has to move the minor axis. It is done in such way that after the full major axis movement has executed, it also has executed the full movements of the minor axis. And the minor axis steps were properly distributed evenly along the major axis movement. So good so far.
 

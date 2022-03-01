@@ -19,10 +19,10 @@
 #endif
 
 #if ENABLED(SINGLENOZZLE)
-  #define _ALT_P active_extruder
-  #define _CNT_P EXTRUDERS
+  #define _ALT_P active_tool
+  #define _CNT_P ATC_TOOLS
 #else
-  #define _ALT_P _MIN(active_extruder, FAN_COUNT - 1)
+  #define _ALT_P _MIN(active_tool, FAN_COUNT - 1)
   #define _CNT_P FAN_COUNT
 #endif
 
@@ -52,7 +52,7 @@ void GcodeSuite::M106() {
     if (t > 0) return fanManager.fanSpeedOverride(pfan, t);
   #endif
 
-  const uint16_t dspeed = parser.seen_test('A') ? fanManager.fan_speed[active_extruder] : 255;
+  const uint16_t dspeed = parser.seen_test('A') ? fanManager.fan_speed[active_tool] : 255;
 
   uint16_t speed = dspeed;
 

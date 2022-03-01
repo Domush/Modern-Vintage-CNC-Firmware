@@ -99,7 +99,7 @@ const struct VPMapping VPMap[] PROGMEM = {
   { DGUSLCD_SCREEN_MANUALEXTRUDE,       VPList_ManualExtrude        },
   { DGUSLCD_SCREEN_FANANDFEEDRATE,      VPList_FanAndFeedrate       },
   { DGUSLCD_SCREEN_FLOWRATES,           VPList_SD_FlowRates         },
-  { DGUSLCD_SCREEN_SDPRINTMANIPULATION, VPList_SD_PrintManipulation },
+  { DGUSLCD_SCREEN_SDJOBMANIPULATION, VPList_SD_PrintManipulation },
   { DGUSLCD_SCREEN_SDFILELIST,          VPList_SDFileList           },
   { 0 , nullptr } // List is terminated with an nullptr as table entry.
 };

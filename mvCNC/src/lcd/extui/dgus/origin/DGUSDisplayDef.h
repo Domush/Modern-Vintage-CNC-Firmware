@@ -16,14 +16,14 @@ enum DGUSLCD_Screens : uint8_t {
   DGUSLCD_SCREEN_FANANDFEEDRATE      =  44,
   DGUSLCD_SCREEN_FLOWRATES           =  46,
   DGUSLCD_SCREEN_SDFILELIST          =  50,
-  DGUSLCD_SCREEN_SDPRINTMANIPULATION =  52,
+  DGUSLCD_SCREEN_SDJOBMANIPULATION =  52,
   DGUSLCD_SCREEN_POWER_LOSS          = 100,
   DGUSLCD_SCREEN_PREHEAT             = 120,
   DGUSLCD_SCREEN_UTILITY             = 110,
   DGUSLCD_SCREEN_FILAMENT_HEATING    = 146,
   DGUSLCD_SCREEN_FILAMENT_LOADING    = 148,
   DGUSLCD_SCREEN_FILAMENT_UNLOADING  = 158,
-  DGUSLCD_SCREEN_SDPRINTTUNE         = 170,
+  DGUSLCD_SCREEN_SDJOBTUNE         = 170,
   DGUSLCD_SCREEN_CONFIRM             = 240,
   DGUSLCD_SCREEN_KILL                = 250, ///< Kill Screen. Must always be 250 (to be able to display "Error wrong LCD Version")
   DGUSLCD_SCREEN_WAITING             = 251,
@@ -60,7 +60,7 @@ constexpr uint16_t VP_MSGSTR4 = 0x11C0;
 constexpr uint8_t VP_MSGSTR4_LEN = 0x20;
 
 // Screenchange request for screens that only make sense when cnc is idle.
-// e.g movement is only allowed if cnc is not printing.
+// e.g movement is only allowed if cnc is not cutting.
 // mvCNC must confirm by setting the screen manually.
 constexpr uint16_t VP_SCREENCHANGE_ASK = 0x2000;
 constexpr uint16_t VP_SCREENCHANGE = 0x2001;   // Key-Return button to new menu pressed. Data contains target screen in low byte and info in high byte.

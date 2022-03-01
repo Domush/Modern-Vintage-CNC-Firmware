@@ -16,10 +16,6 @@
   #include "../../module/servo.h"
 #endif
 
-#if ENABLED(BLTOUCH)
-  #include "../../feature/bltouch.h"
-#endif
-
 #if ENABLED(HOST_PROMPT_SUPPORT)
   #include "../../feature/host_actions.h"
 #endif
@@ -142,32 +138,6 @@ inline void servo_probe_test() {
     SERIAL_EOL();
 
     SET_INPUT_PULLUP(PROBE_TEST_PIN);
-
-    // First, check for a probe that recognizes an advanced BLTouch sequence.
-    // In addition to STOW and DEPLOY, it uses SW MODE (and RESET in the beginning)
-    // to see if this is one of the following: BLTOUCH Classic 1.2, 1.3,  or
-    // BLTouch Smart 1.0, 2.0, 2.2, 3.0, 3.1. But only if the user has actually
-    // configured a BLTouch as being present. If the user has not configured this,
-    // the BLTouch will be detected in the last phase of these tests (see further on).
-    bool blt = false;
-    // This code will try to detect a BLTouch probe or clone
-    #if ENABLED(BLTOUCH)
-      SERIAL_ECHOLNPGM(". Check for BLTOUCH");
-      bltouch._reset();
-      bltouch._stow();
-      if (probe_inverting == READ(PROBE_TEST_PIN)) {
-        bltouch._set_SW_mode();
-        if (probe_inverting != READ(PROBE_TEST_PIN)) {
-          bltouch._deploy();
-          if (probe_inverting == READ(PROBE_TEST_PIN)) {
-            bltouch._stow();
-            SERIAL_ECHOLNPGM("= BLTouch Classic 1.2, 1.3, Smart 1.0, 2.0, 2.2, 3.0, 3.1 detected.");
-            // Check for a 3.1 by letting the user trigger it, later
-            blt = true;
-        }
-      }
-    }
-    #endif
 
     // The following code is common to all kinds of servo probes.
     // Since it could be a real servo or a BLTouch (any kind) or a clone,

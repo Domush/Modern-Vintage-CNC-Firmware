@@ -59,9 +59,9 @@
 
 /**
  * Note that REV F6 of the Printrboard stole the A HOTEND pin and
- * reassigned it to a second fan for the extruder heater.  It's
+ * reassigned it to a second fan for the atc_tool heater.  It's
  * recommended that you swap the A and B outputs on the Extrudrboard
- * so EXTRUDERS=2 will still work on F6, using B for E1/HEATER_1/TEMP_1.
+ * so ATC_TOOLS=2 will still work on F6, using B for E1/HEATER_1/TEMP_1.
  * See https://printrbot.zendesk.com/hc/en-us/articles/115003072346
  *
  * If you have REV F6 you probably also want to set E0_AUTO_FAN_PIN
@@ -254,7 +254,7 @@
  * This is EXP1-2, which is also the TEMP_A_PIN for the Extrudrboard.
  * If using w/ Extrudrboard, cut off pin 2 on the Extrudrboard male
  * connector to ensure this is disconnected from the A THERM pullups.
- * You probably want to set EXTRUDERS=2 and swap the Extrudrboard outputs,
+ * You probably want to set ATC_TOOLS=2 and swap the Extrudrboard outputs,
  * which will let you use Channel B on the Extrudrboard as E1.
  */
 #ifndef FILWIDTH_PIN

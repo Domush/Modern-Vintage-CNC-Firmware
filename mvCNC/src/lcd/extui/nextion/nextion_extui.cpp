@@ -29,7 +29,7 @@ namespace ExtUI {
   void onPrintTimerStarted() {}
   void onPrintTimerPaused()  {}
   void onPrintTimerStopped() {}
-  void onFilamentRunout(const extruder_t)            {}
+  void onFilamentRunout(const atc_tool_t)            {}
   void onUserConfirmRequired(const char * const msg) { nextion.ConfirmationRequest(msg); }
   void onStatusChanged(const char * const msg)       { nextion.StatusChange(msg);        }
 

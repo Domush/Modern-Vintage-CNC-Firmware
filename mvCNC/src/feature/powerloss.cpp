@@ -73,7 +73,7 @@ void CNCJobRecovery::enable(const bool onoff) {
 void CNCJobRecovery::changed() {
   if (!enabled)
     purge();
-  else if (IS_SD_PRINTING())
+  else if (IS_SD_JOB_RUNNING())
     save(true);
 }
 
@@ -124,7 +124,7 @@ void CNCJobRecovery::prepare() {
  */
 void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER_LOSS_ZRAISE*/, const bool raised/*=false*/) {
 
-  // We don't check IS_SD_PRINTING here so a save may occur during a pause
+  // We don't check IS_SD_JOB_RUNNING here so a save may occur during a pause
 
   #if SAVE_INFO_INTERVAL_MS > 0
     static millis_t next_save_ms; // = 0
@@ -152,7 +152,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
 
     // Set Head and Foot to matching non-zero values
     if (!++info.valid_head) ++info.valid_head; // non-zero in sequence
-    //if (!IS_SD_PRINTING()) info.valid_head = 0;
+    //if (!IS_SD_JOB_RUNNING()) info.valid_head = 0;
     info.valid_foot = info.valid_head;
 
     // Machine state
@@ -164,7 +164,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
     TERN_(GCODE_REPEAT_MARKERS, info.stored_repeat = repeat);
     TERN_(HAS_HOME_OFFSET, info.home_offset = home_offset);
     TERN_(HAS_POSITION_SHIFT, info.position_shift = position_shift);
-    E_TERN_(info.active_extruder = active_extruder);
+    E_TERN_(info.active_tool = active_tool);
 
     #if HAS_FAN
       COPY(info.fan_speed, fanManager.fan_speed);
@@ -218,7 +218,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
 
   /**
    * An outage was detected by a sensor pin.
-   *  - If not SD printing, let the machine turn off on its own with no "KILL" screen
+   *  - If not SD job, let the machine turn off on its own with no "KILL" screen
    *  - Disable all heaters first to save energy
    *  - Save the recovery data for the current instant
    *  - If backup power is available Retract E and Raise Z
@@ -240,7 +240,7 @@ void CNCJobRecovery::save(const bool force/*=false*/, const float zraise/*=POWER
 
     // Save the current position, distance that Z was (or should be) raised,
     // and a flag whether the raise was already done here.
-    if (IS_SD_PRINTING()) save(true, zraise, ENABLED(BACKUP_POWER_SUPPLY));
+    if (IS_SD_JOB_RUNNING()) save(true, zraise, ENABLED(BACKUP_POWER_SUPPLY));
 
     // Disable all heaters to reduce power loss
     fanManager.disable_all_heaters();
@@ -352,7 +352,7 @@ void CNCJobRecovery::resume() {
 
   // Restore the previously active tool (with no_move)
   #if TOOL_CHANGE_SUPPORT || TOOL_CHANGE_SUPPORT
-    sprintf_P(cmd, PSTR("T%i S"), info.active_extruder);
+    sprintf_P(cmd, PSTR("T%i S"), info.active_tool);
     gcode.process_subcommands_now(cmd);
   #endif
 
@@ -374,7 +374,7 @@ void CNCJobRecovery::resume() {
   );
   gcode.process_subcommands_now(cmd);
 
-  // Move back down to the saved Z for printing
+  // Move back down to the saved Z for cutting
   sprintf_P(cmd, PSTR("G1Z%sF600"), dtostrf(z_print, 1, 3, str_1));
   gcode.process_subcommands_now(cmd);
 
@@ -457,7 +457,7 @@ void CNCJobRecovery::resume() {
         #endif
 
         #if TOOL_CHANGE_SUPPORT
-          DEBUG_ECHOLNPGM("active_extruder: ", info.active_extruder);
+          DEBUG_ECHOLNPGM("active_tool: ", info.active_tool);
         #endif
 
         #if HAS_FAN

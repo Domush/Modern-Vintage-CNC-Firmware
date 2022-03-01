@@ -95,8 +95,8 @@ void recalc_delta_settings() {
 void inverse_kinematics(const xyz_pos_t &raw) {
   #if HAS_HOTEND_OFFSET
     // Delta hotend offsets must be applied in Cartesian space with no "spoofing"
-    xyz_pos_t pos = { raw.x - hotend_offset[active_extruder].x,
-                      raw.y - hotend_offset[active_extruder].y,
+    xyz_pos_t pos = { raw.x - hotend_offset[active_tool].x,
+                      raw.y - hotend_offset[active_tool].y,
                       raw.z };
     DELTA_IK(pos);
     //DELTA_DEBUG(pos);

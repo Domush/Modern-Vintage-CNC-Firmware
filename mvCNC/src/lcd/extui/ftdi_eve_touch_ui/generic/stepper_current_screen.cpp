@@ -54,7 +54,7 @@ void StepperCurrentScreen::onRedraw(draw_mode_t what) {
   #endif
   #if AXIS_IS_TMC(E0)
     w.color(e_axis)  .adjuster(14, GET_TEXT_F(
-    #if EXTRUDERS == 1
+    #if ATC_TOOLS == 1
       MSG_AXIS_E
     #else
       MSG_AXIS_E1

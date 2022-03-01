@@ -128,11 +128,11 @@ void HAL_idletask() {
   #if HAS_SHARED_MEDIA
     // If mvCNC is using the SD card we need to lock it to prevent access from
     // a PC via USB.
-    // Other HALs use IS_SD_PRINTING() and IS_SD_FILE_OPEN() to check for access but
+    // Other HALs use IS_SD_JOB_RUNNING() and IS_SD_FILE_OPEN() to check for access but
     // this will not reliably detect delete operations. To be safe we will lock
     // the disk if mvCNC has it mounted. Unfortunately there is currently no way
     // to unmount the disk from the LCD menu.
-    // if (IS_SD_PRINTING() || IS_SD_FILE_OPEN())
+    // if (IS_SD_JOB_RUNNING() || IS_SD_FILE_OPEN())
     if (card.isMounted())
       MSC_Aquire_Lock();
     else

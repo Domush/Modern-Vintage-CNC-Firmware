@@ -35,7 +35,7 @@ public:
   static void CNCTimerStarted();
   static void CNCTimerPaused();
   static void CNCTimerStopped();
-  static void FilamentRunout(const ExtUI::extruder_t extruder);
+  static void FilamentRunout(const ExtUI::atc_tool_t atc_tool);
 
   #if ENABLED(SDSUPPORT)
     /// mvCNC informed us that a new SD has been inserted.
@@ -83,7 +83,7 @@ public:
 
   static uint16_t probing_icons[2];
 
-  static DGUS_Data::Extruder filament_extruder;
+  static DGUS_Data::Extruder filament_atc_tool;
   static uint16_t filament_length;
 
   static char gcode[DGUS_GCODE_LEN + 1];

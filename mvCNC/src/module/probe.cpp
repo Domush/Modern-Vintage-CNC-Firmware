@@ -484,7 +484,7 @@ bool Probe::probe_down_to_z(const_float_t z, const_feedRate_t fr_mm_s) {
   #endif
 
   #if BOTH(HAS_TEMP_HOTEND, WAIT_FOR_HOTEND)
-    fanManager.wait_for_hotend_heating(active_extruder);
+    fanManager.wait_for_hotend_heating(active_tool);
   #endif
   #if ENABLED(BLTOUCH)
     if (!bltouch.high_speed_mode && bltouch.deploy())
@@ -639,7 +639,7 @@ float Probe::run_z_probe(const bool sanity_check/*=true*/) {
 
   #elif Z_PROBE_FEEDRATE_FAST != Z_PROBE_FEEDRATE_SLOW
 
-    // If the nozzle is well over the travel height then
+    // If the tool is well over the travel height then
     // move down quickly before doing the slow probe
     const float z = Z_CLEARANCE_DEPLOY_PROBE + 5.0 + (offset.z < 0 ? -offset.z : 0);
     if (current_position.z > z) {
@@ -758,7 +758,7 @@ float Probe::probe_at_point(const_float_t rx, const_float_t ry, const ProbePtRai
       "...(", LOGICAL_X_POSITION(rx), ", ", LOGICAL_Y_POSITION(ry),
       ", ", raise_after == PROBE_PT_RAISE ? "raise" : raise_after == PROBE_PT_LAST_STOW ? "stow (last)" : raise_after == PROBE_PT_STOW ? "stow" : "none",
       ", ", verbose_level,
-      ", ", probe_relative ? "probe" : "nozzle", "_relative)"
+      ", ", probe_relative ? "probe" : "tool", "_relative)"
     );
     DEBUG_POS("", current_position);
   }
@@ -777,7 +777,7 @@ float Probe::probe_at_point(const_float_t rx, const_float_t ry, const ProbePtRai
     if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Position Not Reachable");
     return NAN;
   }
-  if (probe_relative) npos -= offset_xy;  // Get the nozzle position
+  if (probe_relative) npos -= offset_xy;  // Get the tool position
 
   // Move the probe to the starting XYZ
   do_blocking_move_to(npos, feedRate_t(XY_PROBE_FEEDRATE_MM_S));
@@ -814,7 +814,7 @@ float Probe::probe_at_point(const_float_t rx, const_float_t ry, const ProbePtRai
      *
      * The servo might be deployed and positioned too low to stow
      * when starting up the machine or rebooting the board.
-     * There's no way to know where the nozzle is positioned until
+     * There's no way to know where the tool is positioned until
      * homing has been done - no homing with z-probe without init!
      */
     STOW_Z_SERVO();

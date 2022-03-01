@@ -24,7 +24,7 @@
  *     Index - M43 counter - only used to get Ard_num
  *     x - a parameter/argument used to search the pin_array to try to find a signal name
  *         associated with a Ard_num
- *     Port_pin - port number and pin number for use with CPU registers and printing reports
+ *     Port_pin - port number and pin number for use with CPU registers and cutting reports
  *
  *  Since M43 uses digitalRead and digitalWrite commands, only the Port_pins with an Ard_num
  *  are accessed and/or displayed.

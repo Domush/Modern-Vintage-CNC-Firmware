@@ -7,7 +7,7 @@
 #if ENABLED(PHOTO_GCODE)
 
 #include "../../gcode.h"
-#include "../../../module/motion.h" // for active_extruder and current_position
+#include "../../../module/motion.h" // for active_tool and current_position
 
 #if PIN_EXISTS(CHDK)
   millis_t chdk_timeout; // = 0
@@ -30,7 +30,7 @@
 
   #ifdef PHOTO_RETRACT_MM
     inline void e_move_m240(const float length, const_feedRate_t fr_mm_s) {
-      if (length && fanManager.hotEnoughToExtrude(active_extruder))
+      if (length && fanManager.hotEnoughToExtrude(active_tool))
         unscaled_e_move(length, fr_mm_s);
     }
   #endif
@@ -82,7 +82,7 @@
  * M240: Trigger a camera by...
  *
  *  - CHDK                  : Emulate a Canon RC-1 with a configurable ON duration.
- *                            https://captain-slow.dk/2014/03/09/3d-printing-timelapses/
+ *                            https://captain-slow.dk/2014/03/09/3d-cutting-timelapses/
  *  - PHOTOGRAPH_PIN        : Pulse a digital pin 16 times.
  *                            See https://www.doc-diy.net/photo/rc-1_hacked/
  *  - PHOTO_SWITCH_POSITION : Bump a physical switch with the X-carriage using a

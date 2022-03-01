@@ -31,7 +31,7 @@
 #define X_MIN_PIN                              3
 #define X_MAX_PIN                              2
 #define Y_MIN_PIN                             14
-//#define Y_MAX_PIN                           15  // Connected to "DJ" plug on extruder heads
+//#define Y_MAX_PIN                           15  // Connected to "DJ" plug on atc_tool heads
 #define Z_MIN_PIN                             18
 #define Z_MAX_PIN                             19
 

@@ -113,7 +113,7 @@ void menu_advanced_settings();
 
   #if ENABLED(TOOLCHANGE_MIGRATION_FEATURE)
 
-    #include "../../module/motion.h" // for active_extruder
+    #include "../../module/motion.h" // for active_tool
     #include "../../gcode/queue.h"
 
     void menu_toolchange_migration() {
@@ -124,11 +124,11 @@ void menu_advanced_settings();
 
       // Auto mode ON/OFF
       EDIT_ITEM(bool, MSG_TOOL_MIGRATION_AUTO, &migration.automode);
-      EDIT_ITEM(uint8, MSG_TOOL_MIGRATION_END, &migration.last, 0, EXTRUDERS - 1);
+      EDIT_ITEM(uint8, MSG_TOOL_MIGRATION_END, &migration.last, 0, ATC_TOOLS - 1);
 
-      // Migrate to a chosen extruder
-      LOOP_L_N(s, EXTRUDERS) {
-        if (s != active_extruder) {
+      // Migrate to a chosen ATC tool
+      LOOP_L_N(s, ATC_TOOLS) {
+        if (s != active_tool) {
           ACTION_ITEM_N_P(s, msg_migrate, []{
             char cmd[12];
             sprintf_P(cmd, PSTR("M217 T%i"), int(MenuItemBase::itemIndex));
@@ -149,9 +149,9 @@ void menu_advanced_settings();
   void menu_tool_offsets() {
 
     auto _recalc_offsets = []{
-      if (active_extruder && all_axes_trusted()) {  // For the 2nd extruder re-home so the next tool-change gets the new offsets.
-        queue.inject_P(G28_STR); // In future, we can babystep the 2nd extruder (if active), making homing unnecessary.
-        active_extruder = 0;
+      if (active_tool && all_axes_trusted()) {  // For the 2nd ATC tool re-home so the next tool-change gets the new offsets.
+        queue.inject_P(G28_STR); // In future, we can babystep the 2nd ATC tool (if active), making homing unnecessary.
+        active_tool = 0;
       }
     };
 
@@ -190,7 +190,7 @@ void menu_advanced_settings();
     );
     GCODES_ITEM(MSG_IDEX_MODE_FULL_CTRL, PSTR("M605S0\nG28X"));
 
-    EDIT_ITEM(float42_52, MSG_IDEX_DUPE_GAP, &duplicate_extruder_x_offset, (X2_MIN_POS) - (X1_MIN_POS), (X_BED_SIZE) - 20);
+    EDIT_ITEM(float42_52, MSG_IDEX_DUPE_GAP, &duplicate_atc_tool_x_offset, (X2_MIN_POS) - (X1_MIN_POS), (X_BED_SIZE) - 20);
 
     END_MENU();
   }
@@ -508,7 +508,7 @@ void menu_configuration() {
   }
 
   //
-  // Set single nozzle filament retract and prime length
+  // Set single tool filament retract and prime length
   //
   #if TOOL_CHANGE_SUPPORT
     SUBMENU(MSG_TOOL_CHANGE, menu_tool_change);

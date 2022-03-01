@@ -92,8 +92,8 @@
 // For example, a switch to detect any kind of behavior, Power supply pin .... etc.
 #define FIL_RUNOUT_PIN                        32
 
-// This board have the option to use an extra TMC2209 stepper, one of the use could be as a second extruder.
-#if EXTRUDERS < 2
+// This board have the option to use an extra TMC2209 stepper, one of the use could be as a second atc_tool.
+#if ATC_TOOLS < 2
   // TODO: Corregir aquí que cuando tenemos dos extrusores o lo que sea, utiliza los endstop que le sobran, osea los max, no hay Z2_endstop
   #if NUM_Z_STEPPER_DRIVERS > 1
     #define Z2_STOP_PIN                       14
@@ -120,7 +120,7 @@
 // Temperature Sensors
 #define TEMP_0_PIN                             1
 
-// You could use one of the ADC for a temp chamber if you don't use the second extruder, for example.
+// You could use one of the ADC for a temp chamber if you don't use the second atc_tool, for example.
 #if TEMP_SENSOR_CHAMBER > 0
   #define TEMP_CHAMBER_PIN                     3
 #else

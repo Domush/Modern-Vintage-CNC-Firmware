@@ -77,7 +77,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
       const millis_t ms = millis();
       if (ELAPSED(ms, ntr)) {
         ntr = ms + 1000;
-        fanManager.print_heater_states(active_extruder);
+        fanManager.print_heater_states(active_tool);
       }
       return (timeout && ELAPSED(ms, timeout));
     };
@@ -90,7 +90,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
     };
 
     auto g76_probe = [](const TempSensorID sid, celsius_t &targ, const xy_pos_t &nozpos) {
-      do_z_clearance(5.0); // Raise nozzle before probing
+      do_z_clearance(5.0); // Raise tool before probing
       const float measured_z = probe.probe_at_point(nozpos, PROBE_PT_STOW, 0, false);  // verbose=0, probe_relative=false
       if (isnan(measured_z))
         SERIAL_ECHOLNPGM("!Received NAN. Aborting.");
@@ -167,7 +167,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
 
         report_targets(target_bed, target_probe);
 
-        // Park nozzle
+        // Park tool
         do_blocking_move_to(parkpos);
 
         // Wait for heatbed to reach target temp and probe to cool below target temp
@@ -176,7 +176,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
           break;
         }
 
-        // Move the nozzle to the probing point and wait for the probe to reach target temp
+        // Move the tool to the probing point and wait for the probe to reach target temp
         do_blocking_move_to(noz_pos_xyz);
         say_waiting_for_probe_heating();
         SERIAL_EOL();
@@ -208,7 +208,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
 
     if (do_probe_cal) {
 
-      // Park nozzle
+      // Park tool
       do_blocking_move_to(parkpos);
 
       // Initialize temperatures
@@ -278,7 +278,7 @@ static void say_failed_to_calibrate()       { SERIAL_ECHOPGM("!Failed to calibra
  *    R - Reset all offsets to zero (i.e., disable compensation).
  *    B - Manually set offset for bed
  *    P - Manually set offset for probe
- *    E - Manually set offset for extruder
+ *    E - Manually set offset for ATC tool
  *
  * With B, P, or E:
  *    I[index] - Index in the array

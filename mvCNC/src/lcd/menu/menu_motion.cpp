@@ -91,7 +91,7 @@ void lcd_move_x() { _lcd_move_xyz(GET_TEXT(MSG_MOVE_X), X_AXIS); }
 
 #if E_MANUAL
 
-  static void lcd_move_e(TERN_(MULTI_E_MANUAL, const int8_t eindex=active_extruder)) {
+  static void lcd_move_e(TERN_(MULTI_E_MANUAL, const int8_t eindex=active_tool)) {
     if (ui.use_click()) return ui.goto_previous_screen_no_defer();
     if (ui.encoderPosition) {
       if (!ui.manual_move.processing) {
@@ -141,7 +141,7 @@ void _goto_manual_move(const_float_t scale) {
   ui.goto_screen(_manual_move_func_ptr);
 }
 
-void _menu_move_distance(const AxisEnum axis, const screenFunc_t func, const int8_t eindex=active_extruder) {
+void _menu_move_distance(const AxisEnum axis, const screenFunc_t func, const int8_t eindex=active_tool) {
   _manual_move_func_ptr = func;
   START_MENU();
   if (LCD_HEIGHT >= 4) {
@@ -196,7 +196,7 @@ void _menu_move_distance(const AxisEnum axis, const screenFunc_t func, const int
 
   inline void _menu_move_distance_e_maybe() {
     #if ENABLED(PREVENT_COLD_EXTRUSION)
-      const bool too_cold = fanManager.tooColdToExtrude(active_extruder);
+      const bool too_cold = fanManager.tooColdToExtrude(active_tool);
       if (too_cold) {
         ui.goto_screen([]{
           MenuItem_confirm::select_screen(
@@ -251,26 +251,26 @@ void menu_move() {
 
   #if ANY(SWITCHING_EXTRUDER, SWITCHING_NOZZLE, MAGNETIC_SWITCHING_TOOLHEAD)
 
-    #if EXTRUDERS >= 4
-      switch (active_extruder) {
+    #if ATC_TOOLS >= 4
+      switch (active_tool) {
         case 0: GCODES_ITEM_N(1, MSG_SELECT_E, PSTR("T1")); break;
         case 1: GCODES_ITEM_N(0, MSG_SELECT_E, PSTR("T0")); break;
         case 2: GCODES_ITEM_N(3, MSG_SELECT_E, PSTR("T3")); break;
         case 3: GCODES_ITEM_N(2, MSG_SELECT_E, PSTR("T2")); break;
-        #if EXTRUDERS == 6
+        #if ATC_TOOLS == 6
           case 4: GCODES_ITEM_N(5, MSG_SELECT_E, PSTR("T5")); break;
           case 5: GCODES_ITEM_N(4, MSG_SELECT_E, PSTR("T4")); break;
         #endif
       }
-    #elif EXTRUDERS == 3
-      if (active_extruder < 2) {
-        if (active_extruder)
+    #elif ATC_TOOLS == 3
+      if (active_tool < 2) {
+        if (active_tool)
           GCODES_ITEM_N(0, MSG_SELECT_E, PSTR("T0"));
         else
           GCODES_ITEM_N(1, MSG_SELECT_E, PSTR("T1"));
       }
     #else
-      if (active_extruder)
+      if (active_tool)
         GCODES_ITEM_N(0, MSG_SELECT_E, PSTR("T0"));
       else
         GCODES_ITEM_N(1, MSG_SELECT_E, PSTR("T1"));
@@ -278,7 +278,7 @@ void menu_move() {
 
   #elif ENABLED(DUAL_X_CARRIAGE)
 
-    if (active_extruder)
+    if (active_tool)
       GCODES_ITEM_N(0, MSG_SELECT_E, PSTR("T0"));
     else
       GCODES_ITEM_N(1, MSG_SELECT_E, PSTR("T1"));
@@ -287,7 +287,7 @@ void menu_move() {
 
   #if E_MANUAL
 
-    // The current extruder
+    // The current ATC tool
     SUBMENU(MSG_MOVE_E, []{ _menu_move_distance_e_maybe(); });
 
     #define SUBMENU_MOVE_E(N) SUBMENU_N(N, MSG_MOVE_EN, []{ _menu_move_distance(E_AXIS, []{ lcd_move_e(MenuItemBase::itemIndex); }, MenuItemBase::itemIndex); });
@@ -301,7 +301,7 @@ void menu_move() {
 
     #elif MULTI_E_MANUAL
 
-      // Independent extruders with one E-stepper per hotend
+      // Independent ATC tools with one E-stepper per hotend
       LOOP_L_N(n, E_MANUAL) SUBMENU_MOVE_E(n);
 
     #endif

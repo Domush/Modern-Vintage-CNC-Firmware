@@ -4,7 +4,7 @@
 #pragma once
 
 /**
- * Open Motion controller with enable based extruders (Alpha!)
+ * Open Motion controller with enable based ATC tools (Alpha!)
  *
  *                        ATmega644
  *

@@ -92,7 +92,7 @@
 #define LED_PIN                             PC2   // pin 17
 
 // Longer3D board mosfets are passing by default
-// Avoid nozzle heat and fan start before serial init
+// Avoid tool heat and fan start before serial init
 #define BOARD_OPENDRAIN_MOSFETS
 
 #define BOARD_PREINIT() { \

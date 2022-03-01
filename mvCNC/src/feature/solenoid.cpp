@@ -8,7 +8,7 @@
 
 #include "solenoid.h"
 
-#include "../module/motion.h" // for active_extruder
+#include "../module/motion.h" // for active_tool
 
 // PARKING_EXTRUDER options alter the default behavior of solenoids, this ensures compliance of M380-381
 
@@ -26,14 +26,14 @@ static void set_solenoid(const uint8_t num, const bool active) {
   }
 
   #if ENABLED(PARKING_EXTRUDER)
-    if (!active && active_extruder == num) // If active extruder's solenoid is disabled, carriage is considered parked
-      parking_extruder_set_parked(true);
+    if (!active && active_tool == num) // If active ATC tool's solenoid is disabled, carriage is considered parked
+      parking_atc_tool_set_parked(true);
   #endif
 }
 
 void enable_solenoid(const uint8_t num) { set_solenoid(num, true); }
 void disable_solenoid(const uint8_t num) { set_solenoid(num, false); }
-void enable_solenoid_on_active_extruder() {  }
+void enable_solenoid_on_active_tool() {  }
 
 void disable_all_solenoids() {
   #define _SOL_DISABLE(N) TERN_(HAS_SOLENOID_##N, disable_solenoid(N));

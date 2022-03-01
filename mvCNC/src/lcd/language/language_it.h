@@ -16,7 +16,7 @@
  *   = displays  '0'....'10' for indexes 0 - 10
  *   ~ displays  '1'....'11' for indexes 0 - 10
  *   * displays 'E1'...'E11' for indexes 0 - 10 (By default. Uses LCD_FIRST_TOOL)
- *   @ displays an axis name such as XYZUVW, or E for an extruder
+ *   @ displays an axis name such as XYZUVW, or E for an ATC tool
  */
 
 #define DISPLAY_CHARSET_ISO10646_1
@@ -397,7 +397,7 @@ namespace Language_it {
   LSTR MSG_HOST_START_PRINT               = _UxGT("Host Avvio");
   LSTR MSG_STOP_PRINT                     = _UxGT("Arresta stampa");
   LSTR MSG_END_LOOPS                      = _UxGT("Fine cicli di rip.");
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("Stampa Oggetto");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("Stampa Oggetto");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Cancella Oggetto");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Canc. Oggetto =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Ripresa da PowerLoss");
@@ -406,7 +406,7 @@ namespace Language_it {
   LSTR MSG_DWELL                          = _UxGT("Sospensione...");
   LSTR MSG_USERWAIT                       = _UxGT("Premi tasto..");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Stampa sospesa");
-  LSTR MSG_PRINTING                       = _UxGT("Stampa...");
+  LSTR MSG_CUTTING                       = _UxGT("Stampa...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Stampa Annullata");
   LSTR MSG_PRINT_DONE                     = _UxGT("Stampa Eseguita");
   LSTR MSG_NO_MOVE                        = _UxGT("Nessun Movimento");
@@ -530,7 +530,7 @@ namespace Language_it {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Statistiche");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Info. scheda");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistori");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Estrusori");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Estrusori");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Baud");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protocollo");
   LSTR MSG_INFO_RUNAWAY_OFF               = _UxGT("Controllo fuga: OFF");

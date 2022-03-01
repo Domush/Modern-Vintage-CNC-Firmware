@@ -1,5 +1,5 @@
 /*****************************
- * bio_printing_dialog_box.h *
+ * bio_cutting_dialog_box.h *
  *****************************/
 
 /****************************************************************************
@@ -22,10 +22,10 @@
 
 #pragma once
 
-#define FTDI_BIO_PRINTING_DIALOG_BOX
-#define FTDI_BIO_PRINTING_DIALOG_BOX_CLASS BioPrintingDialogBox
+#define FTDI_BIO_CUTTING_DIALOG_BOX
+#define FTDI_BIO_CUTTING_DIALOG_BOX_CLASS BioCuttingDialogBox
 
-class BioPrintingDialogBox : public BaseScreen, public CachedScreen<PRINTING_SCREEN_CACHE,PRINTING_SCREEN_DL_SIZE> {
+class BioCuttingDialogBox : public BaseScreen, public CachedScreen<CUTTING_SCREEN_CACHE,CUTTING_SCREEN_DL_SIZE> {
   private:
     static void draw_status_message(draw_mode_t, const char * const);
     static void draw_progress(draw_mode_t);

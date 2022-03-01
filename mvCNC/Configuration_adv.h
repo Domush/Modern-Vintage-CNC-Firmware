@@ -256,8 +256,8 @@
   #endif
 #endif
 
-// Activate a solenoid on the active extruder with M380. Disable all with M381.
-// Define SOL0_PIN, SOL1_PIN, etc., for each extruder that has a solenoid.
+// Activate a solenoid on the active ATC tool with M380. Disable all with M381.
+// Define SOL0_PIN, SOL1_PIN, etc., for each ATC tool that has a solenoid.
 //#define EXT_SOLENOID
 
 // @section homing
@@ -360,7 +360,7 @@
 
   //#define ASSISTED_TRAMMING_WIZARD    // Add a Tramming Wizard to the LCD menu
 
-  //#define ASSISTED_TRAMMING_WAIT_POSITION { X_CENTER, Y_CENTER, 30 } // Move the nozzle out of the way for adjustment
+  //#define ASSISTED_TRAMMING_WAIT_POSITION { X_CENTER, Y_CENTER, 30 } // Move the tool out of the way for adjustment
 
   /**
    * Screw thread:
@@ -376,7 +376,7 @@
 
 #define AXIS_RELATIVE_MODES { false, false, false }
 
-// Add a Duplicate option for well-separated conjoined nozzles
+// Add a Duplicate option for well-separated conjoined tools
 //#define MULTI_NOZZLE_DUPLICATION
 
 // By default pololu step drivers require an active high signal. However, some high power drivers require an active low signal as step.
@@ -395,12 +395,12 @@
 #define DEFAULT_STEPPER_DEACTIVE_TIME 1200
 #define DISABLE_INACTIVE_X true
 #define DISABLE_INACTIVE_Y true
-#define DISABLE_INACTIVE_Z true  // Set 'false' if the nozzle could fall onto your printed part!
+#define DISABLE_INACTIVE_Z true  // Set 'false' if the tool could fall onto your printed part!
 #define DISABLE_INACTIVE_I true
 #define DISABLE_INACTIVE_J true
 #define DISABLE_INACTIVE_K true
 
-// Default Minimum Feedrates for printing and travel moves
+// Default Minimum Feedrates for cutting and travel moves
 #define DEFAULT_MINIMUMFEEDRATE       1.0     // (mm/s) Minimum feedrate. Set with M205 S.
 #define DEFAULT_MINTRAVELFEEDRATE     10.0     // (mm/s) Minimum travel feedrate. Set with M205 T.
 
@@ -550,7 +550,7 @@
   #define MANUAL_FEEDRATE { 100*60, 100*60, 10*60 } // (mm/min) Feedrates for manual moves along X, Y, Z, E from panel
   #define FINE_MANUAL_MOVE 0.025    // (mm) Smallest manual move (< 0.1mm) applying to Z on most machines
   #if IS_ULTIPANEL
-    #define MANUAL_E_MOVES_RELATIVE // Display extruder move distance rather than "position"
+    #define MANUAL_E_MOVES_RELATIVE // Display ATC tool move distance rather than "position"
     #define ULTIPANEL_FEEDMULTIPLY  // Encoder sets the feedrate multiplier on the Status Screen
   #endif
 #endif
@@ -574,12 +574,12 @@
   #if ENABLED(PROBE_OFFSET_WIZARD)
     /**
      * Enable to init the Probe Z-Offset when starting the Wizard.
-     * Use a height slightly above the estimated nozzle-to-probe Z offset.
+     * Use a height slightly above the estimated tool-to-probe Z offset.
      * For example, with an offset of -5, consider a starting height of -4.
      */
     //#define PROBE_OFFSET_WIZARD_START_Z -4.0
 
-    // Set a convenient position to do the calibration (probing point and nozzle/bed-distance)
+    // Set a convenient position to do the calibration (probing point and tool/bed-distance)
     //#define PROBE_OFFSET_WIZARD_XY_POS { X_CENTER, Y_CENTER }
   #endif
 #endif
@@ -592,7 +592,7 @@
     #if ENABLED(X_AXIS_TWIST_COMPENSATION)
       /**
        * Enable to init the Probe Z-Offset when starting the Wizard.
-       * Use a height slightly above the estimated nozzle-to-probe Z offset.
+       * Use a height slightly above the estimated tool-to-probe Z offset.
        * For example, with an offset of -5, consider a starting height of -4.
        */
       #define XATC_START_Z 0.0
@@ -685,7 +685,7 @@
   #endif
 
   #if EITHER(HAS_MVCNCUI_HD44780, IS_TFTGLCD_PANEL)
-    //#define LCD_PROGRESS_BAR            // Show a progress bar on HD44780 LCDs for SD printing
+    //#define LCD_PROGRESS_BAR            // Show a progress bar on HD44780 LCDs for SD job
     #if ENABLED(LCD_PROGRESS_BAR)
       #define PROGRESS_BAR_BAR_TIME 2000  // (ms) Amount of time to show the bar
       #define PROGRESS_BAR_MSG_TIME 3000  // (ms) Amount of time to show the status message
@@ -726,7 +726,7 @@
   // Since the FAT gets out of order with usage, SDCARD_SORT_ALPHA is recommended.
   #define SDCARD_RATHERRECENTFIRST
 
-  #define SD_MENU_CONFIRM_START             // Confirm the selected SD file before printing
+  #define SD_MENU_CONFIRM_START             // Confirm the selected SD file before jobs
 
   //#define NO_SD_AUTOSTART                 // Remove auto#.g file support completely to save some Flash, SRAM
   //#define MENU_ADDAUTOSTART               // Add a menu option to run auto#.g files
@@ -745,7 +745,7 @@
    * Continue after Power-Loss (Creality3D)
    *
    * Store the current state to the SD Card at the start of each layer
-   * during SD printing. If the recovery file is found at boot time, present
+   * during SD job. If the recovery file is found at boot time, present
    * an option on the LCD screen to continue the print from the last-known
    * point in the file.
    */
@@ -762,7 +762,7 @@
     //#define POWER_LOSS_RETRACT_LEN 10 // (mm) Length of filament to retract on fail. Requires backup power.
 
     // Without a POWER_LOSS_PIN the following option helps reduce wear on the SD card,
-    // especially with "vase mode" printing. Set too high and vases cannot be continued.
+    // especially with "vase mode" cutting. Set too high and vases cannot be continued.
     #define POWER_LOSS_MIN_Z_CHANGE 0.05 // (mm) Minimum Z change before saving power-loss data
 
     // Enable if Z homing is needed for proper recovery. 99.9% of the time this should be disabled!
@@ -822,7 +822,7 @@
   //#define SD_ABORT_NO_COOLDOWN          // Leave the heaters on after Stop Print (not recommended!)
 
   /**
-   * Abort SD printing when any endstop is triggered.
+   * Abort SD job when any endstop is triggered.
    * This feature is enabled with 'M540 S1' or from the LCD menu.
    * Endstops must be activated for this option to work.
    */
@@ -938,14 +938,14 @@
 /**
  * Additional options for Graphical Displays
  *
- * Use the optimizations here to improve printing performance,
+ * Use the optimizations here to improve cutting performance,
  * which can be adversely affected by graphical display drawing,
- * especially when doing several short moves, and when printing
+ * especially when doing several short moves, and when cutting
  * on DELTA and SCARA machines.
  *
  * Some of these options may result in the display lagging behind
  * controller events, as there is a trade-off between reliable
- * printing performance versus fast display updates.
+ * cutting performance versus fast display updates.
  */
 #if HAS_MVCNCUI_U8GLIB
   // Save many cycles by drawing a hollow frame or no frame on the Info Screen
@@ -1261,7 +1261,7 @@
  * Direct Stepping
  *
  * Comparable to the method used by Klipper, G6 direct stepping significantly
- * reduces motion calculations, increases top printing speeds, and results in
+ * reduces motion calculations, increases top cutting speeds, and results in
  * less step aliasing by calculating all motions in advance.
  * Preparing your G-code: https://github.com/colinrgodsey/step-daemon
  */
@@ -1438,7 +1438,7 @@
  * Example: |#|X10.000:Y100.000:Z0.5|X20.000:Y120.000:Z10.5|1|0|1|2|110|2
  * Legend:
  *  Status header [|#], Work coords (G92..), Machine coords (G53), Metric [1] (G21), Absolute pos. mode [0] (G90),
- *  Tool #[1] (active_extruder), Coord set [2] (G55), Feed rate override [110]% (M220 S110), Status: MF_WAITING [2]
+ *  Tool #[1] (active_tool), Coord set [2] (G55), Feed rate override [110]% (M220 S110), Status: MF_WAITING [2]
  *
  * As you can see, quite a bit of info is transmitted to hosts which support it, saving multiple verbose queries.
  */
@@ -1498,10 +1498,10 @@
 
 /**
  * Universal tool change settings.
- * Applies to all types of extruders except where explicitly noted.
+ * Applies to all types of ATC tools except where explicitly noted.
  */
 #if TOOL_CHANGE_SUPPORT
-  // Z raise distance for tool-change, as needed for some extruders
+  // Z raise distance for tool-change, as needed for some ATC tools
   #define TOOLCHANGE_ZRAISE                 2 // (mm)
   //#define TOOLCHANGE_ZRAISE_BEFORE_RETRACT  // Apply raise before swap retraction (if enabled)
   //#define TOOLCHANGE_NO_RETURN              // Never return to previous position on tool-change
@@ -2031,7 +2031,7 @@
   //#define PHOTOGRAPH_PIN 23
 
   // Canon Hack Development Kit
-  // https://captain-slow.dk/2014/03/09/3d-printing-timelapses/
+  // https://captain-slow.dk/2014/03/09/3d-cutting-timelapses/
   //#define CHDK_PIN        4
 
   // Optional second move with delay to trigger the camera shutter
@@ -2379,7 +2379,7 @@
 /**
  * CNC G-code options
  * Support CNC-style G-code dialects used by laser cutters, drawing machine cams, etc.
- * Note that G0 feedrates should be used with care for 3D printing (if used at all).
+ * Note that G0 feedrates should be used with care for CNC cutting (if used at all).
  * High feedrates may cause ringing and harm print quality.
  */
 #define PAREN_COMMENTS      // Support for parentheses-delimited comments
@@ -2484,7 +2484,7 @@
   //#define BUTTON1_PIN -1
   #if PIN_EXISTS(BUTTON1)
     #define BUTTON1_HIT_STATE     LOW       // State of the triggered button. NC=LOW. NO=HIGH.
-    #define BUTTON1_WHEN_PRINTING false     // Button allowed to trigger during a CNC job?
+    #define BUTTON1_WHEN_CUTTING false     // Button allowed to trigger during a CNC job?
     #define BUTTON1_GCODE         "G28"
     #define BUTTON1_DESC          "Homing"  // Optional string to set the LCD status
   #endif
@@ -2492,7 +2492,7 @@
   //#define BUTTON2_PIN -1
   #if PIN_EXISTS(BUTTON2)
     #define BUTTON2_HIT_STATE     LOW
-    #define BUTTON2_WHEN_PRINTING false
+    #define BUTTON2_WHEN_CUTTING false
     #define BUTTON2_GCODE         ""
     #define BUTTON2_DESC          ""
   #endif
@@ -2500,7 +2500,7 @@
   //#define BUTTON3_PIN -1
   #if PIN_EXISTS(BUTTON3)
     #define BUTTON3_HIT_STATE     LOW
-    #define BUTTON3_WHEN_PRINTING false
+    #define BUTTON3_WHEN_CUTTING false
     #define BUTTON3_GCODE         ""
     #define BUTTON3_DESC          ""
   #endif
@@ -2752,10 +2752,10 @@
 //
 // M43 - display pin status, toggle pins, watch pins, watch endstops & toggle LED, test servo probe
 //
-#define PINS_DEBUGGING
+// #define PINS_DEBUGGING
 
 // Enable mvCNC dev mode which adds some special commands
-#define MVCNC_DEV_MODE
+// #define MVCNC_DEV_MODE
 
 #if ENABLED(MVCNC_DEV_MODE)
 /**

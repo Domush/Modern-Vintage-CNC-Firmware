@@ -121,7 +121,7 @@ typedef struct {
 
 typedef struct {
   uint8_t language;
-  bool pause_flag:1;    // printing is paused
+  bool pause_flag:1;    // cutting is paused
   bool pause_action:1;  // flag a pause action
   bool print_finish:1;  // print was finished
   bool select_flag:1;   // Popup button selected
@@ -197,7 +197,7 @@ void Draw_Status_Area(const bool with_update); // Status Area
 void HMI_StartFrame(const bool with_update);   // Prepare the menu view
 void HMI_MainMenu();    // Main process screen
 void HMI_SelectFile();  // File page
-void HMI_Printing();    // CNC page
+void HMI_Cutting();    // CNC page
 void HMI_Prepare();     // Prepare page
 void HMI_Control();     // Control page
 void HMI_Leveling();    // Level the page

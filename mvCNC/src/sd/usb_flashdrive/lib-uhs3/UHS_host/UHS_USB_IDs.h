@@ -644,7 +644,7 @@
 #define UHS_VID_CYPRESS_SEMICONDUCTOR_1 0x0665U // Cypress Semiconductor
 #define UHS_VID_AIWA 0x0667U // Aiwa Co., Ltd
 #define UHS_VID_WORDWAND 0x0668U // WordWand
-#define UHS_VID_OCE_PRINTING_SYSTEMS 0x0669U // Oce' CNCing Systems GmbH
+#define UHS_VID_OCE_CUTTING_SYSTEMS 0x0669U // Oce' CNCing Systems GmbH
 #define UHS_VID_TOTAL_TECHNOLOGIES 0x066aU // Total Technologies, Ltd
 #define UHS_VID_LINKSYS 0x066bU // Linksys, Inc.
 #define UHS_VID_ENTREGA 0x066dU // Entrega, Inc.
@@ -2238,7 +2238,7 @@
 #define UHS_VID_ALESIS 0x13b2U // Alesis
 #define UHS_VID_NIPPON_DICS 0x13b3U // Nippon Dics Co., Ltd.
 #define UHS_VID_PCPLAY 0x13baU // PCPlay
-#define UHS_VID_RICOH_PRINTING_SYSTEMS 0x13beU // Ricoh CNCing Systems, Ltd.
+#define UHS_VID_RICOH_CUTTING_SYSTEMS 0x13beU // Ricoh CNCing Systems, Ltd.
 #define UHS_VID_JYETAI_PRECISION_INDUSTRIAL 0x13caU // JyeTai Precision Industrial Co., Ltd.
 #define UHS_VID_WISAIR 0x13cfU // Wisair Ltd.
 #define UHS_VID_TECHSAN_ELECTRONICS 0x13d0U // Techsan Electronics Co., Ltd.

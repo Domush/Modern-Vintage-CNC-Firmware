@@ -107,42 +107,24 @@ void GcodeSuite::say_units() {
 }
 
 /**
- * Get the target extruder from the T parameter or the active_extruder
+ * Get the target ATC tool from the T parameter or the active_tool
  * Return -1 if the T parameter is out of range
  */
-int8_t GcodeSuite::get_target_extruder_from_command() {
+int8_t GcodeSuite::get_tool_from_command() {
   if (parser.seenval('T')) {
-    const int8_t e = parser.value_byte();
-    if (e < EXTRUDERS) return e;
+    const int8_t tool_number = parser.value_byte();
+    if (tool_number < ATC_TOOLS) return tool_number;
     SERIAL_ECHO_START();
     SERIAL_CHAR('M'); SERIAL_ECHO(parser.codenum);
-    SERIAL_ECHOLNPGM(" " STR_INVALID_EXTRUDER " ", e);
+    SERIAL_ECHOLNPGM(" " STR_INVALID_EXTRUDER " ", tool_number);
     return -1;
   }
-  return active_extruder;
+  return active_tool;
 }
 
-/**
- * Get the target E stepper from the 'T' parameter.
- * If there is no 'T' parameter then dval will be substituted.
- * Returns -1 if the resulting E stepper index is out of range.
- */
-int8_t GcodeSuite::get_target_e_stepper_from_command(const int8_t dval/*=-1*/) {
-  const int8_t e = parser.intval('T', dval);
-  if (WITHIN(e, 0, E_STEPPERS - 1)) return e;
-  if (dval == -2) return dval;
-
-  SERIAL_ECHO_START();
-  SERIAL_CHAR('M'); SERIAL_ECHO(parser.codenum);
-  if (e == -1)
-    SERIAL_ECHOLNPGM(" " STR_E_STEPPER_NOT_SPECIFIED);
-  else
-    SERIAL_ECHOLNPGM(" " STR_INVALID_E_STEPPER " ", e);
-  return -1;
-}
 
 /**
- * Set XYZ...E destination and feedrate from the current GCode command
+ * Set XYZ... destination and feedrate from the current GCode command
  *
  *  - Set destination from included axis codes
  *  - Set to current for missing axis codes
@@ -167,18 +149,12 @@ void GcodeSuite::get_destination_from_command() {
   }
 
   #if ENABLED(POWER_LOSS_RECOVERY) && !PIN_EXISTS(POWER_LOSS)
-    // Only update power loss recovery on moves with E
-    if (recovery.enabled && IS_SD_PRINTING() && seen.e && (seen.x || seen.y))
+    if (recovery.enabled && IS_SD_JOB_RUNNING() && (seen.x || seen.y))
       recovery.save();
   #endif
 
   if (parser.floatval('F') > 0)
     feedrate_mm_s = parser.value_feedrate();
-
-  #if ENABLED(JOBCOUNTER)
-    if (!DEBUGGING(DRYRUN) && !skip_move)
-      JobTimer.incFilamentUsed(destination.e - current_position.e);
-  #endif
 
   #if ENABLED(LASER_MOVE_POWER)
     // Set the laser power in the planner to configure this move
@@ -235,7 +211,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       case 0: case 1:                                             // G0: Fast Move, G1: Linear Move
         G0_G1(TERN_(HAS_FAST_MOVES, parser.codenum == 0)); break;
 
-      #if ENABLED(ARC_SUPPORT) && DISABLED(SCARA)
+      #if ENABLED(ARC_SUPPORT)
         case 2: case 3: G2_G3(parser.codenum == 2); break;        // G2: CW ARC, G3: CCW ARC
       #endif
 
@@ -316,10 +292,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 61: G61(); break;                                    // G61:  Apply/restore saved coordinates.
       #endif
 
-      #if BOTH(PTC_PROBE, PTC_BED)
-        case 76: G76(); break;                                    // G76: Calibrate first layer compensation values
-      #endif
-
       #if ENABLED(GCODE_MOTION_MODES)
         case 80: G80(); break;                                    // G80: Reset the current motion mode
       #endif
@@ -328,10 +300,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       case 91: set_relative_mode(true);  break;                   // G91: Relative Mode
 
       case 92: G92(); break;                                      // G92: Set current axis position(s)
-
-      #if ENABLED(CALIBRATION_GCODE)
-        case 425: G425(); break;                                  // G425: Perform calibration with calibration cube
-      #endif
 
       #if ENABLED(DEBUG_GCODE_PARSER)
         case 800: parser.debug(); break;                          // G800: GCode Parser Test for G
@@ -439,7 +407,8 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 100: M100(); break;                                  // M100: Free Memory Report
       #endif
 
-      case 105: M105(); return;                                   // M105: Report Temperatures (and say "ok")
+      // Kept for compatibility's sake
+      case 105: M105(); return;                                   // M105: Report Temps (and say "ok") 
 
       #if HAS_FAN
         case 106: M106(); break;                                  // M106: Fan On
@@ -499,10 +468,6 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       case 120: M120(); break;                                    // M120: Enable endstops
       case 121: M121(); break;                                    // M121: Disable endstops
 
-      #if HAS_PREHEAT
-        case 145: M145(); break;                                  // M145: Set material heatup parameters
-      #endif
-
       #if ENABLED(TEMPERATURE_UNITS_SUPPORT)
         case 149: M149(); break;                                  // M149: Set temperature units
       #endif
@@ -511,10 +476,10 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 150: M150(); break;                                  // M150: Set Status LED Color
       #endif
 
-      case 201: M201(); break;                                    // M201: Set max acceleration for print moves (units/s^2)
+      case 201: M201(); break;                                    // M201: Set max acceleration for cutting moves (units/s^2)
 
       #if 0
-        case 202: M202(); break;                                  // M202: Not used for Marlin/grbl gen6
+        case 202: M202(); break;                                  // M202: Not used (for Sprinter/grbl gen6)
       #endif
 
       case 203: M203(); break;                                    // M203: Set max feedrate (units/sec)
@@ -579,7 +544,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #endif
 
       #if EITHER(EXT_SOLENOID, MANUAL_SOLENOID_CONTROL)
-        case 380: M380(); break;                                  // M380: Activate solenoid on active (or specified) extruder
+        case 380: M380(); break;                                  // M380: Activate solenoid on active (or specified) ATC tool
         case 381: M381(); break;                                  // M381: Disable all solenoids or, if MANUAL_SOLENOID_CONTROL, active (or specified) solenoid
       #endif
 
@@ -631,7 +596,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #endif
 
       #if ENABLED(SD_ABORT_ON_ENDSTOP_HIT)
-        case 540: M540(); break;                                  // M540: Set abort on endstop hit for SD printing
+        case 540: M540(); break;                                  // M540: Set abort on endstop hit for SD job
       #endif
 
       #if HAS_ETHERNET

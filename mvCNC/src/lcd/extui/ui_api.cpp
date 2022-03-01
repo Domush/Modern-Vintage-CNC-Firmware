@@ -143,11 +143,11 @@ namespace ExtUI {
     if (!flags.cnc_killed) fanManager.manage_heater();
   }
 
-  void enableHeater(const extruder_t extruder) {
+  void enableHeater(const atc_tool_t atc_tool) {
     #if HAS_HOTEND && HEATER_IDLE_HANDLER
-      fanManager.reset_hotend_idle_timer(extruder - E0);
+      fanManager.reset_hotend_idle_timer(atc_tool - E0);
     #else
-      UNUSED(extruder);
+      UNUSED(atc_tool);
     #endif
   }
 
@@ -208,11 +208,11 @@ namespace ExtUI {
     }
   #endif
 
-  bool isHeaterIdle(const extruder_t extruder) {
+  bool isHeaterIdle(const atc_tool_t atc_tool) {
     #if HAS_HOTEND && HEATER_IDLE_HANDLER
-      return fanManager.heater_idle[extruder - E0].timed_out;
+      return fanManager.heater_idle[atc_tool - E0].timed_out;
     #else
-      UNUSED(extruder);
+      UNUSED(atc_tool);
       return false;
     #endif
   }
@@ -253,8 +253,8 @@ namespace ExtUI {
     }
   }
 
-  celsius_float_t getActualTemp_celsius(const extruder_t extruder) {
-    return GET_TEMP_ADJUSTMENT(fanManager.degHotend(extruder - E0));
+  celsius_float_t getActualTemp_celsius(const atc_tool_t atc_tool) {
+    return GET_TEMP_ADJUSTMENT(fanManager.degHotend(atc_tool - E0));
   }
 
   celsius_float_t getTargetTemp_celsius(const heater_t heater) {
@@ -269,8 +269,8 @@ namespace ExtUI {
     }
   }
 
-  celsius_float_t getTargetTemp_celsius(const extruder_t extruder) {
-    return GET_TEMP_ADJUSTMENT(fanManager.degTargetHotend(extruder - E0));
+  celsius_float_t getTargetTemp_celsius(const atc_tool_t atc_tool) {
+    return GET_TEMP_ADJUSTMENT(fanManager.degTargetHotend(atc_tool - E0));
   }
 
   float getTargetFan_percent(const fan_t fan) {
@@ -287,9 +287,9 @@ namespace ExtUI {
     return current_position[axis];
   }
 
-  float getAxisPosition_mm(const extruder_t extruder) {
-    const extruder_t old_tool = getActiveTool();
-    setActiveTool(extruder, true);
+  float getAxisPosition_mm(const atc_tool_t atc_tool) {
+    const atc_tool_t old_tool = getActiveTool();
+    setActiveTool(atc_tool, true);
     const float epos = TERN0(JOYSTICK, flags.jogging) ? destination.e : current_position.e;
     setActiveTool(old_tool, true);
     return epos;
@@ -313,33 +313,33 @@ namespace ExtUI {
     line_to_current_position(feedrate ?: manual_feedrate_mm_s[axis]);
   }
 
-  void setAxisPosition_mm(const_float_t position, const extruder_t extruder, const feedRate_t feedrate/*=0*/) {
-    setActiveTool(extruder, true);
+  void setAxisPosition_mm(const_float_t position, const atc_tool_t atc_tool, const feedRate_t feedrate/*=0*/) {
+    setActiveTool(atc_tool, true);
 
     current_position.e = position;
     line_to_current_position(feedrate ?: manual_feedrate_mm_s.e);
   }
 
-  void setActiveTool(const extruder_t extruder, bool no_move) {
+  void setActiveTool(const atc_tool_t atc_tool, bool no_move) {
     #if TOOL_CHANGE_SUPPORT
-      const uint8_t e = extruder - E0;
-      if (e != active_extruder) tool_change(e, no_move);
-      active_extruder = e;
+      const uint8_t e = atc_tool - E0;
+      if (e != active_tool) tool_change(e, no_move);
+      active_tool = e;
     #else
-      UNUSED(extruder);
+      UNUSED(atc_tool);
       UNUSED(no_move);
     #endif
   }
 
-  extruder_t getTool(const uint8_t extruder) {
-    switch (extruder) {
+  atc_tool_t getTool(const uint8_t atc_tool) {
+    switch (atc_tool) {
       default:
       case 0: return E0; case 1: return E1; case 2: return E2; case 3: return E3;
       case 4: return E4; case 5: return E5; case 6: return E6; case 7: return E7;
     }
   }
 
-  extruder_t getActiveTool() { return getTool(active_extruder); }
+  atc_tool_t getActiveTool() { return getTool(active_tool); }
 
   bool isMoving() { return planner.has_blocks_queued(); }
 
@@ -356,8 +356,8 @@ namespace ExtUI {
     }
   }
 
-  bool canMove(const extruder_t extruder) {
-    return !fanManager.tooColdToExtrude(extruder - E0);
+  bool canMove(const atc_tool_t atc_tool) {
+    return !fanManager.tooColdToExtrude(atc_tool - E0);
   }
 
   GcodeSuite::mvCNCBusyState getHostKeepaliveState() { return TERN0(HOST_KEEPALIVE_FEATURE, gcode.busy_state); }
@@ -408,8 +408,8 @@ namespace ExtUI {
       };
     }
 
-    float getAxisCurrent_mA(const extruder_t extruder) {
-      switch (extruder) {
+    float getAxisCurrent_mA(const atc_tool_t atc_tool) {
+      switch (atc_tool) {
         #if AXIS_IS_TMC(E0)
           case E0: return stepperE0.getMilliamps();
         #endif
@@ -477,8 +477,8 @@ namespace ExtUI {
       };
     }
 
-    void setAxisCurrent_mA(const_float_t mA, const extruder_t extruder) {
-      switch (extruder) {
+    void setAxisCurrent_mA(const_float_t mA, const atc_tool_t atc_tool) {
+      switch (atc_tool) {
         #if AXIS_IS_TMC(E0)
           case E0: stepperE0.rms_current(constrain(mA, 400, 1500)); break;
         #endif
@@ -569,9 +569,9 @@ namespace ExtUI {
     return planner.settings.axis_steps_per_mm[axis];
   }
 
-  float getAxisSteps_per_mm(const extruder_t extruder) {
-    UNUSED(extruder);
-    return planner.settings.axis_steps_per_mm[E_AXIS_N(extruder - E0)];
+  float getAxisSteps_per_mm(const atc_tool_t atc_tool) {
+    UNUSED(atc_tool);
+    return planner.settings.axis_steps_per_mm[E_AXIS_N(atc_tool - E0)];
   }
 
   void setAxisSteps_per_mm(const_float_t value, const axis_t axis) {
@@ -579,9 +579,9 @@ namespace ExtUI {
     planner.refresh_positioning();
   }
 
-  void setAxisSteps_per_mm(const_float_t value, const extruder_t extruder) {
-    UNUSED(extruder);
-    planner.settings.axis_steps_per_mm[E_AXIS_N(extruder - E0)] = value;
+  void setAxisSteps_per_mm(const_float_t value, const atc_tool_t atc_tool) {
+    UNUSED(atc_tool);
+    planner.settings.axis_steps_per_mm[E_AXIS_N(atc_tool - E0)] = value;
     planner.refresh_positioning();
   }
 
@@ -589,36 +589,36 @@ namespace ExtUI {
     return planner.settings.max_feedrate_mm_s[axis];
   }
 
-  feedRate_t getAxisMaxFeedrate_mm_s(const extruder_t extruder) {
-    UNUSED(extruder);
-    return planner.settings.max_feedrate_mm_s[E_AXIS_N(extruder - E0)];
+  feedRate_t getAxisMaxFeedrate_mm_s(const atc_tool_t atc_tool) {
+    UNUSED(atc_tool);
+    return planner.settings.max_feedrate_mm_s[E_AXIS_N(atc_tool - E0)];
   }
 
   void setAxisMaxFeedrate_mm_s(const feedRate_t value, const axis_t axis) {
     planner.set_max_feedrate(axis, value);
   }
 
-  void setAxisMaxFeedrate_mm_s(const feedRate_t value, const extruder_t extruder) {
-    UNUSED(extruder);
-    planner.set_max_feedrate(E_AXIS_N(extruder - E0), value);
+  void setAxisMaxFeedrate_mm_s(const feedRate_t value, const atc_tool_t atc_tool) {
+    UNUSED(atc_tool);
+    planner.set_max_feedrate(E_AXIS_N(atc_tool - E0), value);
   }
 
   float getAxisMaxAcceleration_mm_s2(const axis_t axis) {
     return planner.settings.max_acceleration_mm_per_s2[axis];
   }
 
-  float getAxisMaxAcceleration_mm_s2(const extruder_t extruder) {
-    UNUSED(extruder);
-    return planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(extruder - E0)];
+  float getAxisMaxAcceleration_mm_s2(const atc_tool_t atc_tool) {
+    UNUSED(atc_tool);
+    return planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(atc_tool - E0)];
   }
 
   void setAxisMaxAcceleration_mm_s2(const_float_t value, const axis_t axis) {
     planner.set_max_acceleration(axis, value);
   }
 
-  void setAxisMaxAcceleration_mm_s2(const_float_t value, const extruder_t extruder) {
-    UNUSED(extruder);
-    planner.set_max_acceleration(E_AXIS_N(extruder - E0), value);
+  void setAxisMaxAcceleration_mm_s2(const_float_t value, const atc_tool_t atc_tool) {
+    UNUSED(atc_tool);
+    planner.set_max_acceleration(E_AXIS_N(atc_tool - E0), value);
   }
 
   #if HAS_FILAMENT_SENSOR
@@ -655,13 +655,13 @@ namespace ExtUI {
   #endif
 
   #if ENABLED(LIN_ADVANCE)
-    float getLinearAdvance_mm_mm_s(const extruder_t extruder) {
-      return (extruder < EXTRUDERS) ? planner.extruder_advance_K[extruder - E0] : 0;
+    float getLinearAdvance_mm_mm_s(const atc_tool_t atc_tool) {
+      return (atc_tool < ATC_TOOLS) ? planner.atc_tool_advance_K[atc_tool - E0] : 0;
     }
 
-    void setLinearAdvance_mm_mm_s(const_float_t value, const extruder_t extruder) {
-      if (extruder < EXTRUDERS)
-        planner.extruder_advance_K[extruder - E0] = constrain(value, 0, 10);
+    void setLinearAdvance_mm_mm_s(const_float_t value, const atc_tool_t atc_tool) {
+      if (atc_tool < ATC_TOOLS)
+        planner.atc_tool_advance_K[atc_tool - E0] = constrain(value, 0, 10);
     }
   #endif
 
@@ -676,9 +676,9 @@ namespace ExtUI {
 
   #else
     float getAxisMaxJerk_mm_s(const axis_t axis) { return planner.max_jerk[axis]; }
-    float getAxisMaxJerk_mm_s(const extruder_t) { return planner.max_jerk.e; }
+    float getAxisMaxJerk_mm_s(const atc_tool_t) { return planner.max_jerk.e; }
     void setAxisMaxJerk_mm_s(const_float_t value, const axis_t axis) { planner.set_max_jerk((AxisEnum)axis, value); }
-    void setAxisMaxJerk_mm_s(const_float_t value, const extruder_t) { planner.set_max_jerk(E_AXIS, value); }
+    void setAxisMaxJerk_mm_s(const_float_t value, const atc_tool_t) { planner.set_max_jerk(E_AXIS, value); }
   #endif
 
   #if ENABLED(DUAL_X_CARRIAGE)
@@ -693,17 +693,17 @@ namespace ExtUI {
   #endif
 
   feedRate_t getFeedrate_mm_s()                       { return feedrate_mm_s; }
-  int16_t getFlow_percent(const extruder_t extr)      { return planner.flow_percentage[extr]; }
+  int16_t getFlow_percent(const atc_tool_t extr)      { return planner.flow_percentage[extr]; }
   feedRate_t getMinFeedrate_mm_s()                    { return planner.settings.min_feedrate_mm_s; }
   feedRate_t getMinTravelFeedrate_mm_s()              { return planner.settings.min_travel_feedrate_mm_s; }
-  float getPrintingAcceleration_mm_s2()               { return planner.settings.acceleration; }
+  float getCuttingAcceleration_mm_s2()               { return planner.settings.acceleration; }
   float getRetractAcceleration_mm_s2()                { return planner.settings.retract_acceleration; }
   float getTravelAcceleration_mm_s2()                 { return planner.settings.travel_acceleration; }
   void setFeedrate_mm_s(const feedRate_t fr)          { feedrate_mm_s = fr; }
-  void setFlow_percent(const int16_t flow, const extruder_t extr) { planner.set_flow(extr, flow); }
+  void setFlow_percent(const int16_t flow, const atc_tool_t extr) { planner.set_flow(extr, flow); }
   void setMinFeedrate_mm_s(const feedRate_t fr)       { planner.settings.min_feedrate_mm_s = fr; }
   void setMinTravelFeedrate_mm_s(const feedRate_t fr) { planner.settings.min_travel_feedrate_mm_s = fr; }
-  void setPrintingAcceleration_mm_s2(const_float_t acc) { planner.settings.acceleration = acc; }
+  void setCuttingAcceleration_mm_s2(const_float_t acc) { planner.settings.acceleration = acc; }
   void setRetractAcceleration_mm_s2(const_float_t acc) { planner.settings.retract_acceleration = acc; }
   void setTravelAcceleration_mm_s2(const_float_t acc)  { planner.settings.travel_acceleration = acc; }
 
@@ -728,13 +728,13 @@ namespace ExtUI {
     /**
      * This function adjusts an axis during a print.
      *
-     * When linked_nozzles is false, each nozzle in a multi-nozzle
+     * When linked_tools is false, each tool in a multi-tool
      * cnc can be babystepped independently of the others. This
      * lets the user to fine tune the Z-offset and Spindle Offsets
      * while observing the first layer of a print, regardless of
-     * what nozzle is printing.
+     * what tool is cutting.
      */
-    void smartAdjustAxis_steps(const int16_t steps, const axis_t axis, bool linked_nozzles) {
+    void smartAdjustAxis_steps(const int16_t steps, const axis_t axis, bool linked_tools) {
       const float mm = steps * planner.mm_per_step[axis];
       UNUSED(mm);
 
@@ -742,19 +742,19 @@ namespace ExtUI {
 
       #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
         // Make it so babystepping in Z adjusts the Z probe offset.
-        if (axis == Z && TERN1(TOOL_CHANGE_SUPPORT, (linked_nozzles || active_extruder == 0)))
+        if (axis == Z && TERN1(TOOL_CHANGE_SUPPORT, (linked_tools || active_tool == 0)))
           probe.offset.z += mm;
       #endif
 
       #if TOOL_CHANGE_SUPPORT && HAS_HOTEND_OFFSET
         /**
-         * When linked_nozzles is false, as an axis is babystepped
-         * adjust the hotend offsets so that the other nozzles are
-         * unaffected by the babystepping of the active nozzle.
+         * When linked_tools is false, as an axis is babystepped
+         * adjust the hotend offsets so that the other tools are
+         * unaffected by the babystepping of the active tool.
          */
-        if (!linked_nozzles) {
+        if (!linked_tools) {
           HOTEND_LOOP()
-            if (e != active_extruder)
+            if (e != active_tool)
               hotend_offset[e][axis] += mm;
 
           normalizeSpindleOffset(X);
@@ -762,7 +762,7 @@ namespace ExtUI {
           TERN_(HAS_Z_AXIS, normalizeSpindleOffset(Z));
         }
       #else
-        UNUSED(linked_nozzles);
+        UNUSED(linked_tools);
       #endif
     }
 
@@ -804,20 +804,20 @@ namespace ExtUI {
 
   #if HAS_HOTEND_OFFSET
 
-    float getSpindleOffset_mm(const axis_t axis, const extruder_t extruder) {
-      if (extruder - E0 >= HOTENDS) return 0;
-      return hotend_offset[extruder - E0][axis];
+    float getSpindleOffset_mm(const axis_t axis, const atc_tool_t atc_tool) {
+      if (atc_tool - E0 >= HOTENDS) return 0;
+      return hotend_offset[atc_tool - E0][axis];
     }
 
-    void setSpindleOffset_mm(const_float_t value, const axis_t axis, const extruder_t extruder) {
-      if (extruder - E0 >= HOTENDS) return;
-      hotend_offset[extruder - E0][axis] = value;
+    void setSpindleOffset_mm(const_float_t value, const axis_t axis, const atc_tool_t atc_tool) {
+      if (atc_tool - E0 >= HOTENDS) return;
+      hotend_offset[atc_tool - E0][axis] = value;
     }
 
     /**
      * The UI should call this if needs to guarantee the first
-     * nozzle offset is zero (such as when it doesn't allow the
-     * user to edit the offset the first nozzle).
+     * tool offset is zero (such as when it doesn't allow the
+     * user to edit the offset the first tool).
      */
     void normalizeSpindleOffset(const axis_t axis) {
       const float offs = hotend_offset[0][axis];
@@ -873,7 +873,7 @@ namespace ExtUI {
           const float x_target = MESH_MIN_X + pos.x * (MESH_X_DIST),
                       y_target = MESH_MIN_Y + pos.y * (MESH_Y_DIST);
           if (x_target != current_position.x || y_target != current_position.y) {
-            // If moving across bed, raise nozzle to safe height over bed
+            // If moving across bed, raise tool to safe height over bed
             feedrate_mm_s = Z_PROBE_FEEDRATE_FAST;
             destination = current_position;
             destination.z = Z_CLEARANCE_BETWEEN_PROBES;
@@ -917,18 +917,18 @@ namespace ExtUI {
   float getFeedrate_percent() { return feedrate_percentage; }
 
   #if ENABLED(PIDTEMP)
-    float getPIDValues_Kp(const extruder_t tool) { return PID_PARAM(Kp, tool); }
-    float getPIDValues_Ki(const extruder_t tool) { return unscalePID_i(PID_PARAM(Ki, tool)); }
-    float getPIDValues_Kd(const extruder_t tool) { return unscalePID_d(PID_PARAM(Kd, tool)); }
+    float getPIDValues_Kp(const atc_tool_t tool) { return PID_PARAM(Kp, tool); }
+    float getPIDValues_Ki(const atc_tool_t tool) { return unscalePID_i(PID_PARAM(Ki, tool)); }
+    float getPIDValues_Kd(const atc_tool_t tool) { return unscalePID_d(PID_PARAM(Kd, tool)); }
 
-    void setPIDValues(const_float_t p, const_float_t i, const_float_t d, extruder_t tool) {
+    void setPIDValues(const_float_t p, const_float_t i, const_float_t d, atc_tool_t tool) {
       fanManager.temp_hotend[tool].pid.Kp = p;
       fanManager.temp_hotend[tool].pid.Ki = scalePID_i(i);
       fanManager.temp_hotend[tool].pid.Kd = scalePID_d(d);
       fanManager.updatePID();
     }
 
-    void startPIDTune(const celsius_t temp, extruder_t tool) {
+    void startPIDTune(const celsius_t temp, atc_tool_t tool) {
       fanManager.PID_autotune(temp, (heater_id_t)tool, 8, true);
     }
   #endif
@@ -956,7 +956,7 @@ namespace ExtUI {
   bool commandsInQueue() { return (planner.movesplanned() || queue.has_commands_queued()); }
 
   bool isAxisPositionKnown(const axis_t axis) { return axis_is_trusted((AxisEnum)axis); }
-  bool isAxisPositionKnown(const extruder_t) { return axis_is_trusted(E_AXIS); }
+  bool isAxisPositionKnown(const atc_tool_t) { return axis_is_trusted(E_AXIS); }
   bool isPositionKnown() { return all_axes_trusted(); }
   bool isMachineHomed() { return all_axes_homed(); }
 
@@ -990,14 +990,14 @@ namespace ExtUI {
     }
   }
 
-  void setTargetTemp_celsius(const_float_t inval, const extruder_t extruder) {
+  void setTargetTemp_celsius(const_float_t inval, const atc_tool_t atc_tool) {
     float value = inval;
     #ifdef TOUCH_UI_LCD_TEMP_SCALING
       value *= TOUCH_UI_LCD_TEMP_SCALING;
     #endif
     #if HAS_HOTEND
-      const int16_t e = extruder - E0;
-      enableHeater(extruder);
+      const int16_t e = atc_tool - E0;
+      enableHeater(atc_tool);
       fanManager.setTargetHotend(LROUND(constrain(value, 0, fanManager.hotend_max_target(e))), e);
     #endif
   }
@@ -1035,7 +1035,7 @@ namespace ExtUI {
     return TERN0(SDSUPPORT, IS_SD_PAUSED());
   }
 
-  bool jobRunningFromMedia() { return TERN0(SDSUPPORT, IS_SD_PRINTING() || IS_SD_PAUSED()); }
+  bool jobRunningFromMedia() { return TERN0(SDSUPPORT, IS_SD_JOB_RUNNING() || IS_SD_PAUSED()); }
 
   bool jobRunning() { return commandsInQueue() || jobRunningFromMedia() || jobIsOngoing() || jobIsPaused(); }
 

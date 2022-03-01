@@ -94,7 +94,7 @@ typedef struct {
 
 typedef struct {
   uint8_t language;
-  bool pause_flag:1;    // printing is paused
+  bool pause_flag:1;    // cutting is paused
   bool pause_action:1;  // flag a pause action
   bool print_finish:1;  // print was finished
   bool select_flag:1;   // Popup button selected
@@ -134,7 +134,7 @@ void DWIN_Redraw_screen();  // Redraw all screen elements
 void HMI_StartFrame(const bool with_update);   // Prepare the menu view
 void HMI_MainMenu();        // Main process screen
 void HMI_SelectFile();      // File page
-void HMI_Printing();        // CNC page
+void HMI_Cutting();        // CNC page
 void HMI_ReturnScreen();    // Return to previous screen before popups
 void ApplyExtMinT();
 void HMI_SetLanguageCache(); // Set the languaje image cache
@@ -159,7 +159,7 @@ void DWIN_PidTuning(pidresult_t result);
 void DWIN_Print_Started(const bool sd = false);
 void DWIN_Print_Finished();
 #if HAS_FILAMENT_SENSOR
-  void DWIN_FilamentRunout(const uint8_t extruder);
+  void DWIN_FilamentRunout(const uint8_t atc_tool);
 #endif
 void DWIN_Progress_Update();
 void DWIN_Print_Header(const char *text);

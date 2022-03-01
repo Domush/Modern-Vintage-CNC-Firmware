@@ -102,7 +102,7 @@
 #define FAN2_PIN                            PB7   // EXT2 port
 
 #ifndef E0_AUTO_FAN_PIN
-  #define E0_AUTO_FAN_PIN                   PB9   // EXT0 port, used as main extruder fan
+  #define E0_AUTO_FAN_PIN                   PB9   // EXT0 port, used as main atc_tool fan
 #endif
 
 //

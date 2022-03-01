@@ -68,7 +68,7 @@
  * Set the baud rate defaults for additional serial ports below.
  *
  * 250000 works in most cases, but you might try a lower speed if
- * you commonly experience drop-outs during host printing.
+ * you commonly experience drop-outs during host jobs.
  * You may try up to 1000000 to speed up SD file transfer.
  *
  * :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000]
@@ -142,11 +142,11 @@
   #define AXIS6_NAME 'C' // :['A', 'B', 'C', 'U', 'V', 'W']
 #endif
 
-// @section extruder
+// @section ATC tool
 
 // This defines the number of tools
 // :[0, 1, 2, 3, 4, 5, 6, 7, 8]
-#define EXTRUDERS 0
+#define ATC_TOOLS 0
 
 /**
  * Switching Toolhead
@@ -160,7 +160,7 @@
   #define SWITCHING_TOOLHEAD_Y_POS          235         // (mm) Y position of the toolhead dock
   #define SWITCHING_TOOLHEAD_Y_SECURITY      10         // (mm) Security distance Y axis
   #define SWITCHING_TOOLHEAD_Y_CLEAR         60         // (mm) Minimum distance from dock for unobstructed X axis
-  #define SWITCHING_TOOLHEAD_X_POS          { 215, 0 }  // (mm) X positions for parking the extruders
+  #define SWITCHING_TOOLHEAD_X_POS          { 215, 0 }  // (mm) X positions for parking the ATC tools
   #define SWITCHING_TOOLHEAD_SERVO_NR       2         // Index of the servo connector
   #define SWITCHING_TOOLHEAD_SERVO_ANGLES { 0, 180 }  // (degrees) Angles for Lock, Unlock
 #endif
@@ -398,8 +398,8 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION         482 // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_TRAVEL_ACCELERATION  482 // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_ACCELERATION         482 // X, Y, Z and E acceleration for cutting moves
+#define DEFAULT_TRAVEL_ACCELERATION  482 // X, Y, Z acceleration for travel (non cutting) moves
 
 /**
  * Default Jerk limits (mm/s)
@@ -501,13 +501,13 @@
 
 /**
  * A Fix-Mounted Probe either doesn't deploy or needs manual deployment.
- *   (e.g., an inductive probe or a nozzle-based probe-switch.)
+ *   (e.g., an inductive probe or a tool-based probe-switch.)
  */
 //#define FIX_MOUNTED_PROBE
 
 /**
- * Use the nozzle as the probe, as with a conductive
- * nozzle system or a piezo-electric smart effector.
+ * Use the tool as the probe, as with a conductive
+ * tool system or a piezo-electric smart effector.
  */
 #define NOZZLE_AS_PROBE
 
@@ -526,7 +526,7 @@
 #endif
 
 /**
- * Use StallGuard2 to probe the bed with the nozzle.
+ * Use StallGuard2 to probe the bed with the tool.
  * Requires stallGuard-capable Trinamic stepper drivers.
  * CAUTION: This can damage machines with Z lead screws.
  *          Take extreme care when setting up this feature.
@@ -546,8 +546,8 @@
  *
  * Z offset
  * - For the Z offset use your best known value and adjust at runtime.
- * - Common probes trigger below the nozzle and have negative values for Z offset.
- * - Probes triggering above the nozzle height are uncommon but do exist. When using
+ * - Common probes trigger below the tool and have negative values for Z offset.
+ * - Probes triggering above the tool height are uncommon but do exist. When using
  *   probes such as this, carefully set Z_CLEARANCE_DEPLOY_PROBE and Z_CLEARANCE_BETWEEN_PROBES
  *   to avoid collisions during probing.
  *
@@ -635,8 +635,8 @@
  * probe Z Offset set with NOZZLE_TO_PROBE_OFFSET, M851, or the LCD.
  * Only integer values >= 1 are valid here.
  *
- * Example: `M851 Z-5` with a CLEARANCE of 4  =>  9mm from bed to nozzle.
- *     But: `M851 Z+1` with a CLEARANCE of 2  =>  2mm from bed to nozzle.
+ * Example: `M851 Z-5` with a CLEARANCE of 4  =>  9mm from bed to tool.
+ *     But: `M851 Z+1` with a CLEARANCE of 2  =>  2mm from bed to tool.
  */
 #define Z_CLEARANCE_DEPLOY_PROBE   10 // Z Clearance for Deploy/Stow
 #define Z_CLEARANCE_BETWEEN_PROBES  5 // Z Clearance between probe points
@@ -662,7 +662,7 @@
  * Enable one or more of the following if probing seems unreliable.
  */
 //#define PROBING_FANS_OFF          // Turn fans off when probing
-//#define PROBING_STEPPERS_OFF      // Turn all steppers off (unless needed to hold position) when probing (including extruders)
+//#define PROBING_STEPPERS_OFF      // Turn all steppers off (unless needed to hold position) when probing (including ATC tools)
 //#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
 
 // For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
@@ -703,8 +703,8 @@
 
 /**
  * Set Z_IDLE_HEIGHT if the Z-Axis moves on its own when steppers are disabled.
- *  - Use a low value (i.e., Z_MIN_POS) if the nozzle falls down to the bed.
- *  - Use a large value (i.e., Z_MAX_POS) if the bed falls down, away from the nozzle.
+ *  - Use a low value (i.e., Z_MIN_POS) if the tool falls down to the bed.
+ *  - Use a large value (i.e., Z_MAX_POS) if the bed falls down, away from the tool.
  */
 //#define Z_IDLE_HEIGHT Z_HOME_POS
 
@@ -794,7 +794,7 @@
 /**
  * Use "Z Safe Homing" to avoid homing with a Z probe outside the bed area.
  *
- * - Moves the Z probe (or nozzle) to a defined XY point before Z homing.
+ * - Moves the Z probe (or tool) to a defined XY point before Z homing.
  * - Allows Z homing only when XY positions are known and trusted.
  * - If stepper drivers sleep, XY homing may be required again before Z homing.
  */
@@ -914,13 +914,13 @@
 /**
  * Spindle Park
  *
- * Park the nozzle at the given XYZ position on idle or G27.
+ * Park the tool at the given XYZ position on idle or G27.
  *
  * The "P" parameter controls the action applied to the Z axis:
  *
- *    P0  (Default) If Z is below park Z raise the nozzle.
- *    P1  Raise the nozzle always to Z-park height.
- *    P2  Raise the nozzle by Z-park amount, limited to Z_MAX_POS.
+ *    P0  (Default) If Z is below park Z raise the tool.
+ *    P1  Raise the tool always to Z-park height.
+ *    P2  Raise the tool by Z-park amount, limited to Z_MAX_POS.
  */
 #define SPINDLE_PARK_FEATURE
 
@@ -971,7 +971,7 @@
  *
  *  - When the cnc boots up
  *  - Upon opening the 'CNC from Media' Menu
- *  - When SD printing is completed or aborted
+ *  - When SD job is completed or aborted
  *
  * The following G-codes can be used:
  *
@@ -1876,7 +1876,7 @@
 /**
  * CNC Event LEDs
  *
- * During printing, the LEDs will reflect the cnc status:
+ * During jobs, the LEDs will reflect the cnc status:
  *
  *  - Gradually change from blue to violet as the heated bed gets to target temp
  *  - Gradually change from violet to red as the hotend gets to temperature

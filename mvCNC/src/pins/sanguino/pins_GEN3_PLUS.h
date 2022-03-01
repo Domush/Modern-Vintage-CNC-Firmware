@@ -64,7 +64,7 @@
 //
 // Temperature Sensors
 //
-#define TEMP_0_PIN                             0  // Analog Input (pin 33 extruder)
+#define TEMP_0_PIN                             0  // Analog Input (pin 33 atc_tool)
 #define TEMP_BED_PIN                           5  // Analog Input (pin 34 bed)
 
 //

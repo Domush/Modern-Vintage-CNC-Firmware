@@ -160,7 +160,7 @@ namespace Language_ca {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Estadistiques");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Info placa");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistors");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Extrusors");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Extrusors");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Baud");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protocol");
   LSTR MSG_CASE_LIGHT                     = _UxGT("Llum");
@@ -197,8 +197,8 @@ namespace Language_ca {
     LSTR MSG_FILAMENT_CHANGE_INIT         = _UxGT(MSG_3_LINE("Esperant per", "iniciar el canvi", "de filament"));
     LSTR MSG_FILAMENT_CHANGE_UNLOAD       = _UxGT(MSG_2_LINE("Esperant per", "treure filament"));
     LSTR MSG_FILAMENT_CHANGE_INSERT       = _UxGT(MSG_3_LINE("Poseu filament", "i premeu el boto", "per continuar..."));
-    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Premeu boto per", "escalfar nozzle."));
-    LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("Escalfant nozzle", "Espereu..."));
+    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Premeu boto per", "escalfar tool."));
+    LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("Escalfant tool", "Espereu..."));
     LSTR MSG_FILAMENT_CHANGE_LOAD         = _UxGT(MSG_2_LINE("Esperant carrega", "de filament"));
     LSTR MSG_FILAMENT_CHANGE_RESUME       = _UxGT(MSG_2_LINE("Esperant per", "reprendre"));
   #else // LCD_HEIGHT < 4

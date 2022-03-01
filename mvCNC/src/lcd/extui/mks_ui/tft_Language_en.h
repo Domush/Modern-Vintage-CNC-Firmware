@@ -124,7 +124,7 @@
 #define PREHEAT_TEMPER_EN               "Preset temperature"
 
 #define NOZZLE_CONF_TITLE_EN            "Machine Settings>Spindle settings"
-#define NOZZLECNT_EN                    "Number of nozzles"
+#define NOZZLECNT_EN                    "Number of tools"
 #define NOZZLE_TYPE_EN                  "E0 Temperature type"
 #define NOZZLE_ADJUST_TYPE_EN           "PID thermostat"
 #define NOZZLE_MIN_TEMPERATURE_EN       "lowest temperature"
@@ -376,10 +376,10 @@
 #define FILAMENT_TIPS6_TEXT_EN        "Completed"
 
 #define FILAMENT_CHANGE_TEXT_EN                 "Please click <Load> \nor <unload>,After \npinter pause."
-#define FILAMENT_DIALOG_LOAD_HEAT_TIPS_EN       "Heating up the nozzle,\nplease wait..."
-#define FILAMENT_DIALOG_UNLOAD_HEAT_TIPS_EN     "Heating up the nozzle,\nplease wait..."
-#define FILAMENT_DIALOG_LOAD_CONFIRM1_TIPS_EN   "Heat completed,please load filament \nto extruder,and click <confirm> \nfor start loading."
-#define FILAMENT_DIALOG_LOAD_CONFIRM2_TIPS_EN   "Please load filament to extruder,\nand click <confirm> for start loading."
+#define FILAMENT_DIALOG_LOAD_HEAT_TIPS_EN       "Heating up the tool,\nplease wait..."
+#define FILAMENT_DIALOG_UNLOAD_HEAT_TIPS_EN     "Heating up the tool,\nplease wait..."
+#define FILAMENT_DIALOG_LOAD_CONFIRM1_TIPS_EN   "Heat completed,please load filament \nto atc_tool,and click <confirm> \nfor start loading."
+#define FILAMENT_DIALOG_LOAD_CONFIRM2_TIPS_EN   "Please load filament to atc_tool,\nand click <confirm> for start loading."
 #define FILAMENT_DIALOG_UNLOAD_CONFIRM_TIPS_EN  "Heat completed,please \nclick <confirm> for start unloading.!"
 #define FILAMENT_DIALOG_LOADING_TIPS_EN         "Is loading ,please wait!"
 #define FILAMENT_DIALOG_UNLOADING_TIPS_EN       "Is unloading,please wait!"
@@ -403,15 +403,15 @@
 #define ABOUT_VERSION_TEXT_EN               "Firmware: "
 #define ABOUT_WIFI_TEXT_EN                  "WiFi: "
 
-#define PRINTING_OPERATION_EN               "Option"
-#define PRINTING_PAUSE_EN                   "Pause"
-#define PRINTING_TEMP_EN                    "Temp."
-#define PRINTING_CHANGESPEED_EN             "Speed"
-#define PRINTING_RESUME_EN                  "Resume"
-#define PRINTING_STOP_EN                    "Stop"
-#define PRINTING_MORE_EN                    "More"
-#define PRINTING_EXTRUDER_EN                "Extrusion"
-#define PRINTING_MOVE_EN                    "Move"
+#define CUTTING_OPERATION_EN               "Option"
+#define CUTTING_PAUSE_EN                   "Pause"
+#define CUTTING_TEMP_EN                    "Temp."
+#define CUTTING_CHANGESPEED_EN             "Speed"
+#define CUTTING_RESUME_EN                  "Resume"
+#define CUTTING_STOP_EN                    "Stop"
+#define CUTTING_MORE_EN                    "More"
+#define CUTTING_EXTRUDER_EN                "Extrusion"
+#define CUTTING_MOVE_EN                    "Move"
 
 #define EXTRUDER_SPEED_EN                   "Extrusion"
 #define MOVE_SPEED_EN                       "Move"
@@ -430,7 +430,7 @@
 #define TITLE_SET_EN                        "Settings"
 #define TITLE_MORE_EN                       "More"
 #define TITLE_CHOOSEFILE_EN                 "ChooseFile"
-#define TITLE_PRINTING_EN                   "CNCing"
+#define TITLE_CUTTING_EN                   "CNCing"
 #define TITLE_OPERATION_EN                  "Operation"
 #define TITLE_ADJUST_EN                     "Adjust"
 #define TITLE_WIRELESS_EN                   "Wireless"
@@ -605,7 +605,7 @@
 #define ROTATE_LEFT_MATERIAL_EN           "Material:"
 #define ROTATE_LEFT_PLA_EN                "Model-PLA"
 #define ROTATE_LEFT_NEXT_EN               "Next >"
-#define ROTATE_LEFT_TIPS_EN               "Rotate extruder selection\ndial to the left."
+#define ROTATE_LEFT_TIPS_EN               "Rotate ATC tool selection\ndial to the left."
 
 // hang spool
 #define HANG_SPOOL_TITLE_EN         "Change Bit"
@@ -621,7 +621,7 @@
 #define FEED_FILAMENT_MATERIAL_EN   "Material:"
 #define FEED_FILAMENT_PLA_EN        "Model-PLA"
 #define FEED_FILAMENT_NEXT_EN       "Next >"
-#define FEED_FILAMENT_TIPS_EN       "Feed filament into extruder\nup beyond the gears."
+#define FEED_FILAMENT_TIPS_EN       "Feed filament into atc_tool\nup beyond the gears."
 
 // feed filament
 #define ROTATE_UP_TITLE_EN          "Change Bit"
@@ -629,7 +629,7 @@
 #define ROTATE_UP_MATERIAL_EN       "Material:"
 #define ROTATE_UP_PLA_EN            "Model-PLA"
 #define ROTATE_UP_NEXT_EN           "Next >"
-#define ROTATE_UP_TIPS_EN           "Rotate extruder selection\ndial up."
+#define ROTATE_UP_TIPS_EN           "Rotate ATC tool selection\ndial up."
 
 // filament begin
 #define FEED_BEGIN_TITLE_EN         "Change Bit"
@@ -643,7 +643,7 @@
 #define FEED_FINISH_MATERIAL_EN     "Material:"
 #define FEED_FINISH_PLA_EN          "Model-PLA"
 #define FEED_FINISH_NEXT_EN         "Finish >"
-#define FEED_FINISH_TIPS_EN         "Remove filament from the\nnozzle and discard."
+#define FEED_FINISH_TIPS_EN         "Remove filament from the\ntool and discard."
 // fiament remove
 #define REMOVE_SPOOL_TITLE_EN       "Unload Filament"
 #define REMOVE_SPOOL_PREVIOUS_EN     "< Previous"
@@ -688,9 +688,9 @@
 
 #define TEXT_BABY_STEP_EN "Babystep"
 
-#define PRINTING_OTHER_LANGUGE              "CNCing"
-#define PRINTING_OPERATION_OTHER_LANGUGE    "Operation"
-#define PRINTING_PAUSE_OTHER_LANGUGE        "Pause"
+#define CUTTING_OTHER_LANGUGE              "CNCing"
+#define CUTTING_OPERATION_OTHER_LANGUGE    "Operation"
+#define CUTTING_PAUSE_OTHER_LANGUGE        "Pause"
 
 #define MESSAGE_PAUSING_EN        "Parking..."
 #define MESSAGE_CHANGING_EN       "Wait for filament change to start"
@@ -700,7 +700,7 @@
 #define MESSAGE_LOAD_EN           "Wait for filament load"
 #define MESSAGE_PURGE_EN          "Wait for filament purge"
 #define MESSAGE_RESUME_EN         "Wait for print to resume..."
-#define MESSAGE_HEAT_EN           "Press button to heat nozzle"
+#define MESSAGE_HEAT_EN           "Press button to heat tool"
 #define MESSAGE_HEATING_EN        "Spindle heating Please wait..."
 #define MESSAGE_OPTION_EN         "Purge more or continue print?"
 #define MESSAGE_PURGE_MORE_EN     "Purge"

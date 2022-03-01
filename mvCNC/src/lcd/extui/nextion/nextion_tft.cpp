@@ -49,7 +49,7 @@ void NextionTFT::Startup() {
 
   SEND_VALasTXT("tmppage.mvcnc", SHORT_BUILD_VERSION);
   SEND_VALasTXT("tmppage.compiled", __DATE__ " / " __TIME__);
-  SEND_VALasTXT("tmppage.extruder", EXTRUDERS);
+  SEND_VALasTXT("tmppage.atc_tool", ATC_TOOLS);
   SEND_VALasTXT("tmppage.cnc", MACHINE_NAME);
   SEND_VALasTXT("tmppage.author", STRING_CONFIG_H_AUTHOR);
   SEND_VALasTXT("tmppage.released", STRING_DISTRIBUTION_DATE);
@@ -209,7 +209,7 @@ void NextionTFT::PanelInfo(uint8_t req) {
       SEND_VAL("tmppage.connected", 1);
       SEND_VALasTXT("tmppage.mvcnc", SHORT_BUILD_VERSION);
       SEND_VALasTXT("tmppage.compiled", __DATE__ " / " __TIME__);
-      SEND_VALasTXT("tmppage.extruder", EXTRUDERS);
+      SEND_VALasTXT("tmppage.atc_tool", ATC_TOOLS);
       SEND_VALasTXT("tmppage.cnc", MACHINE_NAME);
       SEND_VALasTXT("tmppage.author", STRING_CONFIG_H_AUTHOR);
       SEND_VALasTXT("tmppage.released", STRING_DISTRIBUTION_DATE);
@@ -386,7 +386,7 @@ void NextionTFT::PanelInfo(uint8_t req) {
     SEND_VALasTXT("y", ui16tostr5rj(getAxisMaxAcceleration_mm_s2(Y)));
     SEND_VALasTXT("z", ui16tostr5rj(getAxisMaxAcceleration_mm_s2(Z)));
     SEND_VALasTXT("e", ui16tostr5rj(getAxisMaxAcceleration_mm_s2(getActiveTool())));
-    SEND_VALasTXT("print",   ui16tostr5rj(getPrintingAcceleration_mm_s2()));
+    SEND_VALasTXT("print",   ui16tostr5rj(getCuttingAcceleration_mm_s2()));
     SEND_VALasTXT("retract", ui16tostr5rj(getRetractAcceleration_mm_s2()));
     SEND_VALasTXT("travel",  ui16tostr5rj(getTravelAcceleration_mm_s2()));
     break;
@@ -602,10 +602,10 @@ void NextionTFT::UpdateOnChange() {
   }
 
   // tmppage Tool
-  static uint8_t last_active_extruder = 99;
-  if (last_active_extruder != getActiveTool()) {
+  static uint8_t last_active_tool = 99;
+  if (last_active_tool != getActiveTool()) {
     SEND_VALasTXT("tmppage.tool", getActiveTool());
-    last_active_extruder = getActiveTool();
+    last_active_tool = getActiveTool();
   }
 
   // tmppage Fan Speed

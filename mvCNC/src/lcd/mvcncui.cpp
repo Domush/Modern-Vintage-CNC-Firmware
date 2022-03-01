@@ -115,28 +115,6 @@ constexpr uint8_t epps = ENCODER_PULSES_PER_STEP;
   }
 #endif
 
-#if HAS_PREHEAT
-  #include "../module/fan_control.h"
-
-  preheat_t mvCNCUI::material_preset[PREHEAT_COUNT];  // Initialized by settings.load()
-
-  PGM_P mvCNCUI::get_preheat_label(const uint8_t m) {
-    #define _PDEF(N) static PGMSTR(preheat_##N##_label, PREHEAT_##N##_LABEL);
-    #define _PLBL(N) preheat_##N##_label,
-    REPEAT_1(PREHEAT_COUNT, _PDEF);
-    static PGM_P const preheat_labels[PREHEAT_COUNT] PROGMEM = { REPEAT_1(PREHEAT_COUNT, _PLBL) };
-    return (PGM_P)pgm_read_ptr(&preheat_labels[m]);
-  }
-
-  void mvCNCUI::apply_preheat(const uint8_t m, const uint8_t pmask, const uint8_t e/*=active_extruder*/) {
-    const preheat_t &pre = material_preset[m];
-    TERN_(HAS_HOTEND,           if (TEST(pmask, PT_HOTEND))  fanManager.setTargetHotend(pre.hotend_temp, e));
-    TERN_(HAS_HEATED_BED,       if (TEST(pmask, PT_BED))     fanManager.setTargetBed(pre.bed_temp));
-    //TERN_(HAS_HEATED_CHAMBER, if (TEST(pmask, PT_CHAMBER)) fanManager.setTargetBed(pre.chamber_temp));
-    TERN_(HAS_FAN,              if (TEST(pmask, PT_FAN))     fanManager.fanSpeedSet(0, pre.fan_speed));
-  }
-#endif
-
 #if EITHER(HAS_MVCNCUI_MENU, EXTENSIBLE_UI)
   bool mvCNCUI::lcd_clicked;
 #endif
@@ -243,10 +221,6 @@ void mvCNCUI::init() {
     #include "../module/settings.h"
   #endif
 
-  #if ENABLED(AUTO_BED_LEVELING_UBL)
-    #include "../feature/bedlevel/bedlevel.h"
-  #endif
-
   #if HAS_TRINAMIC_CONFIG
     #include "../feature/tmc_util.h"
   #endif
@@ -289,7 +263,7 @@ void mvCNCUI::init() {
 
   #if IS_DWIN_MVCNCUI
     bool mvCNCUI::did_first_redraw;
-    bool mvCNCUI::old_is_printing;
+    bool mvCNCUI::old_is_cutting;
   #endif
 
   #if ENABLED(SDSUPPORT)
@@ -348,17 +322,6 @@ void mvCNCUI::init() {
     #if HAS_TOUCH_BUTTONS
       uint8_t mvCNCUI::touch_buttons;
       uint8_t mvCNCUI::repeat_delay;
-    #endif
-
-    #if EITHER(AUTO_BED_LEVELING_UBL, G26_MESH_VALIDATION)
-
-      bool mvCNCUI::external_control; // = false
-
-      void mvCNCUI::wait_for_release() {
-        while (button_pressed()) safe_delay(50);
-        safe_delay(50);
-      }
-
     #endif
 
     #if !HAS_GRAPHICAL_TFT
@@ -750,9 +713,9 @@ void mvCNCUI::init() {
         #if IS_KINEMATIC
 
           #if TOOL_CHANGE_SUPPORT
-            REMEMBER(ae, active_extruder);
+            REMEMBER(ae, active_tool);
             #if MULTI_E_MANUAL
-              if (axis == E_AXIS) active_extruder = e_index;
+              if (axis == E_AXIS) active_tool = e_index;
             #endif
           #endif
 
@@ -780,7 +743,7 @@ void mvCNCUI::init() {
 
           // For Cartesian / Core motion simply move to the current_position
           planner.buffer_line(current_position, fr_mm_s,
-            TERN_(MULTI_E_MANUAL, axis == E_AXIS ? e_index :) active_extruder
+            TERN_(MULTI_E_MANUAL, axis == E_AXIS ? e_index :) active_tool
           );
 
           //SERIAL_ECHOLNPGM("Add planner.move with Axis ", AS_CHAR(axis_codes[axis]), " at FR ", fr_mm_s);
@@ -795,25 +758,13 @@ void mvCNCUI::init() {
     // Tell ui.update() to start a move to current_position after a short delay.
     //
     void ManualMove::soon(const AxisEnum move_axis
-      OPTARG(MULTI_E_MANUAL, const int8_t eindex/*=active_extruder*/)
+      OPTARG(MULTI_E_MANUAL, const int8_t eindex/*=active_tool*/)
     ) {
       TERN_(MULTI_E_MANUAL, if (move_axis == E_AXIS) e_index = eindex);
       start_time = millis() + (menu_scale < 0.99f ? 0UL : 250UL); // delay for bigger moves
       axis = move_axis;
       //SERIAL_ECHOLNPGM("Post Move with Axis ", AS_CHAR(axis_codes[axis]), " soon.");
     }
-
-    #if ENABLED(AUTO_BED_LEVELING_UBL)
-
-      void mvCNCUI::external_encoder() {
-        if (external_control && encoderDiff) {
-          ubl.encoder_diff += encoderDiff;  // Encoder for UBL G29 mesh editing
-          encoderDiff = 0;                  // Hide encoder events from the screen handler
-          refresh(LCDVIEW_REDRAW_NOW);      // ...but keep the refresh.
-        }
-      }
-
-    #endif
 
   #endif // HAS_MVCNCUI_MENU
 
@@ -1383,11 +1334,11 @@ void mvCNCUI::init() {
     if (jobIsPaused())
       msg = GET_TEXT_F(MSG_PRINT_PAUSED);
     #if ENABLED(SDSUPPORT)
-      else if (IS_SD_PRINTING())
+      else if (IS_SD_JOB_RUNNING())
         return set_status(card.longest_filename(), true);
     #endif
     else if (JobTimer.isRunning())
-      msg = GET_TEXT_F(MSG_PRINTING);
+      msg = GET_TEXT_F(MSG_CUTTING);
 
     #if SERVICE_INTERVAL_1 > 0
       else if (JobTimer.needsService(1)) msg = FPSTR(service1);
@@ -1573,13 +1524,13 @@ void mvCNCUI::init() {
     JobTimer.start(); // Also called by M24
   }
 
-  #if HAS_PRINT_PROGRESS
+  #if HAS_JOB_PROGRESS
 
     mvCNCUI::progress_t mvCNCUI::_get_progress() {
       return (
         TERN0(LCD_SET_PROGRESS_MANUALLY, (progress_override & PROGRESS_MASK))
         #if ENABLED(SDSUPPORT)
-          ?: TERN(HAS_PRINT_PROGRESS_PERMYRIAD, card.permyriadDone(), card.percentDone())
+          ?: TERN(HAS_JOB_PROGRESS_PERMYRIAD, card.permyriadDone(), card.percentDone())
         #endif
       );
     }
@@ -1702,7 +1653,7 @@ void mvCNCUI::init() {
 
   #if EITHER(BABYSTEP_ZPROBE_GFX_OVERLAY, MESH_EDIT_GFX_OVERLAY)
     void mvCNCUI::zoffset_overlay(const_float_t zvalue) {
-      // Determine whether the user is raising or lowering the nozzle.
+      // Determine whether the user is raising or lowering the tool.
       static int8_t dir;
       static float old_zvalue;
       if (zvalue != old_zvalue) {
@@ -1720,7 +1671,7 @@ void mvCNCUI::init() {
   void mvCNCUI::pause_show_message(
     const PauseMessage message,
     const PauseMode mode/*=PAUSE_MODE_SAME*/,
-    const uint8_t extruder/*=active_extruder*/
+    const uint8_t atc_tool/*=active_tool*/
   ) {
     pause_mode = mode;
     ExtUI::pauseModeStatus = message;

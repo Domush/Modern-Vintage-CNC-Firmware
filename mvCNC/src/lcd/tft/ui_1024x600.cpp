@@ -293,10 +293,10 @@ void mvCNCUI::draw_status_screen() {
   tft.set_background(COLOR_BACKGROUND);
   color = planner.flow_percentage[0] == 100 ? COLOR_RATE_100 : COLOR_RATE_ALTERED;
   tft.add_image(0, 0, imgFlowRate, color);
-  tft_string.set(i16tostr3rj(planner.flow_percentage[active_extruder]));
+  tft_string.set(i16tostr3rj(planner.flow_percentage[active_tool]));
   tft_string.add('%');
   tft.add_text(36, 1, color, tft_string);
-  TERN_(TOUCH_SCREEN, touch.add_control(FLOWRATE, 650, y, 100, 32, active_extruder));
+  TERN_(TOUCH_SCREEN, touch.add_control(FLOWRATE, 650, y, 100, 32, active_tool));
 
   #if ENABLED(TOUCH_SCREEN)
   add_control(900, y, menu_main, imgSettings);
@@ -447,7 +447,7 @@ void MenuItem_confirm::draw_select_screen(PGM_P const yes, PGM_P const no, const
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
 
-  void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t extruder) {
+  void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t atc_tool) {
     #if ENABLED(TOUCH_SCREEN)
       touch.clear();
       draw_menu_navigation = false;
@@ -457,12 +457,12 @@ void MenuItem_confirm::draw_select_screen(PGM_P const yes, PGM_P const no, const
     menu_line(row);
     tft_string.set(GET_TEXT(MSG_FILAMENT_CHANGE_NOZZLE));
     tft_string.add('E');
-    tft_string.add((char)('1' + extruder));
+    tft_string.add((char)('1' + atc_tool));
     tft_string.add(' ');
-    tft_string.add(i16tostr3rj(fanManager.wholeDegHotend(extruder)));
+    tft_string.add(i16tostr3rj(fanManager.wholeDegHotend(atc_tool)));
     tft_string.add(LCD_STR_DEGREE);
     tft_string.add(" / ");
-    tft_string.add(i16tostr3rj(fanManager.degTargetHotend(extruder)));
+    tft_string.add(i16tostr3rj(fanManager.degTargetHotend(atc_tool)));
     tft_string.add(LCD_STR_DEGREE);
     tft_string.trim();
     tft.add_text(tft_string.center(TFT_WIDTH), 0, COLOR_MENU_TEXT, tft_string);
@@ -658,11 +658,11 @@ static void moveAxis(const AxisEnum axis, const int8_t direction) {
   if (axis == Z_AXIS && motionAxisState.z_selection == Z_SELECTION_Z_PROBE) {
     #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
       const int16_t babystep_increment = direction * BABYSTEP_SIZE_Z;
-      const bool do_probe = DISABLED(BABYSTEP_HOTEND_Z_OFFSET) || active_extruder == 0;
+      const bool do_probe = DISABLED(BABYSTEP_HOTEND_Z_OFFSET) || active_tool == 0;
       const float bsDiff = planner.mm_per_step[Z_AXIS] * babystep_increment,
                   new_probe_offset = probe.offset.z + bsDiff,
                   new_offs = TERN(BABYSTEP_HOTEND_Z_OFFSET
-                    , do_probe ? new_probe_offset : hotend_offset[active_extruder].z - bsDiff
+                    , do_probe ? new_probe_offset : hotend_offset[active_tool].z - bsDiff
                     , new_probe_offset
                   );
       if (WITHIN(new_offs, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX)) {
@@ -670,7 +670,7 @@ static void moveAxis(const AxisEnum axis, const int8_t direction) {
         if (do_probe)
           probe.offset.z = new_offs;
         else
-          TERN(BABYSTEP_HOTEND_Z_OFFSET, hotend_offset[active_extruder].z = new_offs, NOOP);
+          TERN(BABYSTEP_HOTEND_Z_OFFSET, hotend_offset[active_tool].z = new_offs, NOOP);
         drawMessage(""); // clear the error
         drawAxisValue(axis);
       }
@@ -737,7 +737,7 @@ static void z_minus() { moveAxis(Z_AXIS, -1); }
 #if ENABLED(TOUCH_SCREEN)
   static void e_select() {
     motionAxisState.e_selection++;
-    if (motionAxisState.e_selection >= EXTRUDERS) {
+    if (motionAxisState.e_selection >= ATC_TOOLS) {
       motionAxisState.e_selection = 0;
     }
 

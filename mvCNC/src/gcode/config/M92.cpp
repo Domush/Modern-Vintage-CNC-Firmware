@@ -6,10 +6,10 @@
 #include "../../module/planner.h"
 
 /**
- * M92: Set axis steps-per-unit for one or more axes, X, Y, Z, [I, [J, [K]]] and E.
+ * M92: Set axis steps-per-unit for one or more axes, X, Y, Z, [I, [J, [K]]].
  *      (Follows the same syntax as G92)
  *
- *      With multiple extruders use T to specify which one.
+ *      With multiple ATC tools use T to specify which one.
  *
  *      If no argument is given print the current values.
  *
@@ -21,31 +21,16 @@
  */
 void GcodeSuite::M92() {
 
-  const int8_t target_extruder = get_target_extruder_from_command();
-  if (target_extruder < 0) return;
+  const int8_t target_atc_tool = get_tool_from_command();
+  if (target_atc_tool < 0) return;
 
   // No arguments? Show M92 report.
   if (!parser.seen(LOGICAL_AXES_STRING TERN_(MAGIC_NUMBERS_GCODE, "HL")))
-    return M92_report(true, target_extruder);
+    return M92_report(true, target_atc_tool);
 
   LOOP_LOGICAL_AXES(i) {
     if (parser.seenval(axis_codes[i])) {
-      if (TERN1(HAS_EXTRUDERS, i != E_AXIS))
-        planner.settings.axis_steps_per_mm[i] = parser.value_per_axis_units((AxisEnum)i);
-      else {
-        #if HAS_EXTRUDERS
-          const float value = parser.value_per_axis_units((AxisEnum)(E_AXIS_N(target_extruder)));
-          if (value < 20) {
-            float factor = planner.settings.axis_steps_per_mm[E_AXIS_N(target_extruder)] / value; // increase e constants if M92 E14 is given for netfab.
-            #if HAS_CLASSIC_JERK && HAS_CLASSIC_E_JERK
-              planner.max_jerk.e *= factor;
-            #endif
-            planner.settings.max_feedrate_mm_s[E_AXIS_N(target_extruder)] *= factor;
-            planner.max_acceleration_steps_per_s2[E_AXIS_N(target_extruder)] *= factor;
-          }
-          planner.settings.axis_steps_per_mm[E_AXIS_N(target_extruder)] = value;
-        #endif
-      }
+      planner.settings.axis_steps_per_mm[i] = parser.value_per_axis_units((AxisEnum)i);
     }
   }
   planner.refresh_positioning();
@@ -82,21 +67,7 @@ void GcodeSuite::M92_report(const bool forReplay/*=true*/, const int8_t e/*=-1*/
     SP_J_STR, LINEAR_UNIT(planner.settings.axis_steps_per_mm[J_AXIS]),
     SP_K_STR, LINEAR_UNIT(planner.settings.axis_steps_per_mm[K_AXIS]))
   );
-  #if HAS_EXTRUDERS && DISABLED(DISTINCT_E_FACTORS)
-    SERIAL_ECHOPGM_P(SP_E_STR, VOLUMETRIC_UNIT(planner.settings.axis_steps_per_mm[E_AXIS]));
-  #endif
   SERIAL_EOL();
 
-  #if ENABLED(DISTINCT_E_FACTORS)
-    LOOP_L_N(i, E_STEPPERS) {
-      if (e >= 0 && i != e) continue;
-      report_echo_start(forReplay);
-      SERIAL_ECHOLNPGM_P(
-        PSTR("  M92 T"), i,
-        SP_E_STR, VOLUMETRIC_UNIT(planner.settings.axis_steps_per_mm[E_AXIS_N(i)])
-      );
-    }
-  #else
-    UNUSED(e);
-  #endif
+  UNUSED(e);
 }

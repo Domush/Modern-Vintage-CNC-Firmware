@@ -26,6 +26,7 @@
 //#define DEBUG_EEPROM_READWRITE
 
 #include "settings.h"
+#include "src/core/debug_out.h"
 
 #include "endstops.h"
 #include "planner.h"
@@ -89,10 +90,6 @@
   #include "../feature/tmc_util.h"
 #endif
 
-#if HAS_PTC
-  #include "../feature/probe_temp_comp.h"
-#endif
-
 #include "../feature/controllerfan.h"
 
 #if ENABLED(CASE_LIGHT_ENABLE)
@@ -133,10 +130,10 @@
 
 #define _EN_ITEM(N) , E##N
 
-typedef struct { uint16_t LINEAR_AXIS_LIST(X, Y, Z, I, J, K), X2, Y2, Z2, Z3, Z4 REPEAT(E_STEPPERS, _EN_ITEM); } tmc_stepper_current_t;
-typedef struct { uint32_t LINEAR_AXIS_LIST(X, Y, Z, I, J, K), X2, Y2, Z2, Z3, Z4 REPEAT(E_STEPPERS, _EN_ITEM); } tmc_hybrid_threshold_t;
-typedef struct {  int16_t LINEAR_AXIS_LIST(X, Y, Z, I, J, K), X2, Y2, Z2, Z3, Z4;                              } tmc_sgt_t;
-typedef struct {     bool LINEAR_AXIS_LIST(X, Y, Z, I, J, K), X2, Y2, Z2, Z3, Z4 REPEAT(E_STEPPERS, _EN_ITEM); } tmc_stealth_enabled_t;
+typedef struct { uint16_t LINEAR_AXIS_LIST(X, Y, Z, I, J, K), X2, Y2, Z2, Z3, Z4; } tmc_stepper_current_t;
+typedef struct { uint32_t LINEAR_AXIS_LIST(X, Y, Z, I, J, K), X2, Y2, Z2, Z3, Z4; } tmc_hybrid_threshold_t;
+typedef struct {  int16_t LINEAR_AXIS_LIST(X, Y, Z, I, J, K), X2, Y2, Z2, Z3, Z4; } tmc_sgt_t;
+typedef struct {     bool LINEAR_AXIS_LIST(X, Y, Z, I, J, K), X2, Y2, Z2, Z3, Z4; } tmc_stealth_enabled_t;
 
 #undef _EN_ITEM
 
@@ -272,8 +269,8 @@ typedef struct SettingsDataStruct {
   // !NO_VOLUMETRIC
   //
   bool parser_volumetric_enabled;                       // M200 S  parser.volumetric_enabled
-  float planner_filament_size[EXTRUDERS];               // M200 T D  planner.filament_size[]
-  float planner_volumetric_extruder_limit[EXTRUDERS];   // M200 T L  planner.volumetric_extruder_limit[]
+  float planner_filament_size[ATC_TOOLS];               // M200 T D  planner.filament_size[]
+  float planner_volumetric_atc_tool_limit[ATC_TOOLS];   // M200 T L  planner.volumetric_atc_tool_limit[]
 
   //
   // HAS_TRINAMIC_CONFIG

@@ -176,13 +176,13 @@
 
 #define FAN_PIN                                9
 
-#if EXTRUDERS >= 5
+#if ATC_TOOLS >= 5
   #define HEATER_4_PIN                         6
 #else
   #define FAN1_PIN                             6
 #endif
 
-#if EXTRUDERS >= 4
+#if ATC_TOOLS >= 4
   #define HEATER_3_PIN                        45
 #else
   #define FAN2_PIN                            45

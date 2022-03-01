@@ -267,9 +267,9 @@ bool pin_is_protected(const pin_t pin) {
 #pragma GCC diagnostic pop
 
 /**
- * A CNC Job exists when the timer is running or SD is printing
+ * A CNC Job exists when the timer is running or SD job is running
  */
-bool jobIsOngoing() { return JobTimer.isRunning() || IS_SD_PRINTING(); }
+bool jobIsOngoing() { return JobTimer.isRunning() || IS_SD_JOB_RUNNING(); }
 
 /**
  * CNCing is active when a job is underway but not paused
@@ -297,7 +297,7 @@ void startOrResumeJob() {
 
 #if ENABLED(SDSUPPORT)
 
-  inline void abortSDPrinting() {
+  inline void abortSDJob() {
     IF_DISABLED(NO_SD_AUTOSTART, card.autofile_cancel());
     card.abortFilePrintNow(TERN_(SD_RESORT, true));
 
@@ -319,11 +319,11 @@ void startOrResumeJob() {
     TERN_(PASSWORD_AFTER_SD_PRINT_ABORT, password.lock_machine());
   }
 
-  inline void finishSDPrinting() {
+  inline void finishSDJob() {
     if (queue.enqueue_one(F("M1001"))) {  // Keep trying until it gets queued
       mvcnc_state = MF_RUNNING;          // Signal to stop trying
       TERN_(PASSWORD_AFTER_SD_PRINT_END, password.lock_machine());
-      TERN_(DGUS_LCD_UI_MKS, ScreenHandler.SDPrintingFinished());
+      TERN_(DGUS_LCD_UI_MKS, ScreenHandler.SDJobFinished());
     }
   }
 
@@ -339,7 +339,7 @@ void startOrResumeJob() {
  *  - Check for HOME button held down
  *  - Check for CUSTOM USER button held down
  *  - Check if cooling fan needs to be switched on
- *  - Check if an idle but hot extruder needs filament extruded (EXTRUDER_RUNOUT_PREVENT)
+ *  - Check if an idle but hot atc_tool needs filament extruded (EXTRUDER_RUNOUT_PREVENT)
  *  - Pulse FET_SAFETY_PIN if it exists
  */
 inline void manage_inactivity(const bool no_stepper_sleep=false) {
@@ -424,7 +424,7 @@ inline void manage_inactivity(const bool no_stepper_sleep=false) {
     // Handle a standalone HOME button
     constexpr millis_t HOME_DEBOUNCE_DELAY = 1000UL;
     static millis_t next_home_key_ms; // = 0
-    if (!IS_SD_PRINTING() && !READ(HOME_PIN)) { // HOME_PIN goes LOW when pressed
+    if (!IS_SD_JOB_RUNNING() && !READ(HOME_PIN)) { // HOME_PIN goes LOW when pressed
       if (ELAPSED(ms, next_home_key_ms)) {
         next_home_key_ms = ms + HOME_DEBOUNCE_DELAY;
         LCD_MESSAGE(MSG_AUTO_HOME);
@@ -442,7 +442,7 @@ inline void manage_inactivity(const bool no_stepper_sleep=false) {
       constexpr millis_t CUB_DEBOUNCE_DELAY_##N = 250UL;               \
       static millis_t next_cub_ms_##N;                                 \
       if (BUTTON##N##_HIT_STATE == READ(BUTTON##N##_PIN)               \
-        && (ENABLED(BUTTON##N##_WHEN_PRINTING) || cnc_not_busy)) { \
+        && (ENABLED(BUTTON##N##_WHEN_CUTTING) || cnc_not_busy)) { \
         if (ELAPSED(ms, next_cub_ms_##N)) {                            \
           next_cub_ms_##N = ms + CUB_DEBOUNCE_DELAY_##N;               \
           CODE;                                                        \
@@ -576,7 +576,7 @@ void idle(bool no_stepper_sleep/*=false*/) {
   if (mvcnc_state == MF_INITIALIZING) goto IDLE_DONE;
 
   // TODO: Still causing errors
-  (void)check_tool_sensor_stats(active_extruder, true);
+  (void)check_tool_sensor_stats(active_tool, true);
 
   // Run HAL idle tasks
   TERN_(HAL_IDLETASK, HAL_idletask());
@@ -586,7 +586,7 @@ void idle(bool no_stepper_sleep/*=false*/) {
 
   // Handle Power-Loss Recovery
   #if ENABLED(POWER_LOSS_RECOVERY) && PIN_EXISTS(POWER_LOSS)
-    if (IS_SD_PRINTING()) recovery.outage();
+    if (IS_SD_JOB_RUNNING()) recovery.outage();
   #endif
 
   // Run StallGuard endstop checks
@@ -842,7 +842,7 @@ inline void tmc_standby_setup() {
  *    • BLTouch Probe
  *    • I2C Position Encoders
  *    • Custom I2C Bus handlers
- *    • Enhanced tools or extruders:
+ *    • Enhanced tools or ATC tools:
  *      • Switching Extruder
  *      • Switching Spindle
  *      • Parking Extruder
@@ -1305,8 +1305,8 @@ void loop() {
     idle();
 
     #if ENABLED(SDSUPPORT)
-      if (card.flag.abort_sd_printing) abortSDPrinting();
-      if (mvcnc_state == MF_SD_COMPLETE) finishSDPrinting();
+      if (card.flag.abort_sd_job_running) abortSDJob();
+      if (mvcnc_state == MF_SD_COMPLETE) finishSDJob();
     #endif
 
     queue.advance();

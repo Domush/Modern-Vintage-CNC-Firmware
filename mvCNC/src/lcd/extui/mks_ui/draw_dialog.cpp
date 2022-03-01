@@ -65,7 +65,7 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
 
     uiCfg.print_state = WORKING;
     lv_clear_dialog();
-    lv_draw_printing();
+    lv_draw_cutting();
 
     #if ENABLED(SDSUPPORT)
       if (!gcode_preview_over) {
@@ -90,7 +90,7 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
             planner.flow_percentage[1] = 100;
             planner.e_factor[1] = planner.flow_percentage[1] * 0.01f;
           #endif
-          card.startOrResumeFilePrinting();
+          card.startOrResumeFileCutting();
           TERN_(POWER_LOSS_RECOVERY, recovery.prepare());
           once_flag = false;
         }
@@ -171,7 +171,7 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
     TERN_(ADVANCED_PAUSE_FEATURE, pause_menu_response = PAUSE_RESPONSE_RESUME_PRINT);
   }
   else if (DIALOG_IS(TYPE_FILAMENT_LOAD_HEAT, TYPE_FILAMENT_UNLOAD_HEAT, TYPE_FILAMENT_HEAT_LOAD_COMPLETED, TYPE_FILAMENT_HEAT_UNLOAD_COMPLETED)) {
-    fanManager.setTargetHotend(uiCfg.hotendTargetTempBak, uiCfg.extruderIndex);
+    fanManager.setTargetHotend(uiCfg.hotendTargetTempBak, uiCfg.atc_toolIndex);
     goto_previous_ui();
   }
   else if (DIALOG_IS(TYPE_FILAMENT_LOADING, TYPE_FILAMENT_UNLOADING)) {
@@ -183,7 +183,7 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
     uiCfg.filament_loading_time_cnt    = 0;
     uiCfg.filament_unloading_time_flg  = false;
     uiCfg.filament_unloading_time_cnt  = 0;
-    fanManager.setTargetHotend(uiCfg.hotendTargetTempBak, uiCfg.extruderIndex);
+    fanManager.setTargetHotend(uiCfg.hotendTargetTempBak, uiCfg.atc_toolIndex);
     goto_previous_ui();
   }
   else {
@@ -452,9 +452,9 @@ void lv_draw_dialog(uint8_t type) {
 
 void filament_sprayer_temp() {
   char buf[20] = {0};
-  sprintf(buf, preheat_menu.value_state, fanManager.wholeDegHotend(uiCfg.extruderIndex), fanManager.degTargetHotend(uiCfg.extruderIndex));
+  sprintf(buf, preheat_menu.value_state, fanManager.wholeDegHotend(uiCfg.atc_toolIndex), fanManager.degTargetHotend(uiCfg.atc_toolIndex));
 
-  strcpy(public_buf_l, uiCfg.extruderIndex < 1 ? extrude_menu.ext1 : extrude_menu.ext2);
+  strcpy(public_buf_l, uiCfg.atc_toolIndex < 1 ? extrude_menu.ext1 : extrude_menu.ext2);
   strcat_P(public_buf_l, PSTR(": "));
   strcat(public_buf_l, buf);
   lv_label_set_text(tempText1, public_buf_l);
@@ -473,7 +473,7 @@ void filament_dialog_handle() {
     planner.synchronize();
     uiCfg.filament_loading_time_flg = true;
     uiCfg.filament_loading_time_cnt = 0;
-    sprintf_P(public_buf_m, PSTR("T%d\nG91\nG1 E%d F%d\nG90"), uiCfg.extruderIndex, gCfgItems.filamentchange_load_length, gCfgItems.filamentchange_load_speed);
+    sprintf_P(public_buf_m, PSTR("T%d\nG91\nG1 E%d F%d\nG90"), uiCfg.atc_toolIndex, gCfgItems.filamentchange_load_length, gCfgItems.filamentchange_load_speed);
     queue.inject(public_buf_m);
   }
   if (uiCfg.filament_heat_completed_unload) {
@@ -483,12 +483,12 @@ void filament_dialog_handle() {
     planner.synchronize();
     uiCfg.filament_unloading_time_flg = true;
     uiCfg.filament_unloading_time_cnt = 0;
-    sprintf_P(public_buf_m, PSTR("T%d\nG91\nG1 E-%d F%d\nG90"), uiCfg.extruderIndex, gCfgItems.filamentchange_unload_length, gCfgItems.filamentchange_unload_speed);
+    sprintf_P(public_buf_m, PSTR("T%d\nG91\nG1 E-%d F%d\nG90"), uiCfg.atc_toolIndex, gCfgItems.filamentchange_unload_length, gCfgItems.filamentchange_unload_speed);
     queue.inject(public_buf_m);
   }
 
   if (uiCfg.filament_load_heat_flg) {
-    const celsius_t diff = fanManager.wholeDegHotend(uiCfg.extruderIndex) - gCfgItems.filament_limit_temp;
+    const celsius_t diff = fanManager.wholeDegHotend(uiCfg.atc_toolIndex) - gCfgItems.filament_limit_temp;
     if (ABS(diff) < 2 || diff > 0) {
       uiCfg.filament_load_heat_flg = false;
       lv_clear_dialog();
@@ -504,7 +504,7 @@ void filament_dialog_handle() {
   }
 
   if (uiCfg.filament_unload_heat_flg) {
-    const celsius_t diff = fanManager.wholeDegHotend(uiCfg.extruderIndex) - gCfgItems.filament_limit_temp;
+    const celsius_t diff = fanManager.wholeDegHotend(uiCfg.atc_toolIndex) - gCfgItems.filament_limit_temp;
     if (ABS(diff) < 2 || diff > 0) {
       uiCfg.filament_unload_heat_flg = false;
       lv_clear_dialog();

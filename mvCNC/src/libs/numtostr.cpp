@@ -54,7 +54,7 @@ const char* i8tostr3rj(const int8_t x) {
   return &conv[4];
 }
 
-#if HAS_PRINT_PROGRESS_PERMYRIAD
+#if HAS_JOB_PROGRESS_PERMYRIAD
   // Convert unsigned 16-bit permyriad to percent with 100 / 23 / 23.4 / 3.45 format
   const char* permyriadtostr4(const uint16_t xx) {
     if (xx >= 10000)

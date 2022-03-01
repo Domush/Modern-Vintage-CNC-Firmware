@@ -150,9 +150,9 @@ uint8_t valuetype;
 char cmd[MAX_CMD_SIZE+16], str_1[16], str_2[16], str_3[16];
 char statusmsg[64];
 char filename[LONG_FILENAME_LENGTH];
-bool printing = false;
+bool cutting = false;
 bool paused = false;
-bool sdprint = false;
+bool sdjob = false;
 
 int16_t pausetemp, pausebed, pausefan;
 
@@ -253,7 +253,7 @@ CrealityDWINClass CrealityDWIN;
       if (zmove) {
         planner.synchronize();
         current_position.z = goto_mesh_value ? Z_VALUES_ARR[mesh_x][mesh_y] : Z_CLEARANCE_BETWEEN_PROBES;
-        planner.buffer_line(current_position, homing_feedrate(Z_AXIS), active_extruder);
+        planner.buffer_line(current_position, homing_feedrate(Z_AXIS), active_tool);
         planner.synchronize();
       }
       else {
@@ -264,7 +264,7 @@ CrealityDWINClass CrealityDWIN;
         gcode.process_subcommands_now(cmd);
         planner.synchronize();
         current_position.z = goto_mesh_value ? Z_VALUES_ARR[mesh_x][mesh_y] : Z_CLEARANCE_BETWEEN_PROBES;
-        planner.buffer_line(current_position, homing_feedrate(Z_AXIS), active_extruder);
+        planner.buffer_line(current_position, homing_feedrate(Z_AXIS), active_tool);
         planner.synchronize();
         CrealityDWIN.Redraw_Menu();
       }
@@ -687,7 +687,7 @@ void CrealityDWINClass::Draw_Print_Filename(const bool reset/*=false*/) {
 }
 
 void CrealityDWINClass::Draw_Print_ProgressBar() {
-  uint8_t printpercent = sdprint ? card.percentDone() : (ui._get_progress() / 100);
+  uint8_t printpercent = sdjob ? card.percentDone() : (ui._get_progress() / 100);
   DWIN_ICON_Show(ICON, ICON_Bar, 15, 93);
   DWIN_Draw_Rectangle(1, BarFill_Color, 16 + printpercent * 240 / 100, 93, 256, 113);
   DWIN_Draw_IntValue(true, true, 0, DWIN_FONT_MENU, GetColor(eeprom_settings.progress_percent, Percent_Color), Color_Bg_Black, 3, 109, 133, printpercent);
@@ -2864,10 +2864,10 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
           case ADVANCED_LA:
             if (draw) {
               Draw_Menu_Item(row, ICON_MaxAccelerated, F("Lin Advance Kp"));
-              Draw_Float(planner.extruder_advance_K[0], row, false, 100);
+              Draw_Float(planner.atc_tool_advance_K[0], row, false, 100);
             }
             else
-              Modify_Value(planner.extruder_advance_K[0], 0, 10, 100);
+              Modify_Value(planner.atc_tool_advance_K[0], 0, 10, 100);
             break;
         #endif
 
@@ -3688,7 +3688,7 @@ void CrealityDWINClass::Menu_Item_Handler(uint8_t menu, uint8_t item, bool draw/
             else if (!isnan(currval)) {
               current_position.z = currval;
               planner.synchronize();
-              planner.buffer_line(current_position, homing_feedrate(Z_AXIS), active_extruder);
+              planner.buffer_line(current_position, homing_feedrate(Z_AXIS), active_tool);
               planner.synchronize();
               Draw_Float(current_position.z, row - 3, false, 100);
             }
@@ -4214,7 +4214,7 @@ void CrealityDWINClass::Value_Control() {
     if (active_menu == ZOffset && liveadjust) {
       planner.synchronize();
       current_position.z += (tempvalue / valueunit - zoffsetvalue);
-      planner.buffer_line(current_position, homing_feedrate(Z_AXIS), active_extruder);
+      planner.buffer_line(current_position, homing_feedrate(Z_AXIS), active_tool);
       current_position.z = 0;
       sync_plan_position();
     }
@@ -4237,12 +4237,12 @@ void CrealityDWINClass::Value_Control() {
     switch (active_menu) {
       case Move:
         planner.synchronize();
-        planner.buffer_line(current_position, manual_feedrate_mm_s[selection - 1], active_extruder);
+        planner.buffer_line(current_position, manual_feedrate_mm_s[selection - 1], active_tool);
         break;
       #if HAS_MESH
         case ManualMesh:
           planner.synchronize();
-          planner.buffer_line(current_position, homing_feedrate(Z_AXIS), active_extruder);
+          planner.buffer_line(current_position, homing_feedrate(Z_AXIS), active_tool);
           planner.synchronize();
           break;
         case UBLMesh:     mesh_conf.manual_move(true); break;
@@ -4260,7 +4260,7 @@ void CrealityDWINClass::Value_Control() {
   DWIN_UpdateLCD();
   if (active_menu == Move && livemove) {
     *(float*)valuepointer = tempvalue / valueunit;
-    planner.buffer_line(current_position, manual_feedrate_mm_s[selection - 1], active_extruder);
+    planner.buffer_line(current_position, manual_feedrate_mm_s[selection - 1], active_tool);
   }
 }
 
@@ -4410,10 +4410,10 @@ void CrealityDWINClass::CNC_Screen_Control() {
         break;
       case PRINT_PAUSE_RESUME:
         if (paused) {
-          if (sdprint) {
+          if (sdjob) {
             wait_for_user = false;
             #if ENABLED(PARK_HEAD_ON_PAUSE)
-              card.startOrResumeFilePrinting();
+              card.startOrResumeFileCutting();
               TERN_(POWER_LOSS_RECOVERY, recovery.prepare());
             #else
               char cmnd[20];
@@ -4455,14 +4455,14 @@ void CrealityDWINClass::Popup_Control() {
     switch (popup) {
       case Pause:
         if (selection == 0) {
-          if (sdprint) {
+          if (sdjob) {
             #if ENABLED(POWER_LOSS_RECOVERY)
               if (recovery.enabled) recovery.save(true);
             #endif
             #if ENABLED(PARK_HEAD_ON_PAUSE)
               Popup_Handler(Home, true);
               #if ENABLED(SDSUPPORT)
-                if (IS_SD_PRINTING()) card.pauseSDPrint();
+                if (IS_SD_JOB_RUNNING()) card.pauseSDJob();
               #endif
               planner.synchronize();
               queue.inject(F("M125"));
@@ -4483,7 +4483,7 @@ void CrealityDWINClass::Popup_Control() {
         break;
       case Stop:
         if (selection == 0) {
-          if (sdprint) {
+          if (sdjob) {
             ui.abort_print();
             fanManager.cooldown();
           }
@@ -4555,7 +4555,7 @@ void CrealityDWINClass::Popup_Control() {
           }
           else {
             pause_menu_response = PAUSE_RESPONSE_RESUME_PRINT;
-            if (printing) Popup_Handler(Resuming);
+            if (cutting) Popup_Handler(Resuming);
             else Redraw_Menu(true, true, (active_menu==PreheatHotend));
           }
           break;
@@ -4690,9 +4690,9 @@ void CrealityDWINClass::Update_Status(const char * const text) {
 }
 
 void CrealityDWINClass::Start_Print(bool sd) {
-  sdprint = sd;
-  if (!printing) {
-    printing = true;
+  sdjob = sd;
+  if (!cutting) {
+    cutting = true;
     statusmsg[0] = '\0';
     if (sd) {
       #if ENABLED(POWER_LOSS_RECOVERY)
@@ -4713,8 +4713,8 @@ void CrealityDWINClass::Start_Print(bool sd) {
 }
 
 void CrealityDWINClass::Stop_Print() {
-  printing = false;
-  sdprint = false;
+  cutting = false;
+  sdjob = false;
   fanManager.cooldown();
   TERN_(LCD_SET_PROGRESS_MANUALLY, ui.set_progress(100 * (PROGRESS_SCALE)));
   TERN_(USE_M73_REMAINING_TIME, ui.set_remaining_time(0));
@@ -4743,8 +4743,8 @@ void mvCNCUI::update() { CrealityDWIN.Update(); }
 #endif
 
 void CrealityDWINClass::State_Update() {
-  if ((JobTimer.isRunning() || JobTimer.isPaused()) != printing) {
-    if (!printing) Start_Print(card.isFileOpen() || TERN0(POWER_LOSS_RECOVERY, recovery.valid()));
+  if ((JobTimer.isRunning() || JobTimer.isPaused()) != cutting) {
+    if (!cutting) Start_Print(card.isFileOpen() || TERN0(POWER_LOSS_RECOVERY, recovery.valid()));
     else Stop_Print();
   }
   if (JobTimer.isPaused() != paused) {
@@ -4759,7 +4759,7 @@ void CrealityDWINClass::State_Update() {
       if (pause_menu_response == PAUSE_RESPONSE_EXTRUDE_MORE)
         Popup_Handler(FilChange);
       else if (pause_menu_response == PAUSE_RESPONSE_RESUME_PRINT) {
-        if (printing) Popup_Handler(Resuming);
+        if (cutting) Popup_Handler(Resuming);
         else Redraw_Menu(true, true, (active_menu==PreheatHotend));
       }
     }
@@ -4974,7 +4974,7 @@ void mvCNCUI::init_lcd() {
 }
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
-  void mvCNCUI::pause_show_message(const PauseMessage message, const PauseMode mode/*=PAUSE_MODE_SAME*/, const uint8_t extruder/*=active_extruder*/) {
+  void mvCNCUI::pause_show_message(const PauseMessage message, const PauseMode mode/*=PAUSE_MODE_SAME*/, const uint8_t atc_tool/*=active_tool*/) {
     switch (message) {
       case PAUSE_MESSAGE_INSERT:  CrealityDWIN.Confirm_Handler(FilInsert);  break;
       case PAUSE_MESSAGE_PURGE:

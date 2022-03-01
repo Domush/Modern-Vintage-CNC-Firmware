@@ -476,12 +476,12 @@ class MenuItem_bool : public MenuEditItemBase {
     #define FAN_EDIT_ITEMS(F) _FAN_EDIT_ITEMS(F,FAN_SPEED_N)
   #endif
 
-  #define SNFAN(N) (ENABLED(SINGLENOZZLE_STANDBY_FAN) && !HAS_FAN##N && EXTRUDERS > N)
+  #define SNFAN(N) (ENABLED(SINGLENOZZLE_STANDBY_FAN) && !HAS_FAN##N && ATC_TOOLS > N)
 
   #if SNFAN(1) || SNFAN(2) || SNFAN(3) || SNFAN(4) || SNFAN(5) || SNFAN(6) || SNFAN(7)
     #define DEFINE_SINGLENOZZLE_ITEM() \
-      auto singlenozzle_item = [&](const uint8_t f) { \
-        editable.uint8 = fanManager.singlenozzle_fan_speed[f]; \
+      auto singletool_item = [&](const uint8_t f) { \
+        editable.uint8 = fanManager.singletool_fan_speed[f]; \
         EDIT_ITEM_FAST_N(percent, f, MSG_STORED_FAN_N, &editable.uint8, 0, 255, on_fan_update); \
       }
   #else

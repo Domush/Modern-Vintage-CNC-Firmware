@@ -8,10 +8,10 @@
  * Algorithm & Implementation: Scott Mudge - mail@scottmudge.com
  * Date: Dec. 2020
  *
- * Specifically optimized for 3D printing G-Code, this is a zero-cost data compression method
+ * Specifically optimized for CNC cutting G-Code, this is a zero-cost data compression method
  * which packs ~180-190% more data into the same amount of bytes going to the CNC controller.
  * As a majority of G-Code can be represented by a restricted alphabet, I performed histogram
- * analysis on a wide variety of 3D printing gcode samples, and found ~93% of all gcode could
+ * analysis on a wide variety of CNC cutting gcode samples, and found ~93% of all gcode could
  * be represented by the same 15-character alphabet.
  *
  * This allowed me to design a system of packing 2 8-bit characters into a single byte, assuming
@@ -22,7 +22,7 @@
  * character alphabet (at the cost of an extra 8-bits per full-width character), and by stripping
  * out unnecessary comments, the end result is gcode which is roughly half the original size.
  *
- * Why did I do this? I noticed micro-stuttering and other data-bottleneck issues while printing
+ * Why did I do this? I noticed micro-stuttering and other data-bottleneck issues while cutting
  * objects with high curvature, especially at high speeds. There is also the issue of the limited
  * baud rate provided by Prusa's Atmega2560-based boards, over the USB serial connection. So soft-
  * ware like OctoPrint would also suffer this same micro-stuttering and poor print quality issue.

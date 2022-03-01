@@ -33,7 +33,7 @@ static void tmc_print_chopper_time(TMC &st) {
  * Parameters:
  *   XYZ...E     - Selected axes
  *   I[index]    - Axis sub-index (Omit for all XYZ steppers, 1 for X2, Y2, Z2; 2 for Z3; 3 for Z4)
- *   T[index]    - Extruder index (Zero-based. Omit for all extruders.)
+ *   T[index]    - Extruder index (Zero-based. Omit for all ATC tools.)
  *   O           - time-off         [ 1..15]
  *   P           - hysteresis_end   [-3..12]
  *   S           - hysteresis_start [ 1...8]

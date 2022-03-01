@@ -180,7 +180,7 @@ void filament_check() {
     #endif
   ) {
     clear_cur_ui();
-    card.pauseSDPrint();
+    card.pauseSDJob();
     stop_print_time();
     uiCfg.print_state = PAUSING;
 
@@ -189,7 +189,7 @@ void filament_check() {
     else
       default_preview_flg = true;
 
-    lv_draw_printing();
+    lv_draw_cutting();
   }
 }
 

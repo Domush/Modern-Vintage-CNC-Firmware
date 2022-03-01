@@ -12,14 +12,14 @@ enum {
   WORKING,
   PAUSING,
   PAUSED,
-  REPRINTING,
+  RECUTTING,
   REPRINTED,
   RESUMING,
   STOP
 };
 
-void lv_draw_printing();
-void lv_clear_printing();
+void lv_draw_cutting();
+void lv_clear_cutting();
 void disp_ext_temp();
 void disp_bed_temp();
 void disp_fan_speed();

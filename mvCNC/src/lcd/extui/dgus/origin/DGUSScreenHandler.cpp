@@ -67,14 +67,14 @@
 
       case 1: // Pause
 
-        GotoScreen(DGUSLCD_SCREEN_SDPRINTMANIPULATION);
+        GotoScreen(DGUSLCD_SCREEN_SDJOBMANIPULATION);
         if (!ExtUI::jobRunningFromMediaPaused()) {
           ExtUI::pausePrint();
           //ExtUI::mks_pausePrint();
         }
         break;
       case 2: // Abort
-        HandleUserConfirmationPopUp(VP_SD_AbortPrintConfirmed, nullptr, PSTR("Abort printing"), filelist.filename(), PSTR("?"), true, true, false, true);
+        HandleUserConfirmationPopUp(VP_SD_AbortPrintConfirmed, nullptr, PSTR("Abort cutting"), filelist.filename(), PSTR("?"), true, true, false, true);
         break;
     }
   }
@@ -102,7 +102,7 @@
   void DGUSScreenHandler::SDCardRemoved() {
     if (current_screen == DGUSLCD_SCREEN_SDFILELIST
         || (current_screen == DGUSLCD_SCREEN_CONFIRM && (ConfirmVP == VP_SD_AbortPrintConfirmed || ConfirmVP == VP_SD_FileSelectConfirm))
-        || current_screen == DGUSLCD_SCREEN_SDPRINTMANIPULATION
+        || current_screen == DGUSLCD_SCREEN_SDJOBMANIPULATION
     ) GotoScreen(DGUSLCD_SCREEN_MAIN);
   }
 
@@ -314,9 +314,9 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
 
     if (filament_data.action == 0) { // Go back to utility screen
       #if HAS_HOTEND
-        fanManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
+        fanManager.setTargetHotend(e_temp, ExtUI::atc_tool_t::E0);
         #if TOOL_CHANGE_SUPPORT
-          fanManager.setTargetHotend(e_temp, ExtUI::extruder_t::E1);
+          fanManager.setTargetHotend(e_temp, ExtUI::atc_tool_t::E1);
         #endif
       #endif
       GotoScreen(DGUSLCD_SCREEN_UTILITY);
@@ -326,14 +326,14 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
         default: return;
           #if HAS_HOTEND
             case VP_E0_FILAMENT_LOAD_UNLOAD:
-              filament_data.extruder = ExtUI::extruder_t::E0;
-              fanManager.setTargetHotend(e_temp, filament_data.extruder);
+              filament_data.atc_tool = ExtUI::atc_tool_t::E0;
+              fanManager.setTargetHotend(e_temp, filament_data.atc_tool);
               break;
           #endif
           #if TOOL_CHANGE_SUPPORT
             case VP_E1_FILAMENT_LOAD_UNLOAD:
-              filament_data.extruder = ExtUI::extruder_t::E1;
-              fanManager.setTargetHotend(e_temp, filament_data.extruder);
+              filament_data.atc_tool = ExtUI::atc_tool_t::E1;
+              fanManager.setTargetHotend(e_temp, filament_data.atc_tool);
               break;
           #endif
       }
@@ -346,8 +346,8 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
     if (filament_data.action <= 0) return;
 
     // If we close to the target temperature, we can start load or unload the filament
-    if (fanManager.hotEnoughToExtrude(filament_data.extruder) && \
-        fanManager.targetHotEnoughToExtrude(filament_data.extruder)) {
+    if (fanManager.hotEnoughToExtrude(filament_data.atc_tool) && \
+        fanManager.targetHotEnoughToExtrude(filament_data.atc_tool)) {
       float movevalue = DGUS_FILAMENT_LOAD_LENGTH_PER_TIME;
 
       if (filament_data.action == 1) { // load filament
@@ -355,7 +355,7 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
           //GotoScreen(DGUSLCD_SCREEN_FILAMENT_LOADING);
           filament_data.heated = true;
         }
-        movevalue = ExtUI::getAxisPosition_mm(filament_data.extruder) + movevalue;
+        movevalue = ExtUI::getAxisPosition_mm(filament_data.atc_tool) + movevalue;
       }
       else { // unload filament
         if (!filament_data.heated) {
@@ -364,14 +364,14 @@ void DGUSScreenHandler::HandleManualMove(DGUS_VP_Variable &var, void *val_ptr) {
         }
         // Before unloading extrude to prevent jamming
         if (filament_data.purge_length >= 0) {
-          movevalue = ExtUI::getAxisPosition_mm(filament_data.extruder) + movevalue;
+          movevalue = ExtUI::getAxisPosition_mm(filament_data.atc_tool) + movevalue;
           filament_data.purge_length -= movevalue;
         }
         else {
-          movevalue = ExtUI::getAxisPosition_mm(filament_data.extruder) - movevalue;
+          movevalue = ExtUI::getAxisPosition_mm(filament_data.atc_tool) - movevalue;
         }
       }
-      ExtUI::setAxisPosition_mm(movevalue, filament_data.extruder);
+      ExtUI::setAxisPosition_mm(movevalue, filament_data.atc_tool);
     }
   }
 #endif // DGUS_FILAMENT_LOADUNLOAD

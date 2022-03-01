@@ -179,7 +179,7 @@ void StatusScreen::draw_buttons(draw_mode_t what) {
   int16_t x, y, h, v;
 
   const bool can_print        = isMediaInserted() && !jobRunningFromMedia();
-  const bool sdOrHostPrinting = ExtUI::jobRunning();
+  const bool sdOrHostCutting = ExtUI::jobRunning();
   const bool sdOrHostPaused   = ExtUI::jobRunningPaused();
 
   CommandProcessor cmd;
@@ -200,10 +200,10 @@ void StatusScreen::draw_buttons(draw_mode_t what) {
   cmd.tag(4).button(x, y, h, v, GET_TEXT_F(MSG_BUTTON_MENU));
 
   ui.bounds(POLY(pause_btn), x, y, h, v);
-  cmd.tag(sdOrHostPaused ? 6 : 5).enabled(sdOrHostPrinting).button(x, y, h, v, sdOrHostPaused ? GET_TEXT_F(MSG_BUTTON_RESUME) : GET_TEXT_F(MSG_BUTTON_PAUSE));
+  cmd.tag(sdOrHostPaused ? 6 : 5).enabled(sdOrHostCutting).button(x, y, h, v, sdOrHostPaused ? GET_TEXT_F(MSG_BUTTON_RESUME) : GET_TEXT_F(MSG_BUTTON_PAUSE));
 
   ui.bounds(POLY(stop_btn), x, y, h, v);
-  cmd.tag(7).enabled(sdOrHostPrinting).button(x, y, h, v, GET_TEXT_F(MSG_BUTTON_STOP));
+  cmd.tag(7).enabled(sdOrHostCutting).button(x, y, h, v, GET_TEXT_F(MSG_BUTTON_STOP));
 
   ui.bounds(POLY(extrude_btn), x, y, h, v);
   cmd.tag(8).button(x, y, h, v, GET_TEXT_F(MSG_EXTRUDE));

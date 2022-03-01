@@ -1195,7 +1195,7 @@ void Popup_window_PauseOrStop() {
   Draw_Select_Highlight(true);
 }
 
-void Draw_Printing_Screen() {
+void Draw_Cutting_Screen() {
   const uint16_t y = 168;
   if (HMI_IsChinese()) {
     DWIN_Frame_TitleCopy(30, 1, 42, 14);              // "CNCing"
@@ -1236,7 +1236,7 @@ void Goto_PrintProcess() {
   checkkey = CNCProcess;
 
   Clear_Main_Window();
-  Draw_Printing_Screen();
+  Draw_Cutting_Screen();
 
   ICON_Tune();
   ICON_ResumeOrPause();
@@ -2278,7 +2278,7 @@ void HMI_SelectFile() {
 }
 
 // CNCing
-void HMI_Printing() {
+void HMI_Cutting() {
   EncoderState encoder_diffState = get_encoder_state();
   if (encoder_diffState == ENCODER_DIFF_NO) return;
 
@@ -3100,7 +3100,7 @@ void HMI_Temperature() {
           if (HMI_IsChinese()) {
             DWIN_Frame_TitleCopy(59, 16, 81, 14);                       // "PLA Settings"
             Item_AreaCopy(100, 89, 124, 101, PREHEAT_CASE_TEMP);
-            Item_AreaCopy(1, 134, 56, 146, PREHEAT_CASE_TEMP, 24);      // PLA nozzle temp
+            Item_AreaCopy(1, 134, 56, 146, PREHEAT_CASE_TEMP, 24);      // PLA tool temp
             #if HAS_HEATED_BED
               Item_AreaCopy(100, 89, 124, 101, PREHEAT_CASE_BED);
               Item_AreaCopy(58, 134, 113, 146, PREHEAT_CASE_BED, 24);   // PLA bed temp
@@ -3180,7 +3180,7 @@ void HMI_Temperature() {
             DWIN_Frame_TitleCopy(142, 16, 82, 14);                        // "ABS Settings"
 
             Item_AreaCopy(180, 89, 204, 100, PREHEAT_CASE_TEMP);
-            Item_AreaCopy(1, 134, 56, 146, PREHEAT_CASE_TEMP, 24);        // ABS nozzle temp
+            Item_AreaCopy(1, 134, 56, 146, PREHEAT_CASE_TEMP, 24);        // ABS tool temp
             #if HAS_HEATED_BED
               Item_AreaCopy(180, 89, 204, 100, PREHEAT_CASE_BED);
               Item_AreaCopy(58, 134, 113, 146, PREHEAT_CASE_BED, 24);     // ABS bed temp
@@ -4231,7 +4231,7 @@ void DWIN_HandleScreen() {
     case Prepare:         HMI_Prepare(); break;
     case Control:         HMI_Control(); break;
     case Leveling:        break;
-    case CNCProcess:    HMI_Printing(); break;
+    case CNCProcess:    HMI_Cutting(); break;
     case CNC_window:    HMI_PauseOrStop(); break;
     case AxisMove:        HMI_AxisMove(); break;
     case TemperatureID:   HMI_Temperature(); break;

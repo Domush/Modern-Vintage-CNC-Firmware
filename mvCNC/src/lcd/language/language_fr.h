@@ -344,7 +344,7 @@ namespace Language_fr {
   LSTR MSG_PAUSE_PRINT                    = _UxGT("Pause impression");
   LSTR MSG_RESUME_PRINT                   = _UxGT("Reprendre impr.");
   LSTR MSG_STOP_PRINT                     = _UxGT("Arrêter impr.");
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("Impression objet");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("Impression objet");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Annuler objet");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Annuler objet =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Récup. coup.");
@@ -353,7 +353,7 @@ namespace Language_fr {
   LSTR MSG_DWELL                          = _UxGT("Repos...");
   LSTR MSG_USERWAIT                       = _UxGT("Attente utilis.");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Impr. en pause");
-  LSTR MSG_PRINTING                       = _UxGT("Impression");
+  LSTR MSG_CUTTING                       = _UxGT("Impression");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Impr. annulée");
   LSTR MSG_NO_MOVE                        = _UxGT("Moteurs bloqués");
   LSTR MSG_KILLED                         = _UxGT("KILLED");
@@ -473,7 +473,7 @@ namespace Language_fr {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Stats. imprimante");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Infos carte");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Thermistances");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Extrudeurs");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Extrudeurs");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Bauds");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protocole");
   LSTR MSG_INFO_RUNAWAY_OFF               = _UxGT("Protection inactive");

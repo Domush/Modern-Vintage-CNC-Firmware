@@ -56,12 +56,12 @@ extern const char M23_STR[], M24_STR[];
 typedef struct {
   bool saving:1,
        logging:1,
-       sdprinting:1,
-       sdprintdone:1,
+       sdjob:1,
+       sdjobdone:1,
        mounted:1,
        filenameIsDir:1,
        workDirIsRoot:1,
-       abort_sd_printing:1
+       abort_sd_job_running:1
        #if ENABLED(BINARY_FILE_TRANSFER)
          , binary_mode:1
        #endif
@@ -141,23 +141,23 @@ public:
   static void getAbsFilenameInCWD(char *dst);
   static void printSelectedFilename();
   static void openAndPrintFile(const char *name);   // (working directory or full path)
-  static void startOrResumeFilePrinting();
+  static void startOrResumeFileCutting();
   static void endFilePrintNow(TERN_(SD_RESORT, const bool re_sort=false));
   static void abortFilePrintNow(TERN_(SD_RESORT, const bool re_sort=false));
   static void fileHasFinished();
-  static void abortFilePrintSoon() { flag.abort_sd_printing = isFileOpen(); }
-  static void pauseSDPrint()       { flag.sdprinting = false; }
-  static bool jobRunning()         { return flag.sdprinting; }
+  static void abortFilePrintSoon() { flag.abort_sd_job_running = isFileOpen(); }
+  static void pauseSDJob()       { flag.sdjob = false; }
+  static bool jobRunning()         { return flag.sdjob; }
   static bool isPaused()           { return isFileOpen() && !jobRunning(); }
-  #if HAS_PRINT_PROGRESS_PERMYRIAD
+  #if HAS_JOB_PROGRESS_PERMYRIAD
     static uint16_t permyriadDone() {
-      if (flag.sdprintdone) return 10000;
+      if (flag.sdjobdone) return 10000;
       if (isFileOpen() && filesize) return sdpos / ((filesize + 9999) / 10000);
       return 0;
     }
   #endif
   static uint8_t percentDone() {
-    if (flag.sdprintdone) return 100;
+    if (flag.sdjobdone) return 100;
     if (isFileOpen() && filesize) return sdpos / ((filesize + 99) / 100);
     return 0;
   }
@@ -344,8 +344,8 @@ private:
   #define IS_SD_INSERTED() true
 #endif
 
-#define IS_SD_PRINTING()  (card.flag.sdprinting && !card.flag.abort_sd_printing)
-#define IS_SD_FETCHING()  (!card.flag.sdprintdone && IS_SD_PRINTING())
+#define IS_SD_JOB_RUNNING()  (card.flag.sdjob && !card.flag.abort_sd_job_running)
+#define IS_SD_FETCHING()  (!card.flag.sdjobdone && IS_SD_JOB_RUNNING())
 #define IS_SD_PAUSED()    card.isPaused()
 #define IS_SD_FILE_OPEN() card.isFileOpen()
 
@@ -353,7 +353,7 @@ extern CardReader card;
 
 #else // !SDSUPPORT
 
-#define IS_SD_PRINTING()  false
+#define IS_SD_JOB_RUNNING()  false
 #define IS_SD_FETCHING()  false
 #define IS_SD_PAUSED()    false
 #define IS_SD_FILE_OPEN() false

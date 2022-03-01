@@ -50,7 +50,7 @@ void GcodeSuite::M1001() {
   planner.synchronize();
 
   // SD CNCing is finished when the queue reaches M1001
-  card.flag.sdprinting = card.flag.sdprintdone = false;
+  card.flag.sdjob = card.flag.sdjobdone = false;
 
   // If there's another auto#.g file to run...
   if (TERN(NO_SD_AUTOSTART, false, card.autofile_check())) return;

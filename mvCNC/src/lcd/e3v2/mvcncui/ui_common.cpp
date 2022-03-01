@@ -31,7 +31,7 @@
   #include "../../../feature/bedlevel/bedlevel.h"
 #endif
 
-// DWIN printing specifies the font on each string operation
+// DWIN cutting specifies the font on each string operation
 // but we'll make the font modal for mvCNC
 dwin_font_t dwin_font = { font8x16, 8, 16, Color_White, Color_Bg_Black, true };
 void mvCNCUI::set_font(const uint8_t font_nr) {
@@ -243,17 +243,17 @@ void mvCNCUI::draw_status_message(const bool blink) {
 
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
 
-    void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t extruder) {
+    void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t atc_tool) {
 
       dwin_font.solid = false;
       dwin_font.fg = Color_White;
       dwin_string.set("E");
-      dwin_string.add('1' + extruder);
+      dwin_string.add('1' + atc_tool);
       dwin_string.add(' ');
-      dwin_string.add(i16tostr3rj(fanManager.degHotend(extruder)));
+      dwin_string.add(i16tostr3rj(fanManager.degHotend(atc_tool)));
       dwin_string.add('/');
-      if (get_blink() || !fanManager.heater_idle[fanManager.idle_index_for_id(extruder)].timed_out)
-        dwin_string.add(i16tostr3rj(fanManager.degTargetHotend(extruder)));
+      if (get_blink() || !fanManager.heater_idle[fanManager.idle_index_for_id(atc_tool)].timed_out)
+        dwin_string.add(i16tostr3rj(fanManager.degTargetHotend(atc_tool)));
       else
         dwin_string.add(PSTR("    "));
 
@@ -547,12 +547,12 @@ void mvCNCUI::draw_status_message(const bool blink) {
       const int rot_up = TERN(OVERLAY_GFX_REVERSE, ICON_RotateCCW, ICON_RotateCW),
               rot_down = TERN(OVERLAY_GFX_REVERSE, ICON_RotateCW, ICON_RotateCCW);
 
-      const int nozzle = (LCD_PIXEL_WIDTH / 2) - 20;
+      const int tool = (LCD_PIXEL_WIDTH / 2) - 20;
 
-      // Draw a representation of the nozzle
-      DWIN_Draw_Box(1, Color_Bg_Black, nozzle + 3, 8, 48, 52); // 'clear' the area where the nozzle is drawn in case it was moved up/down
-      DWIN_ICON_Show(ICON, ICON_HotendOff, nozzle + 3, 10 - dir);
-      DWIN_ICON_Show(ICON, ICON_BedLine, nozzle, 10 + 36);
+      // Draw a representation of the tool
+      DWIN_Draw_Box(1, Color_Bg_Black, tool + 3, 8, 48, 52); // 'clear' the area where the tool is drawn in case it was moved up/down
+      DWIN_ICON_Show(ICON, ICON_HotendOff, tool + 3, 10 - dir);
+      DWIN_ICON_Show(ICON, ICON_BedLine, tool, 10 + 36);
 
       // Draw cw/ccw indicator and up/down arrows
       const int arrow_y = LCD_PIXEL_HEIGHT / 2 - 24;

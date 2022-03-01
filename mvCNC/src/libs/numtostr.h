@@ -21,7 +21,7 @@ const char* ui8tostr3rj(const uint8_t i);
 // Convert int8_t to string with 123 format
 const char* i8tostr3rj(const int8_t x);
 
-#if HAS_PRINT_PROGRESS_PERMYRIAD
+#if HAS_JOB_PROGRESS_PERMYRIAD
   // Convert 16-bit unsigned permyriad value to percent: 100 / 23 / 23.4 / 3.45
   const char* permyriadtostr4(const uint16_t xx);
 #endif

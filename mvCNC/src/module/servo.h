@@ -13,8 +13,8 @@
 #if HAS_SERVO_ANGLES
 
   #if ENABLED(SWITCHING_EXTRUDER)
-    // Switching extruder can have 2 or 4 angles
-    #if EXTRUDERS > 3
+    // Switching ATC tool can have 2 or 4 angles
+    #if ATC_TOOLS > 3
       #define REQ_ANGLES 4
     #else
       #define REQ_ANGLES 2

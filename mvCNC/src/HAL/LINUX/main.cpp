@@ -48,7 +48,7 @@ void simulation_loop() {
   LinearAxis x_axis(X_ENABLE_PIN, X_DIR_PIN, X_STEP_PIN, X_MIN_PIN, X_MAX_PIN);
   LinearAxis y_axis(Y_ENABLE_PIN, Y_DIR_PIN, Y_STEP_PIN, Y_MIN_PIN, Y_MAX_PIN);
   LinearAxis z_axis(Z_ENABLE_PIN, Z_DIR_PIN, Z_STEP_PIN, Z_MIN_PIN, Z_MAX_PIN);
-  LinearAxis extruder0(E0_ENABLE_PIN, E0_DIR_PIN, E0_STEP_PIN, P_NC, P_NC);
+  LinearAxis atc_tool0(E0_ENABLE_PIN, E0_DIR_PIN, E0_STEP_PIN, P_NC, P_NC);
 
   #ifdef GPIO_LOGGING
     IOLoggerCSV logger("all_gpio_log.csv");
@@ -68,7 +68,7 @@ void simulation_loop() {
     x_axis.update();
     y_axis.update();
     z_axis.update();
-    extruder0.update();
+    atc_tool0.update();
 
     #ifdef GPIO_LOGGING
       if (x_axis.position != x || y_axis.position != y || z_axis.position != z) {

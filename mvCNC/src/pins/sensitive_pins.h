@@ -277,6 +277,8 @@
 //
 // For boards with Extruder driver slots, this will make those pins available to other axes
 //
+// Mixing stepper, Switching stepper, or regular stepper
+#define E_NEEDED(N) 0
 #define _E0_CS
 #define _E0_MS1
 #define _E0_MS2

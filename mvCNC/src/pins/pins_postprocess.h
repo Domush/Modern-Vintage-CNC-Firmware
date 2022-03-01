@@ -203,6 +203,30 @@
 #if !AXIS_HAS_SPI(K)
   #undef K_CS_PIN
 #endif
+#if E_STEPPERS && !AXIS_HAS_SPI(E0)
+  #undef E0_CS_PIN
+#endif
+#if E_STEPPERS > 1 && !AXIS_HAS_SPI(E1)
+  #undef E1_CS_PIN
+#endif
+#if E_STEPPERS > 2 && !AXIS_HAS_SPI(E2)
+  #undef E2_CS_PIN
+#endif
+#if E_STEPPERS > 3 && !AXIS_HAS_SPI(E3)
+  #undef E3_CS_PIN
+#endif
+#if E_STEPPERS > 4 && !AXIS_HAS_SPI(E4)
+  #undef E4_CS_PIN
+#endif
+#if E_STEPPERS > 5 && !AXIS_HAS_SPI(E5)
+  #undef E5_CS_PIN
+#endif
+#if E_STEPPERS > 6 && !AXIS_HAS_SPI(E6)
+  #undef E6_CS_PIN
+#endif
+#if E_STEPPERS > 7 && !AXIS_HAS_SPI(E7)
+  #undef E7_CS_PIN
+#endif
 
 #ifndef X_CS_PIN
   #define X_CS_PIN -1
@@ -547,7 +571,7 @@
   #define Y2_E_INDEX X2_E_INDEX
 #endif
 
-// The X2 axis, if any, should be the next open extruder port
+// The X2 axis, if any, should be the next open atc_tool port
 #if HAS_X2_STEPPER
   #ifndef X2_STEP_PIN
     #define X2_STEP_PIN   _EPIN(X2_E_INDEX, STEP)
@@ -636,7 +660,7 @@
   #define Z2_E_INDEX Y2_E_INDEX
 #endif
 
-// The Y2 axis, if any, should be the next open extruder port
+// The Y2 axis, if any, should be the next open atc_tool port
 #if ENABLED(Y_DUAL_STEPPER_DRIVERS)
   #ifndef Y2_STEP_PIN
     #define Y2_STEP_PIN   _EPIN(Y2_E_INDEX, STEP)
@@ -722,7 +746,7 @@
   #define Z3_E_INDEX Z2_E_INDEX
 #endif
 
-// The Z2 axis, if any, should be the next open extruder port
+// The Z2 axis, if any, should be the next open atc_tool port
 #if NUM_Z_STEPPER_DRIVERS >= 2
   #ifndef Z2_STEP_PIN
     #define Z2_STEP_PIN   _EPIN(Z2_E_INDEX, STEP)
@@ -808,7 +832,7 @@
   #define Z4_E_INDEX Z3_E_INDEX
 #endif
 
-// The Z3 axis, if any, should be the next open extruder port
+// The Z3 axis, if any, should be the next open atc_tool port
 #if NUM_Z_STEPPER_DRIVERS >= 3
   #ifndef Z3_STEP_PIN
     #define Z3_STEP_PIN   _EPIN(Z3_E_INDEX, STEP)
@@ -894,7 +918,7 @@
   #define I_E_INDEX Z4_E_INDEX
 #endif
 
-// The Z4 axis, if any, should be the next open extruder port
+// The Z4 axis, if any, should be the next open atc_tool port
 #if NUM_Z_STEPPER_DRIVERS >= 4
   #ifndef Z4_STEP_PIN
     #define Z4_STEP_PIN   _EPIN(Z4_E_INDEX, STEP)
@@ -980,7 +1004,7 @@
   #define J_E_INDEX I_E_INDEX
 #endif
 
-// The I axis, if any, should be the next open extruder port
+// The I axis, if any, should be the next open atc_tool port
 #if HAS_I_AXIS
   #ifndef I_STEP_PIN
     #define I_STEP_PIN   _EPIN(I_E_INDEX, STEP)
@@ -1066,7 +1090,7 @@
   #define K_E_INDEX J_E_INDEX
 #endif
 
-// The J axis, if any, should be the next open extruder port
+// The J axis, if any, should be the next open atc_tool port
 #if HAS_J_AXIS
   #ifndef J_STEP_PIN
     #define J_STEP_PIN   _EPIN(J_E_INDEX, STEP)
@@ -1146,7 +1170,7 @@
   #define J_MS3_PIN -1
 #endif
 
-// The K axis, if any, should be the next open extruder port
+// The K axis, if any, should be the next open atc_tool port
 #if HAS_K_AXIS
   #ifndef K_STEP_PIN
     #define K_STEP_PIN   _EPIN(K_E_INDEX, STEP)

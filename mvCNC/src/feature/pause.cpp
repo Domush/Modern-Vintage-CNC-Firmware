@@ -56,7 +56,7 @@ static xyze_pos_t resume_position;
   PauseMode pause_mode = PAUSE_MODE_PAUSE_PRINT;
 #endif
 
-fil_change_settings_t fc_settings[EXTRUDERS];
+fil_change_settings_t fc_settings[ATC_TOOLS];
 
 #if ENABLED(SDSUPPORT)
   #include "../sd/cardreader.h"
@@ -125,7 +125,7 @@ bool change_bit(const_float_t slow_load_length/*=0*/, const_float_t fast_load_le
     TERN_(EXTENSIBLE_UI, ExtUI::onUserConfirmRequired(F("Change Bit")));
 
     #if ENABLED(HOST_PROMPT_SUPPORT)
-      const char tool = '0' + TERN0(MULTI_FILAMENT_SENSOR, active_extruder);
+      const char tool = '0' + TERN0(MULTI_FILAMENT_SENSOR, active_tool);
       hostui.prompt_do(PROMPT_USER_CONTINUE, F("Change Bit T"), tool, FPSTR(CONTINUE_STR));
     #endif
 
@@ -154,7 +154,7 @@ bool change_bit(const_float_t slow_load_length/*=0*/, const_float_t fast_load_le
  * - Abort if TARGET temperature is too low
  * - Display "wait for start of filament change" (if a length was specified)
  * - Initial retract, if current temperature is hot enough
- * - Park the nozzle at the given position
+ * - Park the tool at the given position
  * - Call unload_filament (if a length was specified)
  *
  * Return 'true' if pause was completed, 'false' for abort
@@ -184,9 +184,9 @@ bool pause_print(const_float_t retract, const xyz_pos_t &park_point, const bool 
 
   // Pause the CNC job and timer
   #if ENABLED(SDSUPPORT)
-    const bool was_sd_printing = IS_SD_PRINTING();
-    if (was_sd_printing) {
-      card.pauseSDPrint();
+    const bool was_sd_job_running = IS_SD_JOB_RUNNING();
+    if (was_sd_job_running) {
+      card.pauseSDJob();
       ++did_pause_print; // Indicate SD pause also
     }
   #endif
@@ -196,13 +196,13 @@ bool pause_print(const_float_t retract, const xyz_pos_t &park_point, const bool 
   // Save current position
   resume_position = current_position;
 
-  // Will the nozzle be parking?
+  // Will the tool be parking?
   const bool do_park = !axes_should_home();
 
   #if ENABLED(POWER_LOSS_RECOVERY)
     // Save PLR info in case the power goes out while parked
-    const float park_raise = do_park ? nozzle.park_mode_0_height(park_point.z) - current_position.z : POWER_LOSS_ZRAISE;
-    if (was_sd_printing && recovery.enabled) recovery.save(true, park_raise, do_park);
+    const float park_raise = do_park ? tool.park_mode_0_height(park_point.z) - current_position.z : POWER_LOSS_ZRAISE;
+    if (was_sd_job_running && recovery.enabled) recovery.save(true, park_raise, do_park);
   #endif
 
   // Wait for buffered blocks to complete
@@ -212,12 +212,12 @@ bool pause_print(const_float_t retract, const xyz_pos_t &park_point, const bool 
     fanManager.fanPause(true);
   #endif
 
-  // If axes don't need to home then the nozzle can park
-  if (do_park) nozzle.park(0, park_point); // Park the nozzle by doing a Minimum Z Raise followed by an XY Move
+  // If axes don't need to home then the tool can park
+  if (do_park) tool.park(0, park_point); // Park the tool by doing a Minimum Z Raise followed by an XY Move
 
   #if ENABLED(DUAL_X_CARRIAGE)
-    const int8_t saved_ext        = active_extruder;
-    const bool saved_ext_dup_mode = extruder_duplication_enabled;
+    const int8_t saved_ext        = active_tool;
+    const bool saved_ext_dup_mode = atc_tool_duplication_enabled;
     set_duplication_enabled(false, DXC_ext);
   #endif
 
@@ -259,8 +259,8 @@ void wait_for_confirmation(const bool is_reload/*=false*/, const int8_t max_beep
   first_impatient_beep(max_beep_count);
 
   #if ENABLED(DUAL_X_CARRIAGE)
-    const int8_t saved_ext        = active_extruder;
-    const bool saved_ext_dup_mode = extruder_duplication_enabled;
+    const int8_t saved_ext        = active_tool;
+    const bool saved_ext_dup_mode = atc_tool_duplication_enabled;
     set_duplication_enabled(false, DXC_ext);
   #endif
 
@@ -285,13 +285,13 @@ void wait_for_confirmation(const bool is_reload/*=false*/, const int8_t max_beep
  * - If not paused, do nothing and return
  * - Reset heater idle timers
  * - Load filament if specified, but only if:
- *   - a nozzle timed out, or
- *   - the nozzle is already heated.
+ *   - a tool timed out, or
+ *   - the tool is already heated.
  * - Display "wait for print to resume"
  * - Retract to prevent oozing
- * - Move the nozzle back to resume_position
+ * - Move the tool back to resume_position
  * - Unretract
- * - Re-prime the nozzle...
+ * - Re-prime the tool...
  *   -  FWRETRACT: Recover/prime from the prior G10.
  *   - !FWRETRACT: Retract by resume_position.e, if negative.
  *                 Not sure how this logic comes into use.
@@ -306,8 +306,8 @@ void resume_print(const_float_t slow_load_length/*=0*/, const_float_t fast_load_
   /*
   SERIAL_ECHOLNPGM(
     "start of resume_print()\ndual_x_carriage_mode:", dual_x_carriage_mode,
-    "\nextruder_duplication_enabled:", extruder_duplication_enabled,
-    "\nactive_extruder:", active_extruder,
+    "\natc_tool_duplication_enabled:", atc_tool_duplication_enabled,
+    "\nactive_tool:", active_tool,
     "\n"
   );
   //*/
@@ -349,7 +349,7 @@ void resume_print(const_float_t slow_load_length/*=0*/, const_float_t fast_load_
   #if ENABLED(SDSUPPORT)
     if (did_pause_print) {
       --did_pause_print;
-      card.startOrResumeFilePrinting();
+      card.startOrResumeFileCutting();
       // Write PLR now to update the z axis value
       TERN_(POWER_LOSS_RECOVERY, if (recovery.enabled) recovery.save(true));
     }

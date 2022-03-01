@@ -102,9 +102,9 @@
 // Tools
 
 //#define TOOL_0_PIN                          56
-//#define TOOL_0_PWM_PIN                      10  // red warning led at dual extruder
+//#define TOOL_0_PWM_PIN                      10  // red warning led at dual atc_tool
 //#define TOOL_1_PIN                          59
-//#define TOOL_1_PWM_PIN                       8  // lights at dual extruder
+//#define TOOL_1_PWM_PIN                       8  // lights at dual atc_tool
 //#define TOOL_2_PIN                           4
 //#define TOOL_2_PWM_PIN                       5
 //#define TOOL_3_PIN                          14

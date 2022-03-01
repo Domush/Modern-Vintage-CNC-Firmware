@@ -87,7 +87,7 @@ namespace Language_vi {
   LSTR MSG_IDEX_MODE_DUPLICATE            = _UxGT("Sự gấp đôi");                           // Duplication
   LSTR MSG_IDEX_MODE_SCALED_COPY          = _UxGT("Bản sao thu nhỏ");
   LSTR MSG_IDEX_MODE_FULL_CTRL            = _UxGT("Toàn quyền điều khiển");                // Full control
-  LSTR MSG_IDEX_X_OFFSET                  = _UxGT("Đầu phun X nhì");                       // 2nd nozzle X
+  LSTR MSG_IDEX_X_OFFSET                  = _UxGT("Đầu phun X nhì");                       // 2nd tool X
   LSTR MSG_IDEX_Y_OFFSET                  = _UxGT("Đầu phun Y nhì");
   LSTR MSG_IDEX_Z_OFFSET                  = _UxGT("Đầu phun Z nhì");
   LSTR MSG_IDEX_SAVE_OFFSETS              = _UxGT("Lưu bù đắp");                           // Save offsets
@@ -279,7 +279,7 @@ namespace Language_vi {
   LSTR MSG_DWELL                          = _UxGT("Ngủ...");                               // Sleep
   LSTR MSG_USERWAIT                       = _UxGT("Nhấn để tiếp tục...");                  // Click to resume (same as 'continue')
   LSTR MSG_PRINT_PAUSED                   = _UxGT("In tạm dừng");                          // print paused
-  LSTR MSG_PRINTING                       = _UxGT("Đang in...");                           // printing
+  LSTR MSG_CUTTING                       = _UxGT("Đang in...");                           // cutting
   LSTR MSG_PRINT_ABORTED                  = _UxGT("In đã hủy bỏ");                         // Print aborted
   LSTR MSG_NO_MOVE                        = _UxGT("Không di chuyển.");                     // No move.
   LSTR MSG_KILLED                         = _UxGT("ĐÃ CHẾT. ");
@@ -360,7 +360,7 @@ namespace Language_vi {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Thống Kê Máy In");                      // CNC Stats
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Thông Tin Bo Mạch");                    // Board Info
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Điện Trở Nhiệt");                       // Thermistors
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Máy đùn");                              // Extruders
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Máy đùn");                              // Extruders
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Baud");                                 // Baud
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Giao Thức");                            // Protocol
   LSTR MSG_CASE_LIGHT                     = _UxGT("Đèn Khuông");                           // Case light
@@ -409,7 +409,7 @@ namespace Language_vi {
     LSTR MSG_ADVANCED_PAUSE_WAITING       = _UxGT(MSG_2_LINE("Nhấn nút", "để tiếp tục in")); // Press button to resume print
     LSTR MSG_FILAMENT_CHANGE_INIT         = _UxGT(MSG_3_LINE("Chờ cho sự", "thay đổi dây nhựa", "bắt đầu")); // wait for filament change to start
     LSTR MSG_FILAMENT_CHANGE_INSERT       = _UxGT(MSG_3_LINE("Đút dây nhựa vào", "và nhấn nút", "để tiếp tục")); // insert filament and press button to continue                       //
-    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Nhấn nút", "để làm nóng đầu phun")); // Press button to heat nozzle
+    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Nhấn nút", "để làm nóng đầu phun")); // Press button to heat tool
     LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("Đầu phun đang nóng lên", "Xin chờ...")); // Spindle heating Please wait
     LSTR MSG_FILAMENT_CHANGE_UNLOAD       = _UxGT(MSG_2_LINE("Chờ tro", "dây nhựa ra"));   // Wait for filament unload
     LSTR MSG_FILAMENT_CHANGE_LOAD         = _UxGT(MSG_2_LINE("Chờ tro", "dây nhựa vào"));  // Wait for filament load

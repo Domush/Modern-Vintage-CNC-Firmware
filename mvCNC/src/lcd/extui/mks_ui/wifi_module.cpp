@@ -950,7 +950,7 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
               start_print_time();
               preview_gcode_prehandle(list_file.file_name[sel_id]);
               uiCfg.print_state = WORKING;
-              lv_draw_printing();
+              lv_draw_cutting();
 
               #if ENABLED(SDSUPPORT)
                 if (!gcode_preview_over) {
@@ -970,7 +970,7 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
                   if (card.isFileOpen()) {
                     //saved_feedrate_percentage = feedrate_percentage;
                     feedrate_percentage = 100;
-                    card.startOrResumeFilePrinting();
+                    card.startOrResumeFileCutting();
                     TERN_(POWER_LOSS_RECOVERY, recovery.prepare());
                     once_flag = false;
                   }
@@ -986,9 +986,9 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
                 flash_preview_begin = true;
               else
                 default_preview_flg = true;
-              lv_draw_printing();
+              lv_draw_cutting();
             }
-            else if (uiCfg.print_state == REPRINTING) {
+            else if (uiCfg.print_state == RECUTTING) {
               uiCfg.print_state = REPRINTED;
               clear_cur_ui();
               start_print_time();
@@ -996,7 +996,7 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
                 flash_preview_begin = true;
               else
                 default_preview_flg = true;
-              lv_draw_printing();
+              lv_draw_cutting();
             }
           }
           SEND_OK_TO_WIFI;
@@ -1010,21 +1010,21 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
             clear_cur_ui();
 
             #if ENABLED(SDSUPPORT)
-              card.pauseSDPrint();
+              card.pauseSDJob();
               uiCfg.print_state = PAUSING;
             #endif
             if (gCfgItems.from_flash_pic)
               flash_preview_begin = true;
             else
               default_preview_flg = true;
-            lv_draw_printing();
+            lv_draw_cutting();
             SEND_OK_TO_WIFI;
           }
           break;
 
         case 26:
           // Stop print file
-          if ((uiCfg.print_state == WORKING) || (uiCfg.print_state == PAUSED) || (uiCfg.print_state == REPRINTING)) {
+          if ((uiCfg.print_state == WORKING) || (uiCfg.print_state == PAUSED) || (uiCfg.print_state == RECUTTING)) {
             stop_print_time();
 
             clear_cur_ui();
@@ -1041,7 +1041,7 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
 
         case 27:
           // Report print rate
-          if ((uiCfg.print_state == WORKING) || (uiCfg.print_state == PAUSED)|| (uiCfg.print_state == REPRINTING)) {
+          if ((uiCfg.print_state == WORKING) || (uiCfg.print_state == PAUSED)|| (uiCfg.print_state == RECUTTING)) {
             print_rate = uiCfg.totalSend;
             ZERO(tempBuf);
             sprintf_P((char *)tempBuf, PSTR("M27 %d\r\n"), print_rate);
@@ -1172,13 +1172,13 @@ static void wifi_gcode_exec(uint8_t *cmd_line) {
           }
           else if (uiCfg.print_state == WORKING) {
             wifi_ret_ack();
-            send_to_wifi((uint8_t *)"M997 PRINTING\r\n", strlen("M997 PRINTING\r\n"));
+            send_to_wifi((uint8_t *)"M997 CUTTING\r\n", strlen("M997 CUTTING\r\n"));
           }
           else if (uiCfg.print_state == PAUSED) {
             wifi_ret_ack();
             send_to_wifi((uint8_t *)"M997 PAUSE\r\n", strlen("M997 PAUSE\r\n"));
           }
-          else if (uiCfg.print_state == REPRINTING) {
+          else if (uiCfg.print_state == RECUTTING) {
             wifi_ret_ack();
             send_to_wifi((uint8_t *)"M997 PAUSE\r\n", strlen("M997 PAUSE\r\n"));
           }

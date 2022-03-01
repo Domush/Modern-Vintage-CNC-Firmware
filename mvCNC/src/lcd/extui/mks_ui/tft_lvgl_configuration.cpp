@@ -214,7 +214,7 @@ void tft_lvgl_init() {
       else
         default_preview_flg = true;
 
-      uiCfg.print_state = REPRINTING;
+      uiCfg.print_state = RECUTTING;
 
       #if ENABLED(LONG_FILENAME_HOST_SUPPORT)
         strncpy(public_buf_m, recovery.info.sd_filename, sizeof(public_buf_m));
@@ -223,7 +223,7 @@ void tft_lvgl_init() {
       #else
         strncpy(list_file.long_name[sel_id], recovery.info.sd_filename, sizeof(list_file.long_name[0]));
       #endif
-      lv_draw_printing();
+      lv_draw_cutting();
     }
   #endif
 

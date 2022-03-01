@@ -186,7 +186,7 @@ namespace Language_jp_kana {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("プリントジョウキョウ");              // "CNC Stats"
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("セイギョケイジョウホウ");            // "Board Info"
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("サーミスター");                   // "Thermistors"
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("エクストルーダースウ");             // "Extruders"
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("エクストルーダースウ");             // "Extruders"
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("ボーレート");                    // "Baud"
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("プロトコル");                    // "Protocol"
   LSTR MSG_CASE_LIGHT                     = _UxGT("キョウタイナイショウメイ");       // "Case light"
@@ -237,5 +237,5 @@ namespace Language_jp_kana {
   LSTR MSG_STEPS_PER_MM                   = _UxGT("ステップ/mm");
   LSTR MSG_CUSTOM_COMMANDS                = _UxGT("ユーザーコマンド");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("プリントガイチジテイシサレマシタ");
-  LSTR MSG_PRINTING                       = _UxGT("プリントチュウ...");
+  LSTR MSG_CUTTING                       = _UxGT("プリントチュウ...");
 }

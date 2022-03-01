@@ -10,7 +10,7 @@
 #include "../../module/probe.h"
 
 /**
- * M851: Set the nozzle-to-probe offsets in current units
+ * M851: Set the tool-to-probe offsets in current units
  */
 void GcodeSuite::M851() {
   // No parameters? Show current state.

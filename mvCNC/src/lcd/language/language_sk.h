@@ -20,7 +20,7 @@
  *   = displays  '0'....'10' for indexes 0 - 10
  *   ~ displays  '1'....'11' for indexes 0 - 10
  *   * displays 'E1'...'E11' for indexes 0 - 10 (By default. Uses LCD_FIRST_TOOL)
- *   @ displays an axis name such as XYZUVW, or E for an extruder
+ *   @ displays an axis name such as XYZUVW, or E for an ATC tool
  */
 #define DISPLAY_CHARSET_ISO10646_SK
 
@@ -424,7 +424,7 @@ namespace Language_sk {
   LSTR MSG_HOST_START_PRINT               = _UxGT("Spustiť z hosta");
   LSTR MSG_STOP_PRINT                     = _UxGT("Zastaviť tlač");
   LSTR MSG_END_LOOPS                      = _UxGT("Koniec opak. sluč.");
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("Tlačím objekt");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("Tlačím objekt");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Zrušiť objekt");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Zrušiť objekt =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Obnova po výp. nap.");
@@ -434,7 +434,7 @@ namespace Language_sk {
   LSTR MSG_DWELL                          = _UxGT("Spím...");
   LSTR MSG_USERWAIT                       = _UxGT("Pokrač. kliknutím...");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Tlač pozastavená");
-  LSTR MSG_PRINTING                       = _UxGT("Tlačím...");
+  LSTR MSG_CUTTING                       = _UxGT("Tlačím...");
   LSTR MSG_STOPPING                       = _UxGT("Zastavujem...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Tlač zrušená");
   LSTR MSG_PRINT_DONE                     = _UxGT("Tlač dokončená");
@@ -465,7 +465,7 @@ namespace Language_sk {
   LSTR MSG_TOOL_MIGRATION_OFF             = _UxGT("Auto-Vyp");
   LSTR MSG_TOOL_MIGRATION                 = _UxGT("Výmena nástroja");
   LSTR MSG_TOOL_MIGRATION_AUTO            = _UxGT("Auto-výmena");
-  LSTR MSG_TOOL_MIGRATION_END             = _UxGT("Posl. extruder");
+  LSTR MSG_TOOL_MIGRATION_END             = _UxGT("Posl. atc_tool");
   LSTR MSG_TOOL_MIGRATION_SWAP            = _UxGT("Vymeniť za *");
   LSTR MSG_FILAMENTCHANGE                 = _UxGT("Vymeniť filament");
   LSTR MSG_FILAMENTCHANGE_E               = _UxGT("Vymeniť filament *");
@@ -561,7 +561,7 @@ namespace Language_sk {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Štatistika");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Info. o doske");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistory");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Extrudéry");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Extrudéry");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Rýchlosť");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protokol");
   LSTR MSG_INFO_RUNAWAY_OFF               = _UxGT("Tepl. ochrana: VYP");

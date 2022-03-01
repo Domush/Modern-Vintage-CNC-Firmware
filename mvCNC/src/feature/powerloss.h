@@ -53,11 +53,11 @@ typedef struct {
     xyz_pos_t position_shift;
   #endif
   #if TOOL_CHANGE_SUPPORT
-    uint8_t active_extruder;
+    uint8_t active_tool;
   #endif
 
   #if ENABLED(USE_VOLUMETRICS)
-    float filament_size[EXTRUDERS];
+    float filament_size[ATC_TOOLS];
   #endif
 
   #if HAS_HOTEND
@@ -75,10 +75,10 @@ typedef struct {
   #endif
 
   #if ENABLED(FWRETRACT)
-    float retract[EXTRUDERS], retract_hop;
+    float retract[ATC_TOOLS], retract_hop;
   #endif
 
-  // Mixing extruder and gradient
+  // Mixing atc_tool and gradient
   #if ENABLED(MIXING_EXTRUDER)
     //uint_fast8_t selected_vtool;
     //mixer_comp_t color[NR_MIXING_VIRTUAL_TOOLS][MIXING_STEPPERS];

@@ -80,7 +80,7 @@ namespace Language_ko_KR {
   LSTR MSG_NO_MEDIA                       = _UxGT("SD 카드없음");
   LSTR MSG_DWELL                          = _UxGT("슬립모드...");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("일시 정지됨");
-  LSTR MSG_PRINTING                       = _UxGT("출력중...");
+  LSTR MSG_CUTTING                       = _UxGT("출력중...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("취소됨");
   LSTR MSG_KILLED                         = _UxGT("죽음. ");
   LSTR MSG_STOPPED                        = _UxGT("멈춤. ");

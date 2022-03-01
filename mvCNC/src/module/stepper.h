@@ -227,7 +227,7 @@ typedef struct {
     };
   };
   constexpr ena_mask_t linear_bits() { return _BV(LINEAR_AXES) - 1; }
-  constexpr ena_mask_t e_bits() { return (_BV(EXTRUDERS) - 1) << LINEAR_AXES; }
+  constexpr ena_mask_t e_bits() { return (_BV(ATC_TOOLS) - 1) << LINEAR_AXES; }
 } axis_flags_t;
 
 // All the stepper enable pins
@@ -235,7 +235,7 @@ constexpr pin_t ena_pins[] = {
   LINEAR_AXIS_LIST(X_ENABLE_PIN, Y_ENABLE_PIN, Z_ENABLE_PIN, I_ENABLE_PIN, J_ENABLE_PIN, K_ENABLE_PIN),
 };
 
-// Index of the axis or extruder element in a combined array
+// Index of the axis or ATC tool element in a combined array
 constexpr uint8_t index_of_axis(const AxisEnum axis E_OPTARG(const uint8_t eindex=0)) {
   return uint8_t(axis) + (E_TERN0(axis < LINEAR_AXES ? 0 : eindex));
 }
@@ -252,7 +252,7 @@ constexpr ena_mask_t ena_same(const uint8_t a, const uint8_t b) {
   return ena_pins[a] == ena_pins[b] ? _BV(b) : 0;
 }
 
-// Recursively get the enable overlaps mask for a given linear axis or extruder
+// Recursively get the enable overlaps mask for a given linear axis or ATC tool
 constexpr ena_mask_t ena_overlap(const uint8_t a=0, const uint8_t b=0) {
   return b >= ENABLE_COUNT ? 0 : (a == b ? 0 : ena_same(a, b)) | ena_overlap(a, b + 1);
 }
@@ -263,7 +263,7 @@ constexpr bool any_enable_overlap(const uint8_t a=0) {
 }
 
 // Array of axes that overlap with each
-// TODO: Consider cases where >=2 steppers are used by a linear axis or extruder
+// TODO: Consider cases where >=2 steppers are used by a linear axis or ATC tool
 //       (e.g., CoreXY, Dual XYZ, or E with multiple steppers, etc.).
 constexpr ena_mask_t enable_overlap[] = {
 #define _OVERLAP(N) ena_overlap(INDEX_OF_AXIS(AxisEnum(N))),
@@ -299,11 +299,11 @@ class Stepper {
       static uint32_t motor_current_setting[MOTOR_CURRENT_COUNT]; // Initialized by settings.load()
     #endif
 
-    // Last-moved extruder, as set when the last movement was fetched from planner
+    // Last-moved ATC tool, as set when the last movement was fetched from planner
     #if TOOL_CHANGE_SUPPORT
-      static uint8_t last_moved_extruder;
+      static uint8_t last_moved_atc_tool;
     #else
-      static constexpr uint8_t last_moved_extruder = 0;
+      static constexpr uint8_t last_moved_atc_tool = 0;
     #endif
 
     #if HAS_FREEZE_PIN
@@ -355,9 +355,9 @@ class Stepper {
                     step_event_count;       // The total event count for the current block
 
     #if EITHER(TOOL_CHANGE_SUPPORT, MIXING_EXTRUDER)
-      static uint8_t stepper_extruder;
+      static uint8_t stepper_atc_tool;
     #else
-      static constexpr uint8_t stepper_extruder = 0;
+      static constexpr uint8_t stepper_atc_tool = 0;
     #endif
 
     #if ENABLED(S_CURVE_ACCELERATION)
@@ -575,13 +575,13 @@ class Stepper {
     static void enable_axis(const AxisEnum axis);
     static bool disable_axis(const AxisEnum axis);
 
-      static void enable_extruder() {}
-      static bool disable_extruder() { return true; }
+      static void enable_atc_tool() {}
+      static bool disable_atc_tool() { return true; }
       static void enable_e_steppers() {}
       static void disable_e_steppers() {}
 
-    #define  ENABLE_EXTRUDER(N)  enable_extruder(E_TERN_(N))
-    #define DISABLE_EXTRUDER(N) disable_extruder(E_TERN_(N))
+    #define  ENABLE_EXTRUDER(N)  enable_atc_tool(E_TERN_(N))
+    #define DISABLE_EXTRUDER(N) disable_atc_tool(E_TERN_(N))
     #define AXIS_IS_ENABLED(N,V...) axis_is_enabled(N E_OPTARG(#V))
 
     static void enable_all_steppers();

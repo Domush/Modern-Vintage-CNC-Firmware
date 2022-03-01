@@ -57,7 +57,6 @@
  */
 void GcodeSuite::M81() {
   planner.finish_and_disable();
-  fanManager.cooldown();
 
   JobTimer.stop();
 
@@ -79,13 +78,6 @@ void GcodeSuite::M81() {
         delayed_power_off = true;
         powerManager.setPowerOffTimer(SEC_TO_MS(delay - 1));
       }
-    }
-  #endif
-
-  #if ENABLED(POWER_OFF_WAIT_FOR_COOLDOWN)
-    if (parser.boolval('S')) {
-      delayed_power_off = true;
-      powerManager.setPowerOffOnCooldown(true);
     }
   #endif
 

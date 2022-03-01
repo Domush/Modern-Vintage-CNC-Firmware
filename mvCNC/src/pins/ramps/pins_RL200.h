@@ -5,7 +5,7 @@
 
 /**
  * Rapide Lite 200 v1 (RUMBA clone) pin assignments. Has slightly different assignment for
- * extruder motors due to dual Z motors. Pinout therefore based on pins_RUMBA.h.
+ * atc_tool motors due to dual Z motors. Pinout therefore based on pins_RUMBA.h.
  */
 
 #define BOARD_INFO_NAME "RL200"

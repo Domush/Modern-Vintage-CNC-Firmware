@@ -164,7 +164,7 @@ typedef struct block_t {
   };
   uint32_t step_event_count;                // The number of step events required to complete this block
 
-  static constexpr uint8_t extruder = 0;
+  static constexpr uint8_t atc_tool = 0;
 
   // Settings for the trapezoid generator
   uint32_t accelerate_until,                // The index of the step event on which to stop acceleration
@@ -237,9 +237,9 @@ typedef struct {
             min_segment_time_us;                // (µs) M205 B
       float axis_steps_per_mm[DISTINCT_AXES];   // (steps) M92 XYZE - Steps per millimeter
  feedRate_t max_feedrate_mm_s[DISTINCT_AXES];   // (mm/s) M203 XYZE - Max speeds
-      float acceleration,                       // (mm/s^2) M204 S - Normal acceleration. DEFAULT ACCELERATION for all printing moves.
+      float acceleration,                       // (mm/s^2) M204 S - Normal acceleration. DEFAULT ACCELERATION for all cutting moves.
             retract_acceleration,               // (mm/s^2) M204 R - Retract acceleration. Filament pull-back and push-forward while standing still in the other axes
-            travel_acceleration;                // (mm/s^2) M204 T - Travel acceleration. DEFAULT ACCELERATION for all NON printing moves.
+            travel_acceleration;                // (mm/s^2) M204 T - Travel acceleration. DEFAULT ACCELERATION for all NON cutting moves.
  feedRate_t min_feedrate_mm_s,                  // (mm/s) M205 S - Minimum linear feedrate
             min_travel_feedrate_mm_s;           // (mm/s) M205 T - Minimum travel feedrate
 } planner_settings_t;
@@ -524,7 +524,7 @@ class Planner {
      *
      *  target      - target position in steps units
      *  fr_mm_s     - (target) speed of the move
-     *  extruder    - target extruder
+     *  atc_tool    - target ATC tool
      *  millimeters - the length of the movement, if known
      *
      * Returns true if movement was buffered, false otherwise
@@ -532,7 +532,7 @@ class Planner {
     static bool _buffer_steps(const xyze_long_t &target
       OPTARG(HAS_POSITION_FLOAT, const xyze_pos_t &target_float)
       OPTARG(HAS_DIST_MM_ARG, const xyze_float_t &cart_dist_mm)
-      , feedRate_t fr_mm_s, const uint8_t extruder, const_float_t millimeters=0.0
+      , feedRate_t fr_mm_s, const uint8_t atc_tool, const_float_t millimeters=0.0
     );
 
     /**
@@ -542,7 +542,7 @@ class Planner {
      *
      *  target      - target position in steps units
      *  fr_mm_s     - (target) speed of the move
-     *  extruder    - target extruder
+     *  atc_tool    - target ATC tool
      *  millimeters - the length of the movement, if known
      *
      * Returns true is movement is acceptable, false otherwise
@@ -550,7 +550,7 @@ class Planner {
     static bool _populate_block(block_t * const block, bool split_move, const xyze_long_t &target
       OPTARG(HAS_POSITION_FLOAT, const xyze_pos_t &target_float)
       OPTARG(HAS_DIST_MM_ARG, const xyze_float_t &cart_dist_mm)
-      , feedRate_t fr_mm_s, const uint8_t extruder, const_float_t millimeters=0.0
+      , feedRate_t fr_mm_s, const uint8_t atc_tool, const_float_t millimeters=0.0
     );
 
     /**
@@ -578,12 +578,12 @@ class Planner {
      *
      *  a,b,c,e     - target positions in mm and/or degrees
      *  fr_mm_s     - (target) speed of the move
-     *  extruder    - target extruder
+     *  atc_tool    - target ATC tool
      *  millimeters - the length of the movement, if known
      */
     static bool buffer_segment(const abce_pos_t &abce
       OPTARG(HAS_DIST_MM_ARG, const xyze_float_t &cart_dist_mm)
-      , const_feedRate_t fr_mm_s, const uint8_t extruder=active_extruder, const_float_t millimeters=0.0
+      , const_feedRate_t fr_mm_s, const uint8_t atc_tool=active_tool, const_float_t millimeters=0.0
     );
 
   public:
@@ -595,16 +595,16 @@ class Planner {
      *
      *  cart         - target position in mm or degrees
      *  fr_mm_s      - (target) speed of the move (mm/s)
-     *  extruder     - target extruder
+     *  atc_tool     - target ATC tool
      *  millimeters  - the length of the movement, if known
      *  inv_duration - the reciprocal if the duration of the movement, if known (kinematic only if feeedrate scaling is enabled)
      */
-    static bool buffer_line(const xyze_pos_t &cart, const_feedRate_t fr_mm_s, const uint8_t extruder=active_extruder, const float millimeters=0.0
+    static bool buffer_line(const xyze_pos_t &cart, const_feedRate_t fr_mm_s, const uint8_t atc_tool=active_tool, const float millimeters=0.0
       OPTARG(SCARA_FEEDRATE_SCALING, const_float_t inv_duration=0.0)
     );
 
     #if ENABLED(DIRECT_STEPPING)
-      static void buffer_page(const page_idx_t page_idx, const uint8_t extruder, const uint16_t num_steps);
+      static void buffer_page(const page_idx_t page_idx, const uint8_t atc_tool, const uint16_t num_steps);
     #endif
 
     /**
@@ -716,7 +716,7 @@ class Planner {
     #if HAS_LINEAR_E_JERK
       FORCE_INLINE static void recalculate_max_e_jerk() {
         const float prop = junction_deviation_mm * SQRT(0.5) / (1.0f - SQRT(0.5));
-        LOOP_L_N(i, EXTRUDERS)
+        LOOP_L_N(i, ATC_TOOLS)
           max_e_jerk[E_INDEX_N(i)] = SQRT(prop * settings.max_acceleration_mm_per_s2[E_INDEX_N(i)]);
       }
     #endif

@@ -83,7 +83,7 @@ struct measurements_t {
   float obj_side[NUM_SIDES], backlash[NUM_SIDES];
   xyz_float_t pos_error;
 
-  xy_float_t nozzle_outer_dimension = nod;
+  xy_float_t tool_outer_dimension = nod;
 };
 
 #if ENABLED(BACKLASH_GCODE)
@@ -119,10 +119,10 @@ inline void park_above_object(measurements_t &m, const float uncertainty) {
 }
 
 #if TOOL_CHANGE_SUPPORT
-  inline void set_nozzle(measurements_t &m, const uint8_t extruder) {
-    if (extruder != active_extruder) {
+  inline void set_tool(measurements_t &m, const uint8_t atc_tool) {
+    if (atc_tool != active_tool) {
       park_above_object(m, CALIBRATION_MEASUREMENT_UNKNOWN);
-      tool_change(extruder);
+      tool_change(atc_tool);
     }
   }
 #endif
@@ -256,7 +256,7 @@ inline void probe_side(measurements_t &m, const float uncertainty, const side_t 
   if (probe_top_at_edge) {
     #if AXIS_CAN_CALIBRATE(Z)
       // Probe top nearest the side we are probing
-      current_position[axis] = m.obj_center[axis] + (-dir) * (dimensions[axis] / 2 - m.nozzle_outer_dimension[axis]);
+      current_position[axis] = m.obj_center[axis] + (-dir) * (dimensions[axis] / 2 - m.tool_outer_dimension[axis]);
       calibration_move();
       m.obj_side[TOP] = measure(Z_AXIS, -1, true, &m.backlash[TOP], uncertainty);
       m.obj_center.z = m.obj_side[TOP] - dimensions.z / 2;
@@ -265,14 +265,14 @@ inline void probe_side(measurements_t &m, const float uncertainty, const side_t 
 
   if ((AXIS_CAN_CALIBRATE(X) && axis == X_AXIS) || (AXIS_CAN_CALIBRATE(Y) && axis == Y_AXIS)) {
     // Move to safe distance to the side of the calibration object
-    current_position[axis] = m.obj_center[axis] + (-dir) * (dimensions[axis] / 2 + m.nozzle_outer_dimension[axis] / 2 + uncertainty);
+    current_position[axis] = m.obj_center[axis] + (-dir) * (dimensions[axis] / 2 + m.tool_outer_dimension[axis] / 2 + uncertainty);
     calibration_move();
 
     // Plunge below the side of the calibration object and measure
     current_position.z = m.obj_side[TOP] - (CALIBRATION_NOZZLE_TIP_HEIGHT) * 0.7f;
     calibration_move();
     const float measurement = measure(axis, dir, true, &m.backlash[side], uncertainty);
-    m.obj_center[axis] = measurement + dir * (dimensions[axis] / 2 + m.nozzle_outer_dimension[axis] / 2);
+    m.obj_center[axis] = measurement + dir * (dimensions[axis] / 2 + m.tool_outer_dimension[axis] / 2);
     m.obj_side[side] = measurement;
   }
 }
@@ -311,10 +311,10 @@ inline void probe_sides(measurements_t &m, const float uncertainty) {
   TERN_(HAS_J_CENTER, m.obj_center.j = (m.obj_side[JMINIMUM] + m.obj_side[JMAXIMUM]) / 2);
   TERN_(HAS_K_CENTER, m.obj_center.k = (m.obj_side[KMINIMUM] + m.obj_side[KMAXIMUM]) / 2);
 
-  // Compute the outside diameter of the nozzle at the height
+  // Compute the outside diameter of the tool at the height
   // at which it makes contact with the calibration object
-  TERN_(HAS_X_CENTER, m.nozzle_outer_dimension.x = m.obj_side[RIGHT] - m.obj_side[LEFT] - dimensions.x);
-  TERN_(HAS_Y_CENTER, m.nozzle_outer_dimension.y = m.obj_side[BACK]  - m.obj_side[FRONT] - dimensions.y);
+  TERN_(HAS_X_CENTER, m.tool_outer_dimension.x = m.obj_side[RIGHT] - m.obj_side[LEFT] - dimensions.x);
+  TERN_(HAS_Y_CENTER, m.tool_outer_dimension.y = m.obj_side[BACK]  - m.obj_side[FRONT] - dimensions.y);
 
   park_above_object(m, uncertainty);
 
@@ -448,7 +448,7 @@ inline void probe_sides(measurements_t &m, const float uncertainty) {
 
   inline void report_measured_positional_error(const measurements_t &m) {
     SERIAL_CHAR('T');
-    SERIAL_ECHO(active_extruder);
+    SERIAL_ECHO(active_tool);
     SERIAL_ECHOLNPGM(" Positional Error:");
     #if HAS_X_CENTER && AXIS_CAN_CALIBRATE(X)
       SERIAL_ECHOLNPGM_P(SP_X_STR, m.pos_error.x);
@@ -471,13 +471,13 @@ inline void probe_sides(measurements_t &m, const float uncertainty) {
     SERIAL_EOL();
   }
 
-  inline void report_measured_nozzle_dimensions(const measurements_t &m) {
+  inline void report_measured_tool_dimensions(const measurements_t &m) {
     SERIAL_ECHOLNPGM("Spindle Tip Outer Dimensions:");
     #if HAS_X_CENTER
-      SERIAL_ECHOLNPGM_P(SP_X_STR, m.nozzle_outer_dimension.x);
+      SERIAL_ECHOLNPGM_P(SP_X_STR, m.tool_outer_dimension.x);
     #endif
     #if HAS_Y_CENTER
-      SERIAL_ECHOLNPGM_P(SP_Y_STR, m.nozzle_outer_dimension.y);
+      SERIAL_ECHOLNPGM_P(SP_Y_STR, m.tool_outer_dimension.y);
     #endif
     SERIAL_EOL();
     UNUSED(m);
@@ -587,24 +587,24 @@ inline void update_measurements(measurements_t &m, const AxisEnum axis) {
  *
  *   m              in/out - Measurement record, updated with new readings
  *   uncertainty    in     - How far away from the object to begin probing
- *   extruder       in     - What extruder to probe
+ *   atc_tool       in     - What atc_tool to probe
  *
  * Prerequisites:
  *    - Call calibrate_backlash() beforehand for best accuracy
  */
-inline void calibrate_toolhead(measurements_t &m, const float uncertainty, const uint8_t extruder) {
+inline void calibrate_toolhead(measurements_t &m, const float uncertainty, const uint8_t atc_tool) {
   TEMPORARY_BACKLASH_CORRECTION(all_on);
   TEMPORARY_BACKLASH_SMOOTHING(0.0f);
 
-  TERN(TOOL_CHANGE_SUPPORT, set_nozzle(m, extruder), UNUSED(extruder));
+  TERN(TOOL_CHANGE_SUPPORT, set_tool(m, atc_tool), UNUSED(atc_tool));
 
   probe_sides(m, uncertainty);
 
   // Adjust the hotend offset
   #if HAS_HOTEND_OFFSET
-    if (ENABLED(HAS_X_CENTER) && AXIS_CAN_CALIBRATE(X)) hotend_offset[extruder].x += m.pos_error.x;
-    if (ENABLED(HAS_Y_CENTER) && AXIS_CAN_CALIBRATE(Y)) hotend_offset[extruder].y += m.pos_error.y;
-                             if (AXIS_CAN_CALIBRATE(Z)) hotend_offset[extruder].z += m.pos_error.z;
+    if (ENABLED(HAS_X_CENTER) && AXIS_CAN_CALIBRATE(X)) hotend_offset[atc_tool].x += m.pos_error.x;
+    if (ENABLED(HAS_Y_CENTER) && AXIS_CAN_CALIBRATE(Y)) hotend_offset[atc_tool].y += m.pos_error.y;
+                             if (AXIS_CAN_CALIBRATE(Z)) hotend_offset[atc_tool].z += m.pos_error.z;
     normalize_hotend_offsets();
   #endif
 
@@ -624,7 +624,7 @@ inline void calibrate_toolhead(measurements_t &m, const float uncertainty, const
 
 /**
  * Probe around the calibration object for all toolheads, adjusting the coordinate
- * system for the first nozzle and the nozzle offset for subsequent nozzles.
+ * system for the first tool and the tool offset for subsequent tools.
  *
  *   m              in/out - Measurement record, updated with new readings
  *   uncertainty    in     - How far away from the object to begin probing
@@ -637,18 +637,18 @@ inline void calibrate_all_toolheads(measurements_t &m, const float uncertainty) 
 
   TERN_(HAS_HOTEND_OFFSET, normalize_hotend_offsets());
 
-  TERN_(TOOL_CHANGE_SUPPORT, set_nozzle(m, 0));
+  TERN_(TOOL_CHANGE_SUPPORT, set_tool(m, 0));
 }
 
 /**
  * Perform a full auto-calibration routine:
  *
- *   1) For each nozzle, touch top and sides of object to determine object position and
- *      nozzle offsets. Do a fast but rough search over a wider area.
- *   2) With the first nozzle, touch top and sides of object to determine backlash values
+ *   1) For each tool, touch top and sides of object to determine object position and
+ *      tool offsets. Do a fast but rough search over a wider area.
+ *   2) With the first tool, touch top and sides of object to determine backlash values
  *      for all axes (if BACKLASH_GCODE is enabled)
- *   3) For each nozzle, touch top and sides of object slowly to determine precise
- *      position of object. Adjust coordinate system and nozzle offsets so probed object
+ *   3) For each tool, touch top and sides of object slowly to determine precise
+ *      position of object. Adjust coordinate system and tool offsets so probed object
  *      location corresponds to known object location with a high degree of precision.
  */
 inline void calibrate_all() {
@@ -666,21 +666,21 @@ inline void calibrate_all() {
 
   // Cycle the toolheads so the servos settle into their "natural" positions
   #if TOOL_CHANGE_SUPPORT
-    HOTEND_LOOP() set_nozzle(m, e);
+    HOTEND_LOOP() set_tool(m, e);
   #endif
 
   // Do a slow and precise calibration of the toolheads
   calibrate_all_toolheads(m, CALIBRATION_MEASUREMENT_UNCERTAIN);
 
   current_position.x = X_CENTER;
-  calibration_move();         // Park nozzle away from calibration object
+  calibration_move();         // Park tool away from calibration object
 }
 
 /**
  * G425: Perform calibration with calibration object.
  *
  *   B           - Perform calibration of backlash only.
- *   T<extruder> - Perform calibration of toolhead only.
+ *   T<ATC tool> - Perform calibration of toolhead only.
  *   V           - Probe object and print position, error, backlash and hotend offset.
  *   U           - Uncertainty, how far to start probe away from the object (mm)
  *
@@ -703,7 +703,7 @@ void GcodeSuite::G425() {
   if (parser.seen_test('B'))
     calibrate_backlash(m, uncertainty);
   else if (parser.seen_test('T'))
-    calibrate_toolhead(m, uncertainty, parser.intval('T', active_extruder));
+    calibrate_toolhead(m, uncertainty, parser.intval('T', active_tool));
   #if ENABLED(CALIBRATION_REPORTING)
     else if (parser.seen('V')) {
       probe_sides(m, uncertainty);
@@ -711,7 +711,7 @@ void GcodeSuite::G425() {
       report_measured_faces(m);
       report_measured_center(m);
       report_measured_backlash(m);
-      report_measured_nozzle_dimensions(m);
+      report_measured_tool_dimensions(m);
       report_measured_positional_error(m);
       #if HAS_HOTEND_OFFSET
         normalize_hotend_offsets();

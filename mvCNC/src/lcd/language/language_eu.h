@@ -257,7 +257,7 @@ namespace Language_eu {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Inprima. estatis.");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Txartelaren Info.");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistoreak");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Estrusoreak");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Estrusoreak");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Baudioak");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protokoloa");
   LSTR MSG_CASE_LIGHT                     = _UxGT("Kabina Argia");

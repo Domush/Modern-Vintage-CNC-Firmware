@@ -580,7 +580,7 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
 
 #endif // HAS_CUTTER
 
-#if HAS_PRINT_PROGRESS
+#if HAS_JOB_PROGRESS
 
   FORCE_INLINE void _draw_print_progress() {
     if (!PanelDetected) return;
@@ -597,7 +597,7 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
     lcd.write('%');
   }
 
-#endif // HAS_PRINT_PROGRESS
+#endif // HAS_JOB_PROGRESS
 
 #if ENABLED(LCD_PROGRESS_BAR)
 
@@ -786,7 +786,7 @@ void mvCNCUI::draw_status_screen() {
   lcd.setCursor(0, 1);
   lcd_put_u8str(F("FR")); lcd.print(i16tostr3rj(feedrate_percentage)); lcd.write('%');
 
-  #if BOTH(SDSUPPORT, HAS_PRINT_PROGRESS)
+  #if BOTH(SDSUPPORT, HAS_JOB_PROGRESS)
     lcd.setCursor(LCD_WIDTH / 2 - 3, 1);
     _draw_print_progress();
   #endif
@@ -910,12 +910,12 @@ void mvCNCUI::draw_status_screen() {
 
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
 
-    void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t extruder) {
+    void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t atc_tool) {
       if (!PanelDetected) return;
       lcd.setCursor((LCD_WIDTH - 14) / 2, row + 1);
-      lcd.write(LCD_STR_THERMOMETER[0]); lcd_put_u8str(F(" E")); lcd.write('1' + extruder); lcd.write(' ');
-      lcd.print(i16tostr3rj(fanManager.wholeDegHotend(extruder))); lcd.write(LCD_STR_DEGREE[0]); lcd.write('/');
-      lcd.print(i16tostr3rj(fanManager.degTargetHotend(extruder))); lcd.write(LCD_STR_DEGREE[0]);
+      lcd.write(LCD_STR_THERMOMETER[0]); lcd_put_u8str(F(" E")); lcd.write('1' + atc_tool); lcd.write(' ');
+      lcd.print(i16tostr3rj(fanManager.wholeDegHotend(atc_tool))); lcd.write(LCD_STR_DEGREE[0]); lcd.write('/');
+      lcd.print(i16tostr3rj(fanManager.degTargetHotend(atc_tool))); lcd.write(LCD_STR_DEGREE[0]);
       lcd.print_line();
     }
 

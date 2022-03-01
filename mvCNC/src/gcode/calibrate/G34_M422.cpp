@@ -118,7 +118,7 @@ void GcodeSuite::G34() {
 
       // Always home with tool 0 active
       #if TOOL_CHANGE_SUPPORT
-        const uint8_t old_tool_index = active_extruder;
+        const uint8_t old_tool_index = active_tool;
         tool_change(0, true);
       #endif
 
@@ -421,7 +421,7 @@ void GcodeSuite::G34() {
       #endif
 
       // Restore the active tool after homing
-      TERN_(TOOL_CHANGE_SUPPORT, tool_change(old_tool_index, DISABLED(PARKING_EXTRUDER))); // Fetch previous tool for parking extruder
+      TERN_(TOOL_CHANGE_SUPPORT, tool_change(old_tool_index, DISABLED(PARKING_EXTRUDER))); // Fetch previous tool for parking ATC tool
 
       #if BOTH(HAS_LEVELING, RESTORE_LEVELING_AFTER_G34)
         set_bed_leveling_enabled(leveling_was_active);

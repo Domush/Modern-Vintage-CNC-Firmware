@@ -44,7 +44,7 @@
     current_position.set(0.0, 0.0);
     sync_plan_position();
 
-    const int x_axis_home_dir = TOOL_X_HOME_DIR(active_extruder);
+    const int x_axis_home_dir = TOOL_X_HOME_DIR(active_tool);
 
     const float mlx = max_length(X_AXIS),
                 mly = max_length(Y_AXIS),
@@ -96,7 +96,7 @@
     sync_plan_position();
 
     /**
-     * Move the Z probe (or just the nozzle) to the safe homing point
+     * Move the Z probe (or just the tool) to the safe homing point
      * (Z is already at the right height)
      */
     constexpr xy_float_t safe_homing_xy = { Z_SAFE_HOMING_X_POINT, Z_SAFE_HOMING_Y_POINT };
@@ -115,7 +115,7 @@
 
       if (DEBUGGING(LEVELING)) DEBUG_POS("home_z_safely", destination);
 
-      // Free the active extruder for movement
+      // Free the active ATC tool for movement
       TERN_(DUAL_X_CARRIAGE, idex_set_parked(false));
 
       TERN_(SENSORLESS_HOMING, safe_delay(500)); // Short delay needed to settle
@@ -184,7 +184,7 @@ void GcodeSuite::G28() {
   TERN_(REPORT_STATUS_TO_HOST, set_and_report_grblstate(M_HOMING));
 
   #if ENABLED(DUAL_X_CARRIAGE)
-    bool IDEX_saved_duplication_state = extruder_duplication_enabled;
+    bool IDEX_saved_duplication_state = atc_tool_duplication_enabled;
     DualXMode IDEX_saved_mode = dual_x_carriage_mode;
   #endif
 
@@ -300,11 +300,11 @@ void GcodeSuite::G28() {
   // Always home with tool 0 active
   #if TOOL_CHANGE_SUPPORT
     #if DISABLED(DELTA) || ENABLED(DELTA_HOME_TO_SAFE_ZONE)
-      const uint8_t old_tool_index = active_extruder;
+      const uint8_t old_tool_index = active_tool;
     #endif
     // PARKING_EXTRUDER homing requires different handling of movement / solenoid activation, depending on the side of homing
     #if ENABLED(PARKING_EXTRUDER)
-      const bool pe_final_change_must_unpark = parking_extruder_unpark_after_homing(old_tool_index, X_HOME_DIR + 1 == old_tool_index * 2);
+      const bool pe_final_change_must_unpark = parking_atc_tool_unpark_after_homing(old_tool_index, X_HOME_DIR + 1 == old_tool_index * 2);
     #endif
     tool_change(0, true);
   #endif
@@ -377,28 +377,7 @@ void GcodeSuite::G28() {
 
     // Home X
     if (doX || (doY && ENABLED(CODEPENDENT_XY_HOMING) && DISABLED(HOME_Y_BEFORE_X))) {
-
-      #if ENABLED(DUAL_X_CARRIAGE)
-
-        // Always home the 2nd (right) extruder first
-        active_extruder = 1;
-        homeaxis(X_AXIS);
-
-        // Remember this extruder's position for later tool change
-        inactive_extruder_x = current_position.x;
-
-        // Home the 1st (left) extruder
-        active_extruder = 0;
-        homeaxis(X_AXIS);
-
-        // Consider the active extruder to be in its "parked" position
-        idex_set_parked();
-
-      #else
-
-        homeaxis(X_AXIS);
-
-      #endif
+      homeaxis(X_AXIS);
     }
 
     // Home Y (after X)
@@ -427,40 +406,6 @@ void GcodeSuite::G28() {
     sync_plan_position();
 
   #endif
-
-  /**
-   * Preserve DXC mode across a G28 for IDEX cncs in DXC_DUPLICATION_MODE.
-   * This is important because it lets a user use the LCD Panel to set an IDEX Duplication mode, and
-   * then print a standard GCode file that contains a single print that does a G28 and has no other
-   * IDEX specific commands in it.
-   */
-  #if ENABLED(DUAL_X_CARRIAGE)
-
-    if (idex_is_duplicating()) {
-
-      TERN_(IMPROVE_HOMING_RELIABILITY, saved_motion_state = begin_slow_homing());
-
-      // Always home the 2nd (right) extruder first
-      active_extruder = 1;
-      homeaxis(X_AXIS);
-
-      // Remember this extruder's position for later tool change
-      inactive_extruder_x = current_position.x;
-
-      // Home the 1st (left) extruder
-      active_extruder = 0;
-      homeaxis(X_AXIS);
-
-      // Consider the active extruder to be parked
-      idex_set_parked();
-
-      dual_x_carriage_mode = IDEX_saved_mode;
-      set_duplication_enabled(IDEX_saved_duplication_state);
-
-      TERN_(IMPROVE_HOMING_RELIABILITY, end_slow_homing(saved_motion_state));
-    }
-
-  #endif // DUAL_X_CARRIAGE
 
   endstops.not_homing();
 
@@ -514,25 +459,6 @@ void GcodeSuite::G28() {
 
   report_current_position();
 
-  if (ENABLED(NANODLP_Z_SYNC) && (doZ || ENABLED(NANODLP_ALL_AXIS)))
-    SERIAL_ECHOLNPGM(STR_Z_MOVE_COMP);
-
   TERN_(REPORT_STATUS_TO_HOST, set_and_report_grblstate(M_IDLE));
 
-  #if HAS_L64XX
-    // Set L6470 absolute position registers to counts
-    // constexpr *might* move this to PROGMEM.
-    // If not, this will need a PROGMEM directive and an accessor.
-    #define _EN_ITEM(N) , E_AXIS
-    static constexpr AxisEnum L64XX_axis_xref[MAX_L64XX] = {
-      LINEAR_AXIS_LIST(X_AXIS, Y_AXIS, Z_AXIS, I_AXIS, J_AXIS, K_AXIS),
-      X_AXIS, Y_AXIS, Z_AXIS, Z_AXIS, Z_AXIS
-      REPEAT(E_STEPPERS, _EN_ITEM)
-    };
-    #undef _EN_ITEM
-    for (uint8_t j = 1; j <= L64XX::chain[0]; j++) {
-      const uint8_t cv = L64XX::chain[j];
-      L64xxManager.set_param((L64XX_axis_t)cv, L6470_ABS_POS, stepper.position(L64XX_axis_xref[cv]));
-    }
-  #endif
 }

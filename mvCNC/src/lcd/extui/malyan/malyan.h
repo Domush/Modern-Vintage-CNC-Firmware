@@ -13,7 +13,7 @@
 extern uint16_t inbound_count;
 
 // For sending print completion messages
-extern bool last_printing_status;
+extern bool last_cutting_status;
 
 void write_to_lcd(FSTR_P const fmsg);
 void write_to_lcd(const char * const cmsg);

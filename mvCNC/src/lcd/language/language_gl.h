@@ -331,7 +331,7 @@ namespace Language_gl {
   LSTR MSG_PAUSE_PRINT                    = _UxGT("Pausar impresión");
   LSTR MSG_RESUME_PRINT                   = _UxGT("Retomar impresión");
   LSTR MSG_STOP_PRINT                     = _UxGT("Deter impresión");
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("Imprimindo Obxecto");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("Imprimindo Obxecto");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Cancelar Obxecto");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Cancelar Obxecto =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Recuperar Impresión");
@@ -340,7 +340,7 @@ namespace Language_gl {
   LSTR MSG_DWELL                          = _UxGT("En repouso...");
   LSTR MSG_USERWAIT                       = _UxGT("Prema para Retomar..");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Impresión Pausada");
-  LSTR MSG_PRINTING                       = _UxGT("Imprimindo...");
+  LSTR MSG_CUTTING                       = _UxGT("Imprimindo...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Impresión Cancelada");
   LSTR MSG_PRINT_DONE                     = _UxGT("Fin Impresión");
   LSTR MSG_NO_MOVE                        = _UxGT("Sen movemento.");
@@ -451,7 +451,7 @@ namespace Language_gl {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Estatísticas");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Placa nai");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistores");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Extrusores");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Extrusores");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Baudios");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protocolo");
   LSTR MSG_INFO_RUNAWAY_OFF               = _UxGT("Reloxo Traballo: OFF");

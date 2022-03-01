@@ -38,15 +38,15 @@ void MoveEScreen::onRedraw(draw_mode_t what) {
   w.units(GET_TEXT_F(MSG_UNITS_MM));
   w.heading(                           GET_TEXT_F(MSG_E_MOVE));
   w.color(Theme::e_axis);
-  #if EXTRUDERS == 1
+  #if ATC_TOOLS == 1
     w.adjuster(  8, GET_TEXT_F(MSG_AXIS_E),  mydata.e_rel[0], canMove(E0));
   #elif TOOL_CHANGE_SUPPORT
     w.adjuster(  8, GET_TEXT_F(MSG_AXIS_E1), mydata.e_rel[0], canMove(E0));
     w.adjuster( 10, GET_TEXT_F(MSG_AXIS_E2), mydata.e_rel[1], canMove(E1));
-    #if EXTRUDERS > 2
+    #if ATC_TOOLS > 2
       w.adjuster( 12, GET_TEXT_F(MSG_AXIS_E3), mydata.e_rel[2], canMove(E2));
     #endif
-    #if EXTRUDERS > 3
+    #if ATC_TOOLS > 3
       w.adjuster( 14, GET_TEXT_F(MSG_AXIS_E4), mydata.e_rel[3], canMove(E3));
     #endif
   #endif

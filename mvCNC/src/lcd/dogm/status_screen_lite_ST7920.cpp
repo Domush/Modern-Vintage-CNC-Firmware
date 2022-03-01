@@ -31,7 +31,7 @@
  *    the ST7920 rather than being render by U8Glib on the MCU.
  *
  *  - The graphics buffer (GDRAM) is only used for static graphics
- *    elements (nozzle and feedrate bitmaps) and for the progress
+ *    elements (tool and feedrate bitmaps) and for the progress
  *    bar, so updates are sporadic.
  */
 
@@ -258,7 +258,7 @@ PROGMEM const uint8_t degree_symbol[] = {
   0b00110000,
 };
 
-const uint16_t nozzle_icon[] PROGMEM = {
+const uint16_t tool_icon[] PROGMEM = {
   0b0000000000000000,
   0b0000000000000000,
   0b0000111111110000,
@@ -429,9 +429,9 @@ void ST7920_Lite_Status_Screen::draw_static_elements() {
   load_cgram_icon(CGRAM_ICON_4_ADDR, fan2_icon);
 
   // Draw the static icons in GDRAM
-  draw_gdram_icon(0, 0, nozzle_icon);
+  draw_gdram_icon(0, 0, tool_icon);
   #if TOOL_CHANGE_SUPPORT
-    draw_gdram_icon(0, 1, nozzle_icon);
+    draw_gdram_icon(0, 1, tool_icon);
     draw_gdram_icon(0, 2, bed_icon);
   #else
     draw_gdram_icon(0, 1, bed_icon);
@@ -452,7 +452,7 @@ void ST7920_Lite_Status_Screen::draw_static_elements() {
  */
 void ST7920_Lite_Status_Screen::draw_progress_bar(const uint8_t value) {
   #if HOTENDS == 1
-    // If we have only one extruder, draw a long progress bar on the third line
+    // If we have only one ATC tool, draw a long progress bar on the third line
     constexpr uint8_t top     = 1,         // Top in pixels
                       bottom  = 13,        // Bottom in pixels
                       left    = 12,        // Left edge, in 16-bit words
@@ -565,13 +565,13 @@ void ST7920_Lite_Status_Screen::draw_temps(uint8_t line, const int16_t temp, con
   }
 }
 
-void ST7920_Lite_Status_Screen::draw_extruder_1_temp(const int16_t temp, const int16_t target, bool forceUpdate) {
+void ST7920_Lite_Status_Screen::draw_atc_tool_1_temp(const int16_t temp, const int16_t target, bool forceUpdate) {
   const bool show_target = target && FAR(temp, target);
   draw_temps(0, temp, target, show_target, display_state.E1_show_target != show_target || forceUpdate);
   display_state.E1_show_target = show_target;
 }
 
-void ST7920_Lite_Status_Screen::draw_extruder_2_temp(const int16_t temp, const int16_t target, bool forceUpdate) {
+void ST7920_Lite_Status_Screen::draw_atc_tool_2_temp(const int16_t temp, const int16_t target, bool forceUpdate) {
   const bool show_target = target && FAR(temp, target);
   draw_temps(1, temp, target, show_target, display_state.E2_show_target != show_target || forceUpdate);
   display_state.E2_show_target = show_target;
@@ -607,7 +607,7 @@ void ST7920_Lite_Status_Screen::draw_print_time(const duration_t &elapsed, char 
 
 void ST7920_Lite_Status_Screen::draw_feedrate_percentage(const uint16_t percentage) {
   // We only have enough room for the feedrate when
-  // we have one extruder
+  // we have one ATC tool
   #if HOTENDS == 1
     set_ddram_address(DDRAM_LINE_2 + 6);
     begin_data();
@@ -699,16 +699,16 @@ bool ST7920_Lite_Status_Screen::indicators_changed() {
   const bool blink = ui.get_blink();
   const uint16_t feedrate_perc = feedrate_percentage;
   const uint16_t fs = fanManager.scaledFanSpeed(0);
-  const celsius_t extruder_1_target = fanManager.degTargetHotend(0);
+  const celsius_t atc_tool_1_target = fanManager.degTargetHotend(0);
   #if TOOL_CHANGE_SUPPORT
-    const celsius_t extruder_2_target = fanManager.degTargetHotend(1);
+    const celsius_t atc_tool_2_target = fanManager.degTargetHotend(1);
   #endif
   #if HAS_HEATED_BED
     const celsius_t bed_target = fanManager.degTargetBed();
   #endif
   static uint16_t last_checksum = 0;
-  const uint16_t checksum = blink ^ feedrate_perc ^ fs ^ extruder_1_target
-    ^ TERN0(TOOL_CHANGE_SUPPORT, extruder_2_target)
+  const uint16_t checksum = blink ^ feedrate_perc ^ fs ^ atc_tool_1_target
+    ^ TERN0(TOOL_CHANGE_SUPPORT, atc_tool_2_target)
     ^ TERN0(HAS_HEATED_BED, bed_target);
   if (last_checksum == checksum) return false;
   last_checksum = checksum;
@@ -721,19 +721,19 @@ void ST7920_Lite_Status_Screen::update_indicators(const bool forceUpdate) {
     const duration_t elapsed            = JobTimer.duration();
     duration_t       remaining          = TERN0(USE_M73_REMAINING_TIME, ui.get_remaining_time());
     const uint16_t   feedrate_perc      = feedrate_percentage;
-    const celsius_t  extruder_1_temp    = fanManager.wholeDegHotend(0),
-                     extruder_1_target  = fanManager.degTargetHotend(0);
+    const celsius_t  atc_tool_1_temp    = fanManager.wholeDegHotend(0),
+                     atc_tool_1_target  = fanManager.degTargetHotend(0);
     #if TOOL_CHANGE_SUPPORT
-      const celsius_t extruder_2_temp   = fanManager.wholeDegHotend(1),
-                      extruder_2_target = fanManager.degTargetHotend(1);
+      const celsius_t atc_tool_2_temp   = fanManager.wholeDegHotend(1),
+                      atc_tool_2_target = fanManager.degTargetHotend(1);
     #endif
     #if HAS_HEATED_BED
       const celsius_t bed_temp          = fanManager.wholeDegBed(),
                       bed_target        = fanManager.degTargetBed();
     #endif
 
-    draw_extruder_1_temp(extruder_1_temp, extruder_1_target, forceUpdate);
-    TERN_(TOOL_CHANGE_SUPPORT, draw_extruder_2_temp(extruder_2_temp, extruder_2_target, forceUpdate));
+    draw_atc_tool_1_temp(atc_tool_1_temp, atc_tool_1_target, forceUpdate);
+    TERN_(TOOL_CHANGE_SUPPORT, draw_atc_tool_2_temp(atc_tool_2_temp, atc_tool_2_target, forceUpdate));
     TERN_(HAS_HEATED_BED, draw_bed_temp(bed_temp, bed_target, forceUpdate));
 
     uint8_t spd = fanManager.fan_speed[0];

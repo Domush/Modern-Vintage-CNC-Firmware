@@ -40,12 +40,12 @@ namespace ExtUI {
   static constexpr size_t eeprom_data_size = 48;
 
   enum axis_t     : uint8_t { X, Y, Z, I, J, K, X2, Y2, Z2, Z3, Z4 };
-  enum extruder_t : uint8_t { E0, E1, E2, E3, E4, E5, E6, E7 };
+  enum atc_tool_t : uint8_t { E0, E1, E2, E3, E4, E5, E6, E7 };
   enum heater_t   : uint8_t { H0, H1, H2, H3, H4, H5, BED, CHAMBER, COOLER };
   enum fan_t      : uint8_t { FAN0, FAN1, FAN2, FAN3, FAN4, FAN5, FAN6, FAN7 };
   enum result_t   : uint8_t { PID_STARTED, PID_BAD_EXTRUDER_NUM, PID_TEMP_TOO_HIGH, PID_TUNING_TIMEOUT, PID_DONE };
 
-  constexpr uint8_t extruderCount = EXTRUDERS;
+  constexpr uint8_t atc_toolCount = ATC_TOOLS;
   constexpr uint8_t hotendCount   = HOTENDS;
   constexpr uint8_t fanCount      = FAN_COUNT;
 
@@ -55,11 +55,11 @@ namespace ExtUI {
 
   bool isMoving();
   bool isAxisPositionKnown(const axis_t);
-  bool isAxisPositionKnown(const extruder_t);
+  bool isAxisPositionKnown(const atc_tool_t);
   bool isPositionKnown(); // Axis position guaranteed, steppers active since homing
   bool isMachineHomed(); // Axis position most likely correct, steppers may have deactivated
   bool canMove(const axis_t);
-  bool canMove(const extruder_t);
+  bool canMove(const atc_tool_t);
   void injectCommands_P(PGM_P const);
   inline void injectCommands(FSTR_P const fstr) { injectCommands_P(FTOP(fstr)); }
   void injectCommands(char * const);
@@ -69,9 +69,9 @@ namespace ExtUI {
   bool getHostKeepaliveIsPaused();
 
   bool isHeaterIdle(const heater_t);
-  bool isHeaterIdle(const extruder_t);
+  bool isHeaterIdle(const atc_tool_t);
   void enableHeater(const heater_t);
-  void enableHeater(const extruder_t);
+  void enableHeater(const atc_tool_t);
 
   #if ENABLED(JOYSTICK)
     void jog(const xyz_float_t &dir);
@@ -91,40 +91,40 @@ namespace ExtUI {
 
   #if HAS_TRINAMIC_CONFIG
     float getAxisCurrent_mA(const axis_t);
-    float getAxisCurrent_mA(const extruder_t);
+    float getAxisCurrent_mA(const atc_tool_t);
     void  setAxisCurrent_mA(const_float_t, const axis_t);
-    void  setAxisCurrent_mA(const_float_t, const extruder_t);
+    void  setAxisCurrent_mA(const_float_t, const atc_tool_t);
 
      int getTMCBumpSensitivity(const axis_t);
     void setTMCBumpSensitivity(const_float_t, const axis_t);
   #endif
 
   celsius_float_t getActualTemp_celsius(const heater_t);
-  celsius_float_t getActualTemp_celsius(const extruder_t);
+  celsius_float_t getActualTemp_celsius(const atc_tool_t);
   celsius_float_t getTargetTemp_celsius(const heater_t);
-  celsius_float_t getTargetTemp_celsius(const extruder_t);
+  celsius_float_t getTargetTemp_celsius(const atc_tool_t);
   float getTargetFan_percent(const fan_t);
   float getActualFan_percent(const fan_t);
   float getAxisPosition_mm(const axis_t);
-  float getAxisPosition_mm(const extruder_t);
+  float getAxisPosition_mm(const atc_tool_t);
   float getAxisSteps_per_mm(const axis_t);
-  float getAxisSteps_per_mm(const extruder_t);
+  float getAxisSteps_per_mm(const atc_tool_t);
   feedRate_t getAxisMaxFeedrate_mm_s(const axis_t);
-  feedRate_t getAxisMaxFeedrate_mm_s(const extruder_t);
+  feedRate_t getAxisMaxFeedrate_mm_s(const atc_tool_t);
   float getAxisMaxAcceleration_mm_s2(const axis_t);
-  float getAxisMaxAcceleration_mm_s2(const extruder_t);
+  float getAxisMaxAcceleration_mm_s2(const atc_tool_t);
   feedRate_t getMinFeedrate_mm_s();
   feedRate_t getMinTravelFeedrate_mm_s();
   feedRate_t getFeedrate_mm_s();
-  float getPrintingAcceleration_mm_s2();
+  float getCuttingAcceleration_mm_s2();
   float getRetractAcceleration_mm_s2();
   float getTravelAcceleration_mm_s2();
   float getFeedrate_percent();
-  int16_t getFlow_percent(const extruder_t);
+  int16_t getFlow_percent(const atc_tool_t);
 
   inline uint8_t getProgress_percent() { return ui.get_progress_percent(); }
 
-  #if HAS_PRINT_PROGRESS_PERMYRIAD
+  #if HAS_JOB_PROGRESS_PERMYRIAD
     inline uint16_t getProgress_permyriad() { return ui.get_progress_permyriad(); }
   #endif
 
@@ -193,25 +193,25 @@ namespace ExtUI {
   #endif
 
   void setTargetTemp_celsius(const_float_t, const heater_t);
-  void setTargetTemp_celsius(const_float_t, const extruder_t);
+  void setTargetTemp_celsius(const_float_t, const atc_tool_t);
   void setTargetFan_percent(const_float_t, const fan_t);
   void coolDown();
   void setAxisPosition_mm(const_float_t, const axis_t, const feedRate_t=0);
-  void setAxisPosition_mm(const_float_t, const extruder_t, const feedRate_t=0);
+  void setAxisPosition_mm(const_float_t, const atc_tool_t, const feedRate_t=0);
   void setAxisSteps_per_mm(const_float_t, const axis_t);
-  void setAxisSteps_per_mm(const_float_t, const extruder_t);
+  void setAxisSteps_per_mm(const_float_t, const atc_tool_t);
   void setAxisMaxFeedrate_mm_s(const feedRate_t, const axis_t);
-  void setAxisMaxFeedrate_mm_s(const feedRate_t, const extruder_t);
+  void setAxisMaxFeedrate_mm_s(const feedRate_t, const atc_tool_t);
   void setAxisMaxAcceleration_mm_s2(const_float_t, const axis_t);
-  void setAxisMaxAcceleration_mm_s2(const_float_t, const extruder_t);
+  void setAxisMaxAcceleration_mm_s2(const_float_t, const atc_tool_t);
   void setFeedrate_mm_s(const feedRate_t);
   void setMinFeedrate_mm_s(const feedRate_t);
   void setMinTravelFeedrate_mm_s(const feedRate_t);
-  void setPrintingAcceleration_mm_s2(const_float_t);
+  void setCuttingAcceleration_mm_s2(const_float_t);
   void setRetractAcceleration_mm_s2(const_float_t);
   void setTravelAcceleration_mm_s2(const_float_t);
   void setFeedrate_percent(const_float_t);
-  void setFlow_percent(const int16_t, const extruder_t);
+  void setFlow_percent(const int16_t, const atc_tool_t);
   bool awaitingUserConfirm();
   void setUserConfirmed();
 
@@ -222,8 +222,8 @@ namespace ExtUI {
   #endif
 
   #if ENABLED(LIN_ADVANCE)
-    float getLinearAdvance_mm_mm_s(const extruder_t);
-    void setLinearAdvance_mm_mm_s(const_float_t, const extruder_t);
+    float getLinearAdvance_mm_mm_s(const atc_tool_t);
+    void setLinearAdvance_mm_mm_s(const_float_t, const atc_tool_t);
   #endif
 
   #if HAS_JUNCTION_DEVIATION
@@ -231,26 +231,26 @@ namespace ExtUI {
     void setJunctionDeviation_mm(const_float_t);
   #else
     float getAxisMaxJerk_mm_s(const axis_t);
-    float getAxisMaxJerk_mm_s(const extruder_t);
+    float getAxisMaxJerk_mm_s(const atc_tool_t);
     void setAxisMaxJerk_mm_s(const_float_t, const axis_t);
-    void setAxisMaxJerk_mm_s(const_float_t, const extruder_t);
+    void setAxisMaxJerk_mm_s(const_float_t, const atc_tool_t);
   #endif
 
-  extruder_t getTool(const uint8_t extruder);
-  extruder_t getActiveTool();
-  void setActiveTool(const extruder_t, bool no_move);
+  atc_tool_t getTool(const uint8_t atc_tool);
+  atc_tool_t getActiveTool();
+  void setActiveTool(const atc_tool_t, bool no_move);
 
   #if ENABLED(BABYSTEPPING)
     int16_t mmToWholeSteps(const_float_t mm, const axis_t axis);
     float mmFromWholeSteps(int16_t steps, const axis_t axis);
 
     bool babystepAxis_steps(const int16_t steps, const axis_t axis);
-    void smartAdjustAxis_steps(const int16_t steps, const axis_t axis, bool linked_nozzles);
+    void smartAdjustAxis_steps(const int16_t steps, const axis_t axis, bool linked_tools);
   #endif
 
   #if HAS_HOTEND_OFFSET
-    float getSpindleOffset_mm(const axis_t, const extruder_t);
-    void setSpindleOffset_mm(const_float_t, const axis_t, const extruder_t);
+    float getSpindleOffset_mm(const axis_t, const atc_tool_t);
+    void setSpindleOffset_mm(const_float_t, const axis_t, const atc_tool_t);
     void normalizeSpindleOffset(const axis_t axis);
   #endif
 
@@ -303,11 +303,11 @@ namespace ExtUI {
   #endif
 
   #if ENABLED(PIDTEMP)
-    float getPIDValues_Kp(const extruder_t);
-    float getPIDValues_Ki(const extruder_t);
-    float getPIDValues_Kd(const extruder_t);
-    void setPIDValues(const_float_t, const_float_t , const_float_t , extruder_t);
-    void startPIDTune(const celsius_t, extruder_t);
+    float getPIDValues_Kp(const atc_tool_t);
+    float getPIDValues_Ki(const atc_tool_t);
+    float getPIDValues_Kd(const atc_tool_t);
+    void setPIDValues(const_float_t, const_float_t , const_float_t , atc_tool_t);
+    void startPIDTune(const celsius_t, atc_tool_t);
   #endif
 
   #if ENABLED(PIDTEMPBED)
@@ -386,7 +386,7 @@ namespace ExtUI {
   void onPrintTimerPaused();
   void onPrintTimerStopped();
   void onPrintFinished();
-  void onFilamentRunout(const extruder_t extruder);
+  void onFilamentRunout(const atc_tool_t atc_tool);
   void onUserConfirmRequired(const char * const msg);
   void onUserConfirmRequired(FSTR_P const fstr);
   void onStatusChanged(const char * const msg);

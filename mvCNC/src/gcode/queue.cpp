@@ -364,9 +364,7 @@ inline bool process_line_done(uint8_t &sis, char (&buff)[MAX_CMD_SIZE], int &ind
   sis = PS_NORMAL;                    // "Normal" Serial Input State
   buff[ind] = '\0';                   // Of course, I'm a Terminator.
   const bool is_empty = (ind == 0);   // An empty line?
-  if (is_empty)
-    fanManager.manage_heater();   // Keep sensors satisfied
-  else
+  if (!is_empty)
     ind = 0;                          // Start a new line
   return is_empty;                    // Inform the caller
 }
@@ -609,9 +607,9 @@ void GCodeQueue::get_serial_commands() {
 
           #if DISABLED(PARK_HEAD_ON_PAUSE)
             // When M25 is non-blocking it can still suspend SD commands
-            // Otherwise the M125 handler needs to know SD printing is active
+            // Otherwise the M125 handler needs to know SD job is active
             if (command.buffer[0] == 'M' && command.buffer[1] == '2' && command.buffer[2] == '5' && !NUMERIC(command.buffer[3]))
-              card.pauseSDPrint();
+              card.pauseSDJob();
           #endif
 
           // Put the new command into the buffer (no "ok" sent)

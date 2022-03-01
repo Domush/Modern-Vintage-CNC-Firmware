@@ -49,17 +49,17 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       break;
     case ID_O_FILAMENT:
       #if TOOL_CHANGE_SUPPORT
-        uiCfg.extruderIndexBak = active_extruder;
+        uiCfg.atc_toolIndexBak = active_tool;
       #endif
       if (uiCfg.print_state == WORKING) {
         #if ENABLED(SDSUPPORT)
-          card.pauseSDPrint();
+          card.pauseSDJob();
           stop_print_time();
           uiCfg.print_state = PAUSING;
         #endif
       }
       uiCfg.moveSpeed_bak = (uint16_t)feedrate_mm_s;
-      uiCfg.hotendTargetTempBak = fanManager.degTargetHotend(active_extruder);
+      uiCfg.hotendTargetTempBak = fanManager.degTargetHotend(active_tool);
       lv_clear_operation();
       lv_draw_filament_change();
       break;
@@ -78,12 +78,12 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       if (gCfgItems.finish_power_off) {
         gCfgItems.finish_power_off = false;
         lv_imgbtn_set_src_both(buttonPowerOff, "F:/bmp_manual_off.bin");
-        lv_label_set_text(label_PowerOff, printing_more_menu.manual);
+        lv_label_set_text(label_PowerOff, cutting_more_menu.manual);
       }
       else {
         gCfgItems.finish_power_off = true;
         lv_imgbtn_set_src_both(buttonPowerOff, "F:/bmp_auto_off.bin");
-        lv_label_set_text(label_PowerOff, printing_more_menu.auto_close);
+        lv_label_set_text(label_PowerOff, cutting_more_menu.auto_close);
       }
       lv_obj_align(label_PowerOff, buttonPowerOff, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
       lv_obj_refresh_ext_draw_pad(label_PowerOff);
@@ -176,9 +176,9 @@ void lv_draw_operation() {
     lv_obj_align(label_Fan, buttonFan, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
 
     if (gCfgItems.finish_power_off)
-      lv_label_set_text(label_PowerOff, printing_more_menu.auto_close);
+      lv_label_set_text(label_PowerOff, cutting_more_menu.auto_close);
     else
-      lv_label_set_text(label_PowerOff, printing_more_menu.manual);
+      lv_label_set_text(label_PowerOff, cutting_more_menu.manual);
     lv_obj_align(label_PowerOff, buttonPowerOff, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
 
     if (uiCfg.print_state != WORKING) {

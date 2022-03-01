@@ -46,6 +46,6 @@
 // Heaters / Fans
 //
 #define HEATER_BED_PIN                      PA7   // HOT BED
-#define FAN1_PIN                            PC0   // extruder fan
+#define FAN1_PIN                            PC0   // atc_tool fan
 
 #include "pins_CREALITY_V4.h"

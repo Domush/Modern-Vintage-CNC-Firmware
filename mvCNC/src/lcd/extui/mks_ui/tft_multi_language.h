@@ -568,7 +568,7 @@ typedef struct language_menu {
 
 extern language_menu_def language_menu;
 
-typedef struct printing_menu_disp {
+typedef struct cutting_menu_disp {
   const char *title;
   const char *option;
   const char *temp1;
@@ -578,9 +578,9 @@ typedef struct printing_menu_disp {
   const char *pause;
   const char *resume;
   const char *stop;
-} printing_menu_def;
+} cutting_menu_def;
 
-extern printing_menu_def printing_menu;
+extern cutting_menu_def cutting_menu;
 
 typedef struct operation_menu_disp {
   const char *title;
@@ -629,7 +629,7 @@ typedef struct speed_menu_disp {
 
 extern speed_menu_def speed_menu;
 
-typedef struct printing_more_menu_disp {
+typedef struct cutting_more_menu_disp {
   const char *title;
   const char *fan;
   const char *auto_close;
@@ -637,9 +637,9 @@ typedef struct printing_more_menu_disp {
   const char *temp;
   const char *speed;
   const char *back;
-} printing_more_menu_def;
+} cutting_more_menu_def;
 
-extern printing_more_menu_def printing_more_menu;
+extern cutting_more_menu_def cutting_more_menu;
 
 typedef struct dialog_menu_disp {
   const char *confirm_title;

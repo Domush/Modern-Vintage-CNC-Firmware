@@ -15,7 +15,7 @@
 
 #include "env_validate.h"
 
-#if EXTRUDERS > 2 || E_STEPPERS > 2
+#if ATC_TOOLS > 2 || E_STEPPERS > 2
   #error "MKS ESP Nano only supports two E Steppers. Comment out this line to continue."
 #elif HOTENDS > 2
   #error "MKS ESP Nano only supports two hotend / E-stepper. Comment out this line to continue."
@@ -95,8 +95,8 @@
 #define HEATER_BED_PIN                       144
 
 //#define CONTROLLER_FAN_PIN                 148
-//#define E0_AUTO_FAN_PIN                    148  // need to update Configuration_adv.h @section extruder
-//#define E1_AUTO_FAN_PIN                    149  // need to update Configuration_adv.h @section extruder
+//#define E0_AUTO_FAN_PIN                    148  // need to update Configuration_adv.h @section ATC tool
+//#define E1_AUTO_FAN_PIN                    149  // need to update Configuration_adv.h @section ATC tool
 
 //
 // MicroSD card

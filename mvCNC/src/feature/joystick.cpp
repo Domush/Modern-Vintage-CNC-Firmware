@@ -153,7 +153,7 @@ void Joystick::injectJogMoves() {
     apply_motion_limits(current_position);
     const float length = sqrt(hypot2);
     injecting_now = true;
-    planner.buffer_line(current_position, length / seg_time, active_extruder, length);
+    planner.buffer_line(current_position, length / seg_time, active_tool, length);
     injecting_now = false;
   }
 }

@@ -43,7 +43,7 @@ enum {
   ZOFFSET_SCREEN_CACHE,
   STEPPER_CURRENT_SCREEN_CACHE,
   STEPPER_BUMP_SENSITIVITY_SCREEN_CACHE,
-  PRINTING_SCREEN_CACHE,
+  CUTTING_SCREEN_CACHE,
   FILES_SCREEN_CACHE,
   INTERFACE_SETTINGS_SCREEN_CACHE,
   INTERFACE_SOUNDS_SCREEN_CACHE,
@@ -58,7 +58,7 @@ enum {
 #define ALERT_BOX_DL_SIZE            3072
 #define SPINNER_DL_SIZE              3072
 #define FILE_SCREEN_DL_SIZE          4160
-#define PRINTING_SCREEN_DL_SIZE      2048
+#define CUTTING_SCREEN_DL_SIZE      2048
 
 /************************* MENU SCREEN DECLARATIONS *************************/
 
@@ -100,6 +100,6 @@ enum {
 #include "bio_main_menu.h"
 #include "bio_tune_menu.h"
 #include "bio_advanced_settings.h"
-#include "bio_printing_dialog_box.h"
+#include "bio_cutting_dialog_box.h"
 #include "bio_confirm_home_xyz.h"
 #include "bio_confirm_home_e.h"

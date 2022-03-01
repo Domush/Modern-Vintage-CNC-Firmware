@@ -104,7 +104,7 @@ typedef struct {
   uint16_t z_pos;
 } SPINDLE_PARK_DEF;
 
-extern SPINDLE_PARK_DEF nozzle_park_mks;
+extern SPINDLE_PARK_DEF tool_park_mks;
 
 enum DGUSLCD_Screens : uint8_t {
   #if ENABLED(USE_MKS_GREEN_UI)
@@ -119,8 +119,8 @@ enum DGUSLCD_Screens : uint8_t {
     DGUSLCD_SCREEN_UTILITY              = 120,
     DGUSLCD_SCREEN_FILAMENT_UNLOADING   = 158,
     DGUSLCD_SCREEN_SDFILELIST           =  15,
-    DGUSLCD_SCREEN_SDPRINTMANIPULATION  =  15,
-    DGUSLCD_SCREEN_SDPRINTTUNE          =  17,
+    DGUSLCD_SCREEN_SDJOBMANIPULATION  =  15,
+    DGUSLCD_SCREEN_SDJOBTUNE          =  17,
 
     MKSLCD_SCREEN_BOOT                  =  33,
     MKSLCD_SCREEN_HOME                  =  60,   // MKS main page
@@ -171,8 +171,8 @@ enum DGUSLCD_Screens : uint8_t {
     DGUSLCD_SCREEN_UTILITY              = 120,
     DGUSLCD_SCREEN_FILAMENT_UNLOADING   = 158,
     DGUSLCD_SCREEN_SDFILELIST           =  15,
-    DGUSLCD_SCREEN_SDPRINTMANIPULATION  =  15,
-    DGUSLCD_SCREEN_SDPRINTTUNE          =  17,
+    DGUSLCD_SCREEN_SDJOBMANIPULATION  =  15,
+    DGUSLCD_SCREEN_SDJOBTUNE          =  17,
 
     MKSLCD_SCREEN_BOOT                  =   0,
     MKSLCD_SCREEN_HOME                  =   1,   // MKS main page
@@ -584,7 +584,7 @@ constexpr uint16_t SP_T_Bed_Set   = 0x5040;
   constexpr uint16_t VP_HOME_Dis                      = 0x5000;
   constexpr uint16_t VP_Setting_Dis                   = 0x5010;
   constexpr uint16_t VP_Tool_Dis                      = 0x5020;
-  constexpr uint16_t VP_Printing_Dis                  = 0x5030;
+  constexpr uint16_t VP_Cutting_Dis                  = 0x5030;
 
   constexpr uint16_t VP_Language_Dis                  = 0x5080;
   constexpr uint16_t VP_LossPoint_Dis                 = 0x5090;

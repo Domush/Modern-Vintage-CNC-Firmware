@@ -139,7 +139,7 @@ void Backlash::add_correction_steps(const int32_t &da, const int32_t &db, const 
 
   #include "../module/probe.h"
 
-  // Measure Z backlash by raising nozzle in increments until probe deactivates
+  // Measure Z backlash by raising tool in increments until probe deactivates
   void Backlash::measure_with_probe() {
     if (measured_count.z == 255) return;
 

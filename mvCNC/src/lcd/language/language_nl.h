@@ -193,7 +193,7 @@ namespace Language_nl {
     // Up to 3 lines
     LSTR MSG_FILAMENT_CHANGE_INIT         = _UxGT(MSG_3_LINE("Wacht voor start", "filament te", "verwisselen"));
     LSTR MSG_FILAMENT_CHANGE_UNLOAD       = _UxGT(MSG_3_LINE("Wacht voor", "filament uit", "te laden"));
-    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Klik knop om...", "verw. nozzle.")); //nozzle accepted English term
+    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Klik knop om...", "verw. tool.")); //tool accepted English term
     LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("Spindle verw.", "Wacht a.u.b."));
     LSTR MSG_FILAMENT_CHANGE_INSERT       = _UxGT(MSG_3_LINE("Laad filament", "en druk knop", "om verder..."));
     LSTR MSG_FILAMENT_CHANGE_LOAD         = _UxGT(MSG_3_LINE("Wacht voor", "filament te", "laden"));
@@ -202,10 +202,10 @@ namespace Language_nl {
     // Up to 2 lines
     LSTR MSG_FILAMENT_CHANGE_INIT         = _UxGT(MSG_2_LINE("Wacht voor", "start..."));
     LSTR MSG_FILAMENT_CHANGE_UNLOAD       = _UxGT(MSG_2_LINE("Wacht voor", "uitladen..."));
-    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Klik knop om...", "verw. nozzle.")); //nozzle accepted English term
+    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("Klik knop om...", "verw. tool.")); //tool accepted English term
     LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_1_LINE("Verwarmen..."));
     LSTR MSG_FILAMENT_CHANGE_INSERT       = _UxGT(MSG_2_LINE("Laad filament", "en druk knop"));
     LSTR MSG_FILAMENT_CHANGE_LOAD         = _UxGT(MSG_2_LINE("Wacht voor", "inladen..."));
-    LSTR MSG_FILAMENT_CHANGE_RESUME       = _UxGT(MSG_2_LINE("Wacht voor", "printing..."));
+    LSTR MSG_FILAMENT_CHANGE_RESUME       = _UxGT(MSG_2_LINE("Wacht voor", "cutting..."));
   #endif
 }

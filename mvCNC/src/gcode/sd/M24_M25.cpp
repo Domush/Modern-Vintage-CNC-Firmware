@@ -52,7 +52,7 @@ void GcodeSuite::M24() {
   #endif
 
   if (card.isFileOpen()) {
-    card.startOrResumeFilePrinting();            // SD card will now be read for commands
+    card.startOrResumeFileCutting();            // SD card will now be read for commands
     startOrResumeJob();               // Start (or resume) the CNC job timer
     TERN_(POWER_LOSS_RECOVERY, recovery.prepare());
   }
@@ -84,7 +84,7 @@ void GcodeSuite::M25() {
 
     // Set initial pause flag to prevent more commands from landing in the queue while we try to pause
     #if ENABLED(SDSUPPORT)
-      if (IS_SD_PRINTING()) card.pauseSDPrint();
+      if (IS_SD_JOB_RUNNING()) card.pauseSDJob();
     #endif
 
     #if ENABLED(POWER_LOSS_RECOVERY) && DISABLED(DGUS_LCD_UI_MKS)

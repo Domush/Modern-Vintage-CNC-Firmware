@@ -29,7 +29,7 @@ DGUS_Data::StepSize DGUSScreenHandler::move_steps = DGUS_Data::StepSize::MM10;
 
 uint16_t DGUSScreenHandler::probing_icons[] = { 0, 0 };
 
-DGUS_Data::Extruder DGUSScreenHandler::filament_extruder = DGUS_Data::Extruder::CURRENT;
+DGUS_Data::Extruder DGUSScreenHandler::filament_atc_tool = DGUS_Data::Extruder::CURRENT;
 uint16_t DGUSScreenHandler::filament_length = DGUS_DEFAULT_FILAMENT_LEN;
 
 char DGUSScreenHandler::gcode[] = "";
@@ -266,9 +266,9 @@ void DGUSScreenHandler::CNCTimerStopped() {
   TriggerScreenChange(DGUS_Screen::PRINT_FINISHED);
 }
 
-void DGUSScreenHandler::FilamentRunout(const ExtUI::extruder_t extruder) {
+void DGUSScreenHandler::FilamentRunout(const ExtUI::atc_tool_t atc_tool) {
   char buffer[21];
-  snprintf_P(buffer, sizeof(buffer), PSTR("Filament runout E%d"), extruder);
+  snprintf_P(buffer, sizeof(buffer), PSTR("Filament runout E%d"), atc_tool);
 
   SetStatusMessage(buffer);
 

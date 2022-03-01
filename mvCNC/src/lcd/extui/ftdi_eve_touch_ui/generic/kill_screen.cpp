@@ -55,7 +55,7 @@ void KillScreen::show(const char *message) {
      .cmd(CMD_SWAP)
      .execute();
 
-  InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::PRINTING_FAILED, PLAY_SYNCHRONOUS);
+  InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::CUTTING_FAILED, PLAY_SYNCHRONOUS);
 }
 
 #endif // FTDI_KILL_SCREEN

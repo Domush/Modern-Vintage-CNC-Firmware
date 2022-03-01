@@ -22,12 +22,12 @@
 // Change Filament > Change/Unload/Change Bit
 //
 static PauseMode _change_filament_mode; // = PAUSE_MODE_PAUSE_PRINT
-static int8_t _change_filament_extruder; // = 0
+static int8_t _change_filament_atc_tool; // = 0
 
 inline PGM_P _change_filament_command() {
   switch (_change_filament_mode) {
     case PAUSE_MODE_LOAD_FILAMENT:    return PSTR("M701 T%d");
-    case PAUSE_MODE_UNLOAD_FILAMENT:  return _change_filament_extruder >= 0
+    case PAUSE_MODE_UNLOAD_FILAMENT:  return _change_filament_atc_tool >= 0
                                            ? PSTR("M702 T%d") : PSTR("M702 ;%d");
     case PAUSE_MODE_CHANGE_FILAMENT:
     case PAUSE_MODE_PAUSE_PRINT:
@@ -39,8 +39,8 @@ inline PGM_P _change_filament_command() {
 // Initiate Filament Load/Unload/Change at the specified temperature
 static void _change_filament_with_temp(const uint16_t celsius) {
   char cmd[11];
-  sprintf_P(cmd, _change_filament_command(), _change_filament_extruder);
-  fanManager.setTargetHotend(celsius, _change_filament_extruder);
+  sprintf_P(cmd, _change_filament_command(), _change_filament_atc_tool);
+  fanManager.setTargetHotend(celsius, _change_filament_atc_tool);
   queue.inject(cmd);
 }
 
@@ -65,9 +65,9 @@ inline PGM_P change_filament_header(const PauseMode mode) {
   return GET_TEXT(MSG_FILAMENTCHANGE);
 }
 
-void _menu_temp_filament_op(const PauseMode mode, const int8_t extruder) {
+void _menu_temp_filament_op(const PauseMode mode, const int8_t atc_tool) {
   _change_filament_mode = mode;
-  _change_filament_extruder = extruder;
+  _change_filament_atc_tool = atc_tool;
   const int8_t old_index = MenuItemBase::itemIndex;
   START_MENU();
   if (LCD_HEIGHT >= 4) STATIC_ITEM_P(change_filament_header(mode), SS_DEFAULT|SS_INVERT);
@@ -76,8 +76,8 @@ void _menu_temp_filament_op(const PauseMode mode, const int8_t extruder) {
     LOOP_L_N(m, PREHEAT_COUNT)
       ACTION_ITEM_N_S(m, ui.get_preheat_label(m), MSG_PREHEAT_M, _change_filament_with_preset);
   #endif
-  EDIT_ITEM_FAST_N(int3, extruder, MSG_PREHEAT_CUSTOM, &fanManager.temp_hotend[extruder].target,
-    EXTRUDE_MINTEMP, fanManager.hotend_max_target(extruder),
+  EDIT_ITEM_FAST_N(int3, atc_tool, MSG_PREHEAT_CUSTOM, &fanManager.temp_hotend[atc_tool].target,
+    EXTRUDE_MINTEMP, fanManager.hotend_max_target(atc_tool),
     _change_filament_with_custom
   );
   END_MENU();
@@ -96,7 +96,7 @@ void menu_change_filament() {
     // Say "filament change" when no print is active
     editable.int8 = jobIsPaused() ? PAUSE_MODE_PAUSE_PRINT : PAUSE_MODE_CHANGE_FILAMENT;
 
-    #if E_STEPPERS > 1 && ENABLED(FILAMENT_UNLOAD_ALL_EXTRUDERS)
+    #if E_STEPPERS > 1 && ENABLED(FILAMENT_UNLOAD_ALL_ATC_TOOLS)
       bool too_cold = false;
       for (uint8_t s = 0; !too_cold && s < E_STEPPERS; s++)
         too_cold = fanManager.targetTooColdToExtrude(s);
@@ -112,7 +112,7 @@ void menu_change_filament() {
     // Change filament
     #if E_STEPPERS == 1
       PGM_P const msg = GET_TEXT(MSG_FILAMENTCHANGE);
-      if (fanManager.targetTooColdToExtrude(active_extruder))
+      if (fanManager.targetTooColdToExtrude(active_tool))
         SUBMENU_P(msg, []{ _menu_temp_filament_op(PAUSE_MODE_CHANGE_FILAMENT, 0); });
       else
         GCODES_ITEM_P(msg, PSTR("M600 B0"));
@@ -137,7 +137,7 @@ void menu_change_filament() {
         // Load filament
         #if E_STEPPERS == 1
           PGM_P const msg_load = GET_TEXT(MSG_FILAMENTLOAD);
-          if (fanManager.targetTooColdToExtrude(active_extruder))
+          if (fanManager.targetTooColdToExtrude(active_tool))
             SUBMENU_P(msg_load, []{ _menu_temp_filament_op(PAUSE_MODE_LOAD_FILAMENT, 0); });
           else
             GCODES_ITEM_P(msg_load, PSTR("M701"));
@@ -159,12 +159,12 @@ void menu_change_filament() {
         // Unload filament
         #if E_STEPPERS == 1
           PGM_P const msg_unload = GET_TEXT(MSG_FILAMENTUNLOAD);
-          if (fanManager.targetTooColdToExtrude(active_extruder))
+          if (fanManager.targetTooColdToExtrude(active_tool))
             SUBMENU_P(msg_unload, []{ _menu_temp_filament_op(PAUSE_MODE_UNLOAD_FILAMENT, 0); });
           else
             GCODES_ITEM_P(msg_unload, PSTR("M702"));
         #else
-          #if ENABLED(FILAMENT_UNLOAD_ALL_EXTRUDERS)
+          #if ENABLED(FILAMENT_UNLOAD_ALL_ATC_TOOLS)
             if (too_cold)
               SUBMENU(MSG_FILAMENTUNLOAD_ALL, []{ _menu_temp_filament_op(PAUSE_MODE_UNLOAD_FILAMENT, -1); });
             else
@@ -190,7 +190,7 @@ void menu_change_filament() {
 
   #else
 
-    if (fanManager.targetHotEnoughToExtrude(active_extruder))
+    if (fanManager.targetHotEnoughToExtrude(active_tool))
       queue.inject(F("M600B0"));
     else
       ui.goto_screen([]{ _menu_temp_filament_op(PAUSE_MODE_CHANGE_FILAMENT, 0); });
@@ -198,7 +198,7 @@ void menu_change_filament() {
   #endif
 }
 
-static uint8_t hotend_status_extruder = 0;
+static uint8_t hotend_status_atc_tool = 0;
 
 static PGM_P pause_header() {
   switch (pause_mode) {
@@ -215,7 +215,7 @@ static PGM_P pause_header() {
   if (_menuLineNr == _thisItemNr) { \
     if (ui.should_draw()) { \
       IF_DISABLED(HAS_GRAPHICAL_TFT, MenuItem_static::draw(_lcdLineNr, GET_TEXT(MSG_FILAMENT_CHANGE_NOZZLE), SS_INVERT)); \
-      ui.draw_hotend_status(_lcdLineNr, hotend_status_extruder); \
+      ui.draw_hotend_status(_lcdLineNr, hotend_status_atc_tool); \
     } \
     if (_skipStatic && encoderLine <= _thisItemNr) { \
       ui.encoderPosition += ENCODER_STEPS_PER_MENU_ITEM; \
@@ -311,10 +311,10 @@ FORCE_INLINE screenFunc_t ap_message_screen(const PauseMessage message) {
 void mvCNCUI::pause_show_message(
   const PauseMessage message,
   const PauseMode mode/*=PAUSE_MODE_SAME*/,
-  const uint8_t extruder/*=active_extruder*/
+  const uint8_t atc_tool/*=active_tool*/
 ) {
   if (mode != PAUSE_MODE_SAME) pause_mode = mode;
-  hotend_status_extruder = extruder;
+  hotend_status_atc_tool = atc_tool;
   const screenFunc_t next_screen = ap_message_screen(message);
   if (next_screen) {
     ui.defer_status_screen();

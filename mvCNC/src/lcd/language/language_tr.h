@@ -319,7 +319,7 @@ namespace Language_tr {
   LSTR MSG_PAUSE_PRINT                    = _UxGT("Duraklat");
   LSTR MSG_RESUME_PRINT                   = _UxGT("Sürdür");
   LSTR MSG_STOP_PRINT                     = _UxGT("Durdur");
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("Yazdırma Nesnesi");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("Yazdırma Nesnesi");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Nesneyi İptal Et");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Nesneyi İptal Et =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Kesinti Kurtarma");
@@ -328,7 +328,7 @@ namespace Language_tr {
   LSTR MSG_DWELL                          = _UxGT("Uyku...");
   LSTR MSG_USERWAIT                       = _UxGT("Operatör bekleniyor.");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Baskı Duraklatıldı");
-  LSTR MSG_PRINTING                       = _UxGT("Baskı Yapılıyor...");
+  LSTR MSG_CUTTING                       = _UxGT("Baskı Yapılıyor...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Baskı Durduruldu!");
   LSTR MSG_NO_MOVE                        = _UxGT("İşlem yok.");
   LSTR MSG_KILLED                         = _UxGT("Kilitlendi. ");
@@ -431,7 +431,7 @@ namespace Language_tr {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("İstatistikler");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Kontrolcü Bilgisi");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistörler");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Ekstruderler");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Ekstruderler");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("İletişim Hızı");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protokol");
   LSTR MSG_CASE_LIGHT                     = _UxGT("Aydınlatmayı Aç");

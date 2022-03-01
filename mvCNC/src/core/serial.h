@@ -33,6 +33,8 @@ enum mvCNCDebugFlags : uint8_t {
   MVCNC_DEBUG_ERRORS        = _BV(2),  ///< Not implemented
   MVCNC_DEBUG_DRYRUN        = _BV(3),  ///< Ignore temperature setting and E movement commands
   MVCNC_DEBUG_COMMUNICATION = _BV(4),  ///< Not implemented
+  MVCNC_DEBUG_LEVELING      = _BV(5),  ///< Print detailed output for homing and leveling
+  MVCNC_DEBUG_MESH_ADJUST   = _BV(6),  ///< UBL bed leveling
   MVCNC_DEBUG_ALL = 0xFF
 };
 
@@ -289,7 +291,7 @@ inline void SERIAL_ECHO_F(EnsureDouble x, int digit=2) { SERIAL_IMPL.print(x, di
 #endif
 
 //
-// Functions for serial printing from PROGMEM. (Saves loads of SRAM.)
+// Functions for serial jobs from PROGMEM. (Saves loads of SRAM.)
 //
 inline void serial_echopair_P(PGM_P const pstr, serial_char_t v) { serial_print_P(pstr); SERIAL_CHAR(v.c); }
 inline void serial_echopair_P(PGM_P const pstr, float v)         { serial_print_P(pstr); SERIAL_DECIMAL(v); }

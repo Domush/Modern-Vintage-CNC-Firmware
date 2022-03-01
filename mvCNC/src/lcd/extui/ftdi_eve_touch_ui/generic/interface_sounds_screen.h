@@ -28,9 +28,9 @@
 class InterfaceSoundsScreen : public BaseScreen, public CachedScreen<INTERFACE_SOUNDS_SCREEN_CACHE> {
   public:
     enum event_t {
-      PRINTING_STARTED  = 0,
-      PRINTING_FINISHED = 1,
-      PRINTING_FAILED   = 2,
+      CUTTING_STARTED  = 0,
+      CUTTING_FINISHED = 1,
+      CUTTING_FAILED   = 2,
 
       NUM_EVENTS
     };

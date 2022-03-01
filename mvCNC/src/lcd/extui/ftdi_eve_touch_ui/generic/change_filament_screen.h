@@ -27,7 +27,7 @@
 
 struct ChangeFilamentScreenData {
   uint8_t e_tag, t_tag, repeat_tag;
-  ExtUI::extruder_t saved_extruder;
+  ExtUI::atc_tool_t saved_atc_tool;
   #if FILAMENT_UNLOAD_PURGE_LENGTH > 0
     bool need_purge;
   #endif
@@ -36,7 +36,7 @@ struct ChangeFilamentScreenData {
 class ChangeFilamentScreen : public BaseScreen, public CachedScreen<CHANGE_FILAMENT_SCREEN_CACHE> {
   private:
     static uint8_t getSoftenTemp();
-    static ExtUI::extruder_t getExtruder();
+    static ExtUI::atc_tool_t getExtruder();
     static void drawTempGradient(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
     static void doPurge();
   public:

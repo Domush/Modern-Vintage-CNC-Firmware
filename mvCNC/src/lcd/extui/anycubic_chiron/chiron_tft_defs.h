@@ -45,14 +45,14 @@
 #define AC_msg_usb_connected           F("J03")
 #define AC_msg_print_from_sd_card      F("J04")
 #define AC_msg_pause                   F("J05")
-#define AC_msg_nozzle_heating          F("J06")
-#define AC_msg_nozzle_heating_done     F("J07")
+#define AC_msg_tool_heating          F("J06")
+#define AC_msg_tool_heating_done     F("J07")
 #define AC_msg_bed_heating             F("J08")
 #define AC_msg_bed_heating_done        F("J09")
-#define AC_msg_nozzle_temp_abnormal    F("J10")
+#define AC_msg_tool_temp_abnormal    F("J10")
 #define AC_msg_kill_lcd                F("J11")
 #define AC_msg_ready                   F("J12")
-#define AC_msg_low_nozzle_temp         F("J13")
+#define AC_msg_low_tool_temp         F("J13")
 #define AC_msg_print_complete          F("J14")
 #define AC_msg_filament_out_alert      F("J15")
 #define AC_msg_stop                    F("J16")
@@ -85,10 +85,10 @@
 #define mvCNC_msg_ready               PSTR(" Ready.")
 #define mvCNC_msg_print_paused        PSTR("CNC Paused")
 #define mvCNC_msg_print_aborted       PSTR("CNC Aborted")
-#define mvCNC_msg_extruder_heating    PSTR("E Heating...")
+#define mvCNC_msg_atc_tool_heating    PSTR("E Heating...")
 #define mvCNC_msg_bed_heating         PSTR("Bed Heating...")
 #define mvCNC_msg_EEPROM_version      PSTR("EEPROM Version Error")
-#define mvCNC_msg_nozzle_parked       PSTR("Spindle Parked")
+#define mvCNC_msg_tool_parked       PSTR("Spindle Parked")
 #define mvCNC_msg_heater_timeout      PSTR("Heater Timeout")
 #define mvCNC_msg_reheating           PSTR("Reheating...")
 #define mvCNC_msg_reheat_done         PSTR("Reheat finished.")
@@ -96,7 +96,7 @@
 #define mvCNC_msg_special_pause       PSTR("PB")
 
 #define AC_cmnd_auto_unload_filament   F("M701")                    // Use mvCNC unload routine
-#define AC_cmnd_auto_load_filament     F("M702 M0 PB")              // Use mvCNC load routing then pause for user to clean nozzle
+#define AC_cmnd_auto_load_filament     F("M702 M0 PB")              // Use mvCNC load routing then pause for user to clean tool
 
 #define AC_cmnd_manual_load_filament   F("M83\nG1 E50 F700\nM82")   // replace the manual panel commands with something a little faster
 #define AC_cmnd_manual_unload_filament F("M83\nG1 E-50 F1200\nM82")
@@ -121,7 +121,7 @@ namespace Anycubic {
     AC_cnc_booting,
     AC_cnc_idle,
     AC_cnc_probing,
-    AC_cnc_printing,
+    AC_cnc_cutting,
     AC_cnc_pausing,
     AC_cnc_paused,
     AC_cnc_stopping,

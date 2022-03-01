@@ -1637,9 +1637,11 @@
   #undef DISABLE_INACTIVE_K
 #endif
 
+#undef DISABLE_INACTIVE_E
+
 /**
  * Set solenoid flags if any features use solenoids
- *   - EXT_SOLENOID (M380, M381) to enable/disable the extruder solenoid
+ *   - EXT_SOLENOID (M380, M381) to enable/disable the ATC tool solenoid
  *   - MANUAL_SOLENOID_CONTROL (M380, M381) to enable/disable solenoids by index
  *   - PARKING_EXTRUDER uses SOL0_PIN and SOL1_PIN
  *   - SOLENOID_PROBE uses SOL1_PIN
@@ -2166,6 +2168,8 @@
   #endif
 #endif
 
+#undef PIDTEMPBED
+
 #if HAS_TEMP_COOLER && PIN_EXISTS(COOLER)
   #define HAS_COOLER 1
   #ifndef COOLER_OVERSHOOT
@@ -2175,73 +2179,26 @@
   #define COOLER_MAX_TARGET (COOLER_MAXTEMP - (COOLER_OVERSHOOT))
 #endif
 
-#if HAS_TEMP_CHAMBER
-  #define BED_OR_CHAMBER 1
-#endif
+#undef PIDTEMPCHAMBER
 
-#if BED_OR_CHAMBER || HAS_TEMP_PROBE || HAS_TEMP_COOLER || HAS_TEMP_BOARD
-  #define HAS_TEMP_SENSOR 1
-#endif
+#undef THERMAL_PROTECTION_BED
 
-#if HAS_TEMP_CHAMBER && PIN_EXISTS(HEATER_CHAMBER)
-  #define HAS_HEATED_CHAMBER 1
-  #ifndef CHAMBER_OVERSHOOT
-    #define CHAMBER_OVERSHOOT 10
-  #endif
-  #define CHAMBER_MAX_TARGET (CHAMBER_MAXTEMP - (CHAMBER_OVERSHOOT))
-#else
-  #undef PIDTEMPCHAMBER
-#endif
-
-// PID heating
-#if ANY(PIDTEMPCHAMBER)
-  #define HAS_PID_HEATING 1
-#endif
-
-// Thermal protection
-#if !HAS_HEATED_BED
-  #undef THERMAL_PROTECTION_BED
-#endif
-#if BOTH(HAS_HEATED_CHAMBER, THERMAL_PROTECTION_CHAMBER) && WATCH_CHAMBER_TEMP_PERIOD > 0
-  #define WATCH_CHAMBER 1
-#endif
 #if BOTH(HAS_COOLER, THERMAL_PROTECTION_COOLER) && WATCH_COOLER_TEMP_PERIOD > 0
   #define WATCH_COOLER 1
 #endif
 #if NONE(THERMAL_PROTECTION_HOTENDS, THERMAL_PROTECTION_CHAMBER, THERMAL_PROTECTION_BED, THERMAL_PROTECTION_COOLER)
   #undef THERMAL_PROTECTION_VARIANCE_MONITOR
 #endif
-#if (ENABLED(THERMAL_PROTECTION_CHAMBER) || !HAS_HEATED_CHAMBER) \
-  && (ENABLED(THERMAL_PROTECTION_COOLER)  || !HAS_COOLER)
-  #define THERMALLY_SAFE 1
-#endif
+#define THERMALLY_SAFE 1
 
 // Auto fans
-#if HAS_TEMP_CHAMBER && PIN_EXISTS(CHAMBER_AUTO_FAN)
-  #define HAS_AUTO_CHAMBER_FAN 1
-#endif
-#if HAS_TEMP_COOLER && PIN_EXISTS(COOLER_AUTO_FAN)
-  #define HAS_AUTO_COOLER_FAN 1
-#endif
+#undef AUTO_REPORT_TEMPERATURES
 
-#if ANY(HAS_AUTO_CHAMBER_FAN, HAS_AUTO_COOLER_FAN)
-  #define HAS_AUTO_FAN 1
-#endif
-#define _FANOVERLAP(A,B) (A##_AUTO_FAN_PIN == E##B##_AUTO_FAN_PIN)
-#if HAS_AUTO_FAN && (_FANOVERLAP(CHAMBER,0) || _FANOVERLAP(CHAMBER,1) || _FANOVERLAP(CHAMBER,2) || _FANOVERLAP(CHAMBER,3) || _FANOVERLAP(CHAMBER,4) || _FANOVERLAP(CHAMBER,5) || _FANOVERLAP(CHAMBER,6) || _FANOVERLAP(CHAMBER,7))
-  #define AUTO_CHAMBER_IS_E 1
-#endif
-
-#if !HAS_TEMP_SENSOR
-  #undef AUTO_REPORT_TEMPERATURES
-#endif
-#if ANY(AUTO_REPORT_TEMPERATURES, AUTO_REPORT_SD_STATUS, AUTO_REPORT_POSITION, AUTO_REPORT_FANS)
+#if ANY(AUTO_REPORT_SD_STATUS, AUTO_REPORT_POSITION, AUTO_REPORT_FANS)
   #define HAS_AUTO_REPORTING 1
 #endif
 
-#if !HAS_AUTO_CHAMBER_FAN || AUTO_CHAMBER_IS_E
-  #undef AUTO_POWER_CHAMBER_FAN
-#endif
+#undef AUTO_POWER_CHAMBER_FAN
 
 // CNC Cooling fans (limit)
 #ifdef NUM_M106_FANS
@@ -2535,7 +2492,7 @@
 #endif
 
 /**
- * Helper Macros for heaters and extruder fan
+ * Helper Macros for heaters and ATC tool fan
  */
 
 #define WRITE_HEATER_0P(v) WRITE(HEATER_0_PIN, (v) ^ HEATER_0_INVERTING)
@@ -2903,15 +2860,11 @@
 #endif
 
 // Updated G92 behavior shifts the workspace
-#if DISABLED(NO_WORKSPACE_OFFSETS)
-  #define HAS_POSITION_SHIFT 1
-  #if IS_CARTESIAN
-    #define HAS_HOME_OFFSET 1       // The home offset also shifts the coordinate space
-    #define HAS_WORKSPACE_OFFSET 1  // Cumulative offset to workspace to save some calculation
-    #define HAS_M206_COMMAND 1      // M206 sets the home offset for Cartesian machines
-  #elif IS_SCARA
-    #define HAS_SCARA_OFFSET 1      // The SCARA home offset applies only on G28
-  #endif
+#define HAS_POSITION_SHIFT 1
+#if IS_CARTESIAN
+  #define HAS_HOME_OFFSET 1       // The home offset also shifts the coordinate space
+  #define HAS_WORKSPACE_OFFSET 1  // Cumulative offset to workspace to save some calculation
+  #define HAS_M206_COMMAND 1      // M206 sets the home offset for Cartesian machines
 #endif
 
 #if HAS_MVCNCUI_MENU

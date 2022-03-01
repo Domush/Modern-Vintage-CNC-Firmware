@@ -64,13 +64,13 @@
 //
 // Temperature Sensors
 //
-#define TEMP_0_PIN                             7  // Analog Input (pin 33 extruder)
+#define TEMP_0_PIN                             7  // Analog Input (pin 33 atc_tool)
 #define TEMP_BED_PIN                           6  // Analog Input (pin 34 bed)
 
 //
 // Heaters / Fans
 //
-#define HEATER_0_PIN                          13  // (extruder)
+#define HEATER_0_PIN                          13  // (atc_tool)
 
 #if ENABLED(SANGUINOLOLU_V_1_2)
 
@@ -264,8 +264,8 @@
      *
      *  The following assumes:
      *   - The X stepper driver socket is empty
-     *   - The extruder driver socket has a driver board plugged into it
-     *   - The X stepper wires are attached the the extruder connector
+     *   - The atc_tool driver socket has a driver board plugged into it
+     *   - The X stepper wires are attached the the atc_tool connector
      */
 
     /**

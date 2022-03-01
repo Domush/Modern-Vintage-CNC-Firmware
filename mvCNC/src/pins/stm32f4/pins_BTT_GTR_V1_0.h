@@ -6,7 +6,7 @@
 #include "env_validate.h"
 
 #if E_STEPPERS > MAX_E_STEPPERS
-  #error "mvCNC extruder/hotends limit! Increase MAX_E_STEPPERS to continue."
+  #error "mvCNC ATC tool/hotends limit! Increase MAX_E_STEPPERS to continue."
 #elif HOTENDS > 8 || E_STEPPERS > 8
   #error "BIGTREE GTR V1.0 supports up to 8 hotends / E-steppers."
 #endif

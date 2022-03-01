@@ -40,7 +40,7 @@ namespace ExtUI {
   void onPrintTimerStarted() { Chiron.TimerEvent(AC_timer_started); }
   void onPrintTimerPaused()  { Chiron.TimerEvent(AC_timer_paused);  }
   void onPrintTimerStopped()                         { Chiron.TimerEvent(AC_timer_stopped); }
-  void onFilamentRunout(const extruder_t)            { Chiron.FilamentRunout();             }
+  void onFilamentRunout(const atc_tool_t)            { Chiron.FilamentRunout();             }
   void onUserConfirmRequired(const char * const msg) { Chiron.ConfirmationRequest(msg);     }
   void onStatusChanged(const char * const msg)       { Chiron.StatusChange(msg);            }
 

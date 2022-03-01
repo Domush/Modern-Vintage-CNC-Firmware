@@ -149,7 +149,7 @@ bool DGUSSetupHandler::LevelingProbing() {
 }
 
 bool DGUSSetupHandler::Filament() {
-  dgus_screen_handler.filament_extruder = DGUS_Data::Extruder::CURRENT;
+  dgus_screen_handler.filament_atc_tool = DGUS_Data::Extruder::CURRENT;
   dgus_screen_handler.filament_length = DGUS_DEFAULT_FILAMENT_LEN;
 
   return true;

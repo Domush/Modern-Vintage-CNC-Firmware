@@ -25,15 +25,15 @@ void GcodeSuite::M218() {
 
   if (!parser.seen_any()) return M218_report();
 
-  const int8_t target_extruder = get_target_extruder_from_command();
-  if (target_extruder < 0) return;
+  const int8_t target_atc_tool = get_tool_from_command();
+  if (target_atc_tool < 0) return;
 
-  if (parser.seenval('X')) hotend_offset[target_extruder].x = parser.value_linear_units();
-  if (parser.seenval('Y')) hotend_offset[target_extruder].y = parser.value_linear_units();
-  if (parser.seenval('Z')) hotend_offset[target_extruder].z = parser.value_linear_units();
+  if (parser.seenval('X')) hotend_offset[target_atc_tool].x = parser.value_linear_units();
+  if (parser.seenval('Y')) hotend_offset[target_atc_tool].y = parser.value_linear_units();
+  if (parser.seenval('Z')) hotend_offset[target_atc_tool].z = parser.value_linear_units();
 
   #if ENABLED(DELTA)
-    if (target_extruder == active_extruder)
+    if (target_atc_tool == active_atc_tool)
       do_blocking_move_to_xy(current_position, planner.settings.max_feedrate_mm_s[X_AXIS]);
   #endif
 }

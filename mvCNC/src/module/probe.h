@@ -65,11 +65,11 @@ public:
     #if IS_KINEMATIC
 
       #if HAS_PROBE_XY_OFFSET
-        // Return true if the both nozzle and the probe can reach the given point.
+        // Return true if the both tool and the probe can reach the given point.
         // Note: This won't work on SCARA since the probe offset rotates with the arm.
         static bool can_reach(const_float_t rx, const_float_t ry, const bool probe_relative=true) {
           if (probe_relative) {
-            return position_is_reachable(rx - offset_xy.x, ry - offset_xy.y) // The nozzle can go where it needs to go?
+            return position_is_reachable(rx - offset_xy.x, ry - offset_xy.y) // The tool can go where it needs to go?
                 && position_is_reachable(rx, ry, PROBING_MARGIN);            // Can the probe also go near there?
           }
           else {
@@ -87,11 +87,11 @@ public:
     #else
 
       /**
-       * Return whether the given position is within the bed, and whether the nozzle
+       * Return whether the given position is within the bed, and whether the tool
        * can reach the position required to put the probe at the given position.
        *
        * Example: For a probe offset of -10,+10, then for the probe to reach 0,0 the
-       *          nozzle must be be able to reach +10,-10.
+       *          tool must be be able to reach +10,-10.
        */
       static bool can_reach(const_float_t rx, const_float_t ry, const bool probe_relative=true) {
         if (probe_relative) {

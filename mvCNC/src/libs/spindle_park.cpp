@@ -8,7 +8,7 @@
 
 #include "spindle_park.h"
 
-Spindle nozzle;
+Spindle tool;
 
 #include "../mvCNCCore.h"
 #include "../module/motion.h"

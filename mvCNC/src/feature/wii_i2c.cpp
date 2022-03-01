@@ -194,7 +194,7 @@ void WiiNunchuck::injectJogMoves() {
     apply_motion_limits(current_position);
     const float jog_distance = sqrt(quadratic_speed);
     injecting_now      = true;
-    planner.buffer_line(current_position, jog_distance / seg_time, active_extruder, jog_distance);
+    planner.buffer_line(current_position, jog_distance / seg_time, active_tool, jog_distance);
     injecting_now = false;
   }
 }

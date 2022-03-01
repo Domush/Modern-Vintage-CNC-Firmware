@@ -91,7 +91,7 @@ uint16_t lcd_default_light = 50;
 
 EX_FILAMENT_DEF ex_filament;
 RUNOUT_MKS_DEF runout_mks;
-SPINDLE_PARK_DEF nozzle_park_mks;
+SPINDLE_PARK_DEF tool_park_mks;
 
 const uint16_t VPList_Boot[] PROGMEM = {
   VP_MVCNC_VERSION,
@@ -125,7 +125,7 @@ const uint16_t VPList_Main[] PROGMEM = {
 
 const uint16_t MKSList_Home[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -138,7 +138,7 @@ const uint16_t MKSList_Home[] PROGMEM = {
 
 const uint16_t MKSList_Setting[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -150,7 +150,7 @@ const uint16_t MKSList_Setting[] PROGMEM = {
 
 const uint16_t MKSList_Tool[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -164,7 +164,7 @@ const uint16_t MKSList_Tool[] PROGMEM = {
 
 const uint16_t MKSList_EXTRUE[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -178,7 +178,7 @@ const uint16_t MKSList_EXTRUE[] PROGMEM = {
 
 const uint16_t MKSList_LEVEL[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -189,7 +189,7 @@ const uint16_t MKSList_LEVEL[] PROGMEM = {
 
 const uint16_t MKSList_MOVE[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -200,7 +200,7 @@ const uint16_t MKSList_MOVE[] PROGMEM = {
 
 const uint16_t MKSList_Print[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -237,7 +237,7 @@ const uint16_t MKSList_SD_File[] PROGMEM = {
 
 const uint16_t MKSList_TempOnly[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -249,7 +249,7 @@ const uint16_t MKSList_TempOnly[] PROGMEM = {
 
 const uint16_t MKSList_Pluse[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -267,7 +267,7 @@ const uint16_t MKSList_Pluse[] PROGMEM = {
 
 const uint16_t MKSList_MaxSpeed[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -285,7 +285,7 @@ const uint16_t MKSList_MaxSpeed[] PROGMEM = {
 
 const uint16_t MKSList_MaxAcc[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -304,7 +304,7 @@ const uint16_t MKSList_MaxAcc[] PROGMEM = {
 
 const uint16_t MKSList_PID[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -320,7 +320,7 @@ const uint16_t MKSList_PID[] PROGMEM = {
 
 const uint16_t MKSList_Level_Point[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   // FAN
@@ -355,7 +355,7 @@ const uint16_t MKSList_Level_PrintConfig[] PROGMEM = {
 
 const uint16_t MKSList_PrintPauseConfig[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
 
@@ -368,7 +368,7 @@ const uint16_t MKSList_PrintPauseConfig[] PROGMEM = {
 
 const uint16_t MKSList_MotoConfig[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
 
@@ -381,7 +381,7 @@ const uint16_t MKSList_MotoConfig[] PROGMEM = {
 
 const uint16_t MKSList_EX_Config[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   VP_MIN_EX_T,VP_Min_EX_T_E,
@@ -390,7 +390,7 @@ const uint16_t MKSList_EX_Config[] PROGMEM = {
 
 const uint16_t MKSTMC_Config[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   // HB Temp
   VP_T_Bed_Is, VP_T_Bed_Set,
   VP_MIN_EX_T,
@@ -418,7 +418,7 @@ const uint16_t MKSAuto_Level[] PROGMEM = {
 
 const uint16_t MKSOffset_Config[] PROGMEM = {
   // E Temp
-  REPEAT(EXTRUDERS, MKSLIST_E_ITEM)
+  REPEAT(ATC_TOOLS, MKSLIST_E_ITEM)
   VP_OFFSET_X,
   VP_OFFSET_Y,
   VP_OFFSET_Z,
@@ -527,7 +527,7 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   #if HAS_HOTEND
     VPHELPER(VP_T_E0_Is, &fanManager.temp_hotend[0].celsius, nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<0>),
     VPHELPER(VP_T_E0_Set, &fanManager.temp_hotend[0].target, ScreenHandler.HandleTemperatureChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
-    VPHELPER(VP_Flowrate_E0, &planner.flow_percentage[ExtUI::extruder_t::E0], ScreenHandler.HandleFlowRateChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
+    VPHELPER(VP_Flowrate_E0, &planner.flow_percentage[ExtUI::atc_tool_t::E0], ScreenHandler.HandleFlowRateChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
     VPHELPER(VP_EPos, &destination.e, nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
     VPHELPER(VP_MOVE_E0, nullptr, ScreenHandler.HandleManualExtrude, nullptr),
     VPHELPER(VP_E0_CONTROL, &fanManager.temp_hotend[0].target, ScreenHandler.HandleHeaterControl, nullptr),
@@ -552,7 +552,7 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   #if TOOL_CHANGE_SUPPORT
     VPHELPER(VP_T_E1_Is, &fanManager.temp_hotend[1].celsius, nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<0>),
     VPHELPER(VP_T_E1_Set, &fanManager.temp_hotend[1].target, ScreenHandler.HandleTemperatureChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
-    VPHELPER(VP_Flowrate_E1, &planner.flow_percentage[ExtUI::extruder_t::E1], ScreenHandler.HandleFlowRateChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
+    VPHELPER(VP_Flowrate_E1, &planner.flow_percentage[ExtUI::atc_tool_t::E1], ScreenHandler.HandleFlowRateChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
     VPHELPER(VP_MOVE_E1, nullptr, ScreenHandler.HandleManualExtrude, nullptr),
     VPHELPER(VP_E1_CONTROL, &fanManager.temp_hotend[1].target, ScreenHandler.HandleHeaterControl, nullptr),
     VPHELPER(VP_E1_STATUS, &fanManager.temp_hotend[1].target, nullptr, ScreenHandler.DGUSLCD_SendHeaterStatusToDisplay),

@@ -40,7 +40,7 @@ void FanControl::lcd_preheat(const uint8_t e, const int8_t indh, const int8_t in
   #endif
   #if HAS_FAN
     if (indh >= 0) {
-      const uint8_t fan_index = active_extruder < (FAN_COUNT) ? active_extruder : 0;
+      const uint8_t fan_index = active_tool < (FAN_COUNT) ? active_tool : 0;
       if (true
         #if REDUNDANT_PART_COOLING_FAN
           && fan_index != REDUNDANT_PART_COOLING_FAN
@@ -161,8 +161,8 @@ void menu_temperature() {
   #endif
 
   #if ENABLED(SINGLENOZZLE_STANDBY_TEMP)
-    LOOP_S_L_N(e, 1, EXTRUDERS)
-      EDIT_ITEM_FAST_N(int3, e, MSG_NOZZLE_STANDBY, &fanManager.singlenozzle_temp[e], 0, fanManager.hotend_max_target(0));
+    LOOP_S_L_N(e, 1, ATC_TOOLS)
+      EDIT_ITEM_FAST_N(int3, e, MSG_NOZZLE_STANDBY, &fanManager.singletool_temp[e], 0, fanManager.hotend_max_target(0));
   #endif
 
   //
@@ -209,37 +209,37 @@ void menu_temperature() {
     #if HAS_FAN1 && REDUNDANT_PART_COOLING_FAN != 1
       FAN_EDIT_ITEMS(1);
     #elif SNFAN(1)
-      singlenozzle_item(1);
+      singletool_item(1);
     #endif
     #if HAS_FAN2 && REDUNDANT_PART_COOLING_FAN != 2
       FAN_EDIT_ITEMS(2);
     #elif SNFAN(2)
-      singlenozzle_item(2);
+      singletool_item(2);
     #endif
     #if HAS_FAN3 && REDUNDANT_PART_COOLING_FAN != 3
       FAN_EDIT_ITEMS(3);
     #elif SNFAN(3)
-      singlenozzle_item(3);
+      singletool_item(3);
     #endif
     #if HAS_FAN4 && REDUNDANT_PART_COOLING_FAN != 4
       FAN_EDIT_ITEMS(4);
     #elif SNFAN(4)
-      singlenozzle_item(4);
+      singletool_item(4);
     #endif
     #if HAS_FAN5 && REDUNDANT_PART_COOLING_FAN != 5
       FAN_EDIT_ITEMS(5);
     #elif SNFAN(5)
-      singlenozzle_item(5);
+      singletool_item(5);
     #endif
     #if HAS_FAN6 && REDUNDANT_PART_COOLING_FAN != 6
       FAN_EDIT_ITEMS(6);
     #elif SNFAN(6)
-      singlenozzle_item(6);
+      singletool_item(6);
     #endif
     #if HAS_FAN7 && REDUNDANT_PART_COOLING_FAN != 7
       FAN_EDIT_ITEMS(7);
     #elif SNFAN(7)
-      singlenozzle_item(7);
+      singletool_item(7);
     #endif
 
   #endif // HAS_FAN

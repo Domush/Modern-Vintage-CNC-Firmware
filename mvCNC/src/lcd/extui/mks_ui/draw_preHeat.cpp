@@ -44,17 +44,17 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       if (uiCfg.curTempType == 0) {
         #if HAS_HOTEND
           int16_t max_target;
-          fanManager.temp_hotend[uiCfg.extruderIndex].target += uiCfg.stepHeat;
-          if (uiCfg.extruderIndex == 0)
+          fanManager.temp_hotend[uiCfg.atc_toolIndex].target += uiCfg.stepHeat;
+          if (uiCfg.atc_toolIndex == 0)
             max_target = HEATER_0_MAXTEMP - (WATCH_TEMP_INCREASE + TEMP_HYSTERESIS + 1);
           else {
             #if TOOL_CHANGE_SUPPORT
               max_target = HEATER_1_MAXTEMP - (WATCH_TEMP_INCREASE + TEMP_HYSTERESIS + 1);
             #endif
           }
-          if (fanManager.degTargetHotend(uiCfg.extruderIndex) > max_target)
-            fanManager.setTargetHotend(max_target, uiCfg.extruderIndex);
-          fanManager.start_watching_hotend(uiCfg.extruderIndex);
+          if (fanManager.degTargetHotend(uiCfg.atc_toolIndex) > max_target)
+            fanManager.setTargetHotend(max_target, uiCfg.atc_toolIndex);
+          fanManager.start_watching_hotend(uiCfg.atc_toolIndex);
         #endif
       }
       else {
@@ -72,11 +72,11 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
     case ID_P_DEC:
       if (uiCfg.curTempType == 0) {
         #if HAS_HOTEND
-          if (fanManager.degTargetHotend(uiCfg.extruderIndex) > uiCfg.stepHeat)
-            fanManager.temp_hotend[uiCfg.extruderIndex].target -= uiCfg.stepHeat;
+          if (fanManager.degTargetHotend(uiCfg.atc_toolIndex) > uiCfg.stepHeat)
+            fanManager.temp_hotend[uiCfg.atc_toolIndex].target -= uiCfg.stepHeat;
           else
-            fanManager.setTargetHotend(0, uiCfg.extruderIndex);
-          fanManager.start_watching_hotend(uiCfg.extruderIndex);
+            fanManager.setTargetHotend(0, uiCfg.atc_toolIndex);
+          fanManager.start_watching_hotend(uiCfg.atc_toolIndex);
         #endif
       }
       else {
@@ -93,25 +93,25 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
     case ID_P_TYPE:
       if (uiCfg.curTempType == 0) {
         if (ENABLED(TOOL_CHANGE_SUPPORT)) {
-          if (uiCfg.extruderIndex == 0) {
-            uiCfg.extruderIndex = 1;
+          if (uiCfg.atc_toolIndex == 0) {
+            uiCfg.atc_toolIndex = 1;
           }
-          else if (uiCfg.extruderIndex == 1) {
+          else if (uiCfg.atc_toolIndex == 1) {
             if (ENABLED(HAS_HEATED_BED)) {
               uiCfg.curTempType = 1;
             }
             else {
               uiCfg.curTempType = 0;
-              uiCfg.extruderIndex = 0;
+              uiCfg.atc_toolIndex = 0;
             }
           }
         }
-        else if (uiCfg.extruderIndex == 0) {
+        else if (uiCfg.atc_toolIndex == 0) {
           uiCfg.curTempType = TERN(HAS_HEATED_BED, 1, 0);
         }
       }
       else if (uiCfg.curTempType == 1) {
-        uiCfg.extruderIndex = 0;
+        uiCfg.atc_toolIndex = 0;
         uiCfg.curTempType = 0;
       }
       disp_temp_type();
@@ -128,8 +128,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
     case ID_P_OFF:
       if (uiCfg.curTempType == 0) {
         #if HAS_HOTEND
-          fanManager.setTargetHotend(0, uiCfg.extruderIndex);
-          fanManager.start_watching_hotend(uiCfg.extruderIndex);
+          fanManager.setTargetHotend(0, uiCfg.atc_toolIndex);
+          fanManager.start_watching_hotend(uiCfg.atc_toolIndex);
         #endif
       }
       else {
@@ -217,7 +217,7 @@ void disp_ext_heart() {
 
 void disp_temp_type() {
   if (uiCfg.curTempType == 0) {
-    if (TERN0(TOOL_CHANGE_SUPPORT, uiCfg.extruderIndex == 1)) {
+    if (TERN0(TOOL_CHANGE_SUPPORT, uiCfg.atc_toolIndex == 1)) {
       lv_imgbtn_set_src_both(buttonType, "F:/bmp_extru2.bin");
       if (gCfgItems.multiple_language) {
         lv_label_set_text(labelType, preheat_menu.ext2);
@@ -247,8 +247,8 @@ void disp_desire_temp() {
 
   if (uiCfg.curTempType == 0) {
     #if HAS_HOTEND
-      strcat(public_buf_l, uiCfg.extruderIndex < 1 ? preheat_menu.ext1 : preheat_menu.ext2);
-      sprintf(buf, preheat_menu.value_state, fanManager.wholeDegHotend(uiCfg.extruderIndex), fanManager.degTargetHotend(uiCfg.extruderIndex));
+      strcat(public_buf_l, uiCfg.atc_toolIndex < 1 ? preheat_menu.ext1 : preheat_menu.ext2);
+      sprintf(buf, preheat_menu.value_state, fanManager.wholeDegHotend(uiCfg.atc_toolIndex), fanManager.degTargetHotend(uiCfg.atc_toolIndex));
     #endif
   }
   else {

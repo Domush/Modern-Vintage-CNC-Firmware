@@ -28,14 +28,14 @@
    *   M605 S1 : (AUTO_PARK) The firmware automatically parks and unparks the X-carriages on tool-change so that
    *             additional slicer support is not required.
    *
-   *   M605 S2 X R : (DUPLICATION) The firmware moves the second X-carriage and extruder in synchronization with
-   *             the first X-carriage and extruder, to print 2 copies of the same object at the same time.
+   *   M605 S2 X R : (DUPLICATION) The firmware moves the second X-carriage and ATC tool in synchronization with
+   *             the first X-carriage and ATC tool, to print 2 copies of the same object at the same time.
    *             Set the constant X-offset and temperature differential with M605 S2 X[offs] R[deg] and
    *             follow with "M605 S2" to initiate duplicated movement. For example, use "M605 S2 X100 R2" to
    *             make a copy 100mm to the right with E1 2° hotter than E0.
    *
-   *   M605 S3 : (MIRRORED) Formbot/Vivedino-inspired mirrored mode in which the second extruder duplicates
-   *             the movement of the first except the second extruder is reversed in the X axis.
+   *   M605 S3 : (MIRRORED) Formbot/Vivedino-inspired mirrored mode in which the second ATC tool duplicates
+   *             the movement of the first except the second ATC tool is reversed in the X axis.
    *             The temperature differential and initial X offset must be set with "M605 S2 X[offs] R[deg]",
    *             then followed by "M605 S3" to initiate mirrored movement.
    *
@@ -60,10 +60,10 @@
 
         case DXC_DUPLICATION_MODE:
           // Set the X offset, but no less than the safety gap
-          if (parser.seen('X')) duplicate_extruder_x_offset = _MAX(parser.value_linear_units(), (X2_MIN_POS) - (X1_MIN_POS));
-          if (parser.seen('R')) duplicate_extruder_temp_offset = parser.value_celsius_diff();
+          if (parser.seen('X')) duplicate_atc_tool_x_offset = _MAX(parser.value_linear_units(), (X2_MIN_POS) - (X1_MIN_POS));
+          if (parser.seen('R')) duplicate_atc_tool_temp_offset = parser.value_celsius_diff();
           // Always switch back to tool 0
-          if (active_extruder != 0) tool_change(0);
+          if (active_tool != 0) tool_change(0);
           break;
 
         case DXC_MIRRORED_MODE: {
@@ -109,14 +109,14 @@
           case DXC_DUPLICATION_MODE:  DEBUG_ECHOPGM("DUPLICATION");  break;
           case DXC_MIRRORED_MODE:     DEBUG_ECHOPGM("MIRRORED");     break;
         }
-        DEBUG_ECHOPGM("\nActive Ext: ", active_extruder);
-        if (!active_extruder_parked) DEBUG_ECHOPGM(" NOT ");
+        DEBUG_ECHOPGM("\nActive Ext: ", active_tool);
+        if (!active_tool_parked) DEBUG_ECHOPGM(" NOT ");
         DEBUG_ECHOPGM(" parked.");
-        DEBUG_ECHOPGM("\nactive_extruder_x_pos: ", current_position.x);
-        DEBUG_ECHOPGM("\ninactive_extruder_x: ", inactive_extruder_x);
-        DEBUG_ECHOPGM("\nextruder_duplication_enabled: ", extruder_duplication_enabled);
-        DEBUG_ECHOPGM("\nduplicate_extruder_x_offset: ", duplicate_extruder_x_offset);
-        DEBUG_ECHOPGM("\nduplicate_extruder_temp_offset: ", duplicate_extruder_temp_offset);
+        DEBUG_ECHOPGM("\nactive_tool_x_pos: ", current_position.x);
+        DEBUG_ECHOPGM("\ninactive_tool_x: ", inactive_tool_x);
+        DEBUG_ECHOPGM("\natc_tool_duplication_enabled: ", atc_tool_duplication_enabled);
+        DEBUG_ECHOPGM("\nduplicate_atc_tool_x_offset: ", duplicate_atc_tool_x_offset);
+        DEBUG_ECHOPGM("\nduplicate_atc_tool_temp_offset: ", duplicate_atc_tool_temp_offset);
         DEBUG_ECHOPGM("\ndelayed_move_time: ", delayed_move_time);
         DEBUG_ECHOPGM("\nX1 Home X: ", x_home_pos(0), "\nX1_MIN_POS=", X1_MIN_POS, "\nX1_MAX_POS=", X1_MAX_POS);
         DEBUG_ECHOPGM("\nX2 Home X: ", x_home_pos(1), "\nX2_MIN_POS=", X2_MIN_POS, "\nX2_MAX_POS=", X2_MAX_POS);
@@ -139,12 +139,12 @@
 #elif ENABLED(MULTI_NOZZLE_DUPLICATION)
 
   /**
-   * M605: Set multi-nozzle duplication mode
+   * M605: Set multi-tool duplication mode
    *
    *  S2       - Enable duplication mode
-   *  P[mask]  - Bit-mask of nozzles to include in the duplication set.
+   *  P[mask]  - Bit-mask of tools to include in the duplication set.
    *             A value of 0 disables duplication.
-   *  E[index] - Last nozzle index to include in the duplication set.
+   *  E[index] - Last tool index to include in the duplication set.
    *             A value of 0 disables duplication.
    */
   void GcodeSuite::M605() {
@@ -153,12 +153,12 @@
       planner.synchronize();
       if (parser.seenval('P')) duplication_e_mask = parser.value_int();   // Set the mask directly
       else if (parser.seenval('E')) duplication_e_mask = pow(2, parser.value_int() + 1) - 1; // Set the mask by E index
-      ena = (2 == parser.intval('S', extruder_duplication_enabled ? 2 : 0));
+      ena = (2 == parser.intval('S', atc_tool_duplication_enabled ? 2 : 0));
       set_duplication_enabled(ena && (duplication_e_mask >= 3));
     }
     SERIAL_ECHO_START();
     SERIAL_ECHOPGM(STR_DUPLICATION_MODE);
-    serialprint_onoff(extruder_duplication_enabled);
+    serialprint_onoff(atc_tool_duplication_enabled);
     if (ena) {
       SERIAL_ECHOPGM(" ( ");
       HOTEND_LOOP() if (TEST(duplication_e_mask, e)) { SERIAL_ECHO(e); SERIAL_CHAR(' '); }

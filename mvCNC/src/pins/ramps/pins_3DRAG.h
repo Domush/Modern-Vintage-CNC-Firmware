@@ -35,7 +35,7 @@
   #define Z_ENABLE_PIN                        63
 #endif
 
-#if HAS_CUTTER && !HAS_EXTRUDERS
+#if HAS_CUTTER && !HAS_ATC_TOOLS
   #define E0_DIR_PIN                          -1
   #define E0_ENABLE_PIN                       -1
   #define E0_STEP_PIN                         -1
@@ -66,10 +66,10 @@
  *
  *  The following assumes:
  *   - the Z stepper driver socket is empty
- *   - the extruder driver socket has a driver board plugged into it
- *   - the Z stepper wires are attached the the extruder connector
+ *   - the atc_tool driver socket has a driver board plugged into it
+ *   - the Z stepper wires are attached the the atc_tool connector
  *
- *  If you want to keep the extruder AND don't have a LCD display then
+ *  If you want to keep the atc_tool AND don't have a LCD display then
  *  you can still control the power on/off and spindle direction.
  *
  *  Where to get spindle signals
@@ -89,7 +89,7 @@
  *  Note: Socket names vary from vendor to vendor
  */
 #if HAS_CUTTER
-  #if !HAS_EXTRUDERS
+  #if !HAS_ATC_TOOLS
     #define SPINDLE_LASER_PWM_PIN             46  // Hardware PWM
     #define SPINDLE_LASER_ENA_PIN             62  // Pullup!
     #define SPINDLE_DIR_PIN                   48

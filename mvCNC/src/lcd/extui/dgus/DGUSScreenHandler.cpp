@@ -258,18 +258,18 @@ void DGUSScreenHandler::DGUSLCD_SendHeaterStatusToDisplay(DGUS_VP_Variable &var)
 #if ENABLED(SDSUPPORT)
 
   void DGUSScreenHandler::ScreenChangeHookIfSD(DGUS_VP_Variable &var, void *val_ptr) {
-    // default action executed when there is a SD card, but not printing
+    // default action executed when there is a SD card, but not cutting
     if (ExtUI::isMediaInserted() && !ExtUI::jobRunningFromMedia()) {
       ScreenChangeHook(var, val_ptr);
       dgusdisplay.RequestScreen(current_screen);
       return;
     }
 
-    // if we are printing, we jump to two screens after the requested one.
+    // if we are cutting, we jump to two screens after the requested one.
     // This should host e.g a print pause / print abort / print resume dialog.
     // This concept allows to recycle this hook for other file
-    if (ExtUI::jobRunningFromMedia() && !card.flag.abort_sd_printing) {
-      GotoScreen(DGUSLCD_SCREEN_SDPRINTMANIPULATION);
+    if (ExtUI::jobRunningFromMedia() && !card.flag.abort_sd_job_running) {
+      GotoScreen(DGUSLCD_SCREEN_SDJOBMANIPULATION);
       return;
     }
 
@@ -278,7 +278,7 @@ void DGUSScreenHandler::DGUSLCD_SendHeaterStatusToDisplay(DGUS_VP_Variable &var)
       setstatusmessagePGM(GET_TEXT(MSG_NO_MEDIA));
       return;
     }
-    if (card.flag.abort_sd_printing) {
+    if (card.flag.abort_sd_job_running) {
       setstatusmessagePGM(GET_TEXT(MSG_MEDIA_ABORTING));
       return;
     }
@@ -317,7 +317,7 @@ void DGUSScreenHandler::DGUSLCD_SendHeaterStatusToDisplay(DGUS_VP_Variable &var)
 
   void DGUSScreenHandler::DGUSLCD_SD_PrintTune(DGUS_VP_Variable &var, void *val_ptr) {
     if (!ExtUI::jobRunningFromMedia()) return; // avoid race condition when user stays in this menu and cnc finishes.
-    GotoScreen(DGUSLCD_SCREEN_SDPRINTTUNE);
+    GotoScreen(DGUSLCD_SCREEN_SDJOBTUNE);
   }
 
   void DGUSScreenHandler::SDCardError() {
@@ -412,20 +412,20 @@ void DGUSScreenHandler::HandleManualExtrude(DGUS_VP_Variable &var, void *val_ptr
 
   int16_t movevalue = swap16(*(uint16_t*)val_ptr);
   float target = movevalue * 0.01f;
-  ExtUI::extruder_t target_extruder;
+  ExtUI::atc_tool_t target_atc_tool;
 
   switch (var.VP) {
     #if HAS_HOTEND
-      case VP_MOVE_E0: target_extruder = ExtUI::extruder_t::E0; break;
+      case VP_MOVE_E0: target_atc_tool = ExtUI::atc_tool_t::E0; break;
       #if TOOL_CHANGE_SUPPORT
-        case VP_MOVE_E1: target_extruder = ExtUI::extruder_t::E1; break;
+        case VP_MOVE_E1: target_atc_tool = ExtUI::atc_tool_t::E1; break;
       #endif
     #endif
     default: return;
   }
 
-  target += ExtUI::getAxisPosition_mm(target_extruder);
-  ExtUI::setAxisPosition_mm(target, target_extruder);
+  target += ExtUI::getAxisPosition_mm(target_atc_tool);
+  ExtUI::setAxisPosition_mm(target, target_atc_tool);
   skipVP = var.VP;
 }
 
@@ -488,13 +488,13 @@ void DGUSScreenHandler::HandleStepPerMMExtruderChanged(DGUS_VP_Variable &var, vo
   uint16_t value_raw = swap16(*(uint16_t*)val_ptr);
   DEBUG_ECHOLNPGM("value_raw:", value_raw);
   float value = (float)value_raw / 10;
-  ExtUI::extruder_t extruder;
+  ExtUI::atc_tool_t atc_tool;
   switch (var.VP) {
     default: return;
   }
   DEBUG_ECHOLNPGM("value:", value);
-  ExtUI::setAxisSteps_per_mm(value, extruder);
-  DEBUG_ECHOLNPGM("value_set:", ExtUI::getAxisSteps_per_mm(extruder));
+  ExtUI::setAxisSteps_per_mm(value, atc_tool);
+  DEBUG_ECHOLNPGM("value_set:", ExtUI::getAxisSteps_per_mm(atc_tool));
   skipVP = var.VP; // don't overwrite value the next update time as the display might autoincrement in parallel
 }
 
@@ -509,12 +509,12 @@ void DGUSScreenHandler::HandleStepPerMMExtruderChanged(DGUS_VP_Variable &var, vo
         #if ENABLED(PIDTEMP)
           #if HAS_HOTEND
             case VP_PID_AUTOTUNE_E0: // Autotune Extruder 0
-              sprintf_P(buf, PSTR("M303 E%d C5 S210 U1"), ExtUI::extruder_t::E0);
+              sprintf_P(buf, PSTR("M303 E%d C5 S210 U1"), ExtUI::atc_tool_t::E0);
               break;
           #endif
           #if TOOL_CHANGE_SUPPORT
             case VP_PID_AUTOTUNE_E1:
-              sprintf_P(buf, PSTR("M303 E%d C5 S210 U1"), ExtUI::extruder_t::E1);
+              sprintf_P(buf, PSTR("M303 E%d C5 S210 U1"), ExtUI::atc_tool_t::E1);
               break;
           #endif
         #endif

@@ -159,7 +159,7 @@ static FSTR_P const assets[] = {
   F("bmp_function1.bin"),
 
   // Start screen
-  F("bmp_printing.bin"),
+  F("bmp_cutting.bin"),
   F("bmp_set.bin"),
   F("bmp_tool.bin"),
 

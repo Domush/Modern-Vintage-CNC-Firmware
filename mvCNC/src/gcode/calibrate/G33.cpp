@@ -46,7 +46,7 @@ enum CalEnum : char {                        // the 7 main calibration points - 
 #define LOOP_CAL_ACT(VAR, _4P, _OP) LOOP_CAL_PT(VAR, _OP ? _AB : __A, _4P ? _4P_STEP : _7P_STEP)
 
 #if TOOL_CHANGE_SUPPORT
-  const uint8_t old_tool_index = active_extruder;
+  const uint8_t old_tool_index = active_tool;
 #endif
 
 float lcd_probe_pt(const xy_pos_t &xy);

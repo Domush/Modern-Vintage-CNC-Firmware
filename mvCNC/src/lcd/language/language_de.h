@@ -339,7 +339,7 @@ namespace Language_de {
   LSTR MSG_PAUSE_PRINT                    = _UxGT("SD-Druck pausieren");
   LSTR MSG_RESUME_PRINT                   = _UxGT("SD-Druck fortsetzen");
   LSTR MSG_STOP_PRINT                     = _UxGT("SD-Druck abbrechen");
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("Objekt drucken");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("Objekt drucken");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Objekt abbrechen");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Objekt abbrechen =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Wiederh. n. Stroma.");
@@ -348,7 +348,7 @@ namespace Language_de {
   LSTR MSG_DWELL                          = _UxGT("Warten...");
   LSTR MSG_USERWAIT                       = _UxGT("Klick zum Fortsetzen");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Druck pausiert...");
-  LSTR MSG_PRINTING                       = _UxGT("Druckt...");
+  LSTR MSG_CUTTING                       = _UxGT("Druckt...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Druck abgebrochen");
   LSTR MSG_PRINT_DONE                     = _UxGT("Druck fertig");
   LSTR MSG_NO_MOVE                        = _UxGT("Motoren angeschaltet");
@@ -462,7 +462,7 @@ namespace Language_de {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Drucker-Statistik");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Board-Info");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Thermistoren");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Extruder");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Extruder");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Baudrate");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protokoll");
   LSTR MSG_INFO_RUNAWAY_OFF               = _UxGT("Runaway Watch: AUS");

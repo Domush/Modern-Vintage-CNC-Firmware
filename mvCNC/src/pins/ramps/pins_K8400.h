@@ -9,7 +9,7 @@
  *
  * K8400 has some minor differences over a normal 3Drag:
  *  - No X/Y max endstops
- *  - Second extruder step pin has moved
+ *  - Second atc_tool step pin has moved
  *  - No power supply control
  *  - Second heater has moved pin
  */

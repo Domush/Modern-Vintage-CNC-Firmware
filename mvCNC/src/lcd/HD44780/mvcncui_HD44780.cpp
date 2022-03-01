@@ -592,7 +592,7 @@ FORCE_INLINE void _draw_bed_status(const bool blink) {
   _draw_heater_status(H_BED, TERN0(HAS_LEVELING, blink && planner.leveling_active) ? '_' : LCD_STR_BEDTEMP[0], blink);
 }
 
-#if HAS_PRINT_PROGRESS
+#if HAS_JOB_PROGRESS
 
   FORCE_INLINE void _draw_print_progress() {
     const uint8_t progress = ui.get_progress_percent();
@@ -835,7 +835,7 @@ void mvCNCUI::draw_status_screen() {
 
       #if LCD_WIDTH < 20
 
-        #if HAS_PRINT_PROGRESS
+        #if HAS_JOB_PROGRESS
   lcd_moveto(0, 2);
   _draw_print_progress();
         #endif
@@ -844,7 +844,7 @@ void mvCNCUI::draw_status_screen() {
 
   lcd_moveto(0, 1);
 
-        // If the first line has two extruder temps,
+        // If the first line has two atc_tool temps,
         // show more temperatures on the next line
 
         #if HOTENDS > 2 || (TOOL_CHANGE_SUPPORT && HAS_HEATED_BED)
@@ -923,14 +923,14 @@ void mvCNCUI::draw_status_screen() {
 
       #if LCD_WIDTH >= 20
         lcd_moveto(timepos - 7, 2);
-        #if HAS_PRINT_PROGRESS
+        #if HAS_JOB_PROGRESS
           _draw_print_progress();
         #else
           char c;
           uint16_t per;
           #if HAS_FAN0
             if (true
-              #if EXTRUDERS && ENABLED(ADAPTIVE_FAN_SLOWING)
+              #if ATC_TOOLS && ENABLED(ADAPTIVE_FAN_SLOWING)
                 && (blink || fanManager.fan_speed_scaler[0] < 128)
               #endif
             ) {
@@ -996,7 +996,7 @@ void mvCNCUI::draw_status_screen() {
       _draw_heater_status(H_E2, LCD_STR_THERMOMETER[0], blink);
     #elif TOOL_CHANGE_SUPPORT && HAS_HEATED_BED
       _draw_bed_status(blink);
-    #elif HAS_PRINT_PROGRESS
+    #elif HAS_JOB_PROGRESS
       #define DREW_PRINT_PROGRESS 1
       _draw_print_progress();
     #endif
@@ -1006,7 +1006,7 @@ void mvCNCUI::draw_status_screen() {
     //
     lcd_moveto(LCD_WIDTH - 9, 2);
 
-    #if HAS_PRINT_PROGRESS && !DREW_PRINT_PROGRESS
+    #if HAS_JOB_PROGRESS && !DREW_PRINT_PROGRESS
 
       _draw_print_progress();
 
@@ -1032,10 +1032,10 @@ void mvCNCUI::draw_status_screen() {
 
     #if ENABLED(ADVANCED_PAUSE_FEATURE)
 
-void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t extruder) {
+void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t atc_tool) {
   if (row < LCD_HEIGHT) {
     lcd_moveto(LCD_WIDTH - 9, row);
-    _draw_heater_status((heater_id_t)extruder, LCD_STR_THERMOMETER[0], get_blink());
+    _draw_heater_status((heater_id_t)atc_tool, LCD_STR_THERMOMETER[0], get_blink());
   }
     }
 

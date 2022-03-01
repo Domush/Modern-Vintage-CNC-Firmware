@@ -188,8 +188,8 @@ void DGUSScreenHandler::DGUSLCD_SendTMCStepValue(DGUS_VP_Variable &var) {
         GotoScreen(MKSLCD_SCREEN_PRINT);
 
         if (ExtUI::jobRunningFromMediaPaused()) {
-          nozzle_park_mks.print_pause_start_flag = 0;
-          nozzle_park_mks.blstatus = true;
+          tool_park_mks.print_pause_start_flag = 0;
+          tool_park_mks.blstatus = true;
           ExtUI::resumePrint();
         }
       } break;
@@ -198,14 +198,14 @@ void DGUSScreenHandler::DGUSLCD_SendTMCStepValue(DGUS_VP_Variable &var) {
 
         GotoScreen(MKSLCD_SCREEN_PAUSE);
         if (!ExtUI::jobRunningFromMediaPaused()) {
-          nozzle_park_mks.print_pause_start_flag = 1;
-          nozzle_park_mks.blstatus = true;
+          tool_park_mks.print_pause_start_flag = 1;
+          tool_park_mks.blstatus = true;
           ExtUI::pausePrint();
           //ExtUI::mks_pausePrint();
         }
         break;
       case 2: // Abort
-        HandleUserConfirmationPopUp(VP_SD_AbortPrintConfirmed, nullptr, PSTR("Abort printing"), filelist.filename(), PSTR("?"), true, true, false, true);
+        HandleUserConfirmationPopUp(VP_SD_AbortPrintConfirmed, nullptr, PSTR("Abort cutting"), filelist.filename(), PSTR("?"), true, true, false, true);
         break;
     }
   }
@@ -237,11 +237,11 @@ void DGUSScreenHandler::DGUSLCD_SendTMCStepValue(DGUS_VP_Variable &var) {
   void DGUSScreenHandler::SDCardRemoved() {
     if (current_screen == DGUSLCD_SCREEN_SDFILELIST
         || (current_screen == DGUSLCD_SCREEN_CONFIRM && (ConfirmVP == VP_SD_AbortPrintConfirmed || ConfirmVP == VP_SD_FileSelectConfirm))
-        || current_screen == DGUSLCD_SCREEN_SDPRINTMANIPULATION
+        || current_screen == DGUSLCD_SCREEN_SDJOBMANIPULATION
     ) filelist.refresh();
   }
 
-  void DGUSScreenHandler::SDPrintingFinished() {
+  void DGUSScreenHandler::SDJobFinished() {
     if (DGUSAutoTurnOff) {
       queue.exhaust();
       gcode.process_subcommands_now(F("M81"));
@@ -268,7 +268,7 @@ void DGUSScreenHandler::ScreenChangeHook(DGUS_VP_Variable &var, void *val_ptr) {
 
   // when the dgus had reboot, it will enter the DGUSLCD_SCREEN_MAIN page,
   // so user can change any page to use this function, an it will check
-  // if robin nano is printing. when it is, dgus will enter the printing
+  // if robin nano is cutting. when it is, dgus will enter the cutting
   // page to continue print;
   //
   //if (jobIsOngoing() || jobIsPaused()) {
@@ -930,18 +930,18 @@ void DGUSScreenHandler::HandleStepPerMMExtruderChanged_MKS(DGUS_VP_Variable &var
   DEBUG_ECHOLNPGM("value_raw:", value_raw);
   DEBUG_ECHOLNPGM("value:", value);
 
-  ExtUI::extruder_t extruder;
+  ExtUI::atc_tool_t atc_tool;
   switch (var.VP) {
     default: return;
     #if HAS_HOTEND
-      case VP_E0_STEP_PER_MM: extruder = ExtUI::extruder_t::E0; break;
+      case VP_E0_STEP_PER_MM: atc_tool = ExtUI::atc_tool_t::E0; break;
     #endif
     #if TOOL_CHANGE_SUPPORT
-      case VP_E1_STEP_PER_MM: extruder = ExtUI::extruder_t::E1; break;
+      case VP_E1_STEP_PER_MM: atc_tool = ExtUI::atc_tool_t::E1; break;
     #endif
   }
-  ExtUI::setAxisSteps_per_mm(value, extruder);
-  DEBUG_ECHOLNPGM("value_set:", ExtUI::getAxisSteps_per_mm(extruder));
+  ExtUI::setAxisSteps_per_mm(value, atc_tool);
+  DEBUG_ECHOLNPGM("value_set:", ExtUI::getAxisSteps_per_mm(atc_tool));
   settings.save();
   skipVP = var.VP; // don't overwrite value the next update time as the display might autoincrement in parallel
 }
@@ -977,18 +977,18 @@ void DGUSScreenHandler::HandleExtruderMaxSpeedChange_MKS(DGUS_VP_Variable &var, 
   DEBUG_ECHOLNPGM("value_raw:", value_raw);
   DEBUG_ECHOLNPGM("value:", value);
 
-  ExtUI::extruder_t extruder;
+  ExtUI::atc_tool_t atc_tool;
   switch (var.VP) {
     default: return;
       #if HAS_HOTEND
-        case VP_E0_MAX_SPEED: extruder = ExtUI::extruder_t::E0; break;
+        case VP_E0_MAX_SPEED: atc_tool = ExtUI::atc_tool_t::E0; break;
       #endif
       #if TOOL_CHANGE_SUPPORT
       #endif
-    case VP_E1_MAX_SPEED: extruder = ExtUI::extruder_t::E1; break;
+    case VP_E1_MAX_SPEED: atc_tool = ExtUI::atc_tool_t::E1; break;
   }
-  ExtUI::setAxisMaxFeedrate_mm_s(value, extruder);
-  DEBUG_ECHOLNPGM("value_set:", ExtUI::getAxisMaxFeedrate_mm_s(extruder));
+  ExtUI::setAxisMaxFeedrate_mm_s(value, atc_tool);
+  DEBUG_ECHOLNPGM("value_set:", ExtUI::getAxisMaxFeedrate_mm_s(atc_tool));
   settings.save();
   skipVP = var.VP; // don't overwrite value the next update time as the display might autoincrement in parallel
 }
@@ -1021,19 +1021,19 @@ void DGUSScreenHandler::HandleExtruderAccChange_MKS(DGUS_VP_Variable &var, void 
   uint16_t value_raw = swap16(*(uint16_t*)val_ptr);
   DEBUG_ECHOLNPGM("value_raw:", value_raw);
   float value = (float)value_raw;
-  ExtUI::extruder_t extruder;
+  ExtUI::atc_tool_t atc_tool;
   switch (var.VP) {
     default: return;
     #if HAS_HOTEND
-      case VP_E0_ACC_MAX_SPEED: extruder = ExtUI::extruder_t::E0; settings.load(); break;
+      case VP_E0_ACC_MAX_SPEED: atc_tool = ExtUI::atc_tool_t::E0; settings.load(); break;
     #endif
     #if TOOL_CHANGE_SUPPORT
-      case VP_E1_ACC_MAX_SPEED: extruder = ExtUI::extruder_t::E1; settings.load(); break;
+      case VP_E1_ACC_MAX_SPEED: atc_tool = ExtUI::atc_tool_t::E1; settings.load(); break;
     #endif
   }
   DEBUG_ECHOLNPGM("value:", value);
-  ExtUI::setAxisMaxAcceleration_mm_s2(value, extruder);
-  DEBUG_ECHOLNPGM("value_set:", ExtUI::getAxisMaxAcceleration_mm_s2(extruder));
+  ExtUI::setAxisMaxAcceleration_mm_s2(value, atc_tool);
+  DEBUG_ECHOLNPGM("value_set:", ExtUI::getAxisMaxAcceleration_mm_s2(atc_tool));
   settings.save();
   skipVP = var.VP; // don't overwrite value the next update time as the display might autoincrement in parallel
 }
@@ -1313,10 +1313,10 @@ void DGUSScreenHandler::MKS_FilamentUnLoad(DGUS_VP_Variable &var, void *val_ptr)
 
     if (filament_data.action == 0) { // Go back to utility screen
       #if HAS_HOTEND
-        fanManager.setTargetHotend(e_temp, ExtUI::extruder_t::E0);
+        fanManager.setTargetHotend(e_temp, ExtUI::atc_tool_t::E0);
       #endif
       #if TOOL_CHANGE_SUPPORT
-        fanManager.setTargetHotend(e_temp, ExtUI::extruder_t::E1);
+        fanManager.setTargetHotend(e_temp, ExtUI::atc_tool_t::E1);
       #endif
       GotoScreen(DGUSLCD_SCREEN_UTILITY);
     }
@@ -1325,14 +1325,14 @@ void DGUSScreenHandler::MKS_FilamentUnLoad(DGUS_VP_Variable &var, void *val_ptr)
         default: return;
           #if HAS_HOTEND
             case VP_E0_FILAMENT_LOAD_UNLOAD:
-              filament_data.extruder = ExtUI::extruder_t::E0;
-              fanManager.setTargetHotend(e_temp, filament_data.extruder);
+              filament_data.atc_tool = ExtUI::atc_tool_t::E0;
+              fanManager.setTargetHotend(e_temp, filament_data.atc_tool);
               break;
           #endif
           #if TOOL_CHANGE_SUPPORT
             case VP_E1_FILAMENT_LOAD_UNLOAD:
-              filament_data.extruder = ExtUI::extruder_t::E1;
-              fanManager.setTargetHotend(e_temp, filament_data.extruder);
+              filament_data.atc_tool = ExtUI::atc_tool_t::E1;
+              fanManager.setTargetHotend(e_temp, filament_data.atc_tool);
               break;
           #endif
       }
@@ -1344,15 +1344,15 @@ void DGUSScreenHandler::MKS_FilamentUnLoad(DGUS_VP_Variable &var, void *val_ptr)
     if (filament_data.action <= 0) return;
 
     // If we close to the target temperature, we can start load or unload the filament
-    if (fanManager.hotEnoughToExtrude(filament_data.extruder) && \
-        fanManager.targetHotEnoughToExtrude(filament_data.extruder)) {
+    if (fanManager.hotEnoughToExtrude(filament_data.atc_tool) && \
+        fanManager.targetHotEnoughToExtrude(filament_data.atc_tool)) {
       float movevalue = DGUS_FILAMENT_LOAD_LENGTH_PER_TIME;
 
       if (filament_data.action == 1) { // load filament
         if (!filament_data.heated) {
           filament_data.heated = true;
         }
-        movevalue = ExtUI::getAxisPosition_mm(filament_data.extruder) + movevalue;
+        movevalue = ExtUI::getAxisPosition_mm(filament_data.atc_tool) + movevalue;
       }
       else { // unload filament
         if (!filament_data.heated) {
@@ -1361,14 +1361,14 @@ void DGUSScreenHandler::MKS_FilamentUnLoad(DGUS_VP_Variable &var, void *val_ptr)
         }
         // Before unloading extrude to prevent jamming
         if (filament_data.purge_length >= 0) {
-          movevalue = ExtUI::getAxisPosition_mm(filament_data.extruder) + movevalue;
+          movevalue = ExtUI::getAxisPosition_mm(filament_data.atc_tool) + movevalue;
           filament_data.purge_length -= movevalue;
         }
         else {
-          movevalue = ExtUI::getAxisPosition_mm(filament_data.extruder) - movevalue;
+          movevalue = ExtUI::getAxisPosition_mm(filament_data.atc_tool) - movevalue;
         }
       }
-      ExtUI::setAxisPosition_mm(movevalue, filament_data.extruder);
+      ExtUI::setAxisPosition_mm(movevalue, filament_data.atc_tool);
     }
   }
 
@@ -1684,7 +1684,7 @@ void DGUSScreenHandler::DGUS_LanguageDisplay(uint8_t var) {
     dgusdisplay.WriteVariable(VP_Fan_Speed_Dis, FAN_Speed_buf_en, 32, true);
 
     const char CNCing_buf_en[] = "CNCing";
-    dgusdisplay.WriteVariable(VP_Printing_Dis, CNCing_buf_en, 32, true);
+    dgusdisplay.WriteVariable(VP_Cutting_Dis, CNCing_buf_en, 32, true);
 
     const char Info_EEPROM_1_buf_en[] = "Store setting?";
     dgusdisplay.WriteVariable(VP_Info_EEPROM_1_Dis, Info_EEPROM_1_buf_en, 32, true);
@@ -1939,7 +1939,7 @@ void DGUSScreenHandler::DGUS_LanguageDisplay(uint8_t var) {
     dgusdisplay.WriteVariable(VP_Fan_Speed_Dis, FAN_Speed_buf_ch, 16, true);
 
     const uint16_t CNCing_buf_ch[] = { 0xF2B4, 0xA1D3, 0xD0D6, 0x2000 };
-    dgusdisplay.WriteVariable(VP_Printing_Dis, CNCing_buf_ch, 16, true);
+    dgusdisplay.WriteVariable(VP_Cutting_Dis, CNCing_buf_ch, 16, true);
 
     const uint16_t Info_EEPROM_1_buf_ch[] = { 0xC7CA, 0xF1B7, 0xA3B1, 0xE6B4, 0xE8C9, 0xC3D6, 0xBFA3, 0x2000 };
     dgusdisplay.WriteVariable(VP_Info_EEPROM_1_Dis, Info_EEPROM_1_buf_ch, 32, true);

@@ -52,9 +52,9 @@ void InterfaceSoundsScreen::playEventSound(event_t event, play_mode_t mode) {
 }
 
 void InterfaceSoundsScreen::defaultSettings() {
-  setSoundSelection(PRINTING_STARTED,  twinkle);
-  setSoundSelection(PRINTING_FINISHED, fanfare);
-  setSoundSelection(PRINTING_FAILED,   sad_trombone);
+  setSoundSelection(CUTTING_STARTED,  twinkle);
+  setSoundSelection(CUTTING_FINISHED, fanfare);
+  setSoundSelection(CUTTING_FAILED,   sad_trombone);
 }
 
 void InterfaceSoundsScreen::onRedraw(draw_mode_t what) {
@@ -95,9 +95,9 @@ void InterfaceSoundsScreen::onRedraw(draw_mode_t what) {
     #undef EDGE_R
        .colors(normal_btn)
     #define EDGE_R 0
-       .tag(3).button    (BTN_POS(3,5), BTN_SIZE(2,1), getSoundSelection(PRINTING_STARTED))
-       .tag(4).button    (BTN_POS(3,6), BTN_SIZE(2,1), getSoundSelection(PRINTING_FINISHED))
-       .tag(5).button    (BTN_POS(3,7), BTN_SIZE(2,1), getSoundSelection(PRINTING_FAILED))
+       .tag(3).button    (BTN_POS(3,5), BTN_SIZE(2,1), getSoundSelection(CUTTING_STARTED))
+       .tag(4).button    (BTN_POS(3,6), BTN_SIZE(2,1), getSoundSelection(CUTTING_FINISHED))
+       .tag(5).button    (BTN_POS(3,7), BTN_SIZE(2,1), getSoundSelection(CUTTING_FAILED))
        .colors(action_btn)
        .tag(1).button    (BTN_POS(1,9), BTN_SIZE(4,1), GET_TEXT_F(MSG_BUTTON_DONE));
   }
@@ -112,9 +112,9 @@ bool InterfaceSoundsScreen::onTouchEnd(uint8_t tag) {
   switch (tag) {
     case 1: GOTO_PREVIOUS();                                              return true;
     case 2: UIData::enable_touch_sounds(!UIData::touch_sounds_enabled()); break;
-    case 3: toggleSoundSelection(PRINTING_STARTED);                       break;
-    case 4: toggleSoundSelection(PRINTING_FINISHED);                      break;
-    case 5: toggleSoundSelection(PRINTING_FAILED);                        break;
+    case 3: toggleSoundSelection(CUTTING_STARTED);                       break;
+    case 4: toggleSoundSelection(CUTTING_FINISHED);                      break;
+    case 5: toggleSoundSelection(CUTTING_FAILED);                        break;
     default:
       return false;
   }

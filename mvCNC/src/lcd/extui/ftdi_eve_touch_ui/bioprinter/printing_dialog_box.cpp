@@ -1,5 +1,5 @@
 /*******************************
- * bio_printing_dialog_box.cpp *
+ * bio_cutting_dialog_box.cpp *
  *******************************/
 
 /****************************************************************************
@@ -23,7 +23,7 @@
 #include "../config.h"
 #include "../screens.h"
 
-#ifdef FTDI_BIO_PRINTING_DIALOG_BOX
+#ifdef FTDI_BIO_CUTTING_DIALOG_BOX
 
 using namespace FTDI;
 using namespace ExtUI;
@@ -32,7 +32,7 @@ using namespace Theme;
 #define GRID_COLS 2
 #define GRID_ROWS 9
 
-void BioPrintingDialogBox::draw_status_message(draw_mode_t what, const char *message) {
+void BioCuttingDialogBox::draw_status_message(draw_mode_t what, const char *message) {
   if (what & BACKGROUND) {
     CommandProcessor cmd;
     cmd.cmd(COLOR_RGB(bg_text_enabled))
@@ -41,7 +41,7 @@ void BioPrintingDialogBox::draw_status_message(draw_mode_t what, const char *mes
   }
 }
 
-void BioPrintingDialogBox::draw_progress(draw_mode_t what) {
+void BioCuttingDialogBox::draw_progress(draw_mode_t what) {
   if (what & FOREGROUND) {
     CommandProcessor cmd;
     cmd.font(font_large)
@@ -53,7 +53,7 @@ void BioPrintingDialogBox::draw_progress(draw_mode_t what) {
   }
 }
 
-void BioPrintingDialogBox::draw_time_remaining(draw_mode_t what) {
+void BioCuttingDialogBox::draw_time_remaining(draw_mode_t what) {
   if (what & FOREGROUND) {
     const uint32_t elapsed = getProgress_seconds_elapsed();
     const uint8_t hrs = elapsed/3600;
@@ -68,7 +68,7 @@ void BioPrintingDialogBox::draw_time_remaining(draw_mode_t what) {
   }
 }
 
-void BioPrintingDialogBox::draw_interaction_buttons(draw_mode_t what) {
+void BioCuttingDialogBox::draw_interaction_buttons(draw_mode_t what) {
   if (what & FOREGROUND) {
     CommandProcessor cmd;
     cmd.colors(normal_btn)
@@ -82,7 +82,7 @@ void BioPrintingDialogBox::draw_interaction_buttons(draw_mode_t what) {
   }
 }
 
-void BioPrintingDialogBox::onRedraw(draw_mode_t what) {
+void BioCuttingDialogBox::onRedraw(draw_mode_t what) {
   if (what & FOREGROUND) {
     draw_progress(FOREGROUND);
     draw_time_remaining(FOREGROUND);
@@ -90,7 +90,7 @@ void BioPrintingDialogBox::onRedraw(draw_mode_t what) {
   }
 }
 
-bool BioPrintingDialogBox::onTouchEnd(uint8_t tag) {
+bool BioCuttingDialogBox::onTouchEnd(uint8_t tag) {
   switch (tag) {
     case 1: GOTO_SCREEN(FeedratePercentScreen); break;
     case 2: GOTO_SCREEN(TuneMenu); break;
@@ -105,13 +105,13 @@ bool BioPrintingDialogBox::onTouchEnd(uint8_t tag) {
   return true;
 }
 
-void BioPrintingDialogBox::setStatusMessage(FSTR_P message) {
+void BioCuttingDialogBox::setStatusMessage(FSTR_P message) {
   char buff[strlen_P((const char*)message)+1];
   strcpy_P(buff, (const char*) message);
   setStatusMessage(buff);
 }
 
-void BioPrintingDialogBox::setStatusMessage(const char *message) {
+void BioCuttingDialogBox::setStatusMessage(const char *message) {
   CommandProcessor cmd;
   cmd.cmd(CMD_DLSTART)
      .cmd(CLEAR_COLOR_RGB(bg_color))
@@ -127,11 +127,11 @@ void BioPrintingDialogBox::setStatusMessage(const char *message) {
     SERIAL_ECHO_MSG("New status message: ", message);
   #endif
 
-  if (AT_SCREEN(BioPrintingDialogBox))
+  if (AT_SCREEN(BioCuttingDialogBox))
     current_screen.onRefresh();
 }
 
-void BioPrintingDialogBox::onIdle() {
+void BioCuttingDialogBox::onIdle() {
   reset_menu_timeout();
   if (refresh_timer.elapsed(STATUS_UPDATE_INTERVAL)) {
     onRefresh();
@@ -140,8 +140,8 @@ void BioPrintingDialogBox::onIdle() {
   BaseScreen::onIdle();
 }
 
-void BioPrintingDialogBox::show() {
-  GOTO_SCREEN(BioPrintingDialogBox);
+void BioCuttingDialogBox::show() {
+  GOTO_SCREEN(BioCuttingDialogBox);
 }
 
-#endif // FTDI_BIO_PRINTING_DIALOG_BOX
+#endif // FTDI_BIO_CUTTING_DIALOG_BOX

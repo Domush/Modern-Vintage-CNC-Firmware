@@ -256,7 +256,7 @@ void StatusScreen::draw_buttons(draw_mode_t what) {
      .colors(has_media ? action_btn : normal_btn)
      .tag(9).button(x, y, h, v,
         jobRunningFromMedia() ?
-          GET_TEXT_F(MSG_PRINTING) :
+          GET_TEXT_F(MSG_CUTTING) :
           GET_TEXT_F(MSG_BUTTON_MEDIA)
       );
 
@@ -355,11 +355,11 @@ bool StatusScreen::onTouchHeld(uint8_t tag) {
 }
 
 void StatusScreen::setStatusMessage(FSTR_P pstr) {
-  BioPrintingDialogBox::setStatusMessage(pstr);
+  BioCuttingDialogBox::setStatusMessage(pstr);
 }
 
 void StatusScreen::setStatusMessage(const char * const str) {
-  BioPrintingDialogBox::setStatusMessage(str);
+  BioCuttingDialogBox::setStatusMessage(str);
 }
 
 void StatusScreen::onIdle() {
@@ -368,7 +368,7 @@ void StatusScreen::onIdle() {
     if (!EventLoop::is_touch_held())
       onRefresh();
     if (jobRunningFromMedia())
-      BioPrintingDialogBox::show();
+      BioCuttingDialogBox::show();
     refresh_timer.start();
   }
 }

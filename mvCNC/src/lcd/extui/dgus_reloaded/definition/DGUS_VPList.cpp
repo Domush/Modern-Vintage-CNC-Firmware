@@ -62,7 +62,7 @@ const struct DGUS_VP vp_list[] PROGMEM = {
   VP_HELPER_RX(DGUS_Addr::SCREENCHANGE,          &DGUSRxHandler::ScreenChange),
   VP_HELPER_RX(DGUS_Addr::SCREENCHANGE_SD,       &DGUSRxHandler::ScreenChange),
   VP_HELPER_RX(DGUS_Addr::SCREENCHANGE_Idle,     &DGUSRxHandler::ScreenChange),
-  VP_HELPER_RX(DGUS_Addr::SCREENCHANGE_Printing, &DGUSRxHandler::ScreenChange),
+  VP_HELPER_RX(DGUS_Addr::SCREENCHANGE_Cutting, &DGUSRxHandler::ScreenChange),
 
   #if ENABLED(SDSUPPORT)
     VP_HELPER_RX(DGUS_Addr::SD_SelectFile,   &DGUSRxHandler::SelectFile),

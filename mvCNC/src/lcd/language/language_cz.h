@@ -322,7 +322,7 @@ namespace Language_cz {
   LSTR MSG_PAUSE_PRINT                    = _UxGT("Pozastavit tisk");
   LSTR MSG_RESUME_PRINT                   = _UxGT("Obnovit tisk");
   LSTR MSG_STOP_PRINT                     = _UxGT("Zastavit tisk");
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("Tisk objektu");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("Tisk objektu");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Zrušit objekt");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Zrušit objekt =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Obnova výpadku");
@@ -331,7 +331,7 @@ namespace Language_cz {
   LSTR MSG_DWELL                          = _UxGT("Uspáno...");
   LSTR MSG_USERWAIT                       = _UxGT("Čekání na uživ...");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Tisk pozastaven");
-  LSTR MSG_PRINTING                       = _UxGT("Tisknu...");
+  LSTR MSG_CUTTING                       = _UxGT("Tisknu...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Tisk zrušen");
   LSTR MSG_NO_MOVE                        = _UxGT("Žádný pohyb.");
   LSTR MSG_KILLED                         = _UxGT("PŘERUSENO. ");
@@ -437,7 +437,7 @@ namespace Language_cz {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Statistika");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Info o desce");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistory");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Extrudéry");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Extrudéry");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Rychlost");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protokol");
   LSTR MSG_INFO_RUNAWAY_OFF               = _UxGT("Sledování úniku: VYP");

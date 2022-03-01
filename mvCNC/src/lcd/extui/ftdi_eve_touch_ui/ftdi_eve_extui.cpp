@@ -37,7 +37,7 @@ namespace ExtUI {
     #if ENABLED(SDSUPPORT)
       if (jobRunningFromMedia()) {
         stopPrint();
-        InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::PRINTING_FAILED);
+        InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::CUTTING_FAILED);
       }
       else
         sound.play(media_removed, PLAY_ASYNCHRONOUS);
@@ -55,20 +55,20 @@ namespace ExtUI {
   void onStatusChanged(const char *lcd_msg) { StatusScreen::setStatusMessage(lcd_msg); }
 
   void onPrintTimerStarted() {
-    InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::PRINTING_STARTED);
+    InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::CUTTING_STARTED);
   }
   void onPrintTimerStopped() {
-    InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::PRINTING_FINISHED);
+    InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::CUTTING_FINISHED);
   }
 
   void onPrintTimerPaused() {}
   void onPrintFinished() {}
 
-  void onFilamentRunout(const extruder_t extruder) {
+  void onFilamentRunout(const atc_tool_t atc_tool) {
     char lcd_msg[30];
-    sprintf_P(lcd_msg, PSTR("Extruder %d Filament Error"), extruder + 1);
+    sprintf_P(lcd_msg, PSTR("Extruder %d Filament Error"), atc_tool + 1);
     StatusScreen::setStatusMessage(lcd_msg);
-    InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::PRINTING_FAILED, FTDI::PLAY_SYNCHRONOUS);
+    InterfaceSoundsScreen::playEventSound(InterfaceSoundsScreen::CUTTING_FAILED, FTDI::PLAY_SYNCHRONOUS);
   }
 
   void onHomingStart() {}

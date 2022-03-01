@@ -168,7 +168,7 @@ void lv_draw_ready_print() {
   else {
     lv_big_button_create(scr, "F:/bmp_tool.bin", main_menu.tool, 20, 90, event_handler, ID_TOOL);
     lv_big_button_create(scr, "F:/bmp_set.bin", main_menu.set, 180, 90, event_handler, ID_SET);
-    lv_big_button_create(scr, "F:/bmp_printing.bin", main_menu.print, 340, 90, event_handler, ID_PRINT);
+    lv_big_button_create(scr, "F:/bmp_cutting.bin", main_menu.print, 340, 90, event_handler, ID_PRINT);
 
     // Monitoring
     #if HAS_HOTEND
@@ -200,17 +200,17 @@ void lv_draw_ready_print() {
 
 void lv_temp_refr() {
   #if HAS_HOTEND
-    sprintf(public_buf_l, printing_menu.temp1, fanManager.wholeDegHotend(0), fanManager.degTargetHotend(0));
+    sprintf(public_buf_l, cutting_menu.temp1, fanManager.wholeDegHotend(0), fanManager.degTargetHotend(0));
     lv_label_set_text(labelExt1, public_buf_l);
     lv_obj_align(labelExt1, buttonExt1, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
   #endif
   #if TOOL_CHANGE_SUPPORT
-    sprintf(public_buf_l, printing_menu.temp1, fanManager.wholeDegHotend(1), fanManager.degTargetHotend(1));
+    sprintf(public_buf_l, cutting_menu.temp1, fanManager.wholeDegHotend(1), fanManager.degTargetHotend(1));
     lv_label_set_text(labelExt2, public_buf_l);
     lv_obj_align(labelExt2, buttonExt2, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
   #endif
   #if HAS_HEATED_BED
-    sprintf(public_buf_l, printing_menu.bed_temp, fanManager.wholeDegBed(), fanManager.degTargetBed());
+    sprintf(public_buf_l, cutting_menu.bed_temp, fanManager.wholeDegBed(), fanManager.degTargetBed());
     lv_label_set_text(labelBed, public_buf_l);
     lv_obj_align(labelBed, buttonBedstate, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
   #endif

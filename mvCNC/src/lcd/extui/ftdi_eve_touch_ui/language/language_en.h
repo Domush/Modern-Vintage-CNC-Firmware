@@ -44,7 +44,7 @@ namespace Language_en {
   PROGMEM Language_Str MSG_VMAX_X                   = u8"Vmax X";
   PROGMEM Language_Str MSG_VMAX_Y                   = u8"Vmax Y";
   PROGMEM Language_Str MSG_VMAX_Z                   = u8"Vmax Z";
-  PROGMEM Language_Str MSG_ACCEL_PRINTING           = u8"CNCing";
+  PROGMEM Language_Str MSG_ACCEL_CUTTING           = u8"CNCing";
   PROGMEM Language_Str MSG_ACCEL_TRAVEL             = u8"Travel";
   PROGMEM Language_Str MSG_ACCEL_RETRACT            = u8"Retraction";
   PROGMEM Language_Str MSG_AMAX_X                   = u8"Amax X";
@@ -105,7 +105,7 @@ namespace Language_en {
   PROGMEM Language_Str MSG_ERASING                  = u8"Erasing...";
   PROGMEM Language_Str MSG_ERASED                   = u8"SPI flash erased";
   PROGMEM Language_Str MSG_CALIBRATION_WARNING      = u8"For best results, unload the filament and clean the hotend prior to starting calibration. Continue?";
-  PROGMEM Language_Str MSG_START_PRINT_CONFIRMATION = u8"Start printing %s?";
+  PROGMEM Language_Str MSG_START_PRINT_CONFIRMATION = u8"Start cutting %s?";
   PROGMEM Language_Str MSG_ABORT_WARNING            = u8"Are you sure you want to cancel the print?";
   PROGMEM Language_Str MSG_EXTRUDER_SELECTION       = u8"Extruder Selection";
   PROGMEM Language_Str MSG_CURRENT_TEMPERATURE      = u8"Current Temp";

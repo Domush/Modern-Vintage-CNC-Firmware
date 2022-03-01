@@ -185,11 +185,11 @@ const uint16_t VPList_SD_PrintManipulation[] PROGMEM = {
   0x0000
 };
 
-const uint16_t VPList_SDPrintTune[] PROGMEM = {
+const uint16_t VPList_SDJobTune[] PROGMEM = {
   #if HAS_HOTEND
     VP_T_E0_Is, VP_T_E0_Set, VP_Flowrate_E0,
     #if TOOL_CHANGE_SUPPORT
-      VP_T_E1_Is, VP_T_E1_Set, VP_Flowrate_E1,  // ERROR: Flowrate is per-extruder, not per-hotend
+      VP_T_E1_Is, VP_T_E1_Set, VP_Flowrate_E1,  // ERROR: Flowrate is per-atc_tool, not per-hotend
     #endif
   #endif
   #if HAS_HEATED_BED
@@ -250,7 +250,7 @@ const uint16_t VPList_FLCPreheat[] PROGMEM = {
   0x0000
 };
 
-const uint16_t VPList_FLCPrinting[] PROGMEM = {
+const uint16_t VPList_FLCCutting[] PROGMEM = {
   #if HAS_HOTEND
     VP_SD_Print_ProbeOffsetZ,
   #endif
@@ -276,12 +276,12 @@ const struct VPMapping VPMap[] PROGMEM = {
   { DGUSLCD_SCREEN_FILAMENT_HEATING,    VPList_Filament_heating     },
   { DGUSLCD_SCREEN_FILAMENT_LOADING,    VPList_Filament_load_unload },
   { DGUSLCD_SCREEN_FILAMENT_UNLOADING,  VPList_Filament_load_unload },
-  { DGUSLCD_SCREEN_SDPRINTMANIPULATION, VPList_SD_PrintManipulation },
+  { DGUSLCD_SCREEN_SDJOBMANIPULATION, VPList_SD_PrintManipulation },
   { DGUSLCD_SCREEN_SDFILELIST,          VPList_SDFileList           },
-  { DGUSLCD_SCREEN_SDPRINTTUNE,         VPList_SDPrintTune          },
+  { DGUSLCD_SCREEN_SDJOBTUNE,         VPList_SDJobTune          },
   { DGUSLCD_SCREEN_WAITING,             VPList_PIDTuningWaiting     },
   { DGUSLCD_SCREEN_FLC_PREHEAT,         VPList_FLCPreheat           },
-  { DGUSLCD_SCREEN_FLC_PRINTING,        VPList_FLCPrinting          },
+  { DGUSLCD_SCREEN_FLC_CUTTING,        VPList_FLCCutting          },
   { DGUSLCD_SCREEN_Z_OFFSET,            VPList_Z_Offset             },
   { DGUSLCD_SCREEN_STEPPERMM,           VPList_StepPerMM            },
   { DGUSLCD_SCREEN_PID_E,               VPList_PIDE0                },
@@ -337,7 +337,7 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   #if HAS_HOTEND
     VPHELPER(VP_T_E0_Is, &fanManager.temp_hotend[0].celsius, nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<0>),
     VPHELPER(VP_T_E0_Set, &fanManager.temp_hotend[0].target, ScreenHandler.HandleTemperatureChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
-    VPHELPER(VP_Flowrate_E0, &planner.flow_percentage[ExtUI::extruder_t::E0], ScreenHandler.HandleFlowRateChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
+    VPHELPER(VP_Flowrate_E0, &planner.flow_percentage[ExtUI::atc_tool_t::E0], ScreenHandler.HandleFlowRateChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
     VPHELPER(VP_EPos, &destination.e, nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<2>),
     VPHELPER(VP_MOVE_E0, nullptr, ScreenHandler.HandleManualExtrude, nullptr),
     VPHELPER(VP_E0_CONTROL, &fanManager.temp_hotend[0].target, ScreenHandler.HandleHeaterControl, nullptr),
@@ -358,7 +358,7 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   #if TOOL_CHANGE_SUPPORT
     VPHELPER(VP_T_E1_Is, &fanManager.temp_hotend[1].celsius, nullptr, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<0>),
     VPHELPER(VP_T_E1_Set, &fanManager.temp_hotend[1].target, ScreenHandler.HandleTemperatureChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
-    VPHELPER(VP_Flowrate_E1, &planner.flow_percentage[ExtUI::extruder_t::E1], ScreenHandler.HandleFlowRateChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),  // ERROR: Flow is per-extruder, not per-hotend
+    VPHELPER(VP_Flowrate_E1, &planner.flow_percentage[ExtUI::atc_tool_t::E1], ScreenHandler.HandleFlowRateChanged, ScreenHandler.DGUSLCD_SendWordValueToDisplay),  // ERROR: Flow is per-atc_tool, not per-hotend
     VPHELPER(VP_MOVE_E1, nullptr, ScreenHandler.HandleManualExtrude, nullptr),
     VPHELPER(VP_E1_CONTROL, &fanManager.temp_hotend[1].target, ScreenHandler.HandleHeaterControl, nullptr),
     VPHELPER(VP_E1_STATUS, &fanManager.temp_hotend[1].target, nullptr, ScreenHandler.DGUSLCD_SendHeaterStatusToDisplay),

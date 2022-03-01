@@ -37,15 +37,15 @@ void StepsScreen::onRedraw(draw_mode_t what) {
   w.color(x_axis)     .adjuster( 2, GET_TEXT_F(MSG_AXIS_X),  getAxisSteps_per_mm(X) );
   w.color(y_axis)     .adjuster( 4, GET_TEXT_F(MSG_AXIS_Y),  getAxisSteps_per_mm(Y) );
   w.color(z_axis)     .adjuster( 6, GET_TEXT_F(MSG_AXIS_Z),  getAxisSteps_per_mm(Z) );
-  #if EXTRUDERS == 1 || DISABLED(DISTINCT_E_FACTORS)
+  #if ATC_TOOLS == 1 || DISABLED(DISTINCT_E_FACTORS)
     w.color(e_axis)   .adjuster( 8, GET_TEXT_F(MSG_AXIS_E),  getAxisSteps_per_mm(E0) );
   #elif TOOL_CHANGE_SUPPORT
     w.color(e_axis)   .adjuster( 8, GET_TEXT_F(MSG_AXIS_E1), getAxisSteps_per_mm(E0) );
     w.color(e_axis)   .adjuster(10, GET_TEXT_F(MSG_AXIS_E2), getAxisSteps_per_mm(E1) );
-    #if EXTRUDERS > 2
+    #if ATC_TOOLS > 2
       w.color(e_axis) .adjuster(12, GET_TEXT_F(MSG_AXIS_E3), getAxisSteps_per_mm(E2) );
     #endif
-    #if EXTRUDERS > 3
+    #if ATC_TOOLS > 3
       w.color(e_axis) .adjuster(14, GET_TEXT_F(MSG_AXIS_E4), getAxisSteps_per_mm(E3) );
     #endif
   #endif
@@ -67,11 +67,11 @@ bool StepsScreen::onTouchHeld(uint8_t tag) {
     case 10: UI_DECREMENT(AxisSteps_per_mm, E1); break;
     case 11: UI_INCREMENT(AxisSteps_per_mm, E1); break;
     #endif
-    #if EXTRUDERS > 2
+    #if ATC_TOOLS > 2
     case 12: UI_DECREMENT(AxisSteps_per_mm, E2); break;
     case 13: UI_INCREMENT(AxisSteps_per_mm, E2); break;
     #endif
-    #if EXTRUDERS > 3
+    #if ATC_TOOLS > 3
     case 14: UI_DECREMENT(AxisSteps_per_mm, E3); break;
     case 15: UI_INCREMENT(AxisSteps_per_mm, E3); break;
     #endif

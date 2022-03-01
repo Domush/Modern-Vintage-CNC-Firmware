@@ -32,12 +32,12 @@ using namespace ExtUI;
 constexpr static MoveAxisScreenData &mydata = screen_data.MoveAxisScreen;
 
 void BaseMoveAxisScreen::onEntry() {
-  // Since mvCNC keeps only one absolute position for all the extruders,
-  // we have to keep track of the relative motion of individual extruders
+  // Since mvCNC keeps only one absolute position for all the ATC tools,
+  // we have to keep track of the relative motion of individual ATC tools
   // ourselves. The relative distances are reset to zero whenever this
   // screen is entered.
 
-  LOOP_L_N(i, ExtUI::extruderCount) {
+  LOOP_L_N(i, ExtUI::atc_toolCount) {
     mydata.e_rel[i] = 0;
   }
   BaseNumericAdjustmentScreen::onEntry();
@@ -54,15 +54,15 @@ void MoveAxisScreen::onRedraw(draw_mode_t what) {
   w.color(Theme::z_axis).adjuster(  6, GET_TEXT_F(MSG_AXIS_Z),  getAxisPosition_mm(Z), canMove(Z));
 
   w.color(Theme::e_axis);
-  #if EXTRUDERS == 1
+  #if ATC_TOOLS == 1
     w.adjuster(  8, GET_TEXT_F(MSG_AXIS_E),  mydata.e_rel[0], canMove(E0));
   #elif TOOL_CHANGE_SUPPORT
     w.adjuster(  8, GET_TEXT_F(MSG_AXIS_E1), mydata.e_rel[0], canMove(E0));
     w.adjuster( 10, GET_TEXT_F(MSG_AXIS_E2), mydata.e_rel[1], canMove(E1));
-    #if EXTRUDERS > 2
+    #if ATC_TOOLS > 2
       w.adjuster( 12, GET_TEXT_F(MSG_AXIS_E3), mydata.e_rel[2], canMove(E2));
     #endif
-    #if EXTRUDERS > 3
+    #if ATC_TOOLS > 3
       w.adjuster( 14, GET_TEXT_F(MSG_AXIS_E4), mydata.e_rel[3], canMove(E3));
     #endif
   #endif
@@ -83,18 +83,18 @@ bool BaseMoveAxisScreen::onTouchHeld(uint8_t tag) {
     case  5: UI_INCREMENT_AXIS(Y); break;
     case  6: UI_DECREMENT_AXIS(Z); break;
     case  7: UI_INCREMENT_AXIS(Z); break;
-    // For extruders, also update relative distances.
+    // For ATC tools, also update relative distances.
     case  8: UI_DECREMENT_AXIS(E0); mydata.e_rel[0] -= increment; break;
     case  9: UI_INCREMENT_AXIS(E0); mydata.e_rel[0] += increment; break;
     #if TOOL_CHANGE_SUPPORT
     case 10: UI_DECREMENT_AXIS(E1); mydata.e_rel[1] -= increment; break;
     case 11: UI_INCREMENT_AXIS(E1); mydata.e_rel[1] += increment; break;
     #endif
-    #if EXTRUDERS > 2
+    #if ATC_TOOLS > 2
     case 12: UI_DECREMENT_AXIS(E2); mydata.e_rel[2] -= increment; break;
     case 13: UI_INCREMENT_AXIS(E2); mydata.e_rel[2] += increment; break;
     #endif
-    #if EXTRUDERS > 3
+    #if ATC_TOOLS > 3
     case 14: UI_DECREMENT_AXIS(E3); mydata.e_rel[3] -= increment; break;
     case 15: UI_INCREMENT_AXIS(E3); mydata.e_rel[3] += increment; break;
     #endif
@@ -128,7 +128,7 @@ void BaseMoveAxisScreen::setManualFeedrate(ExtUI::axis_t axis, float increment_m
   ExtUI::setFeedrate_mm_s(getManualFeedrate(X_AXIS + (axis - ExtUI::X), increment_mm));
 }
 
-void BaseMoveAxisScreen::setManualFeedrate(ExtUI::extruder_t, float increment_mm) {
+void BaseMoveAxisScreen::setManualFeedrate(ExtUI::atc_tool_t, float increment_mm) {
   ExtUI::setFeedrate_mm_s(getManualFeedrate(E_AXIS, increment_mm));
 }
 

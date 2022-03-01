@@ -20,10 +20,10 @@ enum DGUSLCD_Screens : uint8_t {
   DGUSLCD_SCREEN_FILAMENT_UNLOADING  = 158,
   DGUSLCD_SCREEN_MANUALEXTRUDE       = 160,
   DGUSLCD_SCREEN_SDFILELIST          =  71,
-  DGUSLCD_SCREEN_SDPRINTMANIPULATION =  73,
-  DGUSLCD_SCREEN_SDPRINTTUNE         =  75,
+  DGUSLCD_SCREEN_SDJOBMANIPULATION =  73,
+  DGUSLCD_SCREEN_SDJOBTUNE         =  75,
   DGUSLCD_SCREEN_FLC_PREHEAT         =  94,
-  DGUSLCD_SCREEN_FLC_PRINTING        =  96,
+  DGUSLCD_SCREEN_FLC_CUTTING        =  96,
   DGUSLCD_SCREEN_STEPPERMM           = 212,
   DGUSLCD_SCREEN_PID_E               = 214,
   DGUSLCD_SCREEN_PID_BED             = 218,
@@ -65,7 +65,7 @@ constexpr uint16_t VP_MSGSTR4 = 0x11C0;
 constexpr uint8_t VP_MSGSTR4_LEN = 0x20;
 
 // Screenchange request for screens that only make sense when cnc is idle.
-// e.g movement is only allowed if cnc is not printing.
+// e.g movement is only allowed if cnc is not cutting.
 // mvCNC must confirm by setting the screen manually.
 constexpr uint16_t VP_SCREENCHANGE_ASK = 0x2000;
 constexpr uint16_t VP_SCREENCHANGE = 0x2001;   // Key-Return button to new menu pressed. Data contains target screen in low byte and info in high byte.

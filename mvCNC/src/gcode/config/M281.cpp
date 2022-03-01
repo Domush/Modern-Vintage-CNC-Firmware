@@ -43,7 +43,7 @@ void GcodeSuite::M281_report(const bool forReplay/*=true*/) {
       default: break;
       #if ENABLED(SWITCHING_EXTRUDER)
         case SWITCHING_EXTRUDER_SERVO_NR:
-        #if EXTRUDERS > 3
+        #if ATC_TOOLS > 3
           case SWITCHING_EXTRUDER_E23_SERVO_NR:
         #endif
       #elif ENABLED(SWITCHING_NOZZLE)

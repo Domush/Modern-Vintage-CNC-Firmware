@@ -11,15 +11,15 @@
 #include "../../module/motion.h"
 
 /**
- * M380: Enable solenoid on the active extruder
+ * M380: Enable solenoid on the active ATC tool
  *
  *   S<index> to specify a solenoid (Requires MANUAL_SOLENOID_CONTROL)
  */
 void GcodeSuite::M380() {
   #if ENABLED(MANUAL_SOLENOID_CONTROL)
-    enable_solenoid(parser.intval('S', active_extruder));
+    enable_solenoid(parser.intval('S', active_tool));
   #else
-    enable_solenoid_on_active_extruder();
+    enable_solenoid_on_active_tool();
   #endif
 }
 
@@ -29,7 +29,7 @@ void GcodeSuite::M380() {
  */
 void GcodeSuite::M381() {
   #if ENABLED(MANUAL_SOLENOID_CONTROL)
-    disable_solenoid(parser.intval('S', active_extruder));
+    disable_solenoid(parser.intval('S', active_tool));
   #else
     disable_all_solenoids();
   #endif

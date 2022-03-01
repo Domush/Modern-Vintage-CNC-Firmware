@@ -6,6 +6,10 @@
 
 #include "../mvCNCCore.h"
 #include "../module/fan_control.h"
+void safe_delay(millis_t ms) {
+  delay(ms);
+}
+
 
 // A delay to provide brittle hosts time to receive bytes
 #if ENABLED(SERIAL_OVERRUN_PROTECTION)

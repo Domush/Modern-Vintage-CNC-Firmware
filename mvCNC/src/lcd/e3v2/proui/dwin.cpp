@@ -174,7 +174,7 @@ static uint8_t _percent_done = 0;
 static uint32_t _remain_time = 0;
 
 // Additional Aux Host Support
-static bool sdprint = false;
+static bool sdjob = false;
 
 #if ENABLED(PAUSE_HEAT)
   #if HAS_FAN
@@ -610,9 +610,9 @@ void Draw_PrintProcess() {
   if (HMI_IsChinese())
     Title.FrameCopy(30, 1, 42, 14);                     // "CNCing"
   else
-    Title.ShowCaption(GET_TEXT_F(MSG_PRINTING));
+    Title.ShowCaption(GET_TEXT_F(MSG_CUTTING));
   DWINUI::ClearMenuArea();
-  DWIN_Print_Header(sdprint ? card.longest_filename() : nullptr);
+  DWIN_Print_Header(sdjob ? card.longest_filename() : nullptr);
   Draw_Print_Labels();
   DWINUI::Draw_Icon(ICON_PrintTime, 15, 173);
   DWINUI::Draw_Icon(ICON_RemainTime, 150, 171);
@@ -980,7 +980,7 @@ void HMI_SDCardUpdate() {
       // clean file icon
       if (checkkey == SelectFile) {
         Redraw_SD_List();
-      } else if (sdprint && card.jobRunning() && jobIsActive()) {
+      } else if (sdjob && card.jobRunning() && jobIsActive()) {
         // TODO: Move card removed abort handling
         //       to CardReader::manage_media.
         card.abortFilePrintSoon();
@@ -1255,7 +1255,7 @@ void HMI_SelectFile() {
 }
 
 // CNCing
-void HMI_Printing() {
+void HMI_Cutting() {
   EncoderState encoder_diffState = get_encoder_state();
   if (encoder_diffState == ENCODER_DIFF_NO) return;
   // Avoid flicker by updating only the previous menu
@@ -1493,8 +1493,8 @@ void EachMomentUpdate() {
   if (HMI_flag.pause_action && jobIsPaused() && !planner.has_blocks_queued()) {
     HMI_flag.pause_action = false;
     #if ENABLED(PAUSE_HEAT)
-      TERN_(HAS_HOTEND, resume_hotend_temp = sdprint ? fanManager.degTargetHotend(0) : fanManager.wholeDegHotend(0));
-      TERN_(HAS_HEATED_BED, resume_bed_temp = sdprint ? fanManager.degTargetBed() : fanManager.wholeDegBed());
+      TERN_(HAS_HOTEND, resume_hotend_temp = sdjob ? fanManager.degTargetHotend(0) : fanManager.wholeDegHotend(0));
+      TERN_(HAS_HEATED_BED, resume_bed_temp = sdjob ? fanManager.degTargetBed() : fanManager.wholeDegBed());
       TERN_(HAS_FAN, resume_fan = fanManager.fan_speed[0]);
     #endif
     IF_DISABLED(ADVANCED_PAUSE_FEATURE, fanManager.disable_all_heaters());
@@ -1505,7 +1505,7 @@ void EachMomentUpdate() {
 
     duration_t elapsed = JobTimer.duration(); // print timer
 
-    if (sdprint && card.jobRunning()) {
+    if (sdjob && card.jobRunning()) {
       uint8_t percentDone = card.percentDone();
       static uint8_t last_percentValue = 101;
       if (last_percentValue != percentDone) { // print percent
@@ -1596,7 +1596,7 @@ void EachMomentUpdate() {
       else {
         select_print.set(PRINT_SETUP);
         queue.inject(F("M1000"));
-        sdprint = true;
+        sdjob = true;
         Goto_PrintProcess();
       }
     }
@@ -1619,7 +1619,7 @@ void DWIN_HandleScreen() {
     case SelectFile:      HMI_SelectFile(); break;
     case Homing:          break;
     case Leveling:        break;
-    case CNCProcess:    HMI_Printing(); break;
+    case CNCProcess:    HMI_Cutting(); break;
     case CNCDone:       HMI_PrintDone(); break;
     case PauseOrStop:     HMI_PauseOrStop(); break;
     case Info:            HMI_Popup(); break;
@@ -1715,7 +1715,7 @@ void DWIN_PidTuning(pidresult_t result) {
       break;
     case PID_BAD_EXTRUDER_NUM:
       checkkey = last_checkkey;
-      DWIN_Popup_Confirm(ICON_TempTooLow, F("PID Autotune failed!"), F("Bad extruder"));
+      DWIN_Popup_Confirm(ICON_TempTooLow, F("PID Autotune failed!"), F("Bad ATC tool"));
       break;
     case PID_TUNING_TIMEOUT:
       checkkey = last_checkkey;
@@ -1776,7 +1776,7 @@ void DWIN_Startup() {
 
 // Started a CNC Job
 void DWIN_Print_Started(const bool sd) {
-  sdprint = card.jobRunning() || sd;
+  sdjob = card.jobRunning() || sd;
   _percent_done = 0;
   _remain_time = 0;
   HMI_flag.print_finish = false;
@@ -1804,7 +1804,7 @@ void DWIN_Progress_Update() {
 
 #if HAS_FILAMENT_SENSOR
   // Filament Runout process
-  void DWIN_FilamentRunout(const uint8_t extruder) { LCD_MESSAGE(MSG_RUNOUT_SENSOR); }
+  void DWIN_FilamentRunout(const uint8_t atc_tool) { LCD_MESSAGE(MSG_RUNOUT_SENSOR); }
 #endif
 
 void DWIN_SetColorDefaults() {
@@ -1887,7 +1887,7 @@ void DWIN_Redraw_screen() {
     ui.reset_status(true);
   }
 
-  void mvCNCUI::pause_show_message(const PauseMessage message, const PauseMode mode/*=PAUSE_MODE_SAME*/, const uint8_t extruder/*=active_extruder*/) {
+  void mvCNCUI::pause_show_message(const PauseMessage message, const PauseMode mode/*=PAUSE_MODE_SAME*/, const uint8_t atc_tool/*=active_tool*/) {
     switch (message) {
       case PAUSE_MESSAGE_PARKING:  DWIN_Popup_Pause(GET_TEXT_F(MSG_PAUSE_PRINT_PARKING));    break;
       case PAUSE_MESSAGE_CHANGING: DWIN_Popup_Pause(GET_TEXT_F(MSG_FILAMENT_CHANGE_INIT));   break;
@@ -2151,7 +2151,7 @@ void Goto_Info_Menu(){
 
 void Goto_Move_Menu() {
   #if HAS_HOTEND
-    gcode.process_subcommands_now(F("G92E0"));  // reset extruder position
+    gcode.process_subcommands_now(F("G92E0"));  // reset ATC tool position
     planner.synchronize();
   #endif
   Draw_Move_Menu();

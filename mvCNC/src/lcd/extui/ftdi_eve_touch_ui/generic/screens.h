@@ -103,7 +103,7 @@ enum {
 #define ALERT_BOX_DL_SIZE            3072
 #define SPINNER_DL_SIZE              3072
 #define FILE_SCREEN_DL_SIZE          4160
-#define PRINTING_SCREEN_DL_SIZE      2048
+#define CUTTING_SCREEN_DL_SIZE      2048
 
 /************************* MENU SCREEN DECLARATIONS *************************/
 
@@ -151,7 +151,7 @@ enum {
 #endif
 
 #if TOOL_CHANGE_SUPPORT
-  #include "nozzle_offsets_screen.h"
+  #include "tool_offsets_screen.h"
 #endif
 
 #if HAS_LEVELING
@@ -175,7 +175,7 @@ enum {
 #endif
 
 #if ENABLED(BABYSTEPPING)
-  #include "nudge_nozzle_screen.h"
+  #include "nudge_tool_screen.h"
 #endif
 
 #if ENABLED(BACKLASH_GCODE)

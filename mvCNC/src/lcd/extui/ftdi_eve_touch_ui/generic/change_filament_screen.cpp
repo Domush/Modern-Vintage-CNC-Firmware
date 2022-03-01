@@ -126,14 +126,14 @@ void ChangeFilamentScreen::onEntry() {
   mydata.e_tag = ExtUI::getActiveTool() + 10;
   mydata.t_tag = 0;
   mydata.repeat_tag = 0;
-  mydata.saved_extruder = getActiveTool();
+  mydata.saved_atc_tool = getActiveTool();
   #if FILAMENT_UNLOAD_PURGE_LENGTH > 0
     mydata.need_purge = true;
   #endif
 }
 
 void ChangeFilamentScreen::onExit() {
-  setActiveTool(mydata.saved_extruder, true);
+  setActiveTool(mydata.saved_atc_tool, true);
 }
 
 void ChangeFilamentScreen::onRedraw(draw_mode_t what) {
@@ -153,7 +153,7 @@ void ChangeFilamentScreen::onRedraw(draw_mode_t what) {
 
   if (what & FOREGROUND) {
     char str[15];
-    const extruder_t e = getExtruder();
+    const atc_tool_t e = getExtruder();
 
     if (isHeaterIdle(e))
       format_temp_and_idle(str, getActualTemp_celsius(e));
@@ -237,7 +237,7 @@ uint8_t ChangeFilamentScreen::getSoftenTemp() {
   }
 }
 
-ExtUI::extruder_t ChangeFilamentScreen::getExtruder() {
+ExtUI::atc_tool_t ChangeFilamentScreen::getExtruder() {
   switch (mydata.e_tag) {
     case 13: return ExtUI::E3;
     case 12: return ExtUI::E2;
@@ -289,7 +289,7 @@ bool ChangeFilamentScreen::onTouchEnd(uint8_t tag) {
       break;
     case 10:
     case 11:
-      // Change extruder
+      // Change ATC tool
       mydata.e_tag      = tag;
       mydata.t_tag      = 0;
       mydata.repeat_tag = 0;

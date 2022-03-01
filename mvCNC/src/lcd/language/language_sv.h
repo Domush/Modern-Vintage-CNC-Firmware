@@ -276,7 +276,7 @@ namespace Language_sv {
   LSTR MSG_PID_AUTOTUNE                   = _UxGT("PID Autojustera");
   LSTR MSG_PID_AUTOTUNE_E                 = _UxGT("PID Autojustera *");
   LSTR MSG_PID_AUTOTUNE_DONE              = _UxGT("PID tuning done");
-  LSTR MSG_PID_BAD_EXTRUDER_NUM           = _UxGT("Autojustera misslyckad. Dålig extruder.");
+  LSTR MSG_PID_BAD_EXTRUDER_NUM           = _UxGT("Autojustera misslyckad. Dålig atc_tool.");
   LSTR MSG_PID_TEMP_TOO_HIGH              = _UxGT("Autojustera misslyckad. Temperatur för hög.");
   LSTR MSG_PID_TIMEOUT                    = _UxGT("Autojustera misslyckad! Tidsgräns.");
   LSTR MSG_SELECT                         = _UxGT("Välj");
@@ -373,7 +373,7 @@ namespace Language_sv {
   LSTR MSG_HOST_START_PRINT               = _UxGT("Värd Start");
   LSTR MSG_STOP_PRINT                     = _UxGT("Stoppa Utskrift");
   LSTR MSG_END_LOOPS                      = _UxGT("Slut Upprepningsloop");
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("Skriver Objekt");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("Skriver Objekt");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Avbryt Objekt");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Avbryt Objekt =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Ström Avbrott");
@@ -382,7 +382,7 @@ namespace Language_sv {
   LSTR MSG_DWELL                          = _UxGT("Sov...");
   LSTR MSG_USERWAIT                       = _UxGT("Klick för att återuppta...");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Utskrift Pausad");
-  LSTR MSG_PRINTING                       = _UxGT("Skriver...");
+  LSTR MSG_CUTTING                       = _UxGT("Skriver...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Utskrift Avbruten");
   LSTR MSG_PRINT_DONE                     = _UxGT("Utskrift Färdig");
   LSTR MSG_NO_MOVE                        = _UxGT("Ingen Flytt.");
@@ -497,7 +497,7 @@ namespace Language_sv {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Skrivar Stats");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Kort Info");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistor");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Extruderare");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Extruderare");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Baud");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protokoll");
   LSTR MSG_INFO_RUNAWAY_OFF               = _UxGT("Överdrift Övervakning: AV");

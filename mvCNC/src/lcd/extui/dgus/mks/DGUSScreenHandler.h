@@ -173,7 +173,7 @@ public:
     // mvCNC informed us about a bad SD Card.
     static void SDCardError();
     // mvCNC informed us about SD print completion.
-    static void SDPrintingFinished();
+    static void SDJobFinished();
   #else
     static void CNCReturn(DGUS_VP_Variable &var, void *val_ptr);
   #endif

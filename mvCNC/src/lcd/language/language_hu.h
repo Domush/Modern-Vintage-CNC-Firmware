@@ -389,7 +389,7 @@ namespace Language_hu {
   LSTR MSG_HOST_START_PRINT               = _UxGT("Hoszt indítás");
   LSTR MSG_STOP_PRINT                     = _UxGT("Nyomtatás leállítása");
   LSTR MSG_END_LOOPS                      = _UxGT("Hurok ismétlés vége");
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("Objektum nyomtatása");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("Objektum nyomtatása");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("Objektum törlése");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("Objektum törlése =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("Kiesés helyreáll.");
@@ -398,7 +398,7 @@ namespace Language_hu {
   LSTR MSG_DWELL                          = _UxGT("Alvás...");
   LSTR MSG_USERWAIT                       = _UxGT("Katt a folytatáshoz...");
   LSTR MSG_PRINT_PAUSED                   = _UxGT("Nyomtatás szünetelve");
-  LSTR MSG_PRINTING                       = _UxGT("Nyomtatás...");
+  LSTR MSG_CUTTING                       = _UxGT("Nyomtatás...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("Nyomtatás leállítva");
   LSTR MSG_PRINT_DONE                     = _UxGT("Nyomtatás kész");
   LSTR MSG_NO_MOVE                        = _UxGT("Nincs mozgás.");
@@ -522,7 +522,7 @@ namespace Language_hu {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Statisztikák");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Alaplap infó");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termisztorok");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Adagolók");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Adagolók");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Átviteli sebesség");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protokol");
   LSTR MSG_INFO_RUNAWAY_OFF               = _UxGT("Futáselemzés: KI");

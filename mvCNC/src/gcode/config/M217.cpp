@@ -28,7 +28,7 @@
  *  P[linear/m] Prime speed
  *  R[linear/m] Retract speed
  *  U[linear/m] UnRetract speed
- *  V[linear]   0/1 Enable auto prime first extruder used
+ *  V[linear]   0/1 Enable auto prime first ATC tool used
  *  W[linear]   0/1 Enable park & Z Raise
  *  X[linear]   Park X (Requires TOOLCHANGE_PARK)
  *  Y[linear]   Park Y (Requires TOOLCHANGE_PARK)
@@ -41,10 +41,10 @@
  *
  * Tool migration settings
  *  A[0|1]      Enable auto-migration on runout
- *  L[index]    Last extruder to use for auto-migration
+ *  L[index]    Last ATC tool to use for auto-migration
  *
  * Tool migration command
- *  T[index]    Migrate to next extruder or the given extruder
+ *  T[index]    Migrate to next ATC tool or the given ATC tool
  */
 void GcodeSuite::M217() {
 
@@ -96,9 +96,9 @@ void GcodeSuite::M217() {
 
     if (parser.seenval('L')) {  // Last
       const int16_t lval = parser.value_int();
-      if (WITHIN(lval, 0, EXTRUDERS - 1)) {
+      if (WITHIN(lval, 0, ATC_TOOLS - 1)) {
         migration.last = lval;
-        migration.automode = (active_extruder < migration.last);
+        migration.automode = (active_atc_tool < migration.last);
       }
     }
 
@@ -108,9 +108,9 @@ void GcodeSuite::M217() {
     if (parser.seen('T')) {     // Migrate now
       if (parser.has_value()) {
         const int16_t tval = parser.value_int();
-        if (WITHIN(tval, 0, EXTRUDERS - 1) && tval != active_extruder) {
+        if (WITHIN(tval, 0, ATC_TOOLS - 1) && tval != active_atc_tool) {
           migration.target = tval + 1;
-          extruder_migration();
+          atc_tool_migration();
           migration.target = 0; // disable
           return;
         }
@@ -118,7 +118,7 @@ void GcodeSuite::M217() {
           migration.target = 0; // disable
       }
       else {
-        extruder_migration();
+        atc_tool_migration();
         return;
       }
     }

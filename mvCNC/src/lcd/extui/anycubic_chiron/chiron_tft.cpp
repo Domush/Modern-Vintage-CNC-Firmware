@@ -80,7 +80,7 @@ void ChironTFT::Startup() {
   SendtoTFTLN(AC_msg_main_board_has_reset);
 
   // Enable leveling and Disable end stops during a CNC job
-  // as Z home places nozzle above the bed so we need to allow it past the end stops
+  // as Z home places tool above the bed so we need to allow it past the end stops
   injectCommands(AC_cmnd_enable_leveling);
 
   // Startup tunes are defined in Tunes.h
@@ -145,7 +145,7 @@ void ChironTFT::TimerEvent(timer_event_t event)  {
     case AC_timer_started: {
       live_Zoffset = 0.0; // reset print offset
       setSoftEndstopState(false);  // disable endstops to print
-      cnc_state = AC_cnc_printing;
+      cnc_state = AC_cnc_cutting;
       SendtoTFTLN(AC_msg_print_from_sd_card);
     } break;
 
@@ -182,14 +182,14 @@ void ChironTFT::ConfirmationRequest(const char * const msg)  {
   #endif
   switch (cnc_state) {
     case AC_cnc_pausing: {
-      if (strcmp_P(msg, mvCNC_msg_print_paused) == 0 || strcmp_P(msg, mvCNC_msg_nozzle_parked) == 0) {
+      if (strcmp_P(msg, mvCNC_msg_print_paused) == 0 || strcmp_P(msg, mvCNC_msg_tool_parked) == 0) {
         SendtoTFTLN(AC_msg_paused); // enable continue button
         cnc_state = AC_cnc_paused;
       }
     } break;
 
     case AC_cnc_resuming_from_power_outage:
-    case AC_cnc_printing:
+    case AC_cnc_cutting:
     case AC_cnc_paused: {
       // Heater timeout, send acknowledgement
       if (strcmp_P(msg, mvCNC_msg_heater_timeout) == 0) {
@@ -241,7 +241,7 @@ void ChironTFT::StatusChange(const char * const msg)  {
       }
     } break;
 
-    case AC_cnc_printing: {
+    case AC_cnc_cutting: {
       if (strcmp_P(msg, mvCNC_msg_reheating) == 0) {
         SendtoTFTLN(AC_msg_paused); // enable continue button
         msg_matched = true;
@@ -270,8 +270,8 @@ void ChironTFT::StatusChange(const char * const msg)  {
 
   // If not matched earlier see if this was a heater message
   if (!msg_matched) {
-    if (strcmp_P(msg, mvCNC_msg_extruder_heating) == 0) {
-      SendtoTFTLN(AC_msg_nozzle_heating);
+    if (strcmp_P(msg, mvCNC_msg_atc_tool_heating) == 0) {
+      SendtoTFTLN(AC_msg_tool_heating);
       hotend_state = AC_heater_temp_set;
     }
     else if (strcmp_P(msg, mvCNC_msg_bed_heating) == 0) {
@@ -363,7 +363,7 @@ void ChironTFT::CheckHeaters() {
   while (!WITHIN(temp, HEATER_0_MINTEMP, HEATER_0_MAXTEMP)) {
     faultDuration++;
     if (faultDuration >= AC_HEATER_FAULT_VALIDATION_TIME) {
-      SendtoTFTLN(AC_msg_nozzle_temp_abnormal);
+      SendtoTFTLN(AC_msg_tool_temp_abnormal);
       last_error = AC_error_abnormal_temp_t0;
       SERIAL_ECHOLNPGM("Extruder temp abnormal! : ", temp);
       break;
@@ -378,7 +378,7 @@ void ChironTFT::CheckHeaters() {
   while (!WITHIN(temp, BED_MINTEMP, BED_MAXTEMP)) {
     faultDuration++;
     if (faultDuration >= AC_HEATER_FAULT_VALIDATION_TIME) {
-      SendtoTFTLN(AC_msg_nozzle_temp_abnormal);
+      SendtoTFTLN(AC_msg_tool_temp_abnormal);
       last_error = AC_error_abnormal_temp_bed;
       SERIAL_ECHOLNPGM("Bed temp abnormal! : ", temp);
       break;
@@ -390,7 +390,7 @@ void ChironTFT::CheckHeaters() {
   // Update panel with hotend heater status
   if (hotend_state != AC_heater_temp_reached) {
     if (WITHIN(getActualTemp_celsius(E0) - getTargetTemp_celsius(E0), -(TEMP_WINDOW), TEMP_WINDOW)) {
-      SendtoTFTLN(AC_msg_nozzle_heating_done);
+      SendtoTFTLN(AC_msg_tool_heating_done);
       hotend_state = AC_heater_temp_reached;
     }
   }
@@ -528,7 +528,7 @@ void ChironTFT::PanelInfo(uint8_t req) {
       TFTSer.println(getAxisPosition_mm(Z));
       break;
 
-    case 6:   // A6 Get printing progress
+    case 6:   // A6 Get cutting progress
       if (jobRunningFromMedia()) {
         SendtoTFT(F("A6V "));
         TFTSer.println(ui8tostr2(getProgress_percent()));
@@ -682,7 +682,7 @@ void ChironTFT::PanelAction(uint8_t req) {
       // lets just wrap this in a gcode relative nonprint move and let the controller deal with it
       // G91 G0 <panel command> G90
 
-      if (!jobRunning()) { // Ignore request if printing
+      if (!jobRunning()) { // Ignore request if cutting
         char MoveCmnd[30];
         sprintf_P(MoveCmnd, PSTR("G91\nG0%s\nG90"), panel_command + 3);
         #if ACDEBUG(AC_ACTION)
@@ -694,7 +694,7 @@ void ChironTFT::PanelAction(uint8_t req) {
     } break;
 
     case 23:   // A23 Preheat PLA
-      // Ignore request if printing
+      // Ignore request if cutting
       if (!jobRunning()) {
         // Temps defined in configuration.h
         setTargetTemp_celsius(PREHEAT_1_TEMP_BED, BED);
@@ -706,7 +706,7 @@ void ChironTFT::PanelAction(uint8_t req) {
       break;
 
     case 24:   // A24 Preheat ABS
-      // Ignore request if printing
+      // Ignore request if cutting
       if (!jobRunning()) {
         setTargetTemp_celsius(PREHEAT_2_TEMP_BED, BED);
         setTargetTemp_celsius(PREHEAT_2_TEMP_HOTEND, E0);
@@ -717,7 +717,7 @@ void ChironTFT::PanelAction(uint8_t req) {
       break;
 
     case 25:   // A25 Cool Down
-      // Ignore request if printing
+      // Ignore request if cutting
       if (!jobRunning()) {
         setTargetTemp_celsius(0, E0);
         setTargetTemp_celsius(0, BED);
@@ -738,7 +738,7 @@ void ChironTFT::PanelAction(uint8_t req) {
       break;
 
     case 28:   // A28 Filament set A28 O/C
-      // Ignore request if printing
+      // Ignore request if cutting
       if (jobRunning()) break;
       SendtoTFTLN();
       break;
@@ -785,7 +785,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
 
     case 30: {   // A30 Auto leveling
       if (FindToken('S') != -1) { // Start probing New panel adds spaces..
-        // Ignore request if printing
+        // Ignore request if cutting
         if (jobRunning())
           SendtoTFTLN(AC_msg_probing_not_allowed); // forbid auto leveling
         else {
@@ -814,7 +814,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
 
       else if (FindToken('D') != -1) { // Save Z Offset tables and restore leveling state
         if (!jobRunning()) {
-          setAxisPosition_mm(1.0,Z); // Lift nozzle before any further movements are made
+          setAxisPosition_mm(1.0,Z); // Lift tool before any further movements are made
           injectCommands(F("M500"));
           SERIAL_ECHOLNF(AC_msg_mesh_changes_saved);
           selectedmeshpoint.x = selectedmeshpoint.y = 99;
@@ -823,7 +823,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
 
       else if (FindToken('G') != -1) { // Get current offset
         SendtoTFT(F("A31V "));
-        // When printing use the live z Offset position
+        // When cutting use the live z Offset position
         // we will use babystepping to move the print head
         if (jobRunning())
           TFTSer.println(live_Zoffset);
@@ -892,7 +892,7 @@ void ChironTFT::PanelProcess(uint8_t req) {
     } break;
 
     case 32: { // A32 clean leveling beep flag
-      // Ignore request if printing
+      // Ignore request if cutting
       //if (jobRunning()) break;
       //injectCommands(F("M500\nM420 S1\nG1 Z10 F240\nG1 X0 Y0 F6000"));
       //TFTSer.println();

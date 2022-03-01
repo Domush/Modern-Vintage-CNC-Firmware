@@ -49,11 +49,11 @@ void DGUSRxHandler::ScreenChange(DGUS_VP &vp, void *data_ptr) {
 
   if (vp.addr == DGUS_Addr::SCREENCHANGE_Idle
       && (ExtUI::jobRunning() || ExtUI::jobRunningPaused())) {
-    dgus_screen_handler.SetStatusMessage(F("Impossible while printing"));
+    dgus_screen_handler.SetStatusMessage(F("Impossible while cutting"));
     return;
   }
 
-  if (vp.addr == DGUS_Addr::SCREENCHANGE_Printing
+  if (vp.addr == DGUS_Addr::SCREENCHANGE_Cutting
       && (!ExtUI::jobRunning() && !ExtUI::jobRunningPaused())) {
     dgus_screen_handler.SetStatusMessage(F("Impossible while idle"));
     return;
@@ -532,14 +532,14 @@ void DGUSRxHandler::DisableABL(DGUS_VP &vp, void *data_ptr) {
 void DGUSRxHandler::FilamentSelect(DGUS_VP &vp, void *data_ptr) {
   UNUSED(vp);
 
-  const DGUS_Data::Extruder extruder = (DGUS_Data::Extruder)Swap16(*(uint16_t*)data_ptr);
+  const DGUS_Data::Extruder atc_tool = (DGUS_Data::Extruder)Swap16(*(uint16_t*)data_ptr);
 
-  switch (extruder) {
+  switch (atc_tool) {
     default: return;
     case DGUS_Data::Extruder::CURRENT:
     case DGUS_Data::Extruder::E0:
     E_TERN_(case DGUS_Data::Extruder::E1:)
-      dgus_screen_handler.filament_extruder = extruder;
+      dgus_screen_handler.filament_atc_tool = atc_tool;
       break;
   }
 
@@ -564,26 +564,26 @@ void DGUSRxHandler::FilamentMove(DGUS_VP &vp, void *data_ptr) {
     return;
   }
 
-  ExtUI::extruder_t extruder;
+  ExtUI::atc_tool_t atc_tool;
 
-  switch (dgus_screen_handler.filament_extruder) {
+  switch (dgus_screen_handler.filament_atc_tool) {
     default: return;
     case DGUS_Data::Extruder::CURRENT:
       #if TOOL_CHANGE_SUPPORT
-        extruder = ExtUI::getActiveTool();
+        atc_tool = ExtUI::getActiveTool();
         break;
       #endif
     case DGUS_Data::Extruder::E0:
-      extruder = ExtUI::E0;
+      atc_tool = ExtUI::E0;
       break;
     #if TOOL_CHANGE_SUPPORT
       case DGUS_Data::Extruder::E1:
-        extruder = ExtUI::E1;
+        atc_tool = ExtUI::E1;
         break;
     #endif
   }
 
-  if (ExtUI::getActualTemp_celsius(extruder) < (float)EXTRUDE_MINTEMP) {
+  if (ExtUI::getActualTemp_celsius(atc_tool) < (float)EXTRUDE_MINTEMP) {
     dgus_screen_handler.SetStatusMessage(F("Temperature too low"));
     return;
   }
@@ -592,10 +592,10 @@ void DGUSRxHandler::FilamentMove(DGUS_VP &vp, void *data_ptr) {
 
   switch (move) {
     case DGUS_Data::FilamentMove::RETRACT:
-      UI_DECREMENT_BY(AxisPosition_mm, (float)dgus_screen_handler.filament_length, extruder);
+      UI_DECREMENT_BY(AxisPosition_mm, (float)dgus_screen_handler.filament_length, atc_tool);
       break;
     case DGUS_Data::FilamentMove::EXTRUDE:
-      UI_INCREMENT_BY(AxisPosition_mm, (float)dgus_screen_handler.filament_length, extruder);
+      UI_INCREMENT_BY(AxisPosition_mm, (float)dgus_screen_handler.filament_length, atc_tool);
       break;
   }
 }

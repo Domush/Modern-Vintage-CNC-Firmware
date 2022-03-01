@@ -906,13 +906,13 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 #endif
 
 /**
- * Options only for EXTRUDERS > 1
+ * Options only for ATC_TOOLS > 1
  */
 #if TOOL_CHANGE_SUPPORT
 
-  #define MAX_EXTRUDERS  8
-  static_assert(EXTRUDERS <= MAX_EXTRUDERS, "mvCNC supports a maximum of " STRINGIFY(MAX_EXTRUDERS) " EXTRUDERS.");
-  #undef MAX_EXTRUDERS
+  #define MAX_ATC_TOOLS  8
+  static_assert(ATC_TOOLS <= MAX_ATC_TOOLS, "mvCNC supports a maximum of " STRINGIFY(MAX_ATC_TOOLS) " ATC_TOOLS.");
+  #undef MAX_ATC_TOOLS
 
   #if ENABLED(TOOLCHANGE_PARK)
     #ifndef TOOLCHANGE_PARK_XY
@@ -928,7 +928,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 
 #elif ENABLED(SINGLENOZZLE)
 
-  #error "SINGLENOZZLE requires 2 or more EXTRUDERS."
+  #error "SINGLENOZZLE requires 2 or more ATC_TOOLS."
 
 #endif
 
@@ -945,8 +945,8 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 #if EITHER(PARKING_EXTRUDER, MAGNETIC_PARKING_EXTRUDER)
   #if ENABLED(EXT_SOLENOID)
     #error "(MAGNETIC_)PARKING_EXTRUDER and EXT_SOLENOID are incompatible. (Pins are used twice.)"
-  #elif EXTRUDERS != 2
-    #error "(MAGNETIC_)PARKING_EXTRUDER requires exactly 2 EXTRUDERS."
+  #elif ATC_TOOLS != 2
+    #error "(MAGNETIC_)PARKING_EXTRUDER requires exactly 2 ATC_TOOLS."
   #elif !defined(PARKING_EXTRUDER_PARKING_X)
     #error "(MAGNETIC_)PARKING_EXTRUDER requires PARKING_EXTRUDER_PARKING_X."
   #elif !defined(TOOLCHANGE_ZRAISE)
@@ -970,8 +970,8 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 #if ENABLED(SWITCHING_TOOLHEAD)
   #ifndef SWITCHING_TOOLHEAD_SERVO_NR
     #error "SWITCHING_TOOLHEAD requires SWITCHING_TOOLHEAD_SERVO_NR."
-  #elif EXTRUDERS < 2
-    #error "SWITCHING_TOOLHEAD requires at least 2 EXTRUDERS."
+  #elif ATC_TOOLS < 2
+    #error "SWITCHING_TOOLHEAD requires at least 2 ATC_TOOLS."
   #elif NUM_SERVOS < (SWITCHING_TOOLHEAD_SERVO_NR - 1)
     #if SWITCHING_TOOLHEAD_SERVO_NR == 0
       #error "A SWITCHING_TOOLHEAD_SERVO_NR of 0 requires NUM_SERVOS >= 1."
@@ -1041,10 +1041,10 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 #endif
 
 /**
- * Servo deactivation depends on servo endstops, switching nozzle, or switching extruder
+ * Servo deactivation depends on servo endstops, switching tool, or switching ATC tool
  */
 #if ENABLED(DEACTIVATE_SERVOS_AFTER_MOVE) && NONE(HAS_Z_SERVO_PROBE, POLARGRAPH) && !defined(SWITCHING_NOZZLE_SERVO_NR) && !defined(SWITCHING_EXTRUDER_SERVO_NR) && !defined(SWITCHING_TOOLHEAD_SERVO_NR)
-  #error "Z_PROBE_SERVO_NR, switching nozzle, switching toolhead, switching extruder, or POLARGRAPH is required for DEACTIVATE_SERVOS_AFTER_MOVE."
+  #error "Z_PROBE_SERVO_NR, switching tool, switching toolhead, switching ATC tool, or POLARGRAPH is required for DEACTIVATE_SERVOS_AFTER_MOVE."
 #endif
 
 /**
@@ -1264,9 +1264,9 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   /**
    * Check for improper NOZZLE_TO_PROBE_OFFSET
    */
-  constexpr xyz_pos_t sanity_nozzle_to_probe_offset = NOZZLE_TO_PROBE_OFFSET;
+  constexpr xyz_pos_t sanity_tool_to_probe_offset = NOZZLE_TO_PROBE_OFFSET;
   #if ENABLED(NOZZLE_AS_PROBE)
-    static_assert(sanity_nozzle_to_probe_offset.x == 0 && sanity_nozzle_to_probe_offset.y == 0,
+    static_assert(sanity_tool_to_probe_offset.x == 0 && sanity_tool_to_probe_offset.y == 0,
                   "NOZZLE_AS_PROBE requires the XY offsets in NOZZLE_TO_PROBE_OFFSET to both be 0.");
   #elif !IS_KINEMATIC
     static_assert(PROBING_MARGIN       >= 0, "PROBING_MARGIN must be >= 0.");
@@ -1396,8 +1396,8 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
  * Make sure Z_SAFE_HOMING point is reachable
  */
 #if ENABLED(Z_SAFE_HOMING)
-  static_assert(WITHIN(Z_SAFE_HOMING_X_POINT, X_MIN_POS, X_MAX_POS), "Z_SAFE_HOMING_X_POINT can't be reached by the nozzle.");
-  static_assert(WITHIN(Z_SAFE_HOMING_Y_POINT, Y_MIN_POS, Y_MAX_POS), "Z_SAFE_HOMING_Y_POINT can't be reached by the nozzle.");
+  static_assert(WITHIN(Z_SAFE_HOMING_X_POINT, X_MIN_POS, X_MAX_POS), "Z_SAFE_HOMING_X_POINT can't be reached by the tool.");
+  static_assert(WITHIN(Z_SAFE_HOMING_Y_POINT, Y_MIN_POS, Y_MAX_POS), "Z_SAFE_HOMING_Y_POINT can't be reached by the tool.");
 #endif
 
 /**
@@ -2794,8 +2794,8 @@ static_assert(_PLUS_TEST(4), "HOMING_FEEDRATE_MM_M values must be positive.");
     #error "DGUS_LCD_UI_RELOADED requires a BUFSIZE of at least 4."
   #elif HOTENDS < 1
     #error "DGUS_LCD_UI_RELOADED requires at least 1 hotend."
-  #elif EXTRUDERS < 1
-    #error "DGUS_LCD_UI_RELOADED requires at least 1 extruder."
+  #elif ATC_TOOLS < 1
+    #error "DGUS_LCD_UI_RELOADED requires at least 1 ATC tool."
   #elif !HAS_HEATED_BED
     #error "DGUS_LCD_UI_RELOADED requires a heated bed."
   #elif FAN_COUNT < 1

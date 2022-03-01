@@ -75,7 +75,7 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
 
   #else // !DWIN_mvCNCUI_PORTRAIT
 
-    if (!ui.did_first_redraw || ui.old_is_printing != JobTimer.isRunning()) {
+    if (!ui.did_first_redraw || ui.old_is_cutting != JobTimer.isRunning()) {
       dwin_string.set();
       dwin_string.add('X' + axis);
       DWIN_Draw_String(true, font16x32, Color_IconBlue, Color_Bg_Black, x, y, S(dwin_string.string()));
@@ -98,7 +98,7 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
     }
 
     // For E_TOTAL there may be some characters to cover up
-    if (ENABLED(LCD_SHOW_E_TOTAL) && (!ui.did_first_redraw  || ui.old_is_printing != JobTimer.isRunning()) && axis == X_AXIS)
+    if (ENABLED(LCD_SHOW_E_TOTAL) && (!ui.did_first_redraw  || ui.old_is_cutting != JobTimer.isRunning()) && axis == X_AXIS)
       dwin_string.add("   ");
 
     DWIN_Draw_String(true, font14x28, Color_White, Color_Bg_Black, x + 32, y + 4, S(dwin_string.string()));
@@ -127,7 +127,7 @@ FORCE_INLINE void _draw_axis_value(const AxisEnum axis, const char *value, const
 
     #else // !DWIN_mvCNCUI_PORTRAIT
 
-      if (!ui.did_first_redraw || ui.old_is_printing != JobTimer.isRunning()) {
+      if (!ui.did_first_redraw || ui.old_is_cutting != JobTimer.isRunning()) {
         dwin_string.set("E ");
         DWIN_Draw_String(true, font16x32, Color_IconBlue, Color_Bg_Black, x, y, S(dwin_string.string()));
       }
@@ -383,7 +383,7 @@ void mvCNCUI::draw_status_screen() {
         }
         DWIN_Draw_String(true, font14x28, Color_White, Color_Bg_Black, 378, 170, S(dwin_string.string()));
       }
-      else if (!ui.did_first_redraw || ui.old_is_printing != JobTimer.isRunning()) {
+      else if (!ui.did_first_redraw || ui.old_is_cutting != JobTimer.isRunning()) {
         dwin_string.set("        ");
         DWIN_Draw_String(true, font14x28, Color_IconBlue, Color_Bg_Black, 336, 170, S(dwin_string.string()));
       }
@@ -401,7 +401,7 @@ void mvCNCUI::draw_status_screen() {
                     pb_top = pb_bottom - pb_height,
                     pb_width = pb_right - pb_left;
 
-  const progress_t progress = TERN(HAS_PRINT_PROGRESS_PERMYRIAD, get_progress_permyriad, get_progress_percent)();
+  const progress_t progress = TERN(HAS_JOB_PROGRESS_PERMYRIAD, get_progress_permyriad, get_progress_percent)();
 
   if (!ui.did_first_redraw)
     DWIN_Draw_Rectangle(0, Select_Color, pb_left, pb_top, pb_right, pb_bottom);   // Outline
@@ -437,7 +437,7 @@ void mvCNCUI::draw_status_screen() {
   draw_status_message(blink);
 
   ui.did_first_redraw = true;
-  ui.old_is_printing = JobTimer.isRunning();
+  ui.old_is_cutting = JobTimer.isRunning();
 }
 
 #endif // IS_DWIN_MVCNCUI

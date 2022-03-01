@@ -51,8 +51,8 @@ enum ADCSensorState : char {
   #if HAS_ADC_BUTTONS
     Prepare_ADC_KEY, Measure_ADC_KEY,
   #endif
-  SensorsReady, // Temperatures ready. Delay the next round of readings to let ADC pins settle.
-  StartupDelay  // Startup, delay initial temp reading a tiny bit so the hardware can settle
+  SensorsReady, // Delay the next round of readings to let ADC pins settle.
+  StartupDelay  // Startup, delay initial readings a tiny bit so the hardware can settle
 };
 
 // Minimum number of FanControl::ISR loops between sensor readings.
@@ -98,7 +98,7 @@ class FanControl {
     #if HAS_FAN_LOGIC
       static millis_t fan_update_ms;
 
-      static void manage_extruder_fans(millis_t ms) {
+      static void manage_atc_tool_fans(millis_t ms) {
         if (ELAPSED(ms, fan_update_ms)) { // only need to check fan state very infrequently
           const millis_t next_ms = ms + fan_update_interval_ms;
           #if HAS_PWMFANCHECK
@@ -129,6 +129,7 @@ class FanControl {
     /**
      * Static (class) methods
      */
+    static void isr();
 
     #if HAS_FAN
 

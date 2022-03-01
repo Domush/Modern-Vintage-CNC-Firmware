@@ -112,7 +112,7 @@ namespace Language_hr {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("Statistika cnca");
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("Podaci o elektronici");
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("Termistori");
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("Extruderi");
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("Extruderi");
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("Baud");
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("Protokol");
   LSTR MSG_CASE_LIGHT                     = _UxGT("Osvjetljenje");

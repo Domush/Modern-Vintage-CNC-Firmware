@@ -41,7 +41,7 @@
  *  U[distance] - Retract distance for removal (manual reload)
  *  L[distance] - Extrude distance for insertion (manual reload)
  *  B[count]    - Number of times to beep, -1 for indefinite (if equipped with a buzzer)
- *  T[toolhead] - Select extruder for filament change
+ *  T[toolhead] - Select ATC tool for filament change
  *  R[temp]     - Resume temperature (in current units)
  *
  *  Default values are used for omitted arguments.
@@ -58,21 +58,21 @@ void GcodeSuite::M600() {
     MIXER_STEPPER_LOOP(i) mixer.set_collector(i, i == uint8_t(eindex) ? 1.0 : 0.0);
     mixer.normalize();
 
-    const int8_t target_extruder = active_extruder;
+    const int8_t target_atc_tool = active_tool;
   #else
-    const int8_t target_extruder = get_target_extruder_from_command();
-    if (target_extruder < 0) return;
+    const int8_t target_atc_tool = get_tool_from_command();
+    if (target_atc_tool < 0) return;
   #endif
 
   #if ENABLED(DUAL_X_CARRIAGE)
-    int8_t DXC_ext = target_extruder;
+    int8_t DXC_ext = target_atc_tool;
     if (!parser.seen_test('T')) {  // If no tool index is specified, M600 was (probably) sent in response to filament runout.
-                                   // In this case, for duplicating modes set DXC_ext to the extruder that ran out.
+                                   // In this case, for duplicating modes set DXC_ext to the ATC tool that ran out.
       #if MULTI_FILAMENT_SENSOR
         if (idex_is_duplicating())
           DXC_ext = (READ(FIL_RUNOUT2_PIN) == FIL_RUNOUT2_STATE) ? 1 : 0;
       #else
-        DXC_ext = active_extruder;
+        DXC_ext = active_tool;
       #endif
     }
   #endif
@@ -81,16 +81,16 @@ void GcodeSuite::M600() {
 
   // Show initial "wait for start" message
   if (standardM600)
-    ui.pause_show_message(PAUSE_MESSAGE_CHANGING, PAUSE_MODE_PAUSE_PRINT, target_extruder);
+    ui.pause_show_message(PAUSE_MESSAGE_CHANGING, PAUSE_MODE_PAUSE_PRINT, target_atc_tool);
 
   // If needed, home before parking for filament change
   TERN_(HOME_BEFORE_FILAMENT_CHANGE, home_if_needed(true));
 
   #if TOOL_CHANGE_SUPPORT
     // Change toolhead if specified
-    const uint8_t active_extruder_before_filament_change = active_extruder;
-    if (active_extruder != target_extruder && TERN1(DUAL_X_CARRIAGE, !idex_is_duplicating()))
-      tool_change(target_extruder);
+    const uint8_t active_tool_before_filament_change = active_tool;
+    if (active_tool != target_atc_tool && TERN1(DUAL_X_CARRIAGE, !idex_is_duplicating()))
+      tool_change(target_atc_tool);
   #endif
 
   // Initial retract before move to filament change position
@@ -109,15 +109,15 @@ void GcodeSuite::M600() {
   );
 
   #if HAS_HOTEND_OFFSET && NONE(DUAL_X_CARRIAGE, DELTA)
-    park_point += hotend_offset[active_extruder];
+    park_point += hotend_offset[active_tool];
   #endif
 
   #if ENABLED(MMU2_MENUS)
     // For MMU2, when enabled, reset retract value so it doesn't mess with MMU filament handling
-    const float unload_length = standardM600 ? -ABS(parser.axisunitsval('U', E_AXIS, fc_settings[active_extruder].unload_length)) : 0.5f;
+    const float unload_length = standardM600 ? -ABS(parser.axisunitsval('U', E_AXIS, fc_settings[active_tool].unload_length)) : 0.5f;
   #else
     // Unload filament
-    const float unload_length = -ABS(parser.axisunitsval('U', E_AXIS, fc_settings[active_extruder].unload_length));
+    const float unload_length = -ABS(parser.axisunitsval('U', E_AXIS, fc_settings[active_tool].unload_length));
   #endif
 
   const int beep_count = parser.intval('B', -1
@@ -131,7 +131,7 @@ void GcodeSuite::M600() {
       wait_for_confirmation(true, beep_count DXC_PASS);
       resume_print(
         FILAMENT_CHANGE_SLOW_LOAD_LENGTH,
-        ABS(parser.axisunitsval('L', E_AXIS, fc_settings[active_extruder].load_length)),
+        ABS(parser.axisunitsval('L', E_AXIS, fc_settings[active_tool].load_length)),
         ADVANCED_PAUSE_PURGE_LENGTH,
         beep_count,
         parser.celsiusval('R')
@@ -148,8 +148,8 @@ void GcodeSuite::M600() {
 
   #if TOOL_CHANGE_SUPPORT
     // Restore toolhead if it was changed
-    if (active_extruder_before_filament_change != active_extruder)
-      tool_change(active_extruder_before_filament_change);
+    if (active_tool_before_filament_change != active_tool)
+      tool_change(active_tool_before_filament_change);
   #endif
 
   TERN_(MIXING_EXTRUDER, mixer.T(old_mixing_tool)); // Restore original mixing tool

@@ -143,7 +143,7 @@ CardReader::CardReader() {
     #endif
   #endif
 
-  flag.sdprinting = flag.sdprintdone = flag.mounted = flag.saving = flag.logging = false;
+  flag.sdjob = flag.sdjobdone = flag.mounted = flag.saving = flag.logging = false;
   filesize = sdpos = 0;
 
   TERN_(HAS_MEDIA_SUBCALLS, file_subcall_ctr = 0);
@@ -504,8 +504,8 @@ void CardReader::manage_media() {
  * Used by M22, "Release Media", manage_media.
  */
 void CardReader::release() {
-  // Card removed while printing? Abort!
-  if (IS_SD_PRINTING())
+  // Card removed while cutting? Abort!
+  if (IS_SD_JOB_RUNNING())
     abortFilePrintSoon();
   else
     endFilePrintNow();
@@ -530,15 +530,15 @@ void CardReader::openAndPrintFile(const char *name) {
 }
 
 /**
- * Start or resume a media print by setting the sdprinting flag.
+ * Start or resume a media print by setting the sdjob flag.
  * The file browser pre-sort is also purged to free up memory,
- * since you cannot browse files during active printing.
+ * since you cannot browse files during active cutting.
  * Used by M24 and anywhere Start / Resume applies.
  */
-void CardReader::startOrResumeFilePrinting() {
+void CardReader::startOrResumeFileCutting() {
   if (isMounted()) {
-    flag.sdprinting = true;
-    flag.sdprintdone = false;
+    flag.sdjob = true;
+    flag.sdjobdone = false;
     TERN_(SD_RESORT, flush_presort());
   }
 }
@@ -548,14 +548,14 @@ void CardReader::startOrResumeFilePrinting() {
 //
 void CardReader::endFilePrintNow(TERN_(SD_RESORT, const bool re_sort/*=false*/)) {
   TERN_(ADVANCED_PAUSE_FEATURE, did_pause_print = 0);
-  TERN_(HAS_DWIN_E3V2_BASIC, HMI_flag.print_finish = flag.sdprinting);
-  flag.abort_sd_printing = false;
+  TERN_(HAS_DWIN_E3V2_BASIC, HMI_flag.print_finish = flag.sdjob);
+  flag.abort_sd_job_running = false;
   if (isFileOpen()) file.close();
   TERN_(SD_RESORT, if (re_sort) presort());
 }
 
 void CardReader::abortFilePrintNow(TERN_(SD_RESORT, const bool re_sort/*=false*/)) {
-  flag.sdprinting = flag.sdprintdone = false;
+  flag.sdjob = flag.sdjobdone = false;
   endFilePrintNow(TERN_(SD_RESORT, re_sort));
 }
 
@@ -758,12 +758,12 @@ void CardReader::removeFile(const char * const name) {
 
 void CardReader::report_status() {
   if (jobRunning()) {
-    SERIAL_ECHOPGM(STR_SD_PRINTING_BYTE, sdpos);
+    SERIAL_ECHOPGM(STR_SD_JOB_RUNNING_BYTE, sdpos);
     SERIAL_CHAR('/');
     SERIAL_ECHOLN(filesize);
   }
   else
-    SERIAL_ECHOLNPGM(STR_SD_NOT_PRINTING);
+    SERIAL_ECHOLNPGM(STR_SD_JOB_NOT_RUNNING);
 }
 
 void CardReader::write_command(char * const buf) {
@@ -836,7 +836,7 @@ void CardReader::closefile(const bool store_location/*=false*/) {
 
   if (store_location) {
     //future: store cnc state, filename and position for continuing a stopped print
-    // so one can unplug the cnc and continue printing the next day.
+    // so one can unplug the cnc and continue cutting the next day.
   }
 }
 
@@ -1266,14 +1266,14 @@ void CardReader::fileHasFinished() {
       file_subcall_ctr--;
       openFileRead(proc_filenames[file_subcall_ctr], 2); // 2 = Returning from sub-procedure
       setIndex(filespos[file_subcall_ctr]);
-      startOrResumeFilePrinting();
+      startOrResumeFileCutting();
       return;
     }
   #endif
 
   endFilePrintNow(TERN_(SD_RESORT, true));
 
-  flag.sdprintdone = true;        // Stop getting bytes from the SD card
+  flag.sdjobdone = true;        // Stop getting bytes from the SD card
   mvcnc_state = MF_SD_COMPLETE;  // Tell mvCNC to enqueue M1001 soon
 }
 
@@ -1299,7 +1299,7 @@ void CardReader::fileHasFinished() {
   }
 
   // Removing the job recovery file currently requires closing
-  // the file being printed, so during SD printing the file should
+  // the file being printed, so during SD job the file should
   // be zeroed and written instead of deleted.
   void CardReader::removeJobRecoveryFile() {
     if (jobRecoverFileExists()) {

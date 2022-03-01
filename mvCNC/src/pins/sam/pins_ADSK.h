@@ -21,7 +21,7 @@ On the top put jumper between 5V and 3V3 pins,
 
 /* CNC shield CNC connections:
 X,Y,Z steppers as normal
-A stepper for E0 extruder
+A stepper for E0 atc_tool
 (X-)&(GND) - X limit
 (Y-)&(GND) - Y limit
 (Z-)&(GND) - Z limit
@@ -29,10 +29,10 @@ A stepper for E0 extruder
                                       Vcc (now "5V" on the board but actual 3.3V because of jumper))
 (Hold)&(GND) - Bed thermistor (also require pullup resistor 4.7K between "Hold" and
                                  Vcc (now "5V" on the board but actual 3.3V because of jumper))
-(CoolEn) - 3.3v signal to control extruder heater MOSFET
+(CoolEn) - 3.3v signal to control atc_tool heater MOSFET
 (Resume) - 3.3v signal to control heatbed MOSFET
-(SDA) - 3.3v signal to control extruder fan
-(SCL) - 3.3v signal to control extruder cooling fan
+(SDA) - 3.3v signal to control atc_tool fan
+(SCL) - 3.3v signal to control atc_tool cooling fan
 */
 
 /* CNC Shield pinout
@@ -173,14 +173,14 @@ A stepper for E0 extruder
 #endif // ZONESTAR_LCD
 
 /**
- * RJ45 8 pins extruder connector
+ * RJ45 8 pins atc_tool connector
  *
- * 1 - GND (Please do not connect to the same GND as extruder heater to prevent ground offset voltage)
+ * 1 - GND (Please do not connect to the same GND as atc_tool heater to prevent ground offset voltage)
  * 2 - thermistor
  * 3 - SERVO PWM
- * 4 - extruder heater
+ * 4 - atc_tool heater
  * 5 - FAN (print cooling)
- * 6 - FAN (extruder cooling)
+ * 6 - FAN (atc_tool cooling)
  * 7 - Probe signal
  * 8 - 5V
  *

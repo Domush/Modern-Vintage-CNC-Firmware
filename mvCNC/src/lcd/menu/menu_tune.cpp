@@ -115,8 +115,8 @@ void menu_tune() {
   #endif
 
   #if ENABLED(SINGLENOZZLE_STANDBY_TEMP)
-    LOOP_S_L_N(e, 1, EXTRUDERS)
-      EDIT_ITEM_FAST_N(int3, e, MSG_NOZZLE_STANDBY, &fanManager.singlenozzle_temp[e], 0, fanManager.hotend_max_target(0));
+    LOOP_S_L_N(e, 1, ATC_TOOLS)
+      EDIT_ITEM_FAST_N(int3, e, MSG_NOZZLE_STANDBY, &fanManager.singletool_temp[e], 0, fanManager.hotend_max_target(0));
   #endif
 
   //
@@ -139,37 +139,37 @@ void menu_tune() {
     #if HAS_FAN1
       FAN_EDIT_ITEMS(1);
     #elif SNFAN(1)
-      singlenozzle_item(1);
+      singletool_item(1);
     #endif
     #if HAS_FAN2
       FAN_EDIT_ITEMS(2);
     #elif SNFAN(2)
-      singlenozzle_item(2);
+      singletool_item(2);
     #endif
     #if HAS_FAN3
       FAN_EDIT_ITEMS(3);
     #elif SNFAN(3)
-      singlenozzle_item(3);
+      singletool_item(3);
     #endif
     #if HAS_FAN4
       FAN_EDIT_ITEMS(4);
     #elif SNFAN(4)
-      singlenozzle_item(4);
+      singletool_item(4);
     #endif
     #if HAS_FAN5
       FAN_EDIT_ITEMS(5);
     #elif SNFAN(5)
-      singlenozzle_item(5);
+      singletool_item(5);
     #endif
     #if HAS_FAN6
       FAN_EDIT_ITEMS(6);
     #elif SNFAN(6)
-      singlenozzle_item(6);
+      singletool_item(6);
     #endif
     #if HAS_FAN7
       FAN_EDIT_ITEMS(7);
     #elif SNFAN(7)
-      singlenozzle_item(7);
+      singletool_item(7);
     #endif
 
   #endif // HAS_FAN

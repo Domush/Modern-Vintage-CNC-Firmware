@@ -114,7 +114,7 @@
 #define Z_DIR_PIN                             39
 #define Z_ENABLE_PIN                          35
 
-#if BOTH(HAS_CUTTER, BOARD_REV_1_1_TO_1_3) && EXTRUDERS == 1
+#if BOTH(HAS_CUTTER, BOARD_REV_1_1_TO_1_3) && ATC_TOOLS == 1
   // Move E0 to the spare and get Spindle/Laser signals from E0
   #define E0_STEP_PIN                         49
   #define E0_DIR_PIN                          47
@@ -220,7 +220,7 @@
      * If one of the heaters is used then special precautions will usually be needed.
      * They have an LED and resistor pullup to +24V which could damage 3.3V-5V ICs.
      */
-    #if EXTRUDERS == 1
+    #if ATC_TOOLS == 1
       #define SPINDLE_DIR_PIN                 43
       #define SPINDLE_LASER_PWM_PIN           45  // Hardware PWM
       #define SPINDLE_LASER_ENA_PIN           41  // Pullup!

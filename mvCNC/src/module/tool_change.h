@@ -32,7 +32,7 @@
   #endif
 
   #if ENABLED(TOOLCHANGE_FS_INIT_BEFORE_SWAP)
-    extern bool toolchange_extruder_ready[EXTRUDERS];
+    extern bool toolchange_atc_tool_ready[ATC_TOOLS];
   #endif
 
   #if ENABLED(TOOLCHANGE_MIGRATION_FEATURE)
@@ -42,36 +42,36 @@
     } migration_settings_t;
     constexpr migration_settings_t migration_defaults = { 0, 0, false, false };
     extern migration_settings_t migration;
-    bool extruder_migration();
+    bool atc_tool_migration();
   #endif
 #endif
 
 #if DO_SWITCH_EXTRUDER
-  void move_extruder_servo(const uint8_t e);
+  void move_atc_tool_servo(const uint8_t e);
 #endif
 
 #if ENABLED(SWITCHING_NOZZLE)
   #if SWITCHING_NOZZLE_TWO_SERVOS
-    void lower_nozzle(const uint8_t e);
-    void raise_nozzle(const uint8_t e);
+    void lower_tool(const uint8_t e);
+    void raise_tool(const uint8_t e);
   #else
-    void move_nozzle_servo(const uint8_t angle_index);
+    void move_tool_servo(const uint8_t angle_index);
   #endif
 #endif
 
 #if ENABLED(PARKING_EXTRUDER)
 
-  void pe_solenoid_set_pin_state(const uint8_t extruder_num, const uint8_t state);
+  void pe_solenoid_set_pin_state(const uint8_t atc_tool_num, const uint8_t state);
 
   #define PE_MAGNET_ON_STATE TERN_(PARKING_EXTRUDER_SOLENOIDS_INVERT, !)PARKING_EXTRUDER_SOLENOIDS_PINS_ACTIVE
-  inline void pe_solenoid_magnet_on(const uint8_t extruder_num)  { pe_solenoid_set_pin_state(extruder_num,  PE_MAGNET_ON_STATE); }
-  inline void pe_solenoid_magnet_off(const uint8_t extruder_num) { pe_solenoid_set_pin_state(extruder_num, !PE_MAGNET_ON_STATE); }
+  inline void pe_solenoid_magnet_on(const uint8_t atc_tool_num)  { pe_solenoid_set_pin_state(atc_tool_num,  PE_MAGNET_ON_STATE); }
+  inline void pe_solenoid_magnet_off(const uint8_t atc_tool_num) { pe_solenoid_set_pin_state(atc_tool_num, !PE_MAGNET_ON_STATE); }
 
   void pe_solenoid_init();
 
-  extern bool extruder_parked;
-  inline void parking_extruder_set_parked(const bool parked) { extruder_parked = parked; }
-  bool parking_extruder_unpark_after_homing(const uint8_t final_tool, bool homed_towards_final_tool);
+  extern bool atc_tool_parked;
+  inline void parking_atc_tool_set_parked(const bool parked) { atc_tool_parked = parked; }
+  bool parking_atc_tool_unpark_after_homing(const uint8_t final_tool, bool homed_towards_final_tool);
 
 #elif ENABLED(MAGNETIC_PARKING_EXTRUDER)
 
@@ -106,4 +106,4 @@
  * Perform a tool-change, which may result in moving the
  * previous tool out of the way and the new tool into place.
  */
-void tool_change(const uint8_t tmp_extruder, bool no_move=false);
+void tool_change(const uint8_t tmp_atc_tool, bool no_move=false);

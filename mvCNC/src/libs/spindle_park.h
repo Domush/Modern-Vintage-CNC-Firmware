@@ -23,4 +23,4 @@ class Spindle {
   #endif
 };
 
-extern Spindle nozzle;
+extern Spindle tool;

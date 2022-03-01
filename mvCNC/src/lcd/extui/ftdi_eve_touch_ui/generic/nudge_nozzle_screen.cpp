@@ -1,5 +1,5 @@
 /********************
- * nudge_nozzle.cpp *
+ * nudge_tool.cpp *
  ********************/
 
 /****************************************************************************
@@ -35,7 +35,7 @@ constexpr static NudgeSpindleScreenData &mydata = screen_data.NudgeSpindleScreen
 void NudgeSpindleScreen::onEntry() {
   mydata.show_offsets = false;
   #if TOOL_CHANGE_SUPPORT
-    mydata.link_nozzles = true;
+    mydata.link_tools = true;
   #endif
   mydata.rel.reset();
 
@@ -54,7 +54,7 @@ void NudgeSpindleScreen::onRedraw(draw_mode_t what) {
   w.color(z_axis).adjuster(6, GET_TEXT_F(MSG_AXIS_Z), mydata.rel.z / getAxisSteps_per_mm(Z));
   w.increments();
   #if TOOL_CHANGE_SUPPORT
-    w.toggle(8, GET_TEXT_F(MSG_ADJUST_BOTH_NOZZLES), mydata.link_nozzles);
+    w.toggle(8, GET_TEXT_F(MSG_ADJUST_BOTH_NOZZLES), mydata.link_tools);
   #endif
 
   #if TOOL_CHANGE_SUPPORT || HAS_BED_PROBE
@@ -84,7 +84,7 @@ void NudgeSpindleScreen::onRedraw(draw_mode_t what) {
 bool NudgeSpindleScreen::onTouchHeld(uint8_t tag) {
   const float inc = getIncrement();
   #if TOOL_CHANGE_SUPPORT
-    const bool link = mydata.link_nozzles;
+    const bool link = mydata.link_tools;
   #else
     constexpr bool link = true;
   #endif
@@ -97,7 +97,7 @@ bool NudgeSpindleScreen::onTouchHeld(uint8_t tag) {
     case 6: steps = mmToWholeSteps(inc, Z); smartAdjustAxis_steps(-steps, Z, link); mydata.rel.z -= steps; break;
     case 7: steps = mmToWholeSteps(inc, Z); smartAdjustAxis_steps( steps, Z, link); mydata.rel.z += steps; break;
     #if TOOL_CHANGE_SUPPORT
-      case 8: mydata.link_nozzles = !link; break;
+      case 8: mydata.link_tools = !link; break;
     #endif
     case 9: mydata.show_offsets = !mydata.show_offsets; break;
     default: return false;

@@ -490,7 +490,7 @@ namespace Language_uk {
   LSTR MSG_HOST_START_PRINT                 = _UxGT("Старт з хосту");
   LSTR MSG_STOP_PRINT                       = _UxGT("Скасувати друк");
   LSTR MSG_END_LOOPS                        = _UxGT("End Repeat Loops"); // needs translation
-  LSTR MSG_PRINTING_OBJECT                  = _UxGT("Друк об'єкта");
+  LSTR MSG_CUTTING_OBJECT                  = _UxGT("Друк об'єкта");
   LSTR MSG_CANCEL_OBJECT                    = _UxGT("Завершити об'єкт");
   LSTR MSG_CANCEL_OBJECT_N                  = _UxGT("Завершити об'єкт =");
   LSTR MSG_OUTAGE_RECOVERY                  = _UxGT("Віднов. після збою");
@@ -499,7 +499,7 @@ namespace Language_uk {
   LSTR MSG_DWELL                            = _UxGT("Сон...");
   LSTR MSG_USERWAIT                         = _UxGT("Продовжити...");
   LSTR MSG_PRINT_PAUSED                     = _UxGT("Друк призупинено");
-  LSTR MSG_PRINTING                         = _UxGT("Друк...");
+  LSTR MSG_CUTTING                         = _UxGT("Друк...");
   LSTR MSG_PRINT_ABORTED                    = _UxGT("Друк скасовано");
   LSTR MSG_PRINT_DONE                       = _UxGT("Друк завершено");
   LSTR MSG_NO_MOVE                          = _UxGT("Немає руху.");
@@ -665,7 +665,7 @@ namespace Language_uk {
   LSTR MSG_INFO_STATS_MENU                  = _UxGT("Статистика принтера");
   LSTR MSG_INFO_BOARD_MENU                  = _UxGT("Про плату");
   LSTR MSG_INFO_THERMISTOR_MENU             = _UxGT("Термістори");
-  LSTR MSG_INFO_EXTRUDERS                   = _UxGT("Екструдери");
+  LSTR MSG_INFO_ATC_TOOLS                   = _UxGT("Екструдери");
   LSTR MSG_INFO_BAUDRATE                    = _UxGT("Бод");
   LSTR MSG_INFO_PROTOCOL                    = _UxGT("Протокол");
   #if LCD_WIDTH > 21 || HAS_DWIN_E3V2

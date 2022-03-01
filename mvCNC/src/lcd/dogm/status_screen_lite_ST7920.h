@@ -79,8 +79,8 @@ class ST7920_Lite_Status_Screen {
     static void draw_fan_icon(const bool whichIcon);
     static void draw_heat_icon(const bool whichIcon, const bool heating);
     static void draw_temps(uint8_t line, const int16_t temp, const int16_t target, bool showTarget, bool targetStateChange);
-    static void draw_extruder_1_temp(const int16_t temp, const int16_t target, bool forceUpdate=false);
-    static void draw_extruder_2_temp(const int16_t temp, const int16_t target, bool forceUpdate=false);
+    static void draw_atc_tool_1_temp(const int16_t temp, const int16_t target, bool forceUpdate=false);
+    static void draw_atc_tool_2_temp(const int16_t temp, const int16_t target, bool forceUpdate=false);
     static void draw_bed_temp(const int16_t temp, const int16_t target, bool forceUpdate=false);
     static void draw_fan_speed(const uint8_t value);
     static void draw_print_time(const duration_t &elapsed, char suffix=' ');

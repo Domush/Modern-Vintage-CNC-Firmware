@@ -133,7 +133,7 @@ axis_bits_t Stepper::last_direction_bits, // = 0
 bool Stepper::abort_current_block;
 
 #if DISABLED(MIXING_EXTRUDER) && TOOL_CHANGE_SUPPORT
-  uint8_t Stepper::last_moved_extruder = 0xFF;
+  uint8_t Stepper::last_moved_atc_tool = 0xFF;
 #endif
 
 #if ENABLED(X_DUAL_ENDSTOPS)
@@ -172,7 +172,7 @@ uint32_t Stepper::advance_divisor = 0,
          Stepper::decelerate_after,          // The count at which to start decelerating
          Stepper::step_event_count;          // The total event count for the current block
 
-constexpr uint8_t Stepper::stepper_extruder;
+constexpr uint8_t Stepper::stepper_atc_tool;
 
 #if ENABLED(S_CURVE_ACCELERATION)
   int32_t __attribute__((used)) Stepper::bezier_A __asm__("bezier_A");    // A coefficient in Bézier speed curve with alias for assembler
@@ -2076,7 +2076,7 @@ uint32_t Stepper::block_phase_isr() {
       accelerate_until = current_block->accelerate_until << oversampling;
       decelerate_after = current_block->decelerate_after << oversampling;
 
-      E_TERN_(stepper_extruder = current_block->extruder);
+      E_TERN_(stepper_atc_tool = current_block->atc_tool);
 
       // Initialize the trapezoid generator from the current block.
       if (current_block->direction_bits != last_direction_bits) {
@@ -2206,7 +2206,7 @@ void Stepper::init() {
   #if MB(ALLIGATOR)
     const float motor_current[] = MOTOR_CURRENT;
     unsigned int digipot_motor = 0;
-    LOOP_L_N(i, 3 + EXTRUDERS) {
+    LOOP_L_N(i, 3 + ATC_TOOLS) {
       digipot_motor = 255 * (motor_current[i] / 2.5);
       dac084s085::setValue(i, digipot_motor);
     }

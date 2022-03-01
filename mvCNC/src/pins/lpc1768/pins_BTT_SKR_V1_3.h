@@ -12,6 +12,7 @@
 #define LPC1768_IS_SKRV1_3
 #define USES_DIAG_JUMPERS
 #define DIAG_JUMPERS_REMOVED // enable this if you don't use SENSORLESS_HOMING and removed the DIAG jumpers from the board.
+#define NO_AUTO_ASSIGN_WARNING
 
 //
 // Trinamic Stallguard pins
@@ -90,6 +91,13 @@
 #endif
 
 //
+// Filament Runout Sensor
+//
+#ifndef FIL_RUNOUT_PIN
+  #define FIL_RUNOUT_PIN                   P1_28
+#endif
+
+//
 // Steppers
 //
 #define X_STEP_PIN                         P2_02
@@ -113,7 +121,17 @@
   #define Z_CS_PIN                         P1_10
 #endif
 
-#if defined(X2_DRIVER_TYPE)
+#if HAS_ATC_TOOLS
+  #define E0_STEP_PIN                      P2_13
+  #define E0_DIR_PIN                       P0_11
+  #define E0_ENABLE_PIN                    P2_12
+  #ifndef E0_CS_PIN
+    #define E0_CS_PIN                      P1_08
+  #endif
+  #ifndef E1_CS_PIN
+    #define E1_CS_PIN                      P1_01
+  #endif
+#elif defined(X2_DRIVER_TYPE)
   #define X2_STEP_PIN                      P2_13
   #define X2_DIR_PIN                       P0_11
   #define X2_ENABLE_PIN                    P2_12
@@ -132,7 +150,7 @@
 //
 // Software SPI pins for TMC2130 stepper drivers
 //
-#if defined(TMC_USE_SW_SPI)
+#if ENABLED(TMC_USE_SW_SPI)
   #ifndef TMC_SW_MOSI
     #define TMC_SW_MOSI                    P4_28
   #endif
@@ -157,6 +175,11 @@
   //#define Y2_HARDWARE_SERIAL Serial1
   //#define Z_HARDWARE_SERIAL  Serial1
   //#define Z2_HARDWARE_SERIAL Serial1
+  //#define E0_HARDWARE_SERIAL Serial1
+  //#define E1_HARDWARE_SERIAL Serial1
+  //#define E2_HARDWARE_SERIAL Serial1
+  //#define E3_HARDWARE_SERIAL Serial1
+  //#define E4_HARDWARE_SERIAL Serial1
 
   #define X_SERIAL_TX_PIN                  P4_29
   #define X_SERIAL_RX_PIN                  P1_17
@@ -166,6 +189,12 @@
 
   #define Z_SERIAL_TX_PIN                  P1_14
   #define Z_SERIAL_RX_PIN                  P1_10
+
+  #define E0_SERIAL_TX_PIN                 P1_09
+  #define E0_SERIAL_RX_PIN                 P1_08
+
+  #define E1_SERIAL_TX_PIN                 P1_04
+  #define E1_SERIAL_RX_PIN                 P1_01
 
   // Reduce baud rate to improve software serial reliability
   #define TMC_BAUD_RATE                    19200

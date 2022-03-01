@@ -257,7 +257,7 @@ void StatusScreen::draw_progress(draw_mode_t what) {
       _format_time(remaining_str, remaining);
     #endif
 
-    const uint16_t current_progress = TERN(HAS_PRINT_PROGRESS_PERMYRIAD, getProgress_permyriad(), getProgress_percent() * 100);
+    const uint16_t current_progress = TERN(HAS_JOB_PROGRESS_PERMYRIAD, getProgress_permyriad(), getProgress_percent() * 100);
     constexpr uint16_t progress_range = 10000U;
 
     const bool show_progress_bar = current_progress > 0 && current_progress < progress_range + 1;
@@ -317,7 +317,7 @@ void StatusScreen::draw_interaction_buttons(draw_mode_t what) {
        .font(Theme::font_medium)
        .colors(has_media ? action_btn : normal_btn)
        .enabled(has_media && !jobRunning())
-       .tag(3).button(MEDIA_BTN_POS, jobRunning() ? GET_TEXT_F(MSG_PRINTING) : GET_TEXT_F(MSG_BUTTON_MEDIA))
+       .tag(3).button(MEDIA_BTN_POS, jobRunning() ? GET_TEXT_F(MSG_CUTTING) : GET_TEXT_F(MSG_BUTTON_MEDIA))
        .colors(!has_media ? action_btn : normal_btn)
        .tag(4).button(MENU_BTN_POS, GET_TEXT_F(MSG_BUTTON_MENU));
   }

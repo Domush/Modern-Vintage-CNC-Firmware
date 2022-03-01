@@ -524,38 +524,8 @@
   #endif
 #endif
 
-/**
- *  Multi-Material-Unit supported models
- */
-#define PRUSA_MMU1             1
-#define PRUSA_MMU2             2
-#define PRUSA_MMU2S            3
-#define EXTENDABLE_EMU_MMU2   12
-#define EXTENDABLE_EMU_MMU2S  13
-
-#ifdef MMU_MODEL
-  #define HAS_MMU 1
-  #if MMU_MODEL == PRUSA_MMU1
-    #define HAS_PRUSA_MMU1 1
-  #elif MMU_MODEL % 10 == PRUSA_MMU2
-    #define HAS_PRUSA_MMU2 1
-  #elif MMU_MODEL % 10 == PRUSA_MMU2S
-    #define HAS_PRUSA_MMU2 1
-    #define HAS_PRUSA_MMU2S 1
-  #endif
-  #if MMU_MODEL >= EXTENDABLE_EMU_MMU2
-    #define HAS_EXTENDABLE_MMU 1
-  #endif
-#endif
-
-#undef PRUSA_MMU1
-#undef PRUSA_MMU2
-#undef PRUSA_MMU2S
-#undef EXTENDABLE_EMU_MMU2
-#undef EXTENDABLE_EMU_MMU2S
-
-  #undef EXTRUDERS
-  #define EXTRUDERS 0
+  #undef ATC_TOOLS
+  #define ATC_TOOLS 0
   #undef SINGLENOZZLE
   #undef SWITCHING_EXTRUDER
   #undef SWITCHING_NOZZLE
@@ -566,11 +536,9 @@
 #define E_OPTARG(N) OPTARG(TOOL_CHANGE_SUPPORT, N)
 #define E_TERN_(N)  TERN_(TOOL_CHANGE_SUPPORT, N)
 #define E_TERN0(N)  TERN0(TOOL_CHANGE_SUPPORT, N)
-
-#if ENABLED(SWITCHING_TOOLHEAD)   // Toolchanger
-  #define E_STEPPERS      EXTRUDERS
-  #define E_MANUAL        EXTRUDERS
-#endif
+#define HOTENDS ATC_TOOLS
+#define E_STEPPERS ATC_TOOLS
+#define E_MANUAL ATC_TOOLS
 
 /**
  * Number of Linear Axes (e.g., XYZ)
@@ -609,13 +577,10 @@
 
   #undef PID_PARAMS_PER_HOTEND
 
-// Helper macros for extruder and hotend arrays
+// Helper macros for ATC tool and hotend arrays
 #define HOTEND_LOOP() for (int8_t e = 0; e < HOTENDS; e++)
-#define ARRAY_BY_EXTRUDERS(V...) ARRAY_N(EXTRUDERS, V)
-#define ARRAY_BY_EXTRUDERS1(v1) ARRAY_N_1(EXTRUDERS, v1)
-#define ARRAY_BY_HOTENDS(V...) ARRAY_N(HOTENDS, V)
-#define ARRAY_BY_HOTENDS1(v1) ARRAY_N_1(HOTENDS, v1)
-
+#define ARRAY_BY_ATC_TOOLS(V...) ARRAY_N(ATC_TOOLS, V)
+#define ARRAY_BY_ATC_TOOLS1(v1) ARRAY_N_1(ATC_TOOLS, v1)
 
 /**
  * Disable unused SINGLENOZZLE sub-options
@@ -722,7 +687,7 @@
   #undef ENABLE_LEVELING_AFTER_G28
   #undef G29_RETRY_AND_RECOVER
   #undef PROBE_MANUALLY
-#if ANY(HAS_BED_PROBE, PROBE_MANUALLY, MESH_BED_LEVELING)
+#if ANY(HAS_BED_PROBE, PROBE_MANUALLY)
   #define PROBE_SELECTED 1
 #endif
 
@@ -761,23 +726,15 @@
     #define CORE_AXIS_2 C_AXIS
   #endif
   #define CORESIGN(n) (ANY(COREYX, COREZX, COREZY) ? (-(n)) : (n))
-#elif EITHER(MARKFORGED_XY, MARKFORGED_YX)
-  // Markforged kinematics
-  #define CORE_AXIS_1 A_AXIS
-  #define CORE_AXIS_2 B_AXIS
-  #define NORMAL_AXIS Z_AXIS
 #endif
 
-#if EITHER(DELTA, POLARGRAPH)
+#if ENABLED(DELTA)
   #define IS_KINEMATIC 1
 #else
   #define IS_CARTESIAN 1
   #if !IS_CORE
     #define IS_FULL_CARTESIAN 1
   #endif
-#endif
-
-#if DISABLED(DELTA)
   #undef DELTA_HOME_TO_SAFE_ZONE
 #endif
 
@@ -838,14 +795,14 @@
 #ifndef Z4_DRIVER_TYPE
   #define Z4_DRIVER_TYPE A4988
 #endif
-  #undef E0_DRIVER_TYPE
-  #undef E1_DRIVER_TYPE
-  #undef E2_DRIVER_TYPE
-  #undef E3_DRIVER_TYPE
-  #undef E4_DRIVER_TYPE
-  #undef E5_DRIVER_TYPE
-  #undef E6_DRIVER_TYPE
-  #undef E7_DRIVER_TYPE
+#undef E0_DRIVER_TYPE
+#undef E1_DRIVER_TYPE
+#undef E2_DRIVER_TYPE
+#undef E3_DRIVER_TYPE
+#undef E4_DRIVER_TYPE
+#undef E5_DRIVER_TYPE
+#undef E6_DRIVER_TYPE
+#undef E7_DRIVER_TYPE
 
 // Fallback axis inverting
 #ifndef INVERT_X_DIR

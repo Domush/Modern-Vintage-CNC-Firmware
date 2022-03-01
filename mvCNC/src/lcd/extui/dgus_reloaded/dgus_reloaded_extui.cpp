@@ -54,8 +54,8 @@ namespace ExtUI {
     dgus_screen_handler.CNCTimerStopped();
   }
 
-  void onFilamentRunout(const extruder_t extruder) {
-    dgus_screen_handler.FilamentRunout(extruder);
+  void onFilamentRunout(const atc_tool_t atc_tool) {
+    dgus_screen_handler.FilamentRunout(atc_tool);
   }
 
   void onUserConfirmRequired(const char * const msg) {

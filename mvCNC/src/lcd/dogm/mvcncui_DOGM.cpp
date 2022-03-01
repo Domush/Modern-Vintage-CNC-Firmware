@@ -341,19 +341,19 @@ void mvCNCUI::clear_lcd() { } // Automatically cleared by Picture Loop
 
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
 
-    void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t extruder) {
+    void mvCNCUI::draw_hotend_status(const uint8_t row, const uint8_t atc_tool) {
       u8g_uint_t y1 = row * (MENU_FONT_HEIGHT) + 1, y2 = y1 + MENU_FONT_HEIGHT - 1;
 
       if (!PAGE_CONTAINS(y1 + 1, y2 + 2)) return;
 
       lcd_put_wchar(LCD_PIXEL_WIDTH - 11 * (MENU_FONT_WIDTH), y2, 'E');
-      lcd_put_wchar((char)('1' + extruder));
+      lcd_put_wchar((char)('1' + atc_tool));
       lcd_put_wchar(' ');
-      lcd_put_u8str(i16tostr3rj(fanManager.wholeDegHotend(extruder)));
+      lcd_put_u8str(i16tostr3rj(fanManager.wholeDegHotend(atc_tool)));
       lcd_put_wchar('/');
 
-      if (get_blink() || !fanManager.heater_idle[extruder].timed_out)
-        lcd_put_u8str(i16tostr3rj(fanManager.degTargetHotend(extruder)));
+      if (get_blink() || !fanManager.heater_idle[atc_tool].timed_out)
+        lcd_put_u8str(i16tostr3rj(fanManager.degTargetHotend(atc_tool)));
     }
 
   #endif // ADVANCED_PAUSE_FEATURE
@@ -686,7 +686,7 @@ void mvCNCUI::clear_lcd() { } // Automatically cleared by Picture Loop
       B11111111,B11111111,B11111111
     };
 
-    const unsigned char nozzle_bmp[] PROGMEM = {
+    const unsigned char tool_bmp[] PROGMEM = {
       B01111111,B10000000,
       B11111111,B11000000,
       B11111111,B11000000,
@@ -707,11 +707,11 @@ void mvCNCUI::clear_lcd() { } // Automatically cleared by Picture Loop
 
       const int left = TERN(USE_BIG_EDIT_FONT,  0,  5),
                right = TERN(USE_BIG_EDIT_FONT, 45, 90),
-              nozzle = TERN(USE_BIG_EDIT_FONT, 95, 60);
+              tool = TERN(USE_BIG_EDIT_FONT, 95, 60);
 
-      // Draw nozzle lowered or raised according to direction moved
-      if (PAGE_CONTAINS( 3, 16)) u8g.drawBitmapP(nozzle + 6,  4 - dir, 2, 12, nozzle_bmp);
-      if (PAGE_CONTAINS(20, 20)) u8g.drawBitmapP(nozzle + 0, 20      , 3,  1, offset_bedline_bmp);
+      // Draw tool lowered or raised according to direction moved
+      if (PAGE_CONTAINS( 3, 16)) u8g.drawBitmapP(tool + 6,  4 - dir, 2, 12, tool_bmp);
+      if (PAGE_CONTAINS(20, 20)) u8g.drawBitmapP(tool + 0, 20      , 3,  1, offset_bedline_bmp);
 
       // Draw cw/ccw indicator and up/down arrows.
       if (PAGE_CONTAINS(47, 62)) {

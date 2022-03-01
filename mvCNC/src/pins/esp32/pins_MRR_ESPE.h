@@ -13,7 +13,7 @@
 
 #include "env_validate.h"
 
-#if EXTRUDERS > 2 || E_STEPPERS > 2
+#if ATC_TOOLS > 2 || E_STEPPERS > 2
   #error "MRR ESPE only supports two E Steppers. Comment out this line to continue."
 #elif TOOL_CHANGE_SUPPORT
   #error "MRR ESPE only supports one hotend / E-stepper. Comment out this line to continue."
@@ -87,8 +87,8 @@
 #define HEATER_BED_PIN                       144  // 4
 
 #define CONTROLLER_FAN_PIN                   147
-//#define E0_AUTO_FAN_PIN                    148  // need to update Configuration_adv.h @section extruder
-//#define E1_AUTO_FAN_PIN                    149  // need to update Configuration_adv.h @section extruder
+//#define E0_AUTO_FAN_PIN                    148  // need to update Configuration_adv.h @section ATC tool
+//#define E1_AUTO_FAN_PIN                    149  // need to update Configuration_adv.h @section ATC tool
 #define FAN1_PIN                             149
 
 //

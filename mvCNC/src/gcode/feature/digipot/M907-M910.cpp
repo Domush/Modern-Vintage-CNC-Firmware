@@ -64,7 +64,7 @@ void GcodeSuite::M907() {
   #if HAS_MOTOR_CURRENT_I2C
     // this one uses actual amps in floating point
     LOOP_LOGICAL_AXES(i) if (parser.seenval(axis_codes[i])) digipot_i2c.set_current(i, parser.value_float());
-      // Additional extruders use B,C,D for channels 4,5,6.
+      // Additional ATC tools use B,C,D for channels 4,5,6.
       // TODO: Change these parameters because 'E' is used. B<index>?
   #endif
 

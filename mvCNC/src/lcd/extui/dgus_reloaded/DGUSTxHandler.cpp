@@ -337,7 +337,7 @@ void DGUSTxHandler::ABLGrid(DGUS_VP &vp) {
 void DGUSTxHandler::FilamentIcons(DGUS_VP &vp) {
   uint16_t icons = 0;
 
-  switch (dgus_screen_handler.filament_extruder) {
+  switch (dgus_screen_handler.filament_atc_tool) {
     default: return;
     case DGUS_Data::Extruder::CURRENT:
       #if TOOL_CHANGE_SUPPORT

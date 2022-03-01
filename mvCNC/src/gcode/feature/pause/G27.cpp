@@ -11,12 +11,12 @@
 #include "../../../module/motion.h"
 
 /**
- * G27: Park the nozzle
+ * G27: Park the tool
  */
 void GcodeSuite::G27() {
-  // Don't allow nozzle parking without homing first
+  // Don't allow tool parking without homing first
   if (homing_needed_error()) return;
-  nozzle.park(parser.ushortval('P'));
+  tool.park(parser.ushortval('P'));
 }
 
 #endif // SPINDLE_PARK_FEATURE

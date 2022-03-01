@@ -27,7 +27,7 @@
 
 struct MoveAxisScreenData {
   struct BaseNumericAdjustmentScreenData placeholder;
-  float e_rel[ExtUI::extruderCount];
+  float e_rel[ExtUI::atc_toolCount];
 };
 
 class BaseMoveAxisScreen : public BaseNumericAdjustmentScreen {
@@ -36,7 +36,7 @@ class BaseMoveAxisScreen : public BaseNumericAdjustmentScreen {
   public:
     static void raiseZtoTop();
     static void setManualFeedrate(ExtUI::axis_t, float increment_mm);
-    static void setManualFeedrate(ExtUI::extruder_t, float increment_mm);
+    static void setManualFeedrate(ExtUI::atc_tool_t, float increment_mm);
 
     static void onEntry();
     static bool onTouchHeld(uint8_t tag);

@@ -12,7 +12,7 @@
 
 #include "env_validate.h"
 
-#if EXTRUDERS > 1 || E_STEPPERS > 1
+#if ATC_TOOLS > 1 || E_STEPPERS > 1
   #error "FYSETC E4 only supports one E Stepper. Comment out this line to continue."
 #elif TOOL_CHANGE_SUPPORT
   #error "FYSETC E4 only supports one hotend / E-stepper. Comment out this line to continue."

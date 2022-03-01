@@ -101,11 +101,11 @@
 #define STR_ERR_LINE_NO                     "Line Number is not Last Line Number+1, Last Line: "
 #define STR_ERR_CHECKSUM_MISMATCH           "checksum mismatch, Last Line: "
 #define STR_ERR_NO_CHECKSUM                 "No Checksum with line number, Last Line: "
-#define STR_FILE_PRINTED                    "Done printing file"
+#define STR_FILE_PRINTED                    "Done cutting file"
 #define STR_NO_MEDIA                        "No media"
 #define STR_BEGIN_FILE_LIST                 "Begin file list"
 #define STR_END_FILE_LIST                   "End file list"
-#define STR_INVALID_EXTRUDER                "Invalid extruder"
+#define STR_INVALID_EXTRUDER                "Invalid ATC tool"
 #define STR_INVALID_E_STEPPER               "Invalid E stepper"
 #define STR_E_STEPPER_NOT_SPECIFIED         "E stepper not specified"
 #define STR_INVALID_SOLENOID                "Invalid solenoid"
@@ -162,8 +162,8 @@
 #define STR_SD_SIZE                         " Size: "
 #define STR_SD_FILE_SELECTED                "File selected"
 #define STR_SD_WRITE_TO_FILE                "Writing to file: "
-#define STR_SD_PRINTING_BYTE                "SD printing byte "
-#define STR_SD_NOT_PRINTING                 "Not SD printing"
+#define STR_SD_JOB_RUNNING_BYTE                "SD job byte "
+#define STR_SD_JOB_NOT_RUNNING                 "Not SD job"
 #define STR_SD_ERR_WRITE_TO_FILE            "error writing to file"
 #define STR_SD_ERR_READ                     "SD read error"
 #define STR_SD_CANT_ENTER_SUBDIR            "Cannot enter subdir: "
@@ -174,10 +174,10 @@
 #define STR_ERR_HOTEND_TOO_COLD             "Hotend too cold"
 #define STR_ERR_EEPROM_WRITE                "Error writing to EEPROM!"
 
-#define STR_FILAMENT_CHANGE_HEAT_LCD        "Press button to heat nozzle"
+#define STR_FILAMENT_CHANGE_HEAT_LCD        "Press button to heat tool"
 #define STR_FILAMENT_CHANGE_INSERT_LCD      "Change bit and press button"
 #define STR_FILAMENT_CHANGE_WAIT_LCD        "Press button to resume"
-#define STR_FILAMENT_CHANGE_HEAT_M108       "Send M108 to heat nozzle"
+#define STR_FILAMENT_CHANGE_HEAT_M108       "Send M108 to heat tool"
 #define STR_FILAMENT_CHANGE_INSERT_M108     "Change bit and send M108"
 #define STR_FILAMENT_CHANGE_WAIT_M108       "Send M108 to resume"
 
@@ -467,7 +467,7 @@
 /**
  * Tool indexes for LCD display only
  *
- * By convention the LCD shows "E1" for the first extruder.
+ * By convention the LCD shows "E1" for the first ATC tool.
  * However, internal to mvCNC E0/T0 is the first tool, and
  * most board silkscreens say "E0." Zero-based labels will
  * make these indexes consistent but this defies expectation.

@@ -20,7 +20,7 @@
 #endif
 
 #if defined(STM32F4xx) && BOTH(JOBCOUNTER, FLASH_EEPROM_EMULATION)
-  #warning "FLASH_EEPROM_EMULATION may cause long delays when writing and should not be used while printing."
+  #warning "FLASH_EEPROM_EMULATION may cause long delays when writing and should not be used while cutting."
   #error "Disable JOBCOUNTER or choose another EEPROM emulation."
 #endif
 

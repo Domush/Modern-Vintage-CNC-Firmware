@@ -269,7 +269,7 @@ namespace Language_zh_CN {
   LSTR MSG_VMIN                           = _UxGT("最小进料速率");     // "Vmin"  min_feedrate_mm_s
   LSTR MSG_VTRAV_MIN                      = _UxGT("最小移动速率");     // "VTrav min" min_travel_feedrate_mm_s, (target) speed of the move
   LSTR MSG_ACCELERATION                   = _UxGT("加速度");     // "Acceleration"
-  LSTR MSG_AMAX_A                         = _UxGT("最大打印加速度") STR_A;     // "Amax " max_acceleration_mm_per_s2, acceleration in units/s^2 for print moves
+  LSTR MSG_AMAX_A                         = _UxGT("最大打印加速度") STR_A;     // "Amax " max_acceleration_mm_per_s2, acceleration in units/s^2 for cutting moves
   LSTR MSG_AMAX_B                         = _UxGT("最大打印加速度") STR_B;
   LSTR MSG_AMAX_C                         = _UxGT("最大打印加速度") STR_C;
   LSTR MSG_AMAX_I                         = _UxGT("最大打印加速度") STR_I;
@@ -278,7 +278,7 @@ namespace Language_zh_CN {
   LSTR MSG_AMAX_E                         = _UxGT("最大打印加速度") STR_E;
   LSTR MSG_AMAX_EN                        = _UxGT("最大打印加速度 *");
   LSTR MSG_A_RETRACT                      = _UxGT("收进加速度");     // "A-retract" retract_acceleration, E acceleration in mm/s^2 for retracts
-  LSTR MSG_A_TRAVEL                       = _UxGT("非打印移动加速度");     // "A-travel" travel_acceleration, X, Y, Z acceleration in mm/s^2 for travel (non printing) moves
+  LSTR MSG_A_TRAVEL                       = _UxGT("非打印移动加速度");     // "A-travel" travel_acceleration, X, Y, Z acceleration in mm/s^2 for travel (non cutting) moves
   LSTR MSG_XY_FREQUENCY_LIMIT             = _UxGT("频率最大");
   LSTR MSG_XY_FREQUENCY_FEEDRATE          = _UxGT("进给速度");
   LSTR MSG_STEPS_PER_MM                   = _UxGT("轴步数/mm");     // "Steps/mm" axis_steps_per_mm, axis steps-per-unit G92
@@ -336,7 +336,7 @@ namespace Language_zh_CN {
   LSTR MSG_PAUSE_PRINT                    = _UxGT("暂停打印");     // "Pause print"
   LSTR MSG_RESUME_PRINT                   = _UxGT("恢复打印");     // "Resume print"
   LSTR MSG_STOP_PRINT                     = _UxGT("停止打印");     // "Stop print"
-  LSTR MSG_PRINTING_OBJECT                = _UxGT("打印物体");
+  LSTR MSG_CUTTING_OBJECT                = _UxGT("打印物体");
   LSTR MSG_CANCEL_OBJECT                  = _UxGT("取消物体");
   LSTR MSG_CANCEL_OBJECT_N                = _UxGT("取消物体 =");
   LSTR MSG_OUTAGE_RECOVERY                = _UxGT("中断恢复");
@@ -345,18 +345,18 @@ namespace Language_zh_CN {
   LSTR MSG_DWELL                          = _UxGT("休眠中 ...");     // "Sleep..."
   LSTR MSG_USERWAIT                       = _UxGT("点击继续 ...");     // "Click to resume..."
   LSTR MSG_PRINT_PAUSED                   = _UxGT("暫停打印");     // "CNC paused"
-  LSTR MSG_PRINTING                       = _UxGT("打印中...");
+  LSTR MSG_CUTTING                       = _UxGT("打印中...");
   LSTR MSG_PRINT_ABORTED                  = _UxGT("已取消打印");     // "Print aborted"
   LSTR MSG_PRINT_DONE                     = _UxGT("打印已完成");
   LSTR MSG_NO_MOVE                        = _UxGT("无移动");     // "No move."
   LSTR MSG_KILLED                         = _UxGT("已杀掉");     // "KILLED. "
   LSTR MSG_STOPPED                        = _UxGT("已停止");     // "STOPPED. "
   LSTR MSG_CONTROL_RETRACT                = _UxGT("回抽长度mm");     // "Retract mm" retract_length, retract length (positive mm)
-  LSTR MSG_CONTROL_RETRACT_SWAP           = _UxGT("换手回抽长度mm");     // "Swap Re.mm" swap_retract_length, swap retract length (positive mm), for extruder change
+  LSTR MSG_CONTROL_RETRACT_SWAP           = _UxGT("换手回抽长度mm");     // "Swap Re.mm" swap_retract_length, swap retract length (positive mm), for ATC tool change
   LSTR MSG_CONTROL_RETRACTF               = _UxGT("回抽速率mm/s");     // "Retract V" retract_feedrate_mm_s, feedrate for retracting (mm/s)
   LSTR MSG_CONTROL_RETRACT_ZHOP           = _UxGT("Hop mm");     // "Hop mm" retract_zraise, retract Z-lift
   LSTR MSG_CONTROL_RETRACT_RECOVER        = _UxGT("回抽恢复长度mm");     // "UnRet +mm" retract_recover_extra, additional recover length (mm, added to retract length when recovering)
-  LSTR MSG_CONTROL_RETRACT_RECOVER_SWAP   = _UxGT("换手回抽恢复长度mm");     // "S UnRet+mm" swap_retract_recover_extra, additional swap recover length (mm, added to retract length when recovering from extruder change)
+  LSTR MSG_CONTROL_RETRACT_RECOVER_SWAP   = _UxGT("换手回抽恢复长度mm");     // "S UnRet+mm" swap_retract_recover_extra, additional swap recover length (mm, added to retract length when recovering from ATC tool change)
   LSTR MSG_CONTROL_RETRACT_RECOVERF       = _UxGT("回抽恢复后进料速率mm/s");     // "Unretract V" retract_recover_feedrate_mm_s, feedrate for recovering from retraction (mm/s)
   LSTR MSG_CONTROL_RETRACT_RECOVER_SWAPF  = _UxGT("S UnRet V");     // "S UnRet V"
   LSTR MSG_AUTORETRACT                    = _UxGT("自动抽回");     // "Auto-Retract" autoretract_enabled,
@@ -459,7 +459,7 @@ namespace Language_zh_CN {
   LSTR MSG_INFO_STATS_MENU                = _UxGT("打印机统计");     // "CNC Stats"
   LSTR MSG_INFO_BOARD_MENU                = _UxGT("主板信息");     // "Board Info"
   LSTR MSG_INFO_THERMISTOR_MENU           = _UxGT("温度计");     // "Thermistors"
-  LSTR MSG_INFO_EXTRUDERS                 = _UxGT("挤出机");     // "Extruders"
+  LSTR MSG_INFO_ATC_TOOLS                 = _UxGT("挤出机");     // "Extruders"
   LSTR MSG_INFO_BAUDRATE                  = _UxGT("波特率");     // "Baud"
   LSTR MSG_INFO_PROTOCOL                  = _UxGT("协议");     // "Protocol"
   LSTR MSG_INFO_RUNAWAY_OFF               = _UxGT("监控温度失控:关");
@@ -569,8 +569,8 @@ namespace Language_zh_CN {
     LSTR MSG_PAUSE_PRINT_PARKING          = _UxGT(MSG_1_LINE("停靠中..."));
     LSTR MSG_FILAMENT_CHANGE_INIT         = _UxGT(MSG_3_LINE("等待开始", "丝料", "变更"));     // "Wait for start of the filament change"
     LSTR MSG_FILAMENT_CHANGE_INSERT       = _UxGT(MSG_3_LINE("插入料", "并按下", "以继续"));
-    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("按下按钮来", "加热喷嘴."));     // "Press button to heat nozzle."
-    LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("加热喷嘴", "请等待 ..."));     // "Heating nozzle Please wait..."
+    LSTR MSG_FILAMENT_CHANGE_HEAT         = _UxGT(MSG_2_LINE("按下按钮来", "加热喷嘴."));     // "Press button to heat tool."
+    LSTR MSG_FILAMENT_CHANGE_HEATING      = _UxGT(MSG_2_LINE("加热喷嘴", "请等待 ..."));     // "Heating tool Please wait..."
     LSTR MSG_FILAMENT_CHANGE_UNLOAD       = _UxGT(MSG_2_LINE("等待", "卸下丝料"));     // "Wait for filament unload"
     LSTR MSG_FILAMENT_CHANGE_LOAD         = _UxGT(MSG_2_LINE("等待", "进料"));     // "Wait for filament load"
     LSTR MSG_FILAMENT_CHANGE_PURGE        = _UxGT(MSG_2_LINE("等待", "丝料清除"));     // "Wait for filament purge"

@@ -85,11 +85,11 @@ extern int16_t feedrate_percentage;
 extern float feedrate_percentage_change;
 #define MMS_SCALED(V) ((V) * 0.01f * feedrate_percentage)
 
-// The active extruder (tool). Set with T<extruder> command.
+// The active ATC tool (tool). Set with T<ATC tool> command.
 #if TOOL_CHANGE_SUPPORT
-  extern uint8_t active_extruder;
+  extern uint8_t active_tool;
 #else
-  constexpr uint8_t active_extruder = 0;
+  constexpr uint8_t active_tool = 0;
 #endif
 
 #if ENABLED(LCD_SHOW_E_TOTAL)
@@ -508,7 +508,7 @@ void home_if_needed(const bool keeplev=false);
   inline bool position_is_reachable(const_float_t rx, const_float_t ry) {
     if (!COORDINATE_OKAY(ry, Y_MIN_POS - fslop, Y_MAX_POS + fslop)) return false;
     #if ENABLED(DUAL_X_CARRIAGE)
-      if (active_extruder)
+      if (active_tool)
         return COORDINATE_OKAY(rx, X2_MIN_POS - fslop, X2_MAX_POS + fslop);
       else
         return COORDINATE_OKAY(rx, X1_MIN_POS - fslop, X1_MAX_POS + fslop);
@@ -524,7 +524,7 @@ void home_if_needed(const bool keeplev=false);
  * Duplication mode
  */
 #if HAS_DUPLICATION_MODE
-  extern bool extruder_duplication_enabled;       // Used in Dual X mode 2
+  extern bool atc_tool_duplication_enabled;       // Used in Dual X mode 2
 #endif
 
 /**
@@ -540,17 +540,17 @@ void home_if_needed(const bool keeplev=false);
   };
 
   extern DualXMode dual_x_carriage_mode;
-  extern float inactive_extruder_x,                 // Used in mode 0 & 1
-               duplicate_extruder_x_offset;         // Used in mode 2 & 3
+  extern float inactive_tool_x,                 // Used in mode 0 & 1
+               duplicate_atc_tool_x_offset;         // Used in mode 2 & 3
   extern xyz_pos_t raised_parked_position;          // Used in mode 1
-  extern bool active_extruder_parked;               // Used in mode 1, 2 & 3
+  extern bool active_tool_parked;               // Used in mode 1, 2 & 3
   extern millis_t delayed_move_time;                // Used in mode 1
-  extern celsius_t duplicate_extruder_temp_offset;  // Used in mode 2 & 3
+  extern celsius_t duplicate_atc_tool_temp_offset;  // Used in mode 2 & 3
   extern bool idex_mirrored_mode;                   // Used in mode 3
 
   FORCE_INLINE bool idex_is_duplicating() { return dual_x_carriage_mode >= DXC_DUPLICATION_MODE; }
 
-  float x_home_pos(const uint8_t extruder);
+  float x_home_pos(const uint8_t atc_tool);
 
   #define TOOL_X_HOME_DIR(T) ((T) ? X2_HOME_DIR : X_HOME_DIR)
 
@@ -563,7 +563,7 @@ void home_if_needed(const bool keeplev=false);
   #if ENABLED(MULTI_NOZZLE_DUPLICATION)
     extern uint8_t duplication_e_mask;
     enum DualXMode : char { DXC_DUPLICATION_MODE = 2 };
-    FORCE_INLINE void set_duplication_enabled(const bool dupe) { extruder_duplication_enabled = dupe; }
+    FORCE_INLINE void set_duplication_enabled(const bool dupe) { atc_tool_duplication_enabled = dupe; }
   #endif
 
   #define TOOL_X_HOME_DIR(T) X_HOME_DIR
