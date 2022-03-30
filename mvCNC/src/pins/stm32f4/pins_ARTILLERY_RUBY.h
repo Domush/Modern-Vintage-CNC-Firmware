@@ -1,6 +1,6 @@
 /**
  * Modern Vintage CNC Firmware
- * Copyright (c) 2021 mvCNCFirmware [https://github.com/Domush/Webber-Ranch-CNC-Firmware]
+ * Copyright (c) 2021 mvCNCFirmware [https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware]
  *
  * Based on Marlin and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -31,7 +31,7 @@
 
 #if NO_EEPROM_SELECTED
   #define FLASH_EEPROM_EMULATION
-  //#define I2C_EEPROM
+//#define I2C_EEPROM
 #endif
 //#define E2END                            0xFFF  // 4KB
 

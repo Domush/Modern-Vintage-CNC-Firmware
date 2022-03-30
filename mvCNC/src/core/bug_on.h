@@ -1,6 +1,6 @@
 /**
  * Modern Vintage CNC Firmware
- * Copyright (c) 2021 mvCNCFirmware [https://github.com/Domush/Webber-Ranch-CNC-Firmware]
+ * Copyright (c) 2021 mvCNCFirmware [https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware]
  *
  * Copyright (c) 2021 X-Ryl669 [https://blog.cyril.by]
  *

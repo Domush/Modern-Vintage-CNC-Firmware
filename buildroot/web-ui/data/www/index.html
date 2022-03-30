@@ -13,8 +13,8 @@
   <title>mvCNC WebUI</title>
   <link rel="shortcut icon" href="#" />
   <link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
-  <link rel="stylesheet" type="text/css" href="webmvcnc-font.css">
-  <link rel="stylesheet" type="text/css" href="webmvcnc.css" />
+  <link rel="stylesheet" type="text/css" href="webmarlin-font.css">
+  <link rel="stylesheet" type="text/css" href="webmarlin.css" />
   <script>
     var ua = window.navigator.userAgent;
     var msie = ua.indexOf("MSIE ");
@@ -26,7 +26,7 @@
     window.addEventListener("orientationchange", hideAddressBar );
   </script>
   <script src="moment.min.js"></script>
-  <script src="webmvcnc-class.js"></script>
+  <script src="webmarlin-class.js"></script>
 </head>
 <body>
   <!-- Javascript sources ========================================================================================== -->
@@ -36,7 +36,7 @@
   <script type="text/javascript" src="bootstrap4-toggle.min.js"></script>
   <script async="" src="filesaver.min.js"></script>
   <script type="text/javascript" src="chart.min.js"></script>
-  <script type="text/javascript" src="webmvcnc.js"></script>
+  <script type="text/javascript" src="webmarlin.js"></script>
 
   <!-- Accordion =================================================================================================== -->
   <div id="main-panel" class="h-100 bg-secondary m-0 p-0">
@@ -47,7 +47,7 @@
         <div class="bg-dark text-light text-left p-2">
           <span class="h4">mvCNC WebUI </span> by atbox.tech
           <button type="button" class="btn btn-sm btn-success float-right ml-1" data-toggle="modal" data-target="#modal-info" style="width:35px; height:33px"><i class="icon icon-info"></i></button>
-          <a href="http://mvcncfw.org/" target="_blank" class="float-right"><img src="mvcnc-logo-dark.png" alt="mvCNCLogo" width="100" height="33" /></a>
+          <a href="http://marlinfw.org/" target="_blank" class="float-right"><img src="marlin-logo-dark.png" alt="mvCNCLogo" width="100" height="33" /></a>
         </div>
 
         <!-- PANEL: Fixed connection status bar ==================================================================== -->
@@ -65,7 +65,7 @@
           </div>
         </div>
 
-        <!-- PANEL: CNC status ================================================================================= -->
+        <!-- PANEL: Printer status ================================================================================= -->
         <div class="card-header flex-shrink-1 p-0 bg-dark text-light" id="accordion-panel-status-head">
           <button class="btn btn-sm btn-dark btn-block text-left" type="button" data-toggle="collapse" data-target="#accordion-panel-status-body" aria-expanded="true" aria-controls="accordion-panel-status-body">
             <span class="h5"><span class="badge badge-success" style="width:30px;"><i class="icon icon-info-circled"></i></span><span class="ml-2">Status</span></span>
@@ -75,19 +75,19 @@
         <div id="accordion-panel-status-body" class="collapse flex-grow-1 collapse-panel" aria-labelledby="accordion-panel-status-head" data-parent="#accordion-panels">
           <div class="card-body h-100 border-bottom p-1 text-left">
             <div class="card mb-1 border-0">
-              <div class="card-header card-header-title text-light bg-secondary m-0 p-1"><i class="icon icon-info mr-1 ml-1"></i>CNC status</div>
+              <div class="card-header card-header-title text-light bg-secondary m-0 p-1"><i class="icon icon-info mr-1 ml-1"></i>Printer status</div>
               <div class="card-body px-0 py-1 bg-light badge-description">
                 <div class="border-bottom pb-1">
-                  CNCing status <div id="div-pstatus-sdprint" class="badge badge-danger badge-description float-right pb-1">Idle</div>
+                  Printing status <div id="div-pstatus-sdprint" class="badge badge-danger badge-description float-right pb-1">Idle</div>
                 </div>
                 <div id="div-pstatus-timer" class="border-bottom py-1 collapse">
-                  CNCing timer
+                  Printing timer
                   <div class="float-right ml-1">Remain: <span id="div-pstatus-timer-remain" class="badge badge-info badge-description pb-1">0:45:12</span></div>
                   <div class="float-right ml-1">Estimated: <span id="div-pstatus-timer-estimated" class="badge badge-info badge-description pb-1">1:12:34</span></div>
                   <div class="float-right">Elapsed: <span id="div-pstatus-timer-elapsed" class="badge badge-info badge-description pb-1">0:00:00</span></div>
                 </div>
                 <div id="div-pstatus-progress" class="pt-1 collapse">
-                  CNCing progress:
+                  Printing progress:
                   <div id="div-pstatus-progress-percent" class="badge badge-info badge-description float-right pb-1">10%</div>
                   <div id="div-pstatus-progress-bytes" class="badge badge-info badge-description float-right pb-1 mr-1">1 of 123456</div>
                   <div class="progress mt-1" style="height: 10px;"><div class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div>
@@ -231,7 +231,7 @@
           </div>
         </div>
 
-        <!-- PANEL: CNC controls =============================================================================== -->
+        <!-- PANEL: Printer controls =============================================================================== -->
         <div class="card-header flex-shrink-1 p-0 bg-dark text-light" id="accordion-panel-controls-head">
           <button class="btn btn-sm btn-dark btn-block text-left" type="button" data-toggle="collapse" data-target="#accordion-panel-controls-body" aria-expanded="true" aria-controls="accordion-panel-controls-body">
             <span class="h5"><span class="badge badge-success" style="width:30px;"><i class="icon icon-tasks"></i></span><span class="ml-2">Controls</span></span>
@@ -425,7 +425,7 @@
                     <div class="input-group-prepend"><span class="input-group-text" id="lbl-sdfile-selected">Selected file:</span></div>
                     <input type="text" id="txt-sdfile-selected" class="form-control" aria-describedby="lbl-sdfile-selected" value="" readonly/>
                     <div class="input-group-append">
-                      <button id="btn-set-sdprint" class="btn btn-sm btn-success" data-toggle="modal" data-target="#modal-sdfile-print" onclick="WmButtons.CNCSdConfirm();" disabled><i class="icon icon-print"></i></button>
+                      <button id="btn-set-sdprint" class="btn btn-sm btn-success" data-toggle="modal" data-target="#modal-sdfile-print" onclick="WmButtons.PrintSdConfirm();" disabled><i class="icon icon-print"></i></button>
                       <button id="btn-set-sddelete" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modal-sdfile-delete" onclick="WmButtons.DeleteSdConfirm();" disabled><i class="icon icon-trash"></i></button>
                     </div>
                   </div>
@@ -456,7 +456,7 @@
             <label for="text-gcommand" class="mb-0 field-labels">G-Code command:</label>
             <div class="input-group">
               <div class="input-group-prepend">
-                <a class="btn btn-sm btn-dark" target="_blank" href="http://mvcncfw.org/meta/gcode/"><i class="icon icon-info"></i></a>
+                <a class="btn btn-sm btn-dark" target="_blank" href="http://marlinfw.org/meta/gcode/"><i class="icon icon-info"></i></a>
                 <button class="btn btn-sm btn-outline-dark" type="button" id="btn-gcommand-preset" data-toggle="modal" data-target="#modal-presets"><i class="icon icon-tasks"></i></button>
               </div>
               <input type="text" id="text-gcommand" class="form-control form-control-sm border-dark text-uppercase" value="" required>
@@ -505,7 +505,7 @@
           </p>
           <p>Open source dependencies:</p>
           <ul>
-            <li><a href="https://mvcncfw.org/" target="_blank">mvCNC firmware</a></li>
+            <li><a href="https://marlinfw.org/" target="_blank">mvCNC firmware</a></li>
             <li><a href="https://jquery.com/" target="_blank">JQuery 3.5.1 (slim version)</a></li>
             <li><a href="https://getbootstrap.com/" target="_blank">Bootstrap v4.5.0</a></li>
             <li><a href="https://gitbrent.github.io/bootstrap4-toggle/" target="_blank">Bootstrap4 toggle switch v3.6.1</a></li>
@@ -708,13 +708,13 @@
     <div class="modal-dialog modal-popup">
       <div class="modal-content">
         <div class="modal-header bg-secondary text-light m-0 px-2 py-1">
-          <span class="h5 font-italic mt-1"><i class="icon icon-print mr-2"></i>CNC confirmation</span>
+          <span class="h5 font-italic mt-1"><i class="icon icon-print mr-2"></i>Print confirmation</span>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body p-1 text-center my-4">
           <span class="h5"><i class="icon icon-print"></i><br>Are you sure to start printing of<br><div id="div-sdfile-print-badge" class="badge badge-success"></div></span>
         </div>
-        <div id="div-sdfile-print-rs" class="collapse mt-2"><div class="card card-body border-success p-1 m-2 text-success text-center">CNCing started successfully</div></div>
+        <div id="div-sdfile-print-rs" class="collapse mt-2"><div class="card card-body border-success p-1 m-2 text-success text-center">Printing started successfully</div></div>
         <div class="modal-footer bg-secondary m-0 p-1">
           <div class="row w-100">
             <div class="col"><button type="button" class="btn btn-sm btn-dark btn-block" data-dismiss="modal">No</button></div>

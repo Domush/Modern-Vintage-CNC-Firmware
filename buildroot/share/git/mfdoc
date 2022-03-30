@@ -2,7 +2,7 @@
 #
 # mfdoc
 #
-# Start Jekyll in watch mode to work on mvCNC Documentation and preview locally
+# Start Jekyll in watch mode to work on Marlin Documentation and preview locally
 #
 
 [[ $# == 0 ]] || { echo "Usage: `basename $0`" 1>&2 ; exit 1; }
@@ -13,7 +13,7 @@ ORG=${INFO[0]}
 REPO=${INFO[2]}
 BRANCH=${INFO[5]}
 
-[[ $ORG == "mvCNCFirmware" && $REPO == "mvCNCDocumentation" ]] || { echo "Wrong repository." 1>&2; exit 1; }
+[[ $ORG == "MarlinFirmware" && $REPO == "MarlinDocumentation" ]] || { echo "Wrong repository." 1>&2; exit 1; }
 
 opensite() {
   URL="http://127.0.0.1:4000/"
@@ -27,7 +27,7 @@ opensite() {
   fi
 }
 
-echo "Previewing mvCNCDocumentation..."
+echo "Previewing MarlinDocumentation..."
 
 bundle exec jekyll serve --watch --incremental | {
   while IFS= read -r line

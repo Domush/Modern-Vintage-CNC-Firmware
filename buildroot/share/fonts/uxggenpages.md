@@ -35,7 +35,7 @@ sudo apt-get install xfonts-wqy
 You also need to compile the `bdf2u8g` binary to convert BDF font files into U8glib data structures:
 
 ```bash
-cd mvcnc-git/buildroot/share/fonts/
+cd marlin-git/buildroot/share/fonts/
 ./get-bdf2u8g.sh
 ```
 
@@ -44,14 +44,14 @@ The `genallfont.sh` script generates font data for all language translation file
 You may specify a list of languages to process. For example:
 
 ```bash
-mvCNC_LANGS="zh_CN zh_TW"
+MARLIN_LANGS="zh_CN zh_TW"
 ```
 
 and run the script to generate the font data (`language_data_xx.h`):
 
 ```bash
-cd mvcnc-git/mvCNC/
-mvCNC_LANGS="zh_CN zh_TW" ../buildroot/share/fonts/genallfont.sh
+cd marlin-git/mvCNC/
+MARLIN_LANGS="zh_CN zh_TW" ../buildroot/share/fonts/genallfont.sh
 ```
 
 3. Change the language settings
@@ -84,14 +84,14 @@ cd mvCNC/
 ...or to regenerate the language font data for a specific language:
 
 ```bash
-mvCNC_LANGS="zh_TW" ../buildroot/share/fonts/genallfont.sh ./newfont.bdf
+MARLIN_LANGS="zh_TW" ../buildroot/share/fonts/genallfont.sh ./newfont.bdf
 ```
 
 ### Suggestions for Maintainers
 
 The tool and the language engine can be easily updated. Since it uses common bitmap font files and UTF-8 text, the maintainer needs to confirm that the font contains the glyphs in the language files.
 
-At this time, the font file `mvcnc-6x12-3.bdf` is used to generate the font data. It combines all of mvCNC's ISO10646-1 fonts and the WQY 9pt bitmap font.
+At this time, the font file `marlin-6x12-3.bdf` is used to generate the font data. It combines all of mvCNC's ISO10646-1 fonts and the WQY 9pt bitmap font.
 
 ### Related resources
 
@@ -103,8 +103,8 @@ At this time, the font file `mvcnc-6x12-3.bdf` is used to generate the font data
 
 Documents related to the old version of the language engine:
 
-- [mvCNC Fonts Documentation](https://www.mvcncfw.org/docs/development/fonts.html)
-- [mvCNC LCD Language](https://mvcncfw.org/docs/development/lcd_language.html)
+- [mvCNC Fonts Documentation](https://www.marlinfw.org/docs/development/fonts.html)
+- [mvCNC LCD Language](https://marlinfw.org/docs/development/lcd_language.html)
 - [U8GLIB](https://github.com/olikraus/u8glib.git)
 - [UTF-8 for U8GLIB](https://github.com/yhfudev/u8glib-fontutf8.git)
-- [Standalone test project for the mvCNC UTF-8 language engine](https://github.com/yhfudev/mvcnc-fontutf8.git)
+- [Standalone test project for the mvCNC UTF-8 language engine](https://github.com/yhfudev/marlin-fontutf8.git)

@@ -7,7 +7,7 @@ if pioutil.is_pio_build():
 	Import("env")
 	import os,requests,zipfile,tempfile,shutil
 
-	url = "https://github.com/makerbase-mks/Mks-Robin-Nano-mvCNC2.0-Firmware/archive/0263cdaccf.zip"
+	url = "https://github.com/makerbase-mks/Mks-Robin-Nano-Marlin2.0-Firmware/archive/0263cdaccf.zip"
 	deps_path = env.Dictionary("PROJECT_LIBDEPS_DIR")
 	zip_path = os.path.join(deps_path, "mks-assets.zip")
 	assets_path = os.path.join(env.Dictionary("PROJECT_BUILD_DIR"), env.Dictionary("PIOENV"), "assets")

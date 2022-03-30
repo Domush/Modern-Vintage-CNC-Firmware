@@ -29,21 +29,21 @@ def glyph_bits(size_x, size_y, font, glyph_ord):
     bits.reverse()
     return bits
 
-def mvcnc_font_hzk():
+def marlin_font_hzk():
     fonts = [
-        [6,12,'mvcnc-6x12-3.bdf'],
-        [8,16,'mvcnc-8x16.bdf'],
-        [10,20,'mvcnc-10x20.bdf'],
-        [12,24,'mvcnc-12x24.bdf'],
-        [14,28,'mvcnc-14x28.bdf'],
-        [16,32,'mvcnc-16x32.bdf'],
-        [20,40,'mvcnc-20x40.bdf'],
-        [24,48,'mvcnc-24x48.bdf'],
-        [28,56,'mvcnc-28x56.bdf'],
-        [32,64,'mvcnc-32x64.bdf']
+        [6,12,'marlin-6x12-3.bdf'],
+        [8,16,'marlin-8x16.bdf'],
+        [10,20,'marlin-10x20.bdf'],
+        [12,24,'marlin-12x24.bdf'],
+        [14,28,'marlin-14x28.bdf'],
+        [16,32,'marlin-16x32.bdf'],
+        [20,40,'marlin-20x40.bdf'],
+        [24,48,'marlin-24x48.bdf'],
+        [28,56,'marlin-28x56.bdf'],
+        [32,64,'marlin-32x64.bdf']
     ]
 
-    with open('mvcnc_fixed.hzk','wb') as output:
+    with open('marlin_fixed.hzk','wb') as output:
         for f in fonts:
             with open(f[2], 'rb') as file:
                 print(f'{f[0]}x{f[1]}')

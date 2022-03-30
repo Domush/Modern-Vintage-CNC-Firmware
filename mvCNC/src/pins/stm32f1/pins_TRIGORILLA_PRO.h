@@ -6,8 +6,8 @@
 /**
  * ANYCUBIC Trigorilla Pro (STM32F103ZET6) board pin assignments.
  * It is the same used by the Tronxy X5SA thanks to ftoz1 for sharing it
- * https://github.com/Domush/Webber-Ranch-CNC-Firmware/issues/14655
- * https://github.com/Domush/Webber-Ranch-CNC-Firmware/files/3401484/x5sa-main_board-2.pdf
+ * https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware/issues/14655
+ * https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware/files/3401484/x5sa-main_board-2.pdf
  */
 
 #include "env_validate.h"

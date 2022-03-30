@@ -10,7 +10,7 @@
 #
 import pioutil
 if pioutil.is_pio_build():
-	import os,sys,mvcnc
+	import os,sys,marlin
 	Import("env")
 
 	from SCons.Script import DefaultEnvironment
@@ -23,11 +23,11 @@ if pioutil.is_pio_build():
 	#
 	if 'offset' in board_keys:
 		LD_FLASH_OFFSET = board.get("build.offset")
-		mvcnc.relocate_vtab(LD_FLASH_OFFSET)
+		marlin.relocate_vtab(LD_FLASH_OFFSET)
 
 		# Flash size
 		maximum_flash_size = int(board.get("upload.maximum_size") / 1024)
-		mvcnc.replace_define('STM32_FLASH_SIZE', maximum_flash_size)
+		marlin.replace_define('STM32_FLASH_SIZE', maximum_flash_size)
 
 		# Get upload.maximum_ram_size (defined by /buildroot/share/PlatformIO/boards/VARIOUS.json)
 		maximum_ram_size = board.get("upload.maximum_ram_size")
@@ -45,10 +45,10 @@ if pioutil.is_pio_build():
 
 		# Encrypt ${PROGNAME}.bin and save it with the name given in build.encrypt
 		def encrypt(source, target, env):
-			mvcnc.encrypt_mks(source, target, env, board.get("build.encrypt"))
+			marlin.encrypt_mks(source, target, env, board.get("build.encrypt"))
 
 		if board.get("build.encrypt") != "":
-			mvcnc.add_post_action(encrypt)
+			marlin.add_post_action(encrypt)
 
 	#
 	# For build.rename simply rename the firmware file.
@@ -59,4 +59,4 @@ if pioutil.is_pio_build():
 			firmware = os.path.join(target[0].dir.path, board.get("build.rename"))
 			os.rename(target[0].path, firmware)
 
-		mvcnc.add_post_action(rename_target)
+		marlin.add_post_action(rename_target)

@@ -2,7 +2,7 @@
 #
 # mfpr [1|2]
 #
-# Make a PR targeted to mvCNCFirmware/[repo]
+# Make a PR targeted to MarlinFirmware/[repo]
 #
 
 [[ $# < 2 && $1 != "-h" && $1 != "--help" ]] || { echo "usage: `basename $0` [1|2] [branch]" 1>&2 ; exit 1; }

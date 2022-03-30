@@ -16,7 +16,7 @@ typedef void (*twiRequestFunc_t)();
 
 /**
  * For a light i2c protocol that runs on two boards running mvCNC see:
- * See https://github.com/Domush/Webber-Ranch-CNC-Firmware/issues/4776#issuecomment-246262879
+ * See https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware/issues/4776#issuecomment-246262879
  */
 #if I2C_SLAVE_ADDRESS > 0
 

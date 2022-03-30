@@ -2,4 +2,4 @@
 
 git checkout mvCNC/Configuration*.h 2>/dev/null
 git checkout mvCNC/src/pins/ramps/pins_RAMPS.h 2>/dev/null
-rm -f mvCNC/_Bootscreen.h mvCNC/_Statusscreen.h mvcnc_config.json .pio/build/mc.zip
+rm -f mvCNC/_Bootscreen.h mvCNC/_Statusscreen.h marlin_config.json .pio/build/mc.zip

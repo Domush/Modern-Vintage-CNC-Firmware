@@ -4,7 +4,7 @@
 # Generated files
 _Version.h
 bdf2u8g
-mvcnc_config.json
+marlin_config.json
 mczip.h
 *.gen
 *.sublime-workspace

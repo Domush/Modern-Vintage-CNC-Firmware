@@ -1,6 +1,6 @@
 /**
  * Modern Vintage CNC Firmware
- * Copyright (c) 2021 mvCNCFirmware [https://github.com/Domush/Webber-Ranch-CNC-Firmware]
+ * Copyright (c) 2021 mvCNCFirmware [https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware]
  *
  * Based on Marlin and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -22,6 +22,15 @@
 #pragma once
 
 #define BOARD_INFO_NAME "BTT OCTOPUS PRO V1.0"
+
+//
+// M3/M4/M5 - Spindle/Laser Control
+//
+#if HAS_CUTTER && !defined(SPINDLE_LASER_ENA_PIN)
+  #define SPINDLE_LASER_ENA_PIN PG12  // Pullup or pulldown! (Default: Endstop4)
+  #define SPINDLE_LASER_PWM_PIN PD13  // Hardware PWM (Default: Fan3)
+//#define SPINDLE_DIR_PIN           5
+#endif
 
 //
 // Temperature Sensors

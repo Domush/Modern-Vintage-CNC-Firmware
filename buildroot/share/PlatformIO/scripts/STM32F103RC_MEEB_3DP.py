@@ -36,8 +36,8 @@ if pioutil.is_pio_build():
 		if define[0] == "STM32_FLASH_SIZE":
 			flash_size = define[1]
 
-	print('Use the {0:s} address as the mvcnc app entry point.'.format(vect_tab_addr))
+	print('Use the {0:s} address as the marlin app entry point.'.format(vect_tab_addr))
 	print('Use the {0:d}KB flash version of stm32f103rct6 chip.'.format(flash_size))
 
-	import mvcnc
-	mvcnc.custom_ld_script("STM32F103RC_MEEB_3DP.ld")
+	import marlin
+	marlin.custom_ld_script("STM32F103RC_MEEB_3DP.ld")

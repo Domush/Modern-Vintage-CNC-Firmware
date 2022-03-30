@@ -2470,178 +2470,169 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
   float vmax_junction_sqr; // Initial limit on the segment entry velocity (mm/s)^2
 
   #if HAS_JUNCTION_DEVIATION
-    /**
-     * Compute maximum allowable entry speed at junction by centripetal acceleration approximation.
-     * Let a circle be tangent to both previous and current path line segments, where the junction
-     * deviation is defined as the distance from the junction to the closest edge of the circle,
-     * colinear with the circle center. The circular segment joining the two paths represents the
-     * path of centripetal acceleration. Solve for max velocity based on max acceleration about the
-     * radius of the circle, defined indirectly by junction deviation. This may be also viewed as
-     * path width or max_jerk in the previous Grbl version. This approach does not actually deviate
-     * from path, but used as a robust way to compute cornering speeds, as it takes into account the
-     * nonlinearities of both the junction angle and junction velocity.
-     *
-     * NOTE: If the junction deviation value is finite, Grbl executes the motions in an exact path
-     * mode (G61). If the junction deviation value is zero, Grbl will execute the motion in an exact
-     * stop mode (G61.1) manner. In the future, if continuous mode (G64) is desired, the math here
-     * is exactly the same. Instead of motioning all the way to junction point, the machine will
-     * just follow the arc circle defined here. The Arduino doesn't have the CPU cycles to perform
-     * a continuous mode path, but ARM-based microcontrollers most certainly do.
-     *
-     * NOTE: The max junction speed is a fixed value, since machine acceleration limits cannot be
-     * changed dynamically during operation nor can the line move geometry. This must be kept in
-     * memory in the event of a feedrate override changing the nominal speeds of blocks, which can
-     * change the overall maximum entry speed conditions of all blocks.
-     *
-     * #######
-     * https://github.com/Domush/Webber-Ranch-CNC-Firmware/issues/10341#issuecomment-388191754
-     *
-     * hoffbaked: on May 10 2018 tuned and improved the GRBL algorithm for mvCNC:
-          Okay! It seems to be working good. I somewhat arbitrarily cut it off at 1mm
-          on then on anything with less sides than an octagon. With this, and the
-          reverse pass actually recalculating things, a corner acceleration value
-          of 1000 junction deviation of .05 are pretty reasonable. If the cycles
-          can be spared, a better acos could be used. For all I know, it may be
-          already calculated in a different place. */
+  /**
+   * Compute maximum allowable entry speed at junction by centripetal acceleration approximation.
+   * Let a circle be tangent to both previous and current path line segments, where the junction
+   * deviation is defined as the distance from the junction to the closest edge of the circle,
+   * colinear with the circle center. The circular segment joining the two paths represents the
+   * path of centripetal acceleration. Solve for max velocity based on max acceleration about the
+   * radius of the circle, defined indirectly by junction deviation. This may be also viewed as
+   * path width or max_jerk in the previous Grbl version. This approach does not actually deviate
+   * from path, but used as a robust way to compute cornering speeds, as it takes into account the
+   * nonlinearities of both the junction angle and junction velocity.
+   *
+   * NOTE: If the junction deviation value is finite, Grbl executes the motions in an exact path
+   * mode (G61). If the junction deviation value is zero, Grbl will execute the motion in an exact
+   * stop mode (G61.1) manner. In the future, if continuous mode (G64) is desired, the math here
+   * is exactly the same. Instead of motioning all the way to junction point, the machine will
+   * just follow the arc circle defined here. The Arduino doesn't have the CPU cycles to perform
+   * a continuous mode path, but ARM-based microcontrollers most certainly do.
+   *
+   * NOTE: The max junction speed is a fixed value, since machine acceleration limits cannot be
+   * changed dynamically during operation nor can the line move geometry. This must be kept in
+   * memory in the event of a feedrate override changing the nominal speeds of blocks, which can
+   * change the overall maximum entry speed conditions of all blocks.
+   *
+   * #######
+   * https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware/issues/10341#issuecomment-388191754
+   *
+   * hoffbaked: on May 10 2018 tuned and improved the GRBL algorithm for mvCNC:
+        Okay! It seems to be working good. I somewhat arbitrarily cut it off at 1mm
+        on then on anything with less sides than an octagon. With this, and the
+        reverse pass actually recalculating things, a corner acceleration value
+        of 1000 junction deviation of .05 are pretty reasonable. If the cycles
+        can be spared, a better acos could be used. For all I know, it may be
+        already calculated in a different place. */
 
-    // Unit vector of previous path line segment
-    static xyze_float_t prev_unit_vec;
+  // Unit vector of previous path line segment
+  static xyze_float_t prev_unit_vec;
 
-    xyze_float_t unit_vec =
-      #if HAS_DIST_MM_ARG
-        cart_dist_mm
-      #else
-        LOGICAL_AXIS_ARRAY(steps_dist_mm.e, steps_dist_mm.x, steps_dist_mm.y, steps_dist_mm.z, steps_dist_mm.i, steps_dist_mm.j, steps_dist_mm.k)
-      #endif
-    ;
+  xyze_float_t unit_vec =
+  #if HAS_DIST_MM_ARG
+      cart_dist_mm
+  #else
+      LOGICAL_AXIS_ARRAY(steps_dist_mm.e, steps_dist_mm.x, steps_dist_mm.y, steps_dist_mm.z, steps_dist_mm.i, steps_dist_mm.j, steps_dist_mm.k)
+  #endif
+      ;
 
-    /**
-     * On CoreXY the length of the vector [A,B] is SQRT(2) times the length of the head movement vector [X,Y].
-     * So taking Z and E into account, we cannot scale to a unit vector with "inverse_millimeters".
-     * => normalize the complete junction vector.
-     * Elsewise, when needed JD will factor-in the E component
-     */
-    if (ANY(IS_CORE, MARKFORGED_XY, MARKFORGED_YX) || esteps > 0)
-      normalize_junction_vector(unit_vec);  // Normalize with XYZE components
-    else
-      unit_vec *= inverse_millimeters;      // Use pre-calculated (1 / SQRT(x^2 + y^2 + z^2))
+  /**
+   * On CoreXY the length of the vector [A,B] is SQRT(2) times the length of the head movement vector [X,Y].
+   * So taking Z and E into account, we cannot scale to a unit vector with "inverse_millimeters".
+   * => normalize the complete junction vector.
+   * Elsewise, when needed JD will factor-in the E component
+   */
+  if (ANY(IS_CORE, MARKFORGED_XY, MARKFORGED_YX) || esteps > 0)
+    normalize_junction_vector(unit_vec);  // Normalize with XYZE components
+  else
+    unit_vec *= inverse_millimeters;  // Use pre-calculated (1 / SQRT(x^2 + y^2 + z^2))
 
-    // Skip first block or when previous_nominal_speed is used as a flag for homing and offset cycles.
-    if (moves_queued && !UNEAR_ZERO(previous_nominal_speed_sqr)) {
-      // Compute cosine of angle between previous and current path. (prev_unit_vec is negative)
-      // NOTE: Max junction velocity is computed without sin() or acos() by trig half angle identity.
-      float junction_cos_theta = LOGICAL_AXIS_GANG(
-                                 + (-prev_unit_vec.e * unit_vec.e),
-                                   (-prev_unit_vec.x * unit_vec.x),
-                                 + (-prev_unit_vec.y * unit_vec.y),
-                                 + (-prev_unit_vec.z * unit_vec.z),
-                                 + (-prev_unit_vec.i * unit_vec.i),
-                                 + (-prev_unit_vec.j * unit_vec.j),
-                                 + (-prev_unit_vec.k * unit_vec.k)
-                               );
+  // Skip first block or when previous_nominal_speed is used as a flag for homing and offset cycles.
+  if (moves_queued && !UNEAR_ZERO(previous_nominal_speed_sqr)) {
+    // Compute cosine of angle between previous and current path. (prev_unit_vec is negative)
+    // NOTE: Max junction velocity is computed without sin() or acos() by trig half angle identity.
+    float junction_cos_theta = LOGICAL_AXIS_GANG(
+        +(-prev_unit_vec.e * unit_vec.e),
+        (-prev_unit_vec.x * unit_vec.x),
+        +(-prev_unit_vec.y * unit_vec.y),
+        +(-prev_unit_vec.z * unit_vec.z),
+        +(-prev_unit_vec.i * unit_vec.i),
+        +(-prev_unit_vec.j * unit_vec.j),
+        +(-prev_unit_vec.k * unit_vec.k));
 
-      // NOTE: Computed without any expensive trig, sin() or acos(), by trig half angle identity of cos(theta).
-      if (junction_cos_theta > 0.999999f) {
-        // For a 0 degree acute junction, just set minimum junction speed.
-        vmax_junction_sqr = sq(float(MINIMUM_PLANNER_SPEED));
+    // NOTE: Computed without any expensive trig, sin() or acos(), by trig half angle identity of cos(theta).
+    if (junction_cos_theta > 0.999999f) {
+      // For a 0 degree acute junction, just set minimum junction speed.
+      vmax_junction_sqr = sq(float(MINIMUM_PLANNER_SPEED));
+    } else {
+      NOLESS(junction_cos_theta, -0.999999f);  // Check for numerical round-off to avoid divide by zero.
+
+      // Convert delta vector to unit vector
+      xyze_float_t junction_unit_vec = unit_vec - prev_unit_vec;
+      normalize_junction_vector(junction_unit_vec);
+
+      const float junction_acceleration = limit_value_by_axis_maximum(block->acceleration, junction_unit_vec),
+                  sin_theta_d2          = SQRT(0.5f * (1.0f - junction_cos_theta));  // Trig half angle identity. Always positive.
+
+      vmax_junction_sqr = junction_acceleration * junction_deviation_mm * sin_theta_d2 / (1.0f - sin_theta_d2);
+
+  #if ENABLED(JD_HANDLE_SMALL_SEGMENTS)
+
+      // For small moves with >135° junction (octagon) find speed for approximate arc
+      if (block->millimeters < 1 && junction_cos_theta < -0.7071067812f) {
+    #if ENABLED(JD_USE_MATH_ACOS)
+
+      #error "TODO: Inline maths with the MCU / FPU."
+
+    #elif ENABLED(JD_USE_LOOKUP_TABLE)
+
+        // Fast acos approximation (max. error +-0.01 rads)
+        // Based on LUT table and linear interpolation
+
+        /**
+         *  // Generate the JD Lookup Table
+         *  constexpr float c = 1.00751495f; // Correction factor to center error around 0
+         *  for (int i = 0; i < jd_lut_count - 1; ++i) {
+         *    const float x0 = (sq(i) - 1) / sq(i),
+         *                y0 = acos(x0) * (i == 0 ? 1 : c),
+         *                x1 = i < jd_lut_count - 1 ?  0.5 * x0 + 0.5 : 0.999999f,
+         *                y1 = acos(x1) * (i < jd_lut_count - 1 ? c : 1);
+         *    jd_lut_k[i] = (y0 - y1) / (x0 - x1);
+         *    jd_lut_b[i] = (y1 * x0 - y0 * x1) / (x0 - x1);
+         *  }
+         *
+         *  // Compute correction factor (Set c to 1.0f first!)
+         *  float min = INFINITY, max = -min;
+         *  for (float t = 0; t <= 1; t += 0.0003f) {
+         *    const float e = acos(t) / approx(t);
+         *    if (isfinite(e)) {
+         *      if (e < min) min = e;
+         *      if (e > max) max = e;
+         *    }
+         *  }
+         *  fprintf(stderr, "%.9gf, ", (min + max) / 2);
+         */
+        static constexpr int16_t jd_lut_count                 = 16;
+        static constexpr uint16_t jd_lut_tll                  = _BV(jd_lut_count - 1);
+        static constexpr int16_t jd_lut_tll0                  = __builtin_clz(jd_lut_tll) + 1;  // i.e., 16 - jd_lut_count + 1
+        static constexpr float jd_lut_k[jd_lut_count] PROGMEM = {
+            -1.03145837f, -1.30760646f, -1.75205851f, -2.41705704f,
+            -3.37769222f, -4.74888992f, -6.69649887f, -9.45661736f,
+            -13.3640480f, -18.8928222f, -26.7136841f, -37.7754593f,
+            -53.4201813f, -75.5458374f, -106.836761f, -218.532821f};
+        static constexpr float jd_lut_b[jd_lut_count] PROGMEM = {
+            1.57079637f, 1.70887053f, 2.04220939f, 2.62408352f,
+            3.52467871f, 4.85302639f, 6.77020454f, 9.50875854f,
+            13.4009285f, 18.9188995f, 26.7321243f, 37.7885055f,
+            53.4293975f, 75.5523529f, 106.841369f, 218.534011f};
+
+        const float neg = junction_cos_theta < 0 ? -1 : 1,
+                    t   = neg * junction_cos_theta;
+
+        const int16_t idx = (t < 0.00000003f) ? 0 : __builtin_clz(uint16_t((1.0f - t) * jd_lut_tll)) - jd_lut_tll0;
+
+        float junction_theta = t * pgm_read_float(&jd_lut_k[idx]) + pgm_read_float(&jd_lut_b[idx]);
+        if (neg > 0) junction_theta = RADIANS(180) - junction_theta;  // acos(-t)
+
+    #else
+
+        // Fast acos(-t) approximation (max. error +-0.033rad = 1.89°)
+        // Based on MinMax polynomial published by W. Randolph Franklin, see
+        // https://wrf.ecse.rpi.edu/Research/Short_Notes/arcsin/onlyelem.html
+        //  acos( t) = pi / 2 - asin(x)
+        //  acos(-t) = pi - acos(t) ... pi / 2 + asin(x)
+
+        const float neg            = junction_cos_theta < 0 ? -1 : 1,
+                    t              = neg * junction_cos_theta,
+                    asinx          = 0.032843707f + t * (-1.451838349f + t * (29.66153956f + t * (-131.1123477f + t * (262.8130562f + t * (-242.7199627f + t * (84.31466202f)))))),
+                    junction_theta = RADIANS(90) + neg * asinx;  // acos(-t)
+
+            // NOTE: junction_theta bottoms out at 0.033 which avoids divide by 0.
+
+    #endif
+
+        const float limit_sqr = (block->millimeters * junction_acceleration) / junction_theta;
+        NOMORE(vmax_junction_sqr, limit_sqr);
       }
-      else {
-        NOLESS(junction_cos_theta, -0.999999f); // Check for numerical round-off to avoid divide by zero.
-
-        // Convert delta vector to unit vector
-        xyze_float_t junction_unit_vec = unit_vec - prev_unit_vec;
-        normalize_junction_vector(junction_unit_vec);
-
-        const float junction_acceleration = limit_value_by_axis_maximum(block->acceleration, junction_unit_vec),
-                    sin_theta_d2 = SQRT(0.5f * (1.0f - junction_cos_theta)); // Trig half angle identity. Always positive.
-
-        vmax_junction_sqr = junction_acceleration * junction_deviation_mm * sin_theta_d2 / (1.0f - sin_theta_d2);
-
-        #if ENABLED(JD_HANDLE_SMALL_SEGMENTS)
-
-          // For small moves with >135° junction (octagon) find speed for approximate arc
-          if (block->millimeters < 1 && junction_cos_theta < -0.7071067812f) {
-
-            #if ENABLED(JD_USE_MATH_ACOS)
-
-              #error "TODO: Inline maths with the MCU / FPU."
-
-            #elif ENABLED(JD_USE_LOOKUP_TABLE)
-
-              // Fast acos approximation (max. error +-0.01 rads)
-              // Based on LUT table and linear interpolation
-
-              /**
-               *  // Generate the JD Lookup Table
-               *  constexpr float c = 1.00751495f; // Correction factor to center error around 0
-               *  for (int i = 0; i < jd_lut_count - 1; ++i) {
-               *    const float x0 = (sq(i) - 1) / sq(i),
-               *                y0 = acos(x0) * (i == 0 ? 1 : c),
-               *                x1 = i < jd_lut_count - 1 ?  0.5 * x0 + 0.5 : 0.999999f,
-               *                y1 = acos(x1) * (i < jd_lut_count - 1 ? c : 1);
-               *    jd_lut_k[i] = (y0 - y1) / (x0 - x1);
-               *    jd_lut_b[i] = (y1 * x0 - y0 * x1) / (x0 - x1);
-               *  }
-               *
-               *  // Compute correction factor (Set c to 1.0f first!)
-               *  float min = INFINITY, max = -min;
-               *  for (float t = 0; t <= 1; t += 0.0003f) {
-               *    const float e = acos(t) / approx(t);
-               *    if (isfinite(e)) {
-               *      if (e < min) min = e;
-               *      if (e > max) max = e;
-               *    }
-               *  }
-               *  fprintf(stderr, "%.9gf, ", (min + max) / 2);
-               */
-              static constexpr int16_t  jd_lut_count = 16;
-              static constexpr uint16_t jd_lut_tll   = _BV(jd_lut_count - 1);
-              static constexpr int16_t  jd_lut_tll0  = __builtin_clz(jd_lut_tll) + 1; // i.e., 16 - jd_lut_count + 1
-              static constexpr float jd_lut_k[jd_lut_count] PROGMEM = {
-                -1.03145837f, -1.30760646f, -1.75205851f, -2.41705704f,
-                -3.37769222f, -4.74888992f, -6.69649887f, -9.45661736f,
-                -13.3640480f, -18.8928222f, -26.7136841f, -37.7754593f,
-                -53.4201813f, -75.5458374f, -106.836761f, -218.532821f };
-              static constexpr float jd_lut_b[jd_lut_count] PROGMEM = {
-                 1.57079637f,  1.70887053f,  2.04220939f,  2.62408352f,
-                 3.52467871f,  4.85302639f,  6.77020454f,  9.50875854f,
-                 13.4009285f,  18.9188995f,  26.7321243f,  37.7885055f,
-                 53.4293975f,  75.5523529f,  106.841369f,  218.534011f };
-
-              const float neg = junction_cos_theta < 0 ? -1 : 1,
-                          t = neg * junction_cos_theta;
-
-              const int16_t idx = (t < 0.00000003f) ? 0 : __builtin_clz(uint16_t((1.0f - t) * jd_lut_tll)) - jd_lut_tll0;
-
-              float junction_theta = t * pgm_read_float(&jd_lut_k[idx]) + pgm_read_float(&jd_lut_b[idx]);
-              if (neg > 0) junction_theta = RADIANS(180) - junction_theta; // acos(-t)
-
-            #else
-
-              // Fast acos(-t) approximation (max. error +-0.033rad = 1.89°)
-              // Based on MinMax polynomial published by W. Randolph Franklin, see
-              // https://wrf.ecse.rpi.edu/Research/Short_Notes/arcsin/onlyelem.html
-              //  acos( t) = pi / 2 - asin(x)
-              //  acos(-t) = pi - acos(t) ... pi / 2 + asin(x)
-
-              const float neg = junction_cos_theta < 0 ? -1 : 1,
-                          t = neg * junction_cos_theta,
-                          asinx =       0.032843707f
-                                + t * (-1.451838349f
-                                + t * ( 29.66153956f
-                                + t * (-131.1123477f
-                                + t * ( 262.8130562f
-                                + t * (-242.7199627f
-                                + t * ( 84.31466202f ) ))))),
-                          junction_theta = RADIANS(90) + neg * asinx; // acos(-t)
-
-              // NOTE: junction_theta bottoms out at 0.033 which avoids divide by 0.
-
-            #endif
-
-            const float limit_sqr = (block->millimeters * junction_acceleration) / junction_theta;
-            NOMORE(vmax_junction_sqr, limit_sqr);
-          }
 
         #endif // JD_HANDLE_SMALL_SEGMENTS
       }

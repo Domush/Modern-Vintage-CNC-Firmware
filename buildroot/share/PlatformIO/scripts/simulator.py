@@ -13,7 +13,7 @@ if pioutil.is_pio_build():
 	# Give the binary a distinctive name
 	#
 
-	env['PROGNAME'] = "mvCNCSimulator"
+	env['PROGNAME'] = "MarlinSimulator"
 
 	#
 	# If Xcode is installed add the path to its Frameworks folder,

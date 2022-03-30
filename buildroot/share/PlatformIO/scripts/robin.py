@@ -6,9 +6,9 @@
 def prepare(address, ldname, fwname):
 	import pioutil
 	if pioutil.is_pio_build():
-		import mvcnc
+		import marlin
 		def encrypt(source, target, env):
-			mvcnc.encrypt_mks(source, target, env, fwname)
-		mvcnc.relocate_firmware(address)
-		mvcnc.custom_ld_script(ldname)
-		mvcnc.add_post_action(encrypt);
+			marlin.encrypt_mks(source, target, env, fwname)
+		marlin.relocate_firmware(address)
+		marlin.custom_ld_script(ldname)
+		marlin.add_post_action(encrypt);

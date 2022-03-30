@@ -1,7 +1,7 @@
 /**
  * STM32F1: MMCv3/SDv1/SDv2 (SPI mode) control module
  *
- * Copyright (c) 2020 mvCNCFirmware [https://github.com/Domush/Webber-Ranch-CNC-Firmware]
+ * Copyright (c) 2020 mvCNCFirmware [https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware]
  * Copyright (c) 2019 BigTreeTech [https://github.com/bigtreetech]
  * Copyright (C) 2015, ChaN, all right reserved.
  *

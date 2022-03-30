@@ -18,7 +18,7 @@ Import("env")
 # Not tested: If it's safe to install python libraries in PIO python try:
 #    env.Execute(env.subst("$PYTHONEXE -m pip install https://github.com/p3p/pyheatshrink/releases/download/0.3.3/pyheatshrink-pip.zip"))
 
-import mvCNCBinaryProtocol
+import MarlinBinaryProtocol
 
 # Internal debug flag
 Debug = False
@@ -31,9 +31,9 @@ def Upload(source, target, env):
     #------------------#
     # mvCNC functions #
     #------------------#
-    def _GetmvCNCEnv(mvcncEnv, feature):
-        if not mvcncEnv: return None
-        return mvcncEnv[feature] if feature in mvcncEnv else None
+    def _GetMarlinEnv(marlinEnv, feature):
+        if not marlinEnv: return None
+        return marlinEnv[feature] if feature in marlinEnv else None
 
     #----------------#
     # Port functions #
@@ -123,17 +123,17 @@ def Upload(source, target, env):
     filetransfer = None
 
     # Get mvCNC evironment vars
-    mvCNCEnv = env['mvCNC_FEATURES']
-    mvcnc_pioenv = _GetmvCNCEnv(mvCNCEnv, 'PIOENV')
-    mvcnc_motherboard = _GetmvCNCEnv(mvCNCEnv, 'MOTHERBOARD')
-    mvcnc_board_info_name = _GetmvCNCEnv(mvCNCEnv, 'BOARD_INFO_NAME')
-    mvcnc_board_custom_build_flags = _GetmvCNCEnv(mvCNCEnv, 'BOARD_CUSTOM_BUILD_FLAGS')
-    mvcnc_firmware_bin = _GetmvCNCEnv(mvCNCEnv, 'FIRMWARE_BIN')
-    mvcnc_long_filename_host_support = _GetmvCNCEnv(mvCNCEnv, 'LONG_FILENAME_HOST_SUPPORT') is not None
-    mvcnc_longname_write = _GetmvCNCEnv(mvCNCEnv, 'LONG_FILENAME_WRITE_SUPPORT') is not None
-    mvcnc_custom_firmware_upload = _GetmvCNCEnv(mvCNCEnv, 'CUSTOM_FIRMWARE_UPLOAD') is not None
-    mvcnc_short_build_version = _GetmvCNCEnv(mvCNCEnv, 'SHORT_BUILD_VERSION')
-    mvcnc_string_config_h_author = _GetmvCNCEnv(mvCNCEnv, 'STRING_CONFIG_H_AUTHOR')
+    MarlinEnv = env['MARLIN_FEATURES']
+    marlin_pioenv = _GetMarlinEnv(MarlinEnv, 'PIOENV')
+    marlin_motherboard = _GetMarlinEnv(MarlinEnv, 'MOTHERBOARD')
+    marlin_board_info_name = _GetMarlinEnv(MarlinEnv, 'BOARD_INFO_NAME')
+    marlin_board_custom_build_flags = _GetMarlinEnv(MarlinEnv, 'BOARD_CUSTOM_BUILD_FLAGS')
+    marlin_firmware_bin = _GetMarlinEnv(MarlinEnv, 'FIRMWARE_BIN')
+    marlin_long_filename_host_support = _GetMarlinEnv(MarlinEnv, 'LONG_FILENAME_HOST_SUPPORT') is not None
+    marlin_longname_write = _GetMarlinEnv(MarlinEnv, 'LONG_FILENAME_WRITE_SUPPORT') is not None
+    marlin_custom_firmware_upload = _GetMarlinEnv(MarlinEnv, 'CUSTOM_FIRMWARE_UPLOAD') is not None
+    marlin_short_build_version = _GetMarlinEnv(MarlinEnv, 'SHORT_BUILD_VERSION')
+    marlin_string_config_h_author = _GetMarlinEnv(MarlinEnv, 'STRING_CONFIG_H_AUTHOR')
 
     # Get firmware upload params
     upload_firmware_source_name = str(source[0])    # Source firmware filename
@@ -153,33 +153,33 @@ def Upload(source, target, env):
 
     # Set local upload params based on board type to change script behavior
     # "upload_delete_old_bins": delete all *.bin files in the root of SD Card
-    upload_delete_old_bins = mvcnc_motherboard in ['BOARD_CREALITY_V4',   'BOARD_CREALITY_V4210', 'BOARD_CREALITY_V422', 'BOARD_CREALITY_V423',
+    upload_delete_old_bins = marlin_motherboard in ['BOARD_CREALITY_V4',   'BOARD_CREALITY_V4210', 'BOARD_CREALITY_V422', 'BOARD_CREALITY_V423',
                                                     'BOARD_CREALITY_V427', 'BOARD_CREALITY_V431',  'BOARD_CREALITY_V452', 'BOARD_CREALITY_V453',
                                                     'BOARD_CREALITY_V24S1']
     # "upload_random_name": generate a random 8.3 firmware filename to upload
-    upload_random_filename = mvcnc_motherboard in ['BOARD_CREALITY_V4',   'BOARD_CREALITY_V4210', 'BOARD_CREALITY_V422', 'BOARD_CREALITY_V423',
+    upload_random_filename = marlin_motherboard in ['BOARD_CREALITY_V4',   'BOARD_CREALITY_V4210', 'BOARD_CREALITY_V422', 'BOARD_CREALITY_V423',
                                                     'BOARD_CREALITY_V427', 'BOARD_CREALITY_V431',  'BOARD_CREALITY_V452', 'BOARD_CREALITY_V453',
-                                                    'BOARD_CREALITY_V24S1'] and not mvcnc_long_filename_host_support
+                                                    'BOARD_CREALITY_V24S1'] and not marlin_long_filename_host_support
 
     try:
 
         # Start upload job
-        print(f"Uploading firmware '{os.path.basename(upload_firmware_target_name)}' to '{mvcnc_motherboard}' via '{upload_port}'")
+        print(f"Uploading firmware '{os.path.basename(upload_firmware_target_name)}' to '{marlin_motherboard}' via '{upload_port}'")
 
         # Dump some debug info
         if Debug:
             print('Upload using:')
-            print('---- mvCNC -----------------------------------')
-            print(f' PIOENV                      : {mvcnc_pioenv}')
-            print(f' SHORT_BUILD_VERSION         : {mvcnc_short_build_version}')
-            print(f' STRING_CONFIG_H_AUTHOR      : {mvcnc_string_config_h_author}')
-            print(f' MOTHERBOARD                 : {mvcnc_motherboard}')
-            print(f' BOARD_INFO_NAME             : {mvcnc_board_info_name}')
-            print(f' CUSTOM_BUILD_FLAGS          : {mvcnc_board_custom_build_flags}')
-            print(f' FIRMWARE_BIN                : {mvcnc_firmware_bin}')
-            print(f' LONG_FILENAME_HOST_SUPPORT  : {mvcnc_long_filename_host_support}')
-            print(f' LONG_FILENAME_WRITE_SUPPORT : {mvcnc_longname_write}')
-            print(f' CUSTOM_FIRMWARE_UPLOAD      : {mvcnc_custom_firmware_upload}')
+            print('---- Marlin -----------------------------------')
+            print(f' PIOENV                      : {marlin_pioenv}')
+            print(f' SHORT_BUILD_VERSION         : {marlin_short_build_version}')
+            print(f' STRING_CONFIG_H_AUTHOR      : {marlin_string_config_h_author}')
+            print(f' MOTHERBOARD                 : {marlin_motherboard}')
+            print(f' BOARD_INFO_NAME             : {marlin_board_info_name}')
+            print(f' CUSTOM_BUILD_FLAGS          : {marlin_board_custom_build_flags}')
+            print(f' FIRMWARE_BIN                : {marlin_firmware_bin}')
+            print(f' LONG_FILENAME_HOST_SUPPORT  : {marlin_long_filename_host_support}')
+            print(f' LONG_FILENAME_WRITE_SUPPORT : {marlin_longname_write}')
+            print(f' CUSTOM_FIRMWARE_UPLOAD      : {marlin_custom_firmware_upload}')
             print('---- Upload parameters ------------------------')
             print(f' Source                      : {upload_firmware_source_name}')
             print(f' Target                      : {upload_firmware_target_name}')
@@ -196,13 +196,13 @@ def Upload(source, target, env):
         # Generate a new 8.3 random filename
         if upload_random_filename:
             upload_firmware_target_name = f"fw-{''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=5))}.BIN"
-            print(f"Board {mvcnc_motherboard}: Overriding firmware filename to '{upload_firmware_target_name}'")
+            print(f"Board {marlin_motherboard}: Overriding firmware filename to '{upload_firmware_target_name}'")
 
         # Delete all *.bin files on the root of SD Card (if flagged)
         if upload_delete_old_bins:
             # CUSTOM_FIRMWARE_UPLOAD is needed for this feature
-            if not mvcnc_custom_firmware_upload:
-                raise Exception(f"CUSTOM_FIRMWARE_UPLOAD must be enabled in 'Configuration_adv.h' for '{mvcnc_motherboard}'")
+            if not marlin_custom_firmware_upload:
+                raise Exception(f"CUSTOM_FIRMWARE_UPLOAD must be enabled in 'Configuration_adv.h' for '{marlin_motherboard}'")
 
             # Init serial port
             port = serial.Serial(upload_port, baudrate = upload_speed, write_timeout = 0, timeout = 0.1)
@@ -212,13 +212,13 @@ def Upload(source, target, env):
             _CheckSDCard()
 
             # Get firmware files
-            FirmwareFiles = _GetFirmwareFiles(mvcnc_long_filename_host_support)
+            FirmwareFiles = _GetFirmwareFiles(marlin_long_filename_host_support)
             if Debug:
                 for FirmwareFile in FirmwareFiles:
                     print(f'Found: {FirmwareFile}')
 
             # Get all 1st level firmware files (to remove)
-            OldFirmwareFiles = _FilterFirmwareFiles(FirmwareFiles[1:len(FirmwareFiles)-2], mvcnc_long_filename_host_support)   # Skip header and footers of list
+            OldFirmwareFiles = _FilterFirmwareFiles(FirmwareFiles[1:len(FirmwareFiles)-2], marlin_long_filename_host_support)   # Skip header and footers of list
             if len(OldFirmwareFiles) == 0:
                 print('No old firmware files to delete')
             else:
@@ -237,10 +237,10 @@ def Upload(source, target, env):
 
         # Upload firmware file
         if Debug: print(f"Copy '{upload_firmware_source_name}' --> '{upload_firmware_target_name}'")
-        protocol = mvCNCBinaryProtocol.Protocol(upload_port, upload_speed, upload_blocksize, float(upload_error_ratio), int(upload_timeout))
-        #echologger = mvCNCBinaryProtocol.EchoProtocol(protocol)
+        protocol = MarlinBinaryProtocol.Protocol(upload_port, upload_speed, upload_blocksize, float(upload_error_ratio), int(upload_timeout))
+        #echologger = MarlinBinaryProtocol.EchoProtocol(protocol)
         protocol.connect()
-        filetransfer = mvCNCBinaryProtocol.FileTransferProtocol(protocol)
+        filetransfer = MarlinBinaryProtocol.FileTransferProtocol(protocol)
         filetransfer.copy(upload_firmware_source_name, upload_firmware_target_name, upload_compression, upload_test)
         protocol.disconnect()
 
@@ -272,7 +272,7 @@ def Upload(source, target, env):
         print(f'Serial excepion: {se}')
         raise Exception(se)
 
-    except mvCNCBinaryProtocol.FatalError:
+    except MarlinBinaryProtocol.FatalError:
         if port: port.close()
         if protocol: protocol.shutdown()
         print('Too many retries, Abort')

@@ -1,6 +1,6 @@
 /**
  * Modern Vintage CNC Firmware
- * Copyright (c) 2021 mvCNCFirmware [https://github.com/Domush/Webber-Ranch-CNC-Firmware]
+ * Copyright (c) 2021 mvCNCFirmware [https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware]
  *
  * Based on Marlin and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -25,7 +25,7 @@
 
 #define HAS_OTG_USB_HOST_SUPPORT                  // USB Flash Drive support
 #define USES_DIAG_JUMPERS
-//#define DIAG_JUMPERS_REMOVED // enable this if you don't use SENSORLESS_HOMING and removed the DIAG jumpers from the board.
+#define DIAG_JUMPERS_REMOVED  // enable this if you don't use SENSORLESS_HOMING and removed the DIAG jumpers from the board.
 
 // Onboard I2C EEPROM
 #define I2C_EEPROM
@@ -46,17 +46,14 @@
 //
 #define LED_PIN                             PA13
 
-//
-// Trinamic Stallguard pins
-//
-#define X_DIAG_PIN                          PG6   // X-STOP
-#define Y_DIAG_PIN                          PG9   // Y-STOP
-#define Z_DIAG_PIN                          PG10  // Z-STOP
-#define Z2_DIAG_PIN                         PG11  // Z2-STOP
-#define E0_DIAG_PIN                         PG12  // E0DET
-#define E1_DIAG_PIN                         PG13  // E1DET
-#define E2_DIAG_PIN                         PG14  // E2DET
-#define E3_DIAG_PIN                         PG15  // E3DET
+#define ENDSTOP0 PG6   // X-MIN
+#define ENDSTOP1 PG9   // Y-MIN
+#define ENDSTOP2 PG10  // Y2-MIN
+#define ENDSTOP3 PG11  // Z-MAX
+#define ENDSTOP4 PG12  //
+#define ENDSTOP5 PG13  //
+#define ENDSTOP6 PG14  //
+#define ENDSTOP7 PG15  //
 
 //
 // Z Probe (when not Z_MIN_PIN)
@@ -86,70 +83,62 @@
 // Limit Switches
 //
 #ifdef X_STALL_SENSITIVITY
-  #define X_STOP_PIN                  X_DIAG_PIN
+  #define X_STOP_PIN ENDSTOP0
   #if X_HOME_TO_MIN
-    #define X_MAX_PIN                E0_DIAG_PIN  // E0DET
+    #define X_MAX_PIN ENDSTOP4  //
   #else
-    #define X_MIN_PIN                E0_DIAG_PIN  // E0DET
+    #define X_MIN_PIN ENDSTOP4  //
   #endif
 #elif EITHER(DUAL_X_CARRIAGE, NEEDS_X_MINMAX)
   #ifndef X_MIN_PIN
-    #define X_MIN_PIN                 X_DIAG_PIN  // X-STOP
+    #define X_MIN_PIN ENDSTOP0  // X-STOP
   #endif
   #ifndef X_MAX_PIN
-    #define X_MAX_PIN                E0_DIAG_PIN  // E0DET
+    #define X_MAX_PIN ENDSTOP4  //
   #endif
 #else
-  #define X_STOP_PIN                  X_DIAG_PIN  // X-STOP
+  #define X_STOP_PIN ENDSTOP0  // X-STOP
 #endif
 
 #ifdef Y_STALL_SENSITIVITY
-  #define Y_STOP_PIN                  Y_DIAG_PIN
+  #define Y_STOP_PIN ENDSTOP1
   #if Y_HOME_TO_MIN
-    #define Y_MAX_PIN                E1_DIAG_PIN  // E1DET
+    #define Y_MAX_PIN ENDSTOP5  //
   #else
-    #define Y_MIN_PIN                E1_DIAG_PIN  // E1DET
+    #define Y_MIN_PIN ENDSTOP5  //
   #endif
 #elif NEEDS_Y_MINMAX
   #ifndef Y_MIN_PIN
-    #define Y_MIN_PIN                 Y_DIAG_PIN  // Y-STOP
+    #define Y_MIN_PIN ENDSTOP1  // Y-STOP
   #endif
   #ifndef Y_MAX_PIN
-    #define Y_MAX_PIN                E1_DIAG_PIN  // E1DET
+    #define Y_MAX_PIN ENDSTOP5  //
   #endif
 #else
-  #define Y_STOP_PIN                  Y_DIAG_PIN  // Y-STOP
+  #define Y_STOP_PIN ENDSTOP1  // Y-STOP
 #endif
 
 #ifdef Z_STALL_SENSITIVITY
-  #define Z_STOP_PIN                  Z_DIAG_PIN
+  #define Z_STOP_PIN ENDSTOP2
   #if Z_HOME_TO_MIN
-    #define Z_MAX_PIN                E2_DIAG_PIN  // PWRDET
+    #define Z_MAX_PIN ENDSTOP6  //
   #else
-    #define Z_MIN_PIN                E2_DIAG_PIN  // PWRDET
+    #define Z_MIN_PIN ENDSTOP6  //
   #endif
 #elif NEEDS_Z_MINMAX
   #ifndef Z_MIN_PIN
-    #define Z_MIN_PIN                 Z_DIAG_PIN  // Z-STOP
+    #define Z_MIN_PIN ENDSTOP2  // Z-STOP
   #endif
   #ifndef Z_MAX_PIN
-    #define Z_MAX_PIN                E2_DIAG_PIN  // PWRDET
+    #define Z_MAX_PIN ENDSTOP6  //
   #endif
 #else
-  #define Z_STOP_PIN                  Z_DIAG_PIN  // Z-STOP
+  #define Z_STOP_PIN ENDSTOP2  // Z-STOP
 #endif
 
 #undef NEEDS_X_MINMAX
 #undef NEEDS_Y_MINMAX
 #undef NEEDS_Z_MINMAX
-
-//
-// Filament Runout Sensor
-//
-#define FIL_RUNOUT_PIN                      PG12  // E0DET
-#define FIL_RUNOUT2_PIN                     PG13  // E1DET
-#define FIL_RUNOUT3_PIN                     PG14  // E2DET
-#define FIL_RUNOUT4_PIN                     PG15  // E3DET
 
 //
 // Power Supply Control
@@ -175,54 +164,53 @@
   #define X_CS_PIN                          PC4
 #endif
 
-#define Y_STEP_PIN                          PG0   // MOTOR 1
-#define Y_DIR_PIN                           PG1
-#define Y_ENABLE_PIN                        PF15
+#define X2_STEP_PIN   PG0  // MOTOR 1
+#define X2_DIR_PIN    PG1
+#define X2_ENABLE_PIN PF15
+#ifndef X2_CS_PIN
+  #define X2_CS_PIN PD11
+#endif
+
+#define Y_STEP_PIN   PF11  // MOTOR 2
+#define Y_DIR_PIN    PG3
+#define Y_ENABLE_PIN PG5
 #ifndef Y_CS_PIN
-  #define Y_CS_PIN                          PD11
+  #define Y_CS_PIN PC6
 #endif
 
-#define Z_STEP_PIN                          PF11  // MOTOR 2
-#define Z_DIR_PIN                           PG3
-#define Z_ENABLE_PIN                        PG5
+#define Y2_STEP_PIN   PG4  // MOTOR 3
+#define Y2_DIR_PIN    PC1
+#define Y2_ENABLE_PIN PA0
+#ifndef Y2_CS_PIN
+  #define Y2_CS_PIN PC7
+#endif
+
+#define Z_STEP_PIN   PF9  // MOTOR 4
+#define Z_DIR_PIN    PF10
+#define Z_ENABLE_PIN PG2
 #ifndef Z_CS_PIN
-  #define Z_CS_PIN                          PC6
+  #define Z_CS_PIN PF2
 #endif
 
-#define Z2_STEP_PIN                         PG4   // MOTOR 3
-#define Z2_DIR_PIN                          PC1
-#define Z2_ENABLE_PIN                       PA0
+#define Z2_STEP_PIN   PC13  // MOTOR 5
+#define Z2_DIR_PIN    PF0
+#define Z2_ENABLE_PIN PF1
 #ifndef Z2_CS_PIN
-  #define Z2_CS_PIN                         PC7
+  #define Z2_CS_PIN PE4
 #endif
 
-#define E0_STEP_PIN                         PF9   // MOTOR 4
-#define E0_DIR_PIN                          PF10
-#define E0_ENABLE_PIN                       PG2
-#ifndef E0_CS_PIN
-  #define E0_CS_PIN                         PF2
+#define I_STEP_PIN   PE2  // MOTOR 6
+#define I_DIR_PIN    PE3
+#define I_ENABLE_PIN PD4
+#ifndef I_CS_PIN
+  #define I_CS_PIN PE1
 #endif
 
-#define E1_STEP_PIN                         PC13  // MOTOR 5
-#define E1_DIR_PIN                          PF0
-#define E1_ENABLE_PIN                       PF1
-#ifndef E1_CS_PIN
-  #define E1_CS_PIN                         PE4
-#endif
-
-#define E2_STEP_PIN                         PE2   // MOTOR 6
-#define E2_DIR_PIN                          PE3
-#define E2_ENABLE_PIN                       PD4
-#ifndef E2_CS_PIN
-
-  #define E2_CS_PIN                         PE1
-#endif
-
-#define E3_STEP_PIN                         PE6   // MOTOR 7
-#define E3_DIR_PIN                          PA14
-#define E3_ENABLE_PIN                       PE0
-#ifndef E3_CS_PIN
-  #define E3_CS_PIN                         PD3
+#define J_STEP_PIN   PE6  // MOTOR 7
+#define J_DIR_PIN    PA14
+#define J_ENABLE_PIN PE0
+#ifndef J_CS_PIN
+  #define J_CS_PIN PD3
 #endif
 
 //
@@ -243,11 +231,15 @@
 #define HEATER_3_PIN                        PB11  // Heater3
 
 #define FAN_PIN                             PA8   // Fan0
-#define FAN1_PIN                            PE5   // Fan1
-#define FAN2_PIN                            PD12  // Fan2
-#define FAN3_PIN                            PD13  // Fan3
-#define FAN4_PIN                            PD14  // Fan4
-#define FAN5_PIN                            PD15  // Fan5
+// #define FAN1_PIN                            PE5   // Fan1
+// #define FAN2_PIN                            PD12  // Fan2
+// #define FAN3_PIN                            PD13  // Fan3
+// #define FAN4_PIN                            PD14  // Fan4
+// #define FAN5_PIN                            PD15  // Fan5
+
+#if ENABLED(WII_NUNCHUCK) && !defined(WII_EN_PIN)
+//#define WII_EN_PIN                        ENDSTOP5 // Default: Endstop5
+#endif
 
 //
 // SD Support

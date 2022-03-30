@@ -41,7 +41,7 @@ Getting Help
     The mvCNC Discussion Forum is a great place to get help from other mvCNC
     users who may have experienced similar issues to your own.
 
-  - https://github.com/Domush/Webber-Ranch-CNC-Firmware/issues
+  - https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware/issues
     With a free GitHub account you can provide us with feedback, bug reports,
     and feature requests via the mvCNC Issue Queue.
 

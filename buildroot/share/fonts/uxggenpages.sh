@@ -50,7 +50,7 @@ mkdir -p "${DN_DATA}"
 
 FONTHOME=/usr/share/fonts
 
-FN_FONT_BASE="mvcnc-6x12-3"
+FN_FONT_BASE="marlin-6x12-3"
 #FN_FONT_BASE=unifont
 #FN_FONT_BASE=wenquanyi_12pt
 #FN_FONT_BASE=wenquanyi_9pt

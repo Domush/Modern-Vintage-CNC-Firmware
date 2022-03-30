@@ -7,7 +7,7 @@
 #
 import pioutil
 if pioutil.is_pio_build():
-	import os,shutil,mvcnc
+	import os,shutil,marlin
 	from SCons.Script import DefaultEnvironment
 	from platformio import util
 
@@ -53,4 +53,4 @@ if pioutil.is_pio_build():
 	source_dir = os.path.join("buildroot/share/PlatformIO/variants", variant)
 	assert os.path.isdir(source_dir)
 
-	mvcnc.copytree(source_dir, variant_dir)
+	marlin.copytree(source_dir, variant_dir)

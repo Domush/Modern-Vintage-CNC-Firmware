@@ -6,13 +6,13 @@
 #
 import pioutil
 if pioutil.is_pio_build():
-	import mvcnc
-	board = mvcnc.env.BoardConfig()
+	import marlin
+	board = marlin.env.BoardConfig()
 
 	address = board.get("build.address", "")
 	if address:
-		mvcnc.relocate_firmware(address)
+		marlin.relocate_firmware(address)
 
 	ldscript = board.get("build.ldscript", "")
 	if ldscript:
-		mvcnc.custom_ld_script(ldscript)
+		marlin.custom_ld_script(ldscript)

@@ -3,7 +3,7 @@
 # build_all_examples base_branch [resume_point]
 #
 
-GITREPO=https://github.com/mvCNCFirmware/Configurations.git
+GITREPO=https://github.com/MarlinFirmware/Configurations.git
 STAT_FILE=./.pio/.buildall
 
 # Check dependencies

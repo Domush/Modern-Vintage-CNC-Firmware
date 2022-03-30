@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------
-/ * Copyright (c) 2020 mvCNCFirmware [https://github.com/Domush/Webber-Ranch-CNC-Firmware]
+/ * Copyright (c) 2020 mvCNCFirmware [https://github.com/Domush/mvCNC-Modern-Vintage-CNC-Firmware]
 / * Copyright (c) 2019 BigTreeTech [https://github.com/bigtreetech]
 / * Low level disk interface module include file   (C)ChaN, 2015
 /-----------------------------------------------------------------------*/

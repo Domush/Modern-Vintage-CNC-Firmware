@@ -52,14 +52,14 @@ if pioutil.is_pio_build():
 		if 'PIOENV' not in env:
 			raise SystemExit("Error: PIOENV is not defined. This script is intended to be used with PlatformIO")
 
-		if 'mvCNC_FEATURES' not in env:
+		if 'MARLIN_FEATURES' not in env:
 			raise SystemExit("Error: this script should be used after common mvCNC scripts")
 
-		if 'MOTHERBOARD' not in env['mvCNC_FEATURES']:
+		if 'MOTHERBOARD' not in env['MARLIN_FEATURES']:
 			raise SystemExit("Error: MOTHERBOARD is not defined in Configuration.h")
 
 		build_env = env['PIOENV']
-		motherboard = env['mvCNC_FEATURES']['MOTHERBOARD']
+		motherboard = env['MARLIN_FEATURES']['MOTHERBOARD']
 		board_envs = get_envs_for_board(motherboard)
 		config = env.GetProjectConfig()
 		result = check_envs("env:"+build_env, board_envs, config)
@@ -89,7 +89,7 @@ if pioutil.is_pio_build():
 		#
 		# Rebuild 'settings.cpp' for EEPROM_INIT_NOW
 		#
-		if 'EEPROM_INIT_NOW' in env['mvCNC_FEATURES']:
+		if 'EEPROM_INIT_NOW' in env['MARLIN_FEATURES']:
 			setfile = os.path.join(srcpath, "module", "settings.cpp.o")
 			if os.path.exists(setfile):
 				os.remove(setfile)

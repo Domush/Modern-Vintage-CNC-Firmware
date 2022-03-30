@@ -58,16 +58,16 @@ def compute_build_signature(env):
 	for header in files_to_keep:
 		hashes += get_file_sha256sum(header)[0:10]
 
-	mvcnc_json = os.path.join(build_dir, 'mvcnc_config.json')
-	mvcnc_zip = os.path.join(build_dir, 'mc')
+	marlin_json = os.path.join(build_dir, 'marlin_config.json')
+	marlin_zip = os.path.join(build_dir, 'mc')
 
 	# Read existing config file
 	try:
-		with open(mvcnc_json, 'r') as infile:
+		with open(marlin_json, 'r') as infile:
 			conf = json.load(infile)
 			if conf['__INITIAL_HASH'] == hashes:
 				# Same configuration, skip recomputing the building signature
-				compress_file(mvcnc_json, mvcnc_zip)
+				compress_file(marlin_json, marlin_zip)
 				return
 	except:
 		pass
@@ -155,11 +155,11 @@ def compute_build_signature(env):
 	except:
 		pass
 
-	with open(mvcnc_json, 'w') as outfile:
+	with open(marlin_json, 'w') as outfile:
 		json.dump(data, outfile, separators=(',', ':'))
 
 	# Compress the JSON file as much as we can
-	compress_file(mvcnc_json, mvcnc_zip)
+	compress_file(marlin_json, marlin_zip)
 
 	# Generate a C source file for storing this array
 	with open('mvCNC/src/mczip.h','wb') as result_file:

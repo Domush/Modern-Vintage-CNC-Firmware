@@ -6,7 +6,7 @@
 
 #include "../mvCNCCore.h" // for jobIsPaused
 
-#if LED_POWEROFF_TIMEOUT > 0 || BOTH(HAS_WIRED_LCD, PRINTER_EVENT_LEDS)
+#if LED_POWEROFF_TIMEOUT > 0 || BOTH(HAS_WIRED_LCD, CNC_EVENT_LEDS)
   #include "../feature/leds/leds.h"
 #endif
 
@@ -661,13 +661,13 @@ void mvCNCUI::init() {
     TERN_(HAS_MVCNCUI_MENU, return_to_status());
 
     // RED ALERT. RED ALERT.
-    #if ENABLED(PRINTER_EVENT_LEDS)
-      leds.set_color(LEDColorRed());
-      #ifdef NEOPIXEL_BKGD_INDEX_FIRST
-        neo.set_background_color(255, 0, 0, 0);
-        neo.show();
-      #endif
+  #if ENABLED(CNC_EVENT_LEDS)
+    leds.set_color(LEDColorRed());
+    #ifdef NEOPIXEL_BKGD_INDEX_FIRST
+    neo.set_background_color(255, 0, 0, 0);
+    neo.show();
     #endif
+  #endif
 
     draw_kill_screen();
   }

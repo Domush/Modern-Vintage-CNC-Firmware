@@ -143,7 +143,7 @@
   #include "../feature/e_parser.h"
 #endif
 
-#if ENABLED(PRINTER_EVENT_LEDS)
+#if ENABLED(CNC_EVENT_LEDS)
   #include "../feature/leds/cnc_event_leds.h"
 #endif
 
@@ -622,7 +622,7 @@ volatile bool Thermals::raw_temps_ready = false;
     long bias = GHV(MAX_CHAMBER_POWER, MAX_BED_POWER, PID_MAX) >> 1, d = bias;
     SHV(bias);
 
-    #if ENABLED(PRINTER_EVENT_LEDS)
+    #if ENABLED(CNC_EVENT_LEDS)
       const celsius_float_t start_temp = GHV(degChamber(), degBed(), degHotend(heater_id));
       LEDColor color = ONHEATINGSTART();
     #endif
@@ -643,7 +643,7 @@ volatile bool Thermals::raw_temps_ready = false;
         NOLESS(maxT, current_temp);
         NOMORE(minT, current_temp);
 
-        #if ENABLED(PRINTER_EVENT_LEDS)
+        #if ENABLED(CNC_EVENT_LEDS)
           ONHEATING(start_temp, current_temp, target);
         #endif
 
@@ -787,7 +787,7 @@ volatile bool Thermals::raw_temps_ready = false;
         if (set_result)
           GHV(_set_chamber_pid(tune_pid), _set_bed_pid(tune_pid), _set_hotend_pid(heater_id, tune_pid));
 
-        TERN_(PRINTER_EVENT_LEDS, cncEventLEDs.onPidTuningDone(color));
+        TERN_(CNC_EVENT_LEDS, cncEventLEDs.onPidTuningDone(color));
 
         TERN_(EXTENSIBLE_UI, ExtUI::onPidTuning(ExtUI::result_t::PID_DONE));
         TERN_(DWIN_CREALITY_LCD_ENHANCED, DWIN_PidTuning(PID_DONE));
@@ -805,7 +805,7 @@ volatile bool Thermals::raw_temps_ready = false;
 
     disable_all_heaters();
 
-    TERN_(PRINTER_EVENT_LEDS, cncEventLEDs.onPidTuningDone(color));
+    TERN_(CNC_EVENT_LEDS, cncEventLEDs.onPidTuningDone(color));
 
     TERN_(EXTENSIBLE_UI, ExtUI::onPidTuning(ExtUI::result_t::PID_DONE));
     TERN_(DWIN_CREALITY_LCD_ENHANCED, DWIN_PidTuning(PID_DONE));
@@ -3693,7 +3693,7 @@ void Thermals::isr() {
         KEEPALIVE_STATE(NOT_BUSY);
       #endif
 
-      #if ENABLED(PRINTER_EVENT_LEDS)
+      #if ENABLED(CNC_EVENT_LEDS)
         const celsius_float_t start_temp = degHotend(target_extruder);
         cncEventLEDs.onHotendHeatingStart();
       #endif
@@ -3731,7 +3731,7 @@ void Thermals::isr() {
 
         const celsius_float_t temp = degHotend(target_extruder);
 
-        #if ENABLED(PRINTER_EVENT_LEDS)
+        #if ENABLED(CNC_EVENT_LEDS)
           // Gradually change LED strip from violet to red as nozzle heats up
           if (!wants_to_cool) cncEventLEDs.onHotendHeating(start_temp, temp, target_temp);
         #endif
@@ -3783,7 +3783,7 @@ void Thermals::isr() {
         #else
           ui.reset_status();
         #endif
-        TERN_(PRINTER_EVENT_LEDS, cncEventLEDs.onHeatingDone());
+        TERN_(CNC_EVENT_LEDS, cncEventLEDs.onHeatingDone());
         return true;
       }
 
@@ -3829,7 +3829,7 @@ void Thermals::isr() {
         KEEPALIVE_STATE(NOT_BUSY);
       #endif
 
-      #if ENABLED(PRINTER_EVENT_LEDS)
+      #if ENABLED(CNC_EVENT_LEDS)
         const celsius_float_t start_temp = degBed();
         cncEventLEDs.onBedHeatingStart();
       #endif
@@ -3867,7 +3867,7 @@ void Thermals::isr() {
 
         const celsius_float_t temp = degBed();
 
-        #if ENABLED(PRINTER_EVENT_LEDS)
+        #if ENABLED(CNC_EVENT_LEDS)
           // Gradually change LED strip from blue to violet as bed heats up
           if (!wants_to_cool) cncEventLEDs.onBedHeating(start_temp, temp, target_temp);
         #endif

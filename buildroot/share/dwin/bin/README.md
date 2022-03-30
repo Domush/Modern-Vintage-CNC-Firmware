@@ -18,7 +18,7 @@ This folder includes two useful scripts, one to convert JPEG images into ICO fil
 
 ### splitIco.py
 
-The `splitIco.py` script reads an ICO file and extracts the component JPEG images, saving them in a new folder. Each icon is named by its index in the ICO, also using symbol names from Marlin's `dwin.h` header file for the display.
+The `splitIco.py` script reads an ICO file and extracts the component JPEG images, saving them in a new folder. Each icon is named by its index in the ICO, also using symbol names from mvCNC's `dwin.h` header file for the display.
 
 ### makeIco.py
 

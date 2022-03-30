@@ -38,9 +38,9 @@
             "request": "launch",
             "type": "cppdbg",
             "cwd": "${workspaceRoot}",
-            //"program": ".pio/build/simulator_linux_debug/mvCNCSimulator",
-            //"program": ".pio/build/simulator_windows/mvCNCSimulator",
-            "program": ".pio/build/simulator_macos_debug/mvCNCSimulator",
+            //"program": ".pio/build/simulator_linux_debug/MarlinSimulator",
+            //"program": ".pio/build/simulator_windows/MarlinSimulator",
+            "program": ".pio/build/simulator_macos_debug/MarlinSimulator",
             "miDebuggerPath": "/opt/local/bin/ggdb",
             "MIMode": "gdb"
         }

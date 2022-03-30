@@ -19,7 +19,7 @@ GCodeQueue queue;
 #include "../mvCNCCore.h"
 #include "../core/bug_on.h"
 
-#if ENABLED(PRINTER_EVENT_LEDS)
+#if ENABLED(CNC_EVENT_LEDS)
   #include "../feature/leds/cnc_event_leds.h"
 #endif
 

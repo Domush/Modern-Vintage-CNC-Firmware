@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Create a Configuration from mvcnc_config.json
+# Create a Configuration from marlin_config.json
 #
 import json
 import sys
@@ -11,7 +11,7 @@ opt_output = '--opt' in sys.argv
 output_suffix = '.sh' if opt_output else '' if '--bare-output' in sys.argv else '.gen'
 
 try:
-	with open('mvcnc_config.json', 'r') as infile:
+	with open('marlin_config.json', 'r') as infile:
 		conf = json.load(infile)
 		for key in conf:
 			# We don't care about the hash when restoring here
@@ -66,4 +66,4 @@ try:
 
 			print('Output configuration written to: ' + 'mvCNC/' + key + output_suffix)
 except:
-	print('No mvcnc_config.json found.')
+	print('No marlin_config.json found.')

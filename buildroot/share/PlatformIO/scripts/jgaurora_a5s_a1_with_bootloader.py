@@ -4,7 +4,7 @@
 #
 import pioutil
 if pioutil.is_pio_build():
-	import os,mvcnc
+	import os,marlin
 	# Append ${PROGNAME}.bin firmware after bootloader and save it as 'jgaurora_firmware.bin'
 	def addboot(source, target, env):
 		firmware = open(target[0].path, "rb")
@@ -37,4 +37,4 @@ if pioutil.is_pio_build():
 		os.rename(target[0].path, firmware_without_bootloader_bin)
 		#os.rename(target[0].dir.path+'/firmware_with_bootloader.bin', target[0].dir.path+'/firmware.bin')
 
-	mvcnc.add_post_action(addboot);
+	marlin.add_post_action(addboot);

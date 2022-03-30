@@ -9,7 +9,7 @@ if pioutil.is_pio_build():
 
 	Import("env")
 
-	mf = env["mvCNC_FEATURES"]
+	mf = env["MARLIN_FEATURES"]
 	rxBuf = mf["RX_BUFFER_SIZE"] if "RX_BUFFER_SIZE" in mf else "0"
 	txBuf = mf["TX_BUFFER_SIZE"] if "TX_BUFFER_SIZE" in mf else "0"
 

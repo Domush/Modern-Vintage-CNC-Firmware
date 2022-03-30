@@ -4,16 +4,16 @@
 #
 # Print the following info about the working copy:
 #
-#   - Remote (upstream) Org name (mvCNCFirmware)
+#   - Remote (upstream) Org name (MarlinFirmware)
 #   - Remote (origin) Org name (your Github username)
-#   - Repo Name (mvCNC, mvCNCDocumentation)
+#   - Repo Name (Marlin, MarlinDocumentation)
 #   - PR Target branch (e.g., bugfix-2.0.x)
 #   - Branch Arg (the branch argument or current branch)
 #   - Current Branch
 #
 # Example output
 #   > mfinfo -q ongoing
-#   mvCNCFirmware john.doe mvCNC bugfix-2.0.x ongoing bugfix-2.0.x -q
+#   MarlinFirmware john.doe Marlin bugfix-2.0.x ongoing bugfix-2.0.x -q
 #
 
 CURR=$(git branch 2>/dev/null | grep ^* | sed 's/\* //g')
@@ -24,7 +24,7 @@ REPO=$(git remote get-url upstream 2>/dev/null | sed -E 's/.*\/(.*)\.git/\1/')
 [[ -z $REPO ]] && { echo "`basename $0`: No 'upstream' remote found. (Did you run mfinit?)" 1>&2 ; exit 1; }
 
 ORG=$(git remote get-url upstream 2>/dev/null | sed -E 's/.*[\/:](.*)\/.*$/\1/')
-[[ $ORG == mvCNCFirmware ]] || { echo "`basename $0`: Not a mvCNC repository." 1>&2 ; exit 1; }
+[[ $ORG == MarlinFirmware ]] || { echo "`basename $0`: Not a Marlin repository." 1>&2 ; exit 1; }
 
 FORK=$(git remote get-url origin 2>/dev/null | sed -E 's/.*[\/:](.*)\/.*$/\1/')
 
@@ -55,10 +55,10 @@ while [[ $# -gt 0 ]]; do
 done
 
 case "$REPO" in
-  mvCNC              ) TARG=bugfix-2.0.x ; ((INDEX == 1)) && TARG=bugfix-1.1.x ; [[ $BRANCH =~ ^[12]$ ]] && USAGE=1 ;;
+  Marlin              ) TARG=bugfix-2.0.x ; ((INDEX == 1)) && TARG=bugfix-1.1.x ; [[ $BRANCH =~ ^[12]$ ]] && USAGE=1 ;;
   Configurations      ) TARG=import-2.0.x ;;
-  mvCNCDocumentation ) TARG=master ;;
-  AutoBuildmvCNC     ) TARG=master ;;
+  MarlinDocumentation ) TARG=master ;;
+  AutoBuildMarlin     ) TARG=master ;;
 esac
 
 [[ $USAGE == 1 ]] && { echo "usage: `basename $0` [1|2] [branch]" 1>&2 ; exit 1 ; }
